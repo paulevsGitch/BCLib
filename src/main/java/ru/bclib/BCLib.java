@@ -1,6 +1,8 @@
 package ru.bclib;
 
+import net.fabricmc.api.EnvType;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.loader.api.FabricLoader;
 import ru.bclib.util.Logger;
 
 public class BCLib implements ModInitializer {
@@ -9,4 +11,12 @@ public class BCLib implements ModInitializer {
 	
 	@Override
 	public void onInitialize() {}
+	
+	public static boolean isDevEnvironment() {
+		return FabricLoader.getInstance().isDevelopmentEnvironment();
+	}
+	
+	public static boolean isClient() {
+		return FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT;
+	}
 }

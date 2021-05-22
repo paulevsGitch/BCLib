@@ -17,8 +17,8 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
-import ru.bclib.structures.StructureWorld;
 import ru.bclib.util.BlocksHelper;
+import ru.bclib.world.structures.StructureWorld;
 
 public abstract class SDF {
 	private List<Function<PosInfo, BlockState>> postProcesses = Lists.newArrayList();

@@ -1,4 +1,4 @@
-package ru.bclib.structures;
+package ru.bclib.world.structures;
 
 import java.util.Map;
 
