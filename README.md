@@ -3,21 +3,21 @@
 BCLib is a library mod for BetterX team mods, developed for Fabric, MC 1.16.4+
 
 ## Features:
-- Structure Features API;
-- Bonemeal API;
-- Features API;
-- Biome API;
-- Tag API;
+* Structure Features API;
+* Bonemeal API;
+* Features API;
+* Biome API;
+* Tag API;
 
-- Spline library (simple);
-- Noise library;
-- Math library;
-- SDF library;
+* Spline library (simple);
+* Noise library;
+* Math library;
+* SDF library;
 
-- Custom surface builders;
-- Translation helper;
-- Weighted list;
-- Block helper;
+* Custom surface builders;
+* Translation helper;
+* Weighted list;
+* Block helper;
 
 ## Importing:
 * Clone repo
