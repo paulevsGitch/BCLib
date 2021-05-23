@@ -3,7 +3,9 @@
 	"minVersion": "0.8",
 	"package": "ru.bclib.mixin.common",
 	"compatibilityLevel": "JAVA_8",
-	"mixins": [],
+	"mixins": [
+		"TagLoaderMixin"
+	],
 	"injectors": {
 		"defaultRequire": 1
 	}
