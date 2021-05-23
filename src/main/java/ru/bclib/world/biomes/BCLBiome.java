@@ -11,16 +11,16 @@ import com.google.gson.JsonObject;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biome;
-import ru.bclib.config.IdConfig;
 import ru.bclib.util.JsonFactory;
 import ru.bclib.util.StructureHelper;
+import ru.bclib.util.WeightedList;
 import ru.bclib.world.features.BCLFeature;
 import ru.bclib.world.features.ListFeature;
 import ru.bclib.world.features.ListFeature.StructureInfo;
 import ru.bclib.world.features.NBTStructureFeature.TerrainMerge;
 
 public class BCLBiome {
-	protected List<BCLBiome> subbiomes = Lists.newArrayList();
+	protected WeightedList<BCLBiome> subbiomes = new WeightedList<BCLBiome>();
 
 	protected final Biome biome;
 	protected final ResourceLocation mcID;
@@ -29,32 +29,29 @@ public class BCLBiome {
 
 	protected BCLBiome biomeParent;
 	protected float maxSubBiomeChance = 1;
-	protected final float genChanceUnmutable;
-	protected float genChance = 1;
+	protected final float genChance;
 
 	private final float fogDensity;
 	private BCLFeature structuresFeature;
 	private Biome actualBiome;
 
-	public BCLBiome(BiomeDefinition definition, IdConfig config) {
+	public BCLBiome(BiomeDefinition definition) {
 		this.mcID = definition.getID();
 		this.readStructureList();
 		if (structuresFeature != null) {
 			definition.addFeature(structuresFeature);
 		}
 		this.biome = definition.build();
-		this.fogDensity = config.getFloat(mcID, "fog_density", definition.getFodDensity());
-		this.genChanceUnmutable = config.getFloat(mcID, "generation_chance", definition.getGenChance());
-		this.edgeSize = config.getInt(mcID, "edge_size", 32);
+		this.genChance = definition.getGenChance();
+		this.fogDensity = definition.getFodDensity();
 	}
 
-	public BCLBiome(ResourceLocation id, Biome biome, float fogDensity, float genChance, boolean hasCaves, IdConfig config) {
+	public BCLBiome(ResourceLocation id, Biome biome, float fogDensity, float genChance) {
 		this.mcID = id;
-		this.readStructureList();
 		this.biome = biome;
-		this.fogDensity = config.getFloat(mcID, "fog_density", fogDensity);
-		this.genChanceUnmutable = config.getFloat(mcID, "generation_chance", genChance);
-		this.edgeSize = config.getInt(mcID, "edge_size", 32);
+		this.genChance = genChance;
+		this.fogDensity = fogDensity;
+		this.readStructureList();
 	}
 
 	public BCLBiome getEdge() {
@@ -75,9 +72,8 @@ public class BCLBiome {
 	}
 
 	public void addSubBiome(BCLBiome biome) {
-		maxSubBiomeChance += biome.mutateGenChance(maxSubBiomeChance);
 		biome.biomeParent = this;
-		subbiomes.add(biome);
+		subbiomes.add(biome, biome.getGenChance());
 	}
 	
 	public boolean containsSubBiome(BCLBiome biome) {
@@ -85,11 +81,7 @@ public class BCLBiome {
 	}
 
 	public BCLBiome getSubBiome(Random random) {
-		float chance = random.nextFloat() * maxSubBiomeChance;
-		for (BCLBiome biome : subbiomes)
-			if (biome.canGenerate(chance))
-				return biome;
-		return this;
+		return subbiomes.get(random);
 	}
 
 	public BCLBiome getParentBiome() {
@@ -106,16 +98,6 @@ public class BCLBiome {
 
 	public boolean isSame(BCLBiome biome) {
 		return biome == this || (biome.hasParentBiome() && biome.getParentBiome() == this);
-	}
-
-	public boolean canGenerate(float chance) {
-		return chance <= this.genChance;
-	}
-
-	public float mutateGenChance(float chance) {
-		genChance = genChanceUnmutable;
-		genChance += chance;
-		return genChance;
 	}
 
 	public Biome getBiome() {
@@ -170,10 +152,6 @@ public class BCLBiome {
 
 	public float getGenChance() {
 		return this.genChance;
-	}
-	
-	public float getGenChanceImmutable() {
-		return this.genChanceUnmutable;
 	}
 	
 	public void updateActualBiomes(Registry<Biome> biomeRegistry) {

@@ -34,6 +34,7 @@ import net.minecraft.world.level.levelgen.feature.configurations.ProbabilityFeat
 import net.minecraft.world.level.levelgen.surfacebuilders.ConfiguredSurfaceBuilder;
 import net.minecraft.world.level.levelgen.surfacebuilders.SurfaceBuilder;
 import net.minecraft.world.level.levelgen.surfacebuilders.SurfaceBuilderBaseConfiguration;
+import ru.bclib.config.IdConfig;
 import ru.bclib.util.ColorUtil;
 import ru.bclib.world.features.BCLFeature;
 import ru.bclib.world.structures.BCLStructureFeature;
@@ -85,8 +86,8 @@ public class BiomeDefinition {
 	
 	/** 
 	 * Create default definition for The Nether biome.
-	 * @param id
-	 * @return
+	 * @param id - {@ResourceLocation}.
+	 * @return {@link BiomeDefinition}.
 	 */
 	public static BiomeDefinition netherBiome(ResourceLocation id) {
 		BiomeDefinition def = new BiomeDefinition(id);
@@ -98,8 +99,8 @@ public class BiomeDefinition {
 	
 	/** 
 	 * Create default definition for The End biome.
-	 * @param id
-	 * @return
+	 * @param id - {@ResourceLocation}.
+	 * @return {@link BiomeDefinition}.
 	 */
 	public static BiomeDefinition endBiome(ResourceLocation id) {
 		BiomeDefinition def = new BiomeDefinition(id);
@@ -109,6 +110,23 @@ public class BiomeDefinition {
 		return def;
 	}
 	
+	/**
+	 * Used to load biome settings from config.
+	 * @param config - {@link IdConfig}.
+	 * @return this {@link BiomeDefinition}.
+	 */
+	public BiomeDefinition loadConfigValues(IdConfig config) {
+		this.fogDensity = config.getFloat(id, "fog_density", this.fogDensity);
+		this.genChance = config.getFloat(id, "generation_chance", this.genChance);
+		this.edgeSize = config.getInt(id, "edge_size", this.edgeSize);
+		return this;
+	}
+	
+	/**
+	 * Set category of the biome.
+	 * @param category - {@link BiomeCategory}.
+	 * @return this {@link BiomeDefinition}.
+	 */
 	public BiomeDefinition setCategory(BiomeCategory category) {
 		this.category = category;
 		return this;

@@ -2,8 +2,10 @@ package ru.bclib.util;
 
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
@@ -11,6 +13,15 @@ import net.minecraft.world.level.block.Block;
 public class BonemealUtil {
 	private static final Map<ResourceLocation, Map<Block, WeightedList<Block>>> GRASS_BIOMES = Maps.newHashMap();
 	private static final Map<Block, WeightedList<Block>> GRASS_TYPES = Maps.newHashMap();
+	private static final Set<Block> SPREADABLE_BLOCKS = Sets.newHashSet();
+	
+	public static void addSpreadableBlock(Block block) {
+		SPREADABLE_BLOCKS.add(block);
+	}
+	
+	public static boolean isSpreadable(Block block) {
+		return SPREADABLE_BLOCKS.contains(block);
+	}
 	
 	public static void addBonemealGrass(Block terrain, Block plant) {
 		addBonemealGrass(terrain, plant, 1F);
