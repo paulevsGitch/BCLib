@@ -40,7 +40,7 @@ import ru.bclib.world.features.BCLFeature;
 import ru.bclib.world.structures.BCLStructureFeature;
 import ru.bclib.world.surface.DoubleBlockSurfaceBuilder;
 
-public class BiomeDefinition {
+public class BCLBiomeDef {
 	private static final int DEF_FOLIAGE_OVERWORLD = Biomes.PLAINS.getFoliageColor();
 	private static final int DEF_FOLIAGE_NETHER =ColorUtil.color(117, 10, 10);
 	private static final int DEF_FOLIAGE_END = ColorUtil.color(197, 210, 112);
@@ -80,17 +80,17 @@ public class BiomeDefinition {
 	 * Custom biome definition. Can be extended with new parameters.
 	 * @param id - Biome {@link ResourceLocation} (identifier).
 	 */
-	public BiomeDefinition(ResourceLocation id) {
+	public BCLBiomeDef(ResourceLocation id) {
 		this.id = id;
 	}
 	
 	/** 
 	 * Create default definition for The Nether biome.
 	 * @param id - {@ResourceLocation}.
-	 * @return {@link BiomeDefinition}.
+	 * @return {@link BCLBiomeDef}.
 	 */
-	public static BiomeDefinition netherBiome(ResourceLocation id) {
-		BiomeDefinition def = new BiomeDefinition(id);
+	public static BCLBiomeDef netherBiome(ResourceLocation id) {
+		BCLBiomeDef def = new BCLBiomeDef(id);
 		def.foliageColor = DEF_FOLIAGE_NETHER;
 		def.grassColor = DEF_FOLIAGE_NETHER;
 		def.setCategory(BiomeCategory.NETHER);
@@ -100,10 +100,10 @@ public class BiomeDefinition {
 	/** 
 	 * Create default definition for The End biome.
 	 * @param id - {@ResourceLocation}.
-	 * @return {@link BiomeDefinition}.
+	 * @return {@link BCLBiomeDef}.
 	 */
-	public static BiomeDefinition endBiome(ResourceLocation id) {
-		BiomeDefinition def = new BiomeDefinition(id);
+	public static BCLBiomeDef endBiome(ResourceLocation id) {
+		BCLBiomeDef def = new BCLBiomeDef(id);
 		def.foliageColor = DEF_FOLIAGE_END;
 		def.grassColor = DEF_FOLIAGE_END;
 		def.setCategory(BiomeCategory.THEEND);
@@ -113,9 +113,9 @@ public class BiomeDefinition {
 	/**
 	 * Used to load biome settings from config.
 	 * @param config - {@link IdConfig}.
-	 * @return this {@link BiomeDefinition}.
+	 * @return this {@link BCLBiomeDef}.
 	 */
-	public BiomeDefinition loadConfigValues(IdConfig config) {
+	public BCLBiomeDef loadConfigValues(IdConfig config) {
 		this.fogDensity = config.getFloat(id, "fog_density", this.fogDensity);
 		this.genChance = config.getFloat(id, "generation_chance", this.genChance);
 		this.edgeSize = config.getInt(id, "edge_size", this.edgeSize);
@@ -125,19 +125,19 @@ public class BiomeDefinition {
 	/**
 	 * Set category of the biome.
 	 * @param category - {@link BiomeCategory}.
-	 * @return this {@link BiomeDefinition}.
+	 * @return this {@link BCLBiomeDef}.
 	 */
-	public BiomeDefinition setCategory(BiomeCategory category) {
+	public BCLBiomeDef setCategory(BiomeCategory category) {
 		this.category = category;
 		return this;
 	}
 	
-	public BiomeDefinition setPrecipitation(Precipitation precipitation) {
+	public BCLBiomeDef setPrecipitation(Precipitation precipitation) {
 		this.precipitation = precipitation;
 		return this;
 	}
 	
-	public BiomeDefinition setSurface(Block block) {
+	public BCLBiomeDef setSurface(Block block) {
 		setSurface(SurfaceBuilder.DEFAULT.configured(new SurfaceBuilderBaseConfiguration(
 				block.defaultBlockState(),
 				Blocks.END_STONE.defaultBlockState(),
@@ -146,47 +146,47 @@ public class BiomeDefinition {
 		return this;
 	}
 	
-	public BiomeDefinition setSurface(Block block1, Block block2) {
+	public BCLBiomeDef setSurface(Block block1, Block block2) {
 		setSurface(DoubleBlockSurfaceBuilder.register("bclib_" + id.getPath() + "_surface").setBlock1(block1).setBlock2(block2).configured());
 		return this;
 	}
 	
-	public BiomeDefinition setSurface(ConfiguredSurfaceBuilder<?> builder) {
+	public BCLBiomeDef setSurface(ConfiguredSurfaceBuilder<?> builder) {
 		this.surface = builder;
 		return this;
 	}
 
-	public BiomeDefinition setParticles(ParticleOptions particle, float probability) {
+	public BCLBiomeDef setParticles(ParticleOptions particle, float probability) {
 		this.particleConfig = new AmbientParticleSettings(particle, probability);
 		return this;
 	}
 	
-	public BiomeDefinition setGenChance(float genChance) {
+	public BCLBiomeDef setGenChance(float genChance) {
 		this.genChance = genChance;
 		return this;
 	}
 	
-	public BiomeDefinition setDepth(float depth) {
+	public BCLBiomeDef setDepth(float depth) {
 		this.depth = depth;
 		return this;
 	}
 	
-	public BiomeDefinition setTemperature(float temperature) {
+	public BCLBiomeDef setTemperature(float temperature) {
 		this.temperature = temperature;
 		return this;
 	}
 	
-	public BiomeDefinition setDownfall(float downfall) {
+	public BCLBiomeDef setDownfall(float downfall) {
 		this.downfall = downfall;
 		return this;
 	}
 	
-	public BiomeDefinition setEdgeSize(int edgeSize) {
+	public BCLBiomeDef setEdgeSize(int edgeSize) {
 		this.edgeSize = edgeSize;
 		return this;
 	}
 
-	public BiomeDefinition addMobSpawn(EntityType<?> type, int weight, int minGroupSize, int maxGroupSize) {
+	public BCLBiomeDef addMobSpawn(EntityType<?> type, int weight, int minGroupSize, int maxGroupSize) {
 		ResourceLocation eID = Registry.ENTITY_TYPE.getKey(type);
 		if (eID != Registry.ENTITY_TYPE.getDefaultKey()) {
 			SpawnInfo info = new SpawnInfo();
@@ -199,22 +199,22 @@ public class BiomeDefinition {
 		return this;
 	}
 	
-	public BiomeDefinition addMobSpawn(SpawnerData entry) {
+	public BCLBiomeDef addMobSpawn(SpawnerData entry) {
 		spawns.add(entry);
 		return this;
 	}
 
-	public BiomeDefinition addStructureFeature(ConfiguredStructureFeature<?, ?> feature) {
+	public BCLBiomeDef addStructureFeature(ConfiguredStructureFeature<?, ?> feature) {
 		structures.add(feature);
 		return this;
 	}
 	
-	public BiomeDefinition addStructureFeature(BCLStructureFeature feature) {
+	public BCLBiomeDef addStructureFeature(BCLStructureFeature feature) {
 		structures.add(feature.getFeatureConfigured());
 		return this;
 	}
 	
-	public BiomeDefinition addFeature(BCLFeature feature) {
+	public BCLBiomeDef addFeature(BCLFeature feature) {
 		FeatureInfo info = new FeatureInfo();
 		info.featureStep = feature.getFeatureStep();
 		info.feature = feature.getFeatureConfigured();
@@ -222,7 +222,7 @@ public class BiomeDefinition {
 		return this;
 	}
 
-	public BiomeDefinition addFeature(Decoration featureStep, ConfiguredFeature<?, ?> feature) {
+	public BCLBiomeDef addFeature(Decoration featureStep, ConfiguredFeature<?, ?> feature) {
 		FeatureInfo info = new FeatureInfo();
 		info.featureStep = featureStep;
 		info.feature = feature;
@@ -237,60 +237,60 @@ public class BiomeDefinition {
 		return ColorUtil.color(r, g, b);
 	}
 
-	public BiomeDefinition setFogColor(int r, int g, int b) {
+	public BCLBiomeDef setFogColor(int r, int g, int b) {
 		this.fogColor = getColor(r, g, b);
 		return this;
 	}
 
-	public BiomeDefinition setFogDensity(float density) {
+	public BCLBiomeDef setFogDensity(float density) {
 		this.fogDensity = density;
 		return this;
 	}
 
-	public BiomeDefinition setWaterColor(int r, int g, int b) {
+	public BCLBiomeDef setWaterColor(int r, int g, int b) {
 		this.waterColor = getColor(r, g, b);
 		return this;
 	}
 
-	public BiomeDefinition setWaterFogColor(int r, int g, int b) {
+	public BCLBiomeDef setWaterFogColor(int r, int g, int b) {
 		this.waterFogColor = getColor(r, g, b);
 		return this;
 	}
 	
-	public BiomeDefinition setWaterAndFogColor(int r, int g, int b) {
+	public BCLBiomeDef setWaterAndFogColor(int r, int g, int b) {
 		return setWaterColor(r, g, b).setWaterFogColor(r, g, b);
 	}
 	
-	public BiomeDefinition setFoliageColor(int r, int g, int b) {
+	public BCLBiomeDef setFoliageColor(int r, int g, int b) {
 		this.foliageColor = getColor(r, g, b);
 		return this;
 	}
 	
-	public BiomeDefinition setGrassColor(int r, int g, int b) {
+	public BCLBiomeDef setGrassColor(int r, int g, int b) {
 		this.grassColor = getColor(r, g, b);
 		return this;
 	}
 	
-	public BiomeDefinition setPlantsColor(int r, int g, int b) {
+	public BCLBiomeDef setPlantsColor(int r, int g, int b) {
 		return this.setFoliageColor(r, g, b).setGrassColor(r, g, b);
 	}
 
-	public BiomeDefinition setLoop(SoundEvent loop) {
+	public BCLBiomeDef setLoop(SoundEvent loop) {
 		this.loop = loop;
 		return this;
 	}
 
-	public BiomeDefinition setMood(SoundEvent mood) {
+	public BCLBiomeDef setMood(SoundEvent mood) {
 		this.mood = new AmbientMoodSettings(mood, 6000, 8, 2.0D);
 		return this;
 	}
 
-	public BiomeDefinition setAdditions(SoundEvent additions) {
+	public BCLBiomeDef setAdditions(SoundEvent additions) {
 		this.additions = new AmbientAdditionsSettings(additions, 0.0111);
 		return this;
 	}
 
-	public BiomeDefinition setMusic(SoundEvent music) {
+	public BCLBiomeDef setMusic(SoundEvent music) {
 		this.music = music;
 		return this;
 	}
@@ -366,7 +366,7 @@ public class BiomeDefinition {
 		return edgeSize;
 	}
 
-	public BiomeDefinition addCarver(Carving carverStep, ConfiguredWorldCarver<ProbabilityFeatureConfiguration> carver) {
+	public BCLBiomeDef addCarver(Carving carverStep, ConfiguredWorldCarver<ProbabilityFeatureConfiguration> carver) {
 		CarverInfo info = new CarverInfo();
 		info.carverStep = carverStep;
 		info.carver = carver;

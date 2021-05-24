@@ -35,7 +35,7 @@ public class BCLBiome {
 	private BCLFeature structuresFeature;
 	private Biome actualBiome;
 
-	public BCLBiome(BiomeDefinition definition) {
+	public BCLBiome(BCLBiomeDef definition) {
 		this.mcID = definition.getID();
 		this.readStructureList();
 		if (structuresFeature != null) {

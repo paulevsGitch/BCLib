@@ -4,8 +4,8 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
 import ru.bclib.util.Logger;
+import ru.bclib.world.surface.BCLSurfaceBuilders;
 import ru.bclib.api.BCLibTags;
-import ru.bclib.api.SurfaceBuilders;
 
 public class BCLib implements ModInitializer {
 	public static final String MOD_ID = "bclib";
@@ -13,7 +13,7 @@ public class BCLib implements ModInitializer {
 	
 	@Override
 	public void onInitialize() {
-		SurfaceBuilders.register();
+		BCLSurfaceBuilders.register();
 		BCLibTags.init();
 	}
 	
