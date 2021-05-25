@@ -1,6 +1,6 @@
 plugins {
 	id 'fabric-loom' version '0.7-SNAPSHOT'
-	//id 'maven-publish'
+	id 'maven-publish'
 }
 
 apply plugin: 'maven'
@@ -99,35 +99,21 @@ artifacts {
 	archives javadocJar
 }
 
-install {
-	repositories.mavenInstaller {
-		pom.project {
-			licenses {
-				license {
-					name 'MIT License'
-					url 'https://raw.githubusercontent.com/paulevsGitch/BCLib/main/LICENSE'
-					distribution 'repo'
-				}
+// configure the maven publication
+publishing {
+	publications {
+		mavenJava(MavenPublication) {
+			artifact(remapJar) {
+				builtBy remapJar
+			}
+			artifact(sourcesJar) {
+				builtBy remapSourcesJar
 			}
 		}
 	}
-}
 
-// configure the maven publication
-//publishing {
-//	publications {
-//		mavenJava(MavenPublication) {
-//			artifact(remapJar) {
-//				builtBy remapJar
-//			}
-//			artifact(sourcesJar) {
-//				builtBy remapSourcesJar
-//			}
-//		}
-//	}
-//
-//	// select the repositories you want to publish to
-//	repositories {
-//		mavenLocal()
-//	}
-//}
+	// select the repositories you want to publish to
+	repositories {
+		mavenLocal()
+	}
+}
