@@ -1,7 +1,6 @@
 plugins {
 	id 'fabric-loom' version '0.7-SNAPSHOT'
 	id 'maven-publish'
-	id 'maven'
 }
 
 sourceCompatibility = JavaVersion.VERSION_1_8
@@ -103,7 +102,6 @@ publishing {
 
 	// select the repositories you want to publish to
 	repositories {
-		// uncomment to publish to the local maven
-		// mavenLocal()
+		mavenLocal()
 	}
 }
