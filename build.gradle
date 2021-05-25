@@ -1,7 +1,9 @@
 plugins {
 	id 'fabric-loom' version '0.7-SNAPSHOT'
-	id 'maven-publish'
+	//id 'maven-publish'
 }
+
+apply plugin: 'maven'
 
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
@@ -88,20 +90,20 @@ jar {
 }
 
 // configure the maven publication
-publishing {
-	publications {
-		mavenJava(MavenPublication) {
-			artifact(remapJar) {
-				builtBy remapJar
-			}
-			artifact(sourcesJar) {
-				builtBy remapSourcesJar
-			}
-		}
-	}
-
-	// select the repositories you want to publish to
-	repositories {
-		mavenLocal()
-	}
-}
+//publishing {
+//	publications {
+//		mavenJava(MavenPublication) {
+//			artifact(remapJar) {
+//				builtBy remapJar
+//			}
+//			artifact(sourcesJar) {
+//				builtBy remapSourcesJar
+//			}
+//		}
+//	}
+//
+//	// select the repositories you want to publish to
+//	repositories {
+//		mavenLocal()
+//	}
+//}
