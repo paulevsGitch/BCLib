@@ -85,8 +85,32 @@ task sourcesJar(type: Jar, dependsOn: classes) {
 	from sourceSets.main.allSource
 }
 
+task javadocJar(type: Jar, dependsOn: javadoc) {
+	classifier = 'javadoc'
+	from javadoc.destinationDir
+}
+
 jar {
 	from "LICENSE"
+}
+
+artifacts {
+	archives sourcesJar
+	archives javadocJar
+}
+
+install {
+	repositories.mavenInstaller {
+		pom.project {
+			licenses {
+				license {
+					name 'MIT License'
+					url 'https://raw.githubusercontent.com/paulevsGitch/BCLib/main/LICENSE'
+					distribution 'repo'
+				}
+			}
+		}
+	}
 }
 
 // configure the maven publication
