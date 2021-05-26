@@ -22,7 +22,7 @@ import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import net.minecraft.world.level.levelgen.surfacebuilders.SurfaceBuilderConfiguration;
-import ru.bclib.api.BCLibTags;
+import ru.bclib.api.TagAPI;
 import ru.bclib.api.BiomeAPI;
 import ru.bclib.util.BlocksHelper;
 import ru.bclib.world.processors.DestructionStructureProcessor;
@@ -124,11 +124,11 @@ public abstract class NBTStructureFeature extends DefaultFeature {
 					mut.setZ(z);
 					mut.setY(surfMax);
 					BlockState state = world.getBlockState(mut);
-					if (!state.is(BCLibTags.GEN_TERRAIN) && state.isFaceSturdy(world, mut, Direction.DOWN)) {
+					if (!state.is(TagAPI.GEN_TERRAIN) && state.isFaceSturdy(world, mut, Direction.DOWN)) {
 						for (int i = 0; i < 10; i++) {
 							mut.setY(mut.getY() - 1);
 							BlockState stateSt = world.getBlockState(mut);
-							if (!stateSt.is(BCLibTags.GEN_TERRAIN)) {
+							if (!stateSt.is(TagAPI.GEN_TERRAIN)) {
 								if (merge == TerrainMerge.SURFACE) {
 									SurfaceBuilderConfiguration config = world.getBiome(mut).getGenerationSettings().getSurfaceBuilderConfig();
 									boolean isTop = mut.getY() == surfMax && state.getMaterial().isSolidBlocking();
@@ -140,7 +140,7 @@ public abstract class NBTStructureFeature extends DefaultFeature {
 								}
 							}
 							else {
-								if (stateSt.is(BCLibTags.END_GROUND) && state.getMaterial().isSolidBlocking()) {
+								if (stateSt.is(TagAPI.END_GROUND) && state.getMaterial().isSolidBlocking()) {
 									if (merge == TerrainMerge.SURFACE) {
 										SurfaceBuilderConfiguration config = world.getBiome(mut).getGenerationSettings()
 												.getSurfaceBuilderConfig();
