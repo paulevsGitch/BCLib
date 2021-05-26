@@ -4,7 +4,8 @@
 	"package": "ru.bclib.mixin.client",
 	"compatibilityLevel": "JAVA_8",
 	"client": [
-	  "ModelBakeryMixin"
+		"EnchantingTableBlockMixin",
+	  	"ModelBakeryMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

@@ -16,7 +16,7 @@ import net.minecraft.world.level.block.Blocks;
 import ru.bclib.BCLib;
 import ru.bclib.util.TagHelper;
 
-public class BCLibTags {
+public class TagAPI {
 	// Block Tags
 	public static final Tag.Named<Block> BOOKSHELVES = makeCommonBlockTag("bookshelves");
 	public static final Tag.Named<Block> GEN_TERRAIN = makeBlockTag(BCLib.MOD_ID, "gen_terrain");

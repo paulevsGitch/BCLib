@@ -4,6 +4,11 @@
 	"package": "ru.bclib.mixin.common",
 	"compatibilityLevel": "JAVA_8",
 	"mixins": [
+		"ComposterBlockAccessor",
+		"PotionBrewingAccessor",
+		"RecipeManagerAccessor",
+		"EnchantmentMenuMixin",
+		"RecipeManagerMixin",
 		"BoneMealItemMixin",
 		"TagLoaderMixin"
 	],

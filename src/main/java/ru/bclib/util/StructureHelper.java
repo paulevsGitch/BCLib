@@ -27,7 +27,7 @@ import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import net.minecraft.world.level.material.Material;
-import ru.bclib.api.BCLibTags;
+import ru.bclib.api.TagAPI;
 
 public class StructureHelper {
 	private static final Direction[] DIR = BlocksHelper.makeHorizontal();
@@ -264,7 +264,7 @@ public class StructureHelper {
 	
 	private static boolean isTerrainNear(WorldGenLevel world, BlockPos pos) {
 		for (Direction dir: BlocksHelper.DIRECTIONS) {
-			if (world.getBlockState(pos.relative(dir)).is(BCLibTags.GEN_TERRAIN)) {
+			if (world.getBlockState(pos.relative(dir)).is(TagAPI.GEN_TERRAIN)) {
 				return true;
 			}
 		}
@@ -344,7 +344,7 @@ public class StructureHelper {
 	private static boolean ignore(BlockState state) {
 		return state.getMaterial().isReplaceable() ||
 				!state.getFluidState().isEmpty() ||
-				state.is(BCLibTags.END_GROUND) ||
+				state.is(TagAPI.END_GROUND) ||
 				state.is(BlockTags.LOGS) ||
 				state.is(BlockTags.LEAVES) ||
 				state.getMaterial().equals(Material.PLANT) ||
@@ -362,7 +362,7 @@ public class StructureHelper {
 				for (int y = bounds.y1; y >= bounds.y0; y--) {
 					mut.setY(y);
 					BlockState state = world.getBlockState(mut);
-					if (state.is(BCLibTags.END_GROUND) && !world.getBlockState(mut.above()).getMaterial().isSolidBlocking()) {
+					if (state.is(TagAPI.END_GROUND) && !world.getBlockState(mut.above()).getMaterial().isSolidBlocking()) {
 						BlocksHelper.setWithoutUpdate(world, mut, top);
 					}
 				}

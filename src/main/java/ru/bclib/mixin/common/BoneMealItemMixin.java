@@ -16,7 +16,7 @@ import net.minecraft.world.level.biome.Biome.BiomeCategory;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import ru.bclib.api.BCLibTags;
+import ru.bclib.api.TagAPI;
 import ru.bclib.api.BiomeAPI;
 import ru.bclib.api.BonemealAPI;
 import ru.bclib.util.BlocksHelper;
@@ -34,7 +34,7 @@ public class BoneMealItemMixin {
 			BlockPos offseted = blockPos.relative(context.getClickedFace());
 			boolean endBiome = world.getBiome(offseted).getBiomeCategory() == BiomeCategory.THEEND;
 			
-			if (world.getBlockState(blockPos).is(BCLibTags.END_GROUND)) {
+			if (world.getBlockState(blockPos).is(TagAPI.END_GROUND)) {
 				boolean consume = false;
 				if (world.getBlockState(blockPos).is(Blocks.END_STONE)) {
 					BlockState nylium = bclib_getNylium(world, blockPos);

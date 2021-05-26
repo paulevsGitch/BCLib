@@ -6,7 +6,7 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.resources.ResourceLocation;
 import ru.bclib.util.Logger;
 import ru.bclib.world.surface.BCLSurfaceBuilders;
-import ru.bclib.api.BCLibTags;
+import ru.bclib.api.TagAPI;
 
 public class BCLib implements ModInitializer {
 	public static final String MOD_ID = "bclib";
@@ -15,7 +15,7 @@ public class BCLib implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		BCLSurfaceBuilders.register();
-		BCLibTags.init();
+		TagAPI.init();
 	}
 	
 	public static boolean isDevEnvironment() {
