@@ -1,9 +1,9 @@
+import java.util.function.BiConsumer
+
 plugins {
 	id 'fabric-loom' version '0.7-SNAPSHOT'
 	id 'maven-publish'
 }
-
-apply plugin: 'maven'
 
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
@@ -99,10 +99,13 @@ artifacts {
 	archives javadocJar
 }
 
+def env = System.getenv()
+
 // configure the maven publication
 publishing {
 	publications {
-		mavenJava(MavenPublication) {
+		gpr(MavenPublication) {
+			artifactId archivesBaseName
 			artifact(remapJar) {
 				builtBy remapJar
 			}
@@ -114,6 +117,13 @@ publishing {
 
 	// select the repositories you want to publish to
 	repositories {
-		mavenLocal()
+		maven {
+			name = "GitHubPackages"
+			url = uri("https://maven.pkg.github.com/paulevsgitch/bclib")
+			credentials {
+				username = env.GITHUB_USER
+				password = env.GITHUB_TOKEN
+			}
+		}
 	}
 }
