@@ -26,12 +26,16 @@ public class BonemealAPI {
 		return SPREADABLE_BLOCKS.contains(block);
 	}
 	
-	public static void addLandGrass(Block terrain, Block plant) {
-		addLandGrass(terrain, plant, 1F);
+	public static void addLandGrass(Block plant, Block... terrain) {
+		for (Block block: terrain) {
+			addLandGrass(block, plant, 1F);
+		}
 	}
 	
-	public static void addLandGrass(ResourceLocation biome, Block terrain, Block plant) {
-		addLandGrass(biome, terrain, plant, 1F);
+	public static void addLandGrass(ResourceLocation biome, Block plant, Block... terrain) {
+		for (Block block: terrain) {
+			addLandGrass(biome, block, plant, 1F);
+		}
 	}
 	
 	public static void addLandGrass(Block terrain, Block plant, float chance) {
@@ -57,12 +61,16 @@ public class BonemealAPI {
 		list.add(plant, chance);
 	}
 	
-	public static void addWaterGrass(Block terrain, Block plant) {
-		addWaterGrass(terrain, plant, 1F);
+	public static void addWaterGrass(Block plant, Block... terrain) {
+		for (Block block: terrain) {
+			addWaterGrass(block, plant, 1F);
+		}
 	}
 	
-	public static void addWaterGrass(ResourceLocation biome, Block terrain, Block plant) {
-		addWaterGrass(biome, terrain, plant, 1F);
+	public static void addWaterGrass(ResourceLocation biome, Block plant, Block... terrain) {
+		for (Block block: terrain) {
+			addWaterGrass(biome, block, plant, 1F);
+		}
 	}
 	
 	public static void addWaterGrass(Block terrain, Block plant, float chance) {
