@@ -17,6 +17,7 @@ import net.minecraft.world.item.crafting.ShapedRecipe;
 import net.minecraft.world.item.crafting.ShapelessRecipe;
 import net.minecraft.world.level.ItemLike;
 import ru.bclib.BCLib;
+import ru.bclib.config.PathConfig;
 
 public class GridRecipe {
 	private static final GridRecipe INSTANCE = new GridRecipe();
@@ -48,6 +49,11 @@ public class GridRecipe {
 		INSTANCE.exist = BCLRecipeManager.exists(output);
 		
 		return INSTANCE;
+	}
+	
+	public GridRecipe checkConfig(PathConfig config) {
+		exist = config.getBoolean("grid", id.getPath(), true);
+		return this;
 	}
 
 	public GridRecipe setGroup(String group) {

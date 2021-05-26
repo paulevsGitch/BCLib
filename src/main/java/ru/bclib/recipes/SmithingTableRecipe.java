@@ -9,6 +9,7 @@ import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.UpgradeRecipe;
 import net.minecraft.world.level.ItemLike;
 import ru.bclib.BCLib;
+import ru.bclib.config.PathConfig;
 
 public class SmithingTableRecipe {
 	
@@ -34,8 +35,14 @@ public class SmithingTableRecipe {
 	private Ingredient addition;
 	private ItemStack result;
 	private boolean alright;
+	private boolean exist;
 	
 	private SmithingTableRecipe() {}
+	
+	public SmithingTableRecipe checkConfig(PathConfig config) {
+		exist = config.getBoolean("smithing", id.getPath(), true);
+		return this;
+	}
 	
 	public SmithingTableRecipe setResult(ItemLike item) {
 		return this.setResult(item, 1);
@@ -70,6 +77,10 @@ public class SmithingTableRecipe {
 	}
 	
 	public void build() {
+		if (!exist) {
+			return;
+		}
+		
 		if (base == null) {
 			BCLib.LOGGER.warning("Base input for Smithing recipe can't be 'null', recipe {} will be ignored!", id);
 			return;

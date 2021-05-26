@@ -10,6 +10,7 @@ import net.minecraft.world.item.crafting.SmeltingRecipe;
 import net.minecraft.world.item.crafting.SmokingRecipe;
 import net.minecraft.world.level.ItemLike;
 import ru.bclib.BCLib;
+import ru.bclib.config.PathConfig;
 
 public class FurnaceRecipe {
 	private static final FurnaceRecipe INSTANCE = new FurnaceRecipe();
@@ -35,6 +36,11 @@ public class FurnaceRecipe {
 		INSTANCE.xp = 0;
 		INSTANCE.exist = BCLRecipeManager.exists(output) && BCLRecipeManager.exists(input);
 		return INSTANCE;
+	}
+	
+	public FurnaceRecipe checkConfig(PathConfig config) {
+		exist = config.getBoolean("furnace", id.getPath(), true);
+		return this;
 	}
 	
 	public FurnaceRecipe setGroup(String group) {
