@@ -3,7 +3,9 @@
 	"minVersion": "0.8",
 	"package": "ru.bclib.mixin.client",
 	"compatibilityLevel": "JAVA_8",
-	"client": [],
+	"client": [
+	  "ModelBakeryMixin"
+	],
 	"injectors": {
 		"defaultRequire": 1
 	}

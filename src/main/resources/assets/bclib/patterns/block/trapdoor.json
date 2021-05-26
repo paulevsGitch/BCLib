@@ -1,0 +1,7 @@
+{
+	"parent": "bclib:block/sided_trapdoor",
+	"textures": {
+		"texture": "%modid%:block/%texture%",
+		"side": "%modid%:block/%side%"
+	}
+}
