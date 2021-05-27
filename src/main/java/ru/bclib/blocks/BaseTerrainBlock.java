@@ -46,8 +46,8 @@ import ru.bclib.client.sound.BlockSounds;
 public class BaseTerrainBlock extends BaseBlock {
 	private Block pathBlock;
 	
-	public BaseTerrainBlock(MaterialColor color) {
-		super(FabricBlockSettings.copyOf(Blocks.END_STONE).materialColor(color).sound(BlockSounds.TERRAIN_SOUND).randomTicks());
+	public BaseTerrainBlock(Block baseBlock, MaterialColor color) {
+		super(FabricBlockSettings.copyOf(baseBlock).materialColor(color).sound(BlockSounds.TERRAIN_SOUND).randomTicks());
 	}
 	
 	public void setPathBlock(Block roadBlock) {

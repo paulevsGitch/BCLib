@@ -38,15 +38,7 @@ public abstract class ItemsRegistry extends BaseRegistry<Item> {
 
 	@Override
 	public Item register(ResourceLocation itemId, Item item) {
-		if (item instanceof ArmorItem) {
-			return registerArmor(itemId, item);
-		}
 		registerItem(itemId, item, BaseRegistry.MOD_ITEMS);
-		return item;
-	}
-
-	private Item registerArmor(ResourceLocation id, Item item) {
-		registerItem(id, item, BaseRegistry.MOD_ITEMS);
 		return item;
 	}
 

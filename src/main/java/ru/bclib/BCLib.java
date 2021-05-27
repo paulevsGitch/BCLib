@@ -4,6 +4,8 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.resources.ResourceLocation;
+import ru.bclib.registry.BaseBlockEntities;
+import ru.bclib.registry.BaseRegistry;
 import ru.bclib.util.Logger;
 import ru.bclib.world.surface.BCLSurfaceBuilders;
 import ru.bclib.api.TagAPI;
@@ -14,6 +16,8 @@ public class BCLib implements ModInitializer {
 	
 	@Override
 	public void onInitialize() {
+		BaseRegistry.register();
+		BaseBlockEntities.register();
 		BCLSurfaceBuilders.register();
 		TagAPI.init();
 	}

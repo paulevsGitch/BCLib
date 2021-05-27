@@ -5,14 +5,16 @@ import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.*;
+import ru.bclib.BCLib;
 
 import java.util.List;
 
 public abstract class BaseRegistry<T> {
+
+	private static final List<BaseRegistry<?>> REGISTRIES = Lists.newArrayList();
+
 	protected static final List<Item> MOD_BLOCKS = Lists.newArrayList();
 	protected static final List<Item> MOD_ITEMS = Lists.newArrayList();
-
-	public static void register() {}
 
 	public static List<Item> getModBlocks() {
 		return MOD_BLOCKS;
@@ -22,21 +24,28 @@ public abstract class BaseRegistry<T> {
 		return MOD_ITEMS;
 	}
 
+	public static void register() {
+		REGISTRIES.forEach(BaseRegistry::registerDependency);
+	}
+
 	protected final CreativeModeTab creativeTab;
 
 	protected BaseRegistry(CreativeModeTab creativeTab) {
 		this.creativeTab = creativeTab;
+		REGISTRIES.add(this);
 	}
 
-	protected T register(String name, T obj) {
+	public T register(String name, T obj) {
 		return register(createModId(name), obj);
 	}
 
-	protected abstract T register(ResourceLocation objId, T obj);
+	public abstract T register(ResourceLocation objId, T obj);
 
-	protected abstract ResourceLocation createModId(String name);
+	public ResourceLocation createModId(String name) {
+		return BCLib.makeID(name);
+	}
 
-	protected void registerItem(ResourceLocation id, Item item, List<Item> registry) {
+	public void registerItem(ResourceLocation id, Item item, List<Item> registry) {
 		if (item != Items.AIR) {
 			Registry.register(Registry.ITEM, id, item);
 			registry.add(item);
@@ -47,4 +56,6 @@ public abstract class BaseRegistry<T> {
 		FabricItemSettings properties = new FabricItemSettings();
 		return (FabricItemSettings) properties.tab(creativeTab);
 	}
+
+	private void registerDependency() {}
 }

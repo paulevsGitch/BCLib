@@ -21,22 +21,22 @@ import ru.bclib.blocks.BaseFurnaceBlock;
 import ru.bclib.blocks.BaseSignBlock;
 
 public class BaseBlockEntities {
-	public static final BlockEntityType<BaseChestBlockEntity> CHEST = registerBlockEntity(BCLib.makeID("chest"),
+	public static final BlockEntityType<BaseChestBlockEntity> CHEST = registerBlockEntityType(BCLib.makeID("chest"),
 			BlockEntityType.Builder.of(BaseChestBlockEntity::new, getChests()));
-	public static final BlockEntityType<BaseBarrelBlockEntity> BARREL = registerBlockEntity(BCLib.makeID("barrel"),
+	public static final BlockEntityType<BaseBarrelBlockEntity> BARREL = registerBlockEntityType(BCLib.makeID("barrel"),
 			BlockEntityType.Builder.of(BaseBarrelBlockEntity::new, getBarrels()));
-	public static final BlockEntityType<BaseSignBlockEntity> SIGN = registerBlockEntity(BCLib.makeID("sign"),
+	public static final BlockEntityType<BaseSignBlockEntity> SIGN = registerBlockEntityType(BCLib.makeID("sign"),
 			BlockEntityType.Builder.of(BaseSignBlockEntity::new, getSigns()));
-	public static final BlockEntityType<BaseFurnaceBlockEntity> FURNACE = registerBlockEntity(BCLib.makeID("furnace"),
+	public static final BlockEntityType<BaseFurnaceBlockEntity> FURNACE = registerBlockEntityType(BCLib.makeID("furnace"),
 			BlockEntityType.Builder.of(BaseFurnaceBlockEntity::new, getFurnaces()));
 
-	public static <T extends BlockEntity> BlockEntityType<T> registerBlockEntity(ResourceLocation blockId, BlockEntityType.Builder<T> builder) {
+	public static <T extends BlockEntity> BlockEntityType<T> registerBlockEntityType(ResourceLocation blockId, BlockEntityType.Builder<T> builder) {
 		return Registry.register(Registry.BLOCK_ENTITY_TYPE, blockId, builder.build(null));
 	}
 	
 	public static void register() {}
 
-	static Block[] getChests() {
+	private static Block[] getChests() {
 		List<Block> result = Lists.newArrayList();
 		BaseRegistry.getModBlocks().forEach((item) -> {
 			if (item instanceof BlockItem) {
@@ -48,8 +48,8 @@ public class BaseBlockEntities {
 		});
 		return result.toArray(new Block[] {});
 	}
-	
-	static Block[] getBarrels() {
+
+	private static Block[] getBarrels() {
 		List<Block> result = Lists.newArrayList();
 		BaseRegistry.getModBlocks().forEach((item) -> {
 			if (item instanceof BlockItem) {
@@ -61,8 +61,8 @@ public class BaseBlockEntities {
 		});
 		return result.toArray(new Block[] {});
 	}
-	
-	static Block[] getSigns() {
+
+	private static Block[] getSigns() {
 		List<Block> result = Lists.newArrayList();
 		BaseRegistry.getModBlocks().forEach((item) -> {
 			if (item instanceof BlockItem) {
@@ -74,8 +74,8 @@ public class BaseBlockEntities {
 		});
 		return result.toArray(new Block[] {});
 	}
-	
-	static Block[] getFurnaces() {
+
+	private static Block[] getFurnaces() {
 		List<Block> result = Lists.newArrayList();
 		BaseRegistry.getModBlocks().forEach((item) -> {
 			if (item instanceof BlockItem) {

@@ -40,9 +40,9 @@ import ru.bclib.client.models.PatternsHelper;
 public class TripleTerrainBlock extends BaseTerrainBlock {
 	public static final EnumProperty<TripleShape> SHAPE = BlockProperties.TRIPLE_SHAPE;
 	
-	public TripleTerrainBlock(MaterialColor color) {
-		super(color);
-		this.registerDefaultState(this.defaultBlockState().setValue(SHAPE, TripleShape.BOTTOM));
+	public TripleTerrainBlock(Block baseBlock, MaterialColor color) {
+		super(baseBlock, color);
+		this.registerDefaultState(defaultBlockState().setValue(SHAPE, TripleShape.BOTTOM));
 	}
 	
 	@Override
@@ -54,7 +54,7 @@ public class TripleTerrainBlock extends BaseTerrainBlock {
 	public BlockState getStateForPlacement(BlockPlaceContext ctx) {
 		Direction dir = ctx.getClickedFace();
 		TripleShape shape = dir == Direction.UP ? TripleShape.BOTTOM : dir == Direction.DOWN ? TripleShape.TOP : TripleShape.MIDDLE;
-		return this.defaultBlockState().setValue(SHAPE, shape);
+		return defaultBlockState().setValue(SHAPE, shape);
 	}
 
 	@Override
