@@ -57,6 +57,7 @@ public class BaseFurnaceBlock extends FurnaceBlock implements BlockModelProvider
 	public @Nullable BlockModel getBlockModel(ResourceLocation blockId, BlockState blockState) {
 		String blockName = blockId.getPath();
 		Map<String, String> textures = Maps.newHashMap();
+		textures.put("%modid%", blockId.getNamespace());
 		textures.put("%top%", blockName + "_top");
 		textures.put("%side%", blockName + "_side");
 		Optional<String> pattern;

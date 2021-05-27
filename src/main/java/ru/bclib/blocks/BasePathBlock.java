@@ -68,6 +68,7 @@ public class BasePathBlock extends BaseBlockNotFull {
 	public @Nullable BlockModel getBlockModel(ResourceLocation resourceLocation, BlockState blockState) {
 		String name = resourceLocation.getPath();
 		Map<String, String> textures = Maps.newHashMap();
+		textures.put("%modid%", resourceLocation.getNamespace());
 		textures.put("%top%", name + "_top");
 		textures.put("%side%", name.replace("_path", "") + "_side");
 		Optional<String> pattern = PatternsHelper.createJson(BasePatterns.BLOCK_PATH, textures);
