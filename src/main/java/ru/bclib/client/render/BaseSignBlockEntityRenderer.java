@@ -28,6 +28,7 @@ import net.minecraft.world.level.block.StandingSignBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.WoodType;
 import ru.bclib.blockentities.BaseSignBlockEntity;
+import ru.bclib.blocks.BaseChestBlock;
 import ru.bclib.blocks.BaseSignBlock;
 import ru.bclib.registry.BaseRegistry;
 
@@ -102,21 +103,14 @@ public class BaseSignBlockEntityRenderer extends BlockEntityRenderer<BaseSignBlo
 		return provider.getBuffer(LAYERS.getOrDefault(block, defaultLayer));
 	}
 
-	static {
-		defaultLayer = RenderType.entitySolid(new ResourceLocation("textures/entity/sign/oak.png"));
-		
-		BaseRegistry.getModBlocks().forEach((item) -> {
-			if (item instanceof BlockItem) {
-				Block block = ((BlockItem) item).getBlock();
-				if (block instanceof BaseSignBlock) {
-					ResourceLocation blockId = Registry.BLOCK.getKey(block);
-					RenderType layer = RenderType.entitySolid(new ResourceLocation(blockId.getNamespace(),
-							"textures/entity/sign/" + blockId.getPath() + ".png"));
-					LAYERS.put(block, layer);
-				}
-			}
-		});
+	public static void registerRenderLayer(BaseSignBlock block) {
+		ResourceLocation blockId = Registry.BLOCK.getKey(block);
+		RenderType layer = RenderType.entitySolid(new ResourceLocation(blockId.getNamespace(),
+				"textures/entity/sign/" + blockId.getPath() + ".png"));
+		LAYERS.put(block, layer);
 	}
 
-	
+	static {
+		defaultLayer = RenderType.entitySolid(new ResourceLocation("textures/entity/sign/oak.png"));
+	}
 }

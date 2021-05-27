@@ -9,6 +9,8 @@ import com.mojang.math.Vector3f;
 
 import it.unimi.dsi.fastutil.floats.Float2FloatFunction;
 import it.unimi.dsi.fastutil.ints.Int2IntFunction;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
@@ -34,6 +36,7 @@ import ru.bclib.blockentities.BaseChestBlockEntity;
 import ru.bclib.blocks.BaseChestBlock;
 import ru.bclib.registry.BaseRegistry;
 
+@Environment(EnvType.CLIENT)
 public class BaseChestBlockEntityRenderer extends BlockEntityRenderer<BaseChestBlockEntity> {
 	private static final HashMap<Block, RenderType[]> LAYERS = Maps.newHashMap();
 	private static final RenderType[] defaultLayer;
@@ -154,27 +157,22 @@ public class BaseChestBlockEntityRenderer extends BlockEntityRenderer<BaseChestB
 		return provider.getBuffer(getChestTexture(chestType, layers));
 	}
 
+	public static void registerRenderLayer(BaseChestBlock block) {
+		ResourceLocation blockId = Registry.BLOCK.getKey(block);
+		String modId = blockId.getNamespace();
+		String path = blockId.getPath();
+		LAYERS.put(block, new RenderType[] {
+			RenderType.entityCutout(new ResourceLocation(modId, "textures/entity/chest/" + path + ".png")),
+			RenderType.entityCutout(new ResourceLocation(modId, "textures/entity/chest/" + path + "_left.png")),
+			RenderType.entityCutout(new ResourceLocation(modId, "textures/entity/chest/" + path + "_right.png"))
+		});
+	}
+
 	static {
 		defaultLayer = new RenderType[] {
 			RenderType.entityCutout(new ResourceLocation("textures/entity/chest/normal.png")),
 			RenderType.entityCutout(new ResourceLocation("textures/entity/chest/normal_left.png")),
 			RenderType.entityCutout(new ResourceLocation("textures/entity/chest/normal_right.png"))
 		};
-		
-		BaseRegistry.getModBlocks().forEach((item) -> {
-			if (item instanceof BlockItem) {
-				Block block = ((BlockItem) item).getBlock();
-				if (block instanceof BaseChestBlock) {
-					ResourceLocation blockId = Registry.BLOCK.getKey(block);
-					String modId = blockId.getNamespace();
-					String path = blockId.getPath();
-					LAYERS.put(block, new RenderType[] {
-						RenderType.entityCutout(new ResourceLocation(modId, "textures/entity/chest/" + path + ".png")),
-						RenderType.entityCutout(new ResourceLocation(modId, "textures/entity/chest/" + path + "_left.png")),
-						RenderType.entityCutout(new ResourceLocation(modId, "textures/entity/chest/" + path + "_right.png"))
-					});
-				}
-			}
-		});
 	}
 }
