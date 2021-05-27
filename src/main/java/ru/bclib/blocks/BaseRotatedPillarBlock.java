@@ -10,23 +10,23 @@ import org.jetbrains.annotations.Nullable;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.resources.model.UnbakedModel;
-import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.ChainBlock;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.MaterialColor;
 import net.minecraft.world.level.storage.loot.LootContext;
-import ru.betterend.client.models.BlockModelProvider;
-import ru.betterend.client.models.ModelsHelper;
-import ru.betterend.client.models.Patterns;
-import ru.betterend.client.render.ERenderLayer;
-import ru.betterend.interfaces.IRenderTypeable;
+import ru.bclib.client.models.BlockModelProvider;
+import ru.bclib.client.models.ModelsHelper;
+import ru.bclib.client.models.PatternsHelper;
 
-public class EndChainBlock extends ChainBlock implements BlockModelProvider, IRenderTypeable {
-	public EndChainBlock(MaterialColor color) {
-		super(FabricBlockSettings.copyOf(Blocks.CHAIN).materialColor(color));
+public class BaseRotatedPillarBlock extends RotatedPillarBlock implements BlockModelProvider {
+	public BaseRotatedPillarBlock(Properties settings) {
+		super(settings);
+	}
+	
+	public BaseRotatedPillarBlock(Block block) {
+		super(FabricBlockSettings.copyOf(block));
 	}
 	
 	@Override
@@ -36,27 +36,24 @@ public class EndChainBlock extends ChainBlock implements BlockModelProvider, IRe
 
 	@Override
 	public BlockModel getItemModel(ResourceLocation blockId) {
-		return ModelsHelper.createItemModel(blockId.getPath());
+		return getBlockModel(blockId, defaultBlockState());
 	}
 
 	@Override
 	public @Nullable BlockModel getBlockModel(ResourceLocation blockId, BlockState blockState) {
-		String name = blockId.getPath();
-		Optional<String> pattern = Patterns.createJson(Patterns.BLOCK_CHAIN, name, name);
+		Optional<String> pattern = createBlockPattern(blockId);
 		return ModelsHelper.fromPattern(pattern);
 	}
 
 	@Override
 	public UnbakedModel getModelVariant(ResourceLocation stateId, BlockState blockState, Map<ResourceLocation, UnbakedModel> modelCache) {
-		Direction.Axis axis = blockState.getValue(AXIS);
 		ResourceLocation modelId = new ResourceLocation(stateId.getNamespace(),
 				"block/" + stateId.getPath());
 		registerBlockModel(stateId, modelId, blockState, modelCache);
-		return ModelsHelper.createRotatedModel(modelId, axis);
+		return ModelsHelper.createRotatedModel(modelId, blockState.getValue(AXIS));
 	}
 
-	@Override
-	public ERenderLayer getRenderLayer() {
-		return ERenderLayer.CUTOUT;
+	protected Optional<String> createBlockPattern(ResourceLocation blockId) {
+		return PatternsHelper.createBlockPillar(blockId);
 	}
 }

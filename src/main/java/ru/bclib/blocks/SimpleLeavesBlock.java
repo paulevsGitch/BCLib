@@ -4,10 +4,10 @@ import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
-import ru.betterend.client.render.ERenderLayer;
-import ru.betterend.interfaces.IRenderTypeable;
+import ru.bclib.client.render.ERenderLayer;
+import ru.bclib.interfaces.IRenderTypeable;
 
-public class SimpleLeavesBlock extends BlockBaseNotFull implements IRenderTypeable {
+public class SimpleLeavesBlock extends BaseBlockNotFull implements IRenderTypeable {
 	public SimpleLeavesBlock(MaterialColor color) {
 		super(FabricBlockSettings.of(Material.LEAVES)
 				.strength(0.2F)

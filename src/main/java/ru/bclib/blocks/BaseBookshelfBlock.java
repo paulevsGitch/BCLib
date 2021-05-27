@@ -17,11 +17,12 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
-import ru.betterend.client.models.ModelsHelper;
-import ru.betterend.client.models.Patterns;
+import ru.bclib.client.models.BasePatterns;
+import ru.bclib.client.models.ModelsHelper;
+import ru.bclib.client.models.PatternsHelper;
 
-public class EndBookshelfBlock extends BlockBase {
-	public EndBookshelfBlock(Block source) {
+public class BaseBookshelfBlock extends BaseBlock {
+	public BaseBookshelfBlock(Block source) {
 		super(FabricBlockSettings.copyOf(source));
 	}
 	
@@ -39,13 +40,12 @@ public class EndBookshelfBlock extends BlockBase {
 
 	@Override
 	public @Nullable BlockModel getBlockModel(ResourceLocation blockId, BlockState blockState) {
-		Optional<String> pattern = Patterns.createJson(Patterns.BLOCK_BOOKSHELF,
-				getName(blockId), blockId.getPath());
+		Optional<String> pattern = PatternsHelper.createJson(BasePatterns.BLOCK_BOOKSHELF, replacePath(blockId));
 		return ModelsHelper.fromPattern(pattern);
 	}
 
-	private String getName(ResourceLocation blockId) {
-		String name = blockId.getPath();
-		return name.replace("_bookshelf", "");
+	private ResourceLocation replacePath(ResourceLocation blockId) {
+		String newPath = blockId.getPath().replace("_bookshelf", "");
+		return new ResourceLocation(blockId.getNamespace(), newPath);
 	}
 }

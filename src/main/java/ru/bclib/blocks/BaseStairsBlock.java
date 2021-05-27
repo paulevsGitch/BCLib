@@ -20,15 +20,16 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Half;
 import net.minecraft.world.level.block.state.properties.StairsShape;
 import net.minecraft.world.level.storage.loot.LootContext;
-import ru.betterend.client.models.BlockModelProvider;
-import ru.betterend.client.models.ModelsHelper;
-import ru.betterend.client.models.Patterns;
+import ru.bclib.client.models.BasePatterns;
+import ru.bclib.client.models.BlockModelProvider;
+import ru.bclib.client.models.ModelsHelper;
+import ru.bclib.client.models.PatternsHelper;
 
-public class EndStairsBlock extends StairBlock implements BlockModelProvider {
+public class BaseStairsBlock extends StairBlock implements BlockModelProvider {
 	
 	private final Block parent;
 	
-	public EndStairsBlock(Block source) {
+	public BaseStairsBlock(Block source) {
 		super(source.defaultBlockState(), FabricBlockSettings.copyOf(source));
 		this.parent = source;
 	}
@@ -49,15 +50,15 @@ public class EndStairsBlock extends StairBlock implements BlockModelProvider {
 		Optional<String> pattern = Optional.empty();
 		switch (blockState.getValue(SHAPE)) {
 			case STRAIGHT:
-				pattern = Patterns.createJson(Patterns.BLOCK_STAIR, parentId.getPath(), blockId.getPath());
+				pattern = PatternsHelper.createJson(BasePatterns.BLOCK_STAIR, parentId);
 				break;
 			case INNER_LEFT:
 			case INNER_RIGHT:
-				pattern = Patterns.createJson(Patterns.BLOCK_STAIR_INNER, parentId.getPath(), blockId.getPath());
+				pattern = PatternsHelper.createJson(BasePatterns.BLOCK_STAIR_INNER, parentId);
 				break;
 			case OUTER_LEFT:
 			case OUTER_RIGHT:
-				pattern = Patterns.createJson(Patterns.BLOCK_STAIR_OUTER, parentId.getPath(), blockId.getPath());
+				pattern = PatternsHelper.createJson(BasePatterns.BLOCK_STAIR_OUTER, parentId);
 				break;
 		}
 		return ModelsHelper.fromPattern(pattern);
@@ -65,7 +66,7 @@ public class EndStairsBlock extends StairBlock implements BlockModelProvider {
 
 	@Override
 	public UnbakedModel getModelVariant(ResourceLocation stateId, BlockState blockState, Map<ResourceLocation, UnbakedModel> modelCache) {
-		String state = "";
+		String state;
 		StairsShape shape = blockState.getValue(SHAPE);
 		switch (shape) {
 			case INNER_LEFT:
@@ -73,8 +74,9 @@ public class EndStairsBlock extends StairBlock implements BlockModelProvider {
 				state = "_inner"; break;
 			case OUTER_LEFT:
 			case OUTER_RIGHT:
-			default:
 				state = "_outer"; break;
+			default:
+				state = "";
 		}
 		ResourceLocation modelId = new ResourceLocation(stateId.getNamespace(), "block/" + stateId.getPath() + state);
 		registerBlockModel(stateId, modelId, blockState, modelCache);

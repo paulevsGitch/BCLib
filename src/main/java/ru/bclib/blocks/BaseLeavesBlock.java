@@ -19,15 +19,15 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.MaterialColor;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
+import ru.bclib.client.models.BlockModelProvider;
+import ru.bclib.client.render.ERenderLayer;
+import ru.bclib.interfaces.IRenderTypeable;
 import ru.bclib.util.MHelper;
-import ru.betterend.client.models.BlockModelProvider;
-import ru.betterend.client.render.ERenderLayer;
-import ru.betterend.interfaces.IRenderTypeable;
 
-public class EndLeavesBlock extends LeavesBlock implements BlockModelProvider, IRenderTypeable {
+public class BaseLeavesBlock extends LeavesBlock implements BlockModelProvider, IRenderTypeable {
 	private final Block sapling;
 	
-	public EndLeavesBlock(Block sapling, MaterialColor color) {
+	public BaseLeavesBlock(Block sapling, MaterialColor color) {
 		super(FabricBlockSettings.copyOf(Blocks.OAK_LEAVES)
 				.materialColor(color)
 				.breakByTool(FabricToolTags.HOES)
@@ -39,7 +39,7 @@ public class EndLeavesBlock extends LeavesBlock implements BlockModelProvider, I
 		this.sapling = sapling;
 	}
 	
-	public EndLeavesBlock(Block sapling, MaterialColor color, int light) {
+	public BaseLeavesBlock(Block sapling, MaterialColor color, int light) {
 		super(FabricBlockSettings.copyOf(Blocks.OAK_LEAVES)
 				.materialColor(color)
 				.luminance(light)

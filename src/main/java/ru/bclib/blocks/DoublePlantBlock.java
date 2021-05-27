@@ -34,13 +34,11 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import ru.betterend.blocks.BlockProperties;
-import ru.betterend.client.render.ERenderLayer;
-import ru.betterend.interfaces.IRenderTypeable;
-import ru.betterend.registry.EndTags;
-import ru.betterend.util.BlocksHelper;
+import ru.bclib.client.render.ERenderLayer;
+import ru.bclib.interfaces.IRenderTypeable;
+import ru.bclib.util.BlocksHelper;
 
-public class DoublePlantBlock extends BlockBaseNotFull implements IRenderTypeable, BonemealableBlock {
+public abstract class DoublePlantBlock extends BaseBlockNotFull implements IRenderTypeable, BonemealableBlock {
 	private static final VoxelShape SHAPE = Block.box(4, 2, 4, 12, 16, 12);
 	public static final IntegerProperty ROTATION = BlockProperties.ROTATION;
 	public static final BooleanProperty TOP = BooleanProperty.create("top");
@@ -93,9 +91,7 @@ public class DoublePlantBlock extends BlockBaseNotFull implements IRenderTypeabl
 		return state.getValue(TOP) ? down.getBlock() == this : isTerrain(down) && (up.getBlock() == this);
 	}
 
-	protected boolean isTerrain(BlockState state) {
-		return state.is(EndTags.END_GROUND);
-	}
+	protected abstract boolean isTerrain(BlockState state);
 	
 	@Override
 	public BlockState updateShape(BlockState state, Direction facing, BlockState neighborState, LevelAccessor world, BlockPos pos, BlockPos neighborPos) {

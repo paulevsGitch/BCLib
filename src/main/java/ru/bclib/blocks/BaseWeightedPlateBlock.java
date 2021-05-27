@@ -14,18 +14,19 @@ import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.FenceGateBlock;
+import net.minecraft.world.level.block.WeightedPressurePlateBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootContext;
-import ru.betterend.client.models.BlockModelProvider;
-import ru.betterend.client.models.ModelsHelper;
-import ru.betterend.client.models.Patterns;
+import ru.bclib.client.models.BasePatterns;
+import ru.bclib.client.models.BlockModelProvider;
+import ru.bclib.client.models.ModelsHelper;
+import ru.bclib.client.models.PatternsHelper;
 
-public class EndGateBlock extends FenceGateBlock implements BlockModelProvider {
+public class BaseWeightedPlateBlock extends WeightedPressurePlateBlock implements BlockModelProvider {
 	private final Block parent;
 	
-	public EndGateBlock(Block source) {
-		super(FabricBlockSettings.copyOf(source).noOcclusion());
+	public BaseWeightedPlateBlock(Block source) {
+		super(15, FabricBlockSettings.copyOf(source).noCollission().noOcclusion().requiresCorrectToolForDrops().strength(0.5F));
 		this.parent = source;
 	}
 
@@ -40,29 +41,23 @@ public class EndGateBlock extends FenceGateBlock implements BlockModelProvider {
 	}
 
 	@Override
-	public @Nullable BlockModel getBlockModel(ResourceLocation blockId, BlockState blockState) {
-		boolean inWall = blockState.getValue(IN_WALL);
-		boolean isOpen = blockState.getValue(OPEN);
+	public @Nullable BlockModel getBlockModel(ResourceLocation resourceLocation, BlockState blockState) {
 		ResourceLocation parentId = Registry.BLOCK.getKey(parent);
 		Optional<String> pattern;
-		if (inWall) {
-			pattern = isOpen ? Patterns.createJson(Patterns.BLOCK_GATE_OPEN_WALL, parentId.getPath(), blockId.getPath()) :
-					Patterns.createJson(Patterns.BLOCK_GATE_CLOSED_WALL, parentId.getPath(), blockId.getPath());
+		if (blockState.getValue(POWER) > 0) {
+			pattern = PatternsHelper.createJson(BasePatterns.BLOCK_PLATE_DOWN, parentId);
 		} else {
-			pattern = isOpen ? Patterns.createJson(Patterns.BLOCK_GATE_OPEN, parentId.getPath(), blockId.getPath()) :
-					Patterns.createJson(Patterns.BLOCK_GATE_CLOSED, parentId.getPath(), blockId.getPath());
+			pattern = PatternsHelper.createJson(BasePatterns.BLOCK_PLATE_UP, parentId);
 		}
 		return ModelsHelper.fromPattern(pattern);
 	}
 
 	@Override
 	public UnbakedModel getModelVariant(ResourceLocation stateId, BlockState blockState, Map<ResourceLocation, UnbakedModel> modelCache) {
-		boolean inWall = blockState.getValue(IN_WALL);
-		boolean isOpen = blockState.getValue(OPEN);
-		String state = "" + (inWall ? "_wall" : "") + (isOpen ? "_open" : "_closed");
+		String state = blockState.getValue(POWER) > 0 ? "_down" : "_up";
 		ResourceLocation modelId = new ResourceLocation(stateId.getNamespace(),
 				"block/" + stateId.getPath() + state);
 		registerBlockModel(stateId, modelId, blockState, modelCache);
-		return ModelsHelper.createFacingModel(modelId, blockState.getValue(FACING), true, false);
+		return ModelsHelper.createBlockSimple(modelId);
 	}
 }

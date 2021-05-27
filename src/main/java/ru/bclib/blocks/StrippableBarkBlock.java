@@ -16,7 +16,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.MaterialColor;
 import net.minecraft.world.phys.BlockHitResult;
 
-public class StrippableBarkBlock extends BarkBlock {
+public class StrippableBarkBlock extends BaseBarkBlock {
 	private final Block striped;
 	
 	public StrippableBarkBlock(MaterialColor color, Block striped) {

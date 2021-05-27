@@ -28,12 +28,12 @@ import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import ru.betterend.client.models.BlockModelProvider;
-import ru.betterend.client.models.ModelsHelper;
-import ru.betterend.client.models.Patterns;
-import ru.betterend.client.render.ERenderLayer;
-import ru.betterend.interfaces.IRenderTypeable;
-import ru.betterend.registry.EndTags;
+import ru.bclib.client.models.BasePatterns;
+import ru.bclib.client.models.BlockModelProvider;
+import ru.bclib.client.models.ModelsHelper;
+import ru.bclib.client.models.PatternsHelper;
+import ru.bclib.client.render.ERenderLayer;
+import ru.bclib.interfaces.IRenderTypeable;
 
 public abstract class FeatureSaplingBlock extends SaplingBlock implements IRenderTypeable, BlockModelProvider {
 	private static final VoxelShape SHAPE = Block.box(4, 0, 4, 12, 14, 12);
@@ -67,11 +67,6 @@ public abstract class FeatureSaplingBlock extends SaplingBlock implements IRende
 	@Override
 	public VoxelShape getShape(BlockState state, BlockGetter view, BlockPos pos, CollisionContext ePos) {
 		return SHAPE;
-	}
-
-	@Override
-	public boolean canSurvive(BlockState state, LevelReader world, BlockPos pos) {
-		return world.getBlockState(pos.below()).is(EndTags.END_GROUND);
 	}
 
 	@Override
@@ -117,7 +112,7 @@ public abstract class FeatureSaplingBlock extends SaplingBlock implements IRende
 
 	@Override
 	public @Nullable BlockModel getBlockModel(ResourceLocation resourceLocation, BlockState blockState) {
-		Optional<String> pattern = Patterns.createJson(Patterns.BLOCK_CROSS, resourceLocation.getPath());
+		Optional<String> pattern = PatternsHelper.createJson(BasePatterns.BLOCK_CROSS, resourceLocation);
 		return ModelsHelper.fromPattern(pattern);
 	}
 }

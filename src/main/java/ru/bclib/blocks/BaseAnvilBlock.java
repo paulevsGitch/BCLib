@@ -22,16 +22,16 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.material.MaterialColor;
 import net.minecraft.world.level.storage.loot.LootContext;
-import ru.betterend.blocks.BlockProperties;
-import ru.betterend.client.models.BlockModelProvider;
-import ru.betterend.client.models.ModelsHelper;
-import ru.betterend.client.models.Patterns;
+import ru.bclib.client.models.BasePatterns;
+import ru.bclib.client.models.BlockModelProvider;
+import ru.bclib.client.models.ModelsHelper;
+import ru.bclib.client.models.PatternsHelper;
 
-public class EndAnvilBlock extends AnvilBlock implements BlockModelProvider {
+public class BaseAnvilBlock extends AnvilBlock implements BlockModelProvider {
 	private static final IntegerProperty DESTRUCTION = BlockProperties.DESTRUCTION;
 	protected final int level;
 	
-	public EndAnvilBlock(MaterialColor color, int level) {
+	public BaseAnvilBlock(MaterialColor color, int level) {
 		super(FabricBlockSettings.copyOf(Blocks.ANVIL).materialColor(color));
 		this.level = level;
 	}
@@ -79,7 +79,7 @@ public class EndAnvilBlock extends AnvilBlock implements BlockModelProvider {
 		Map<String, String> textures = Maps.newHashMap();
 		textures.put("%anvil%", name);
 		textures.put("%top%", name + "_top_" + destruction);
-		Optional<String> pattern = Patterns.createJson(Patterns.BLOCK_ANVIL, textures);
+		Optional<String> pattern = PatternsHelper.createJson(BasePatterns.BLOCK_ANVIL, textures);
 		return ModelsHelper.fromPattern(pattern);
 	}
 

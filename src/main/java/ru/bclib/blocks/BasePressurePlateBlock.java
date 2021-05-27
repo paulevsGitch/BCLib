@@ -17,14 +17,15 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.PressurePlateBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootContext;
-import ru.betterend.client.models.BlockModelProvider;
-import ru.betterend.client.models.ModelsHelper;
-import ru.betterend.client.models.Patterns;
+import ru.bclib.client.models.BasePatterns;
+import ru.bclib.client.models.BlockModelProvider;
+import ru.bclib.client.models.ModelsHelper;
+import ru.bclib.client.models.PatternsHelper;
 
-public class EndPlateBlock extends PressurePlateBlock implements BlockModelProvider {
+public class BasePressurePlateBlock extends PressurePlateBlock implements BlockModelProvider {
 	private final Block parent;
 	
-	public EndPlateBlock(Sensitivity rule, Block source) {
+	public BasePressurePlateBlock(Sensitivity rule, Block source) {
 		super(rule, FabricBlockSettings.copyOf(source).noCollission().noOcclusion().strength(0.5F));
 		this.parent = source;
 	}
@@ -44,9 +45,9 @@ public class EndPlateBlock extends PressurePlateBlock implements BlockModelProvi
 		ResourceLocation parentId = Registry.BLOCK.getKey(parent);
 		Optional<String> pattern;
 		if (blockState.getValue(POWERED)) {
-			pattern = Patterns.createJson(Patterns.BLOCK_PLATE_DOWN, parentId.getPath(), resourceLocation.getPath());
+			pattern = PatternsHelper.createJson(BasePatterns.BLOCK_PLATE_DOWN, parentId);
 		} else {
-			pattern = Patterns.createJson(Patterns.BLOCK_PLATE_UP, parentId.getPath(), resourceLocation.getPath());
+			pattern = PatternsHelper.createJson(BasePatterns.BLOCK_PLATE_UP, parentId);
 		}
 		return ModelsHelper.fromPattern(pattern);
 	}

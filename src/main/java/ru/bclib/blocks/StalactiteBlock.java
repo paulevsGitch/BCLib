@@ -35,12 +35,11 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import ru.bclib.client.models.BasePatterns;
+import ru.bclib.client.models.ModelsHelper;
+import ru.bclib.client.models.PatternsHelper;
+import ru.bclib.client.render.ERenderLayer;
 import ru.bclib.interfaces.IRenderTypeable;
-import ru.betterend.blocks.BlockProperties;
-import ru.betterend.client.models.ModelsHelper;
-import ru.betterend.client.models.Patterns;
-import ru.betterend.client.render.ERenderLayer;
-import ru.betterend.interfaces.IRenderTypeable;
 
 public class StalactiteBlock extends BaseBlockNotFull implements SimpleWaterloggedBlock, LiquidBlockContainer, IRenderTypeable {
 	public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
@@ -202,7 +201,7 @@ public class StalactiteBlock extends BaseBlockNotFull implements SimpleWaterlogg
 	
 	@Override
 	public @Nullable BlockModel getBlockModel(ResourceLocation resourceLocation, BlockState blockState) {
-		Optional<String> pattern = Patterns.createJson(Patterns.BLOCK_CROSS_SHADED, resourceLocation.getPath());
+		Optional<String> pattern = PatternsHelper.createJson(BasePatterns.BLOCK_CROSS_SHADED, resourceLocation);
 		return ModelsHelper.fromPattern(pattern);
 	}
 

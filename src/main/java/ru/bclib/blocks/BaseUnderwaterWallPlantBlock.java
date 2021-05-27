@@ -14,7 +14,7 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.material.Material;
 
-public class BaseUnderwaterWallPlantBlock extends BaseWallPlantBlock implements LiquidBlockContainer {
+public abstract class BaseUnderwaterWallPlantBlock extends BaseWallPlantBlock implements LiquidBlockContainer {
 	
 	public BaseUnderwaterWallPlantBlock() {
 		super(FabricBlockSettings.of(Material.WATER_PLANT)

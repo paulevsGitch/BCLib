@@ -32,13 +32,12 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import ru.betterend.blocks.BlockProperties;
-import ru.betterend.blocks.BlockProperties.TripleShape;
-import ru.betterend.client.render.ERenderLayer;
-import ru.betterend.interfaces.IRenderTypeable;
-import ru.betterend.util.BlocksHelper;
+import ru.bclib.blocks.BlockProperties.TripleShape;
+import ru.bclib.client.render.ERenderLayer;
+import ru.bclib.interfaces.IRenderTypeable;
+import ru.bclib.util.BlocksHelper;
 
-public class VineBlock extends BlockBaseNotFull implements IRenderTypeable, BonemealableBlock {
+public class VineBlock extends BaseBlockNotFull implements IRenderTypeable, BonemealableBlock {
 	public static final EnumProperty<TripleShape> SHAPE = BlockProperties.TRIPLE_SHAPE;
 	private static final VoxelShape VOXEL_SHAPE = Block.box(2, 0, 2, 14, 16, 14);
 	

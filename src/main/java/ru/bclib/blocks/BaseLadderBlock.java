@@ -37,7 +37,7 @@ import ru.bclib.client.models.PatternsHelper;
 import ru.bclib.interfaces.IRenderTypeable;
 import ru.bclib.util.BlocksHelper;
 
-public class EndLadderBlock extends BaseBlockNotFull implements IRenderTypeable, BlockModelProvider {
+public class BaseLadderBlock extends BaseBlockNotFull implements IRenderTypeable, BlockModelProvider {
 	public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
 	public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 	protected static final VoxelShape EAST_SHAPE = Block.box(0.0D, 0.0D, 0.0D, 3.0D, 16.0D, 16.0D);
@@ -45,7 +45,7 @@ public class EndLadderBlock extends BaseBlockNotFull implements IRenderTypeable,
 	protected static final VoxelShape SOUTH_SHAPE = Block.box(0.0D, 0.0D, 0.0D, 16.0D, 16.0D, 3.0D);
 	protected static final VoxelShape NORTH_SHAPE = Block.box(0.0D, 0.0D, 13.0D, 16.0D, 16.0D, 16.0D);
 
-	public EndLadderBlock(Block block) {
+	public BaseLadderBlock(Block block) {
 		super(FabricBlockSettings.copyOf(block).noOcclusion());
 	}
 
@@ -75,7 +75,7 @@ public class EndLadderBlock extends BaseBlockNotFull implements IRenderTypeable,
 
 	@Override
 	public boolean canSurvive(BlockState state, LevelReader world, BlockPos pos) {
-		Direction direction = (Direction) state.getValue(FACING);
+		Direction direction = state.getValue(FACING);
 		return this.canPlaceOn(world, pos.relative(direction.getOpposite()), direction);
 	}
 
@@ -85,7 +85,7 @@ public class EndLadderBlock extends BaseBlockNotFull implements IRenderTypeable,
 		if (facing.getOpposite() == state.getValue(FACING) && !state.canSurvive(world, pos)) {
 			return Blocks.AIR.defaultBlockState();
 		} else {
-			if ((Boolean) state.getValue(WATERLOGGED)) {
+			if (state.getValue(WATERLOGGED)) {
 				world.getLiquidTicks().scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(world));
 			}
 
@@ -133,7 +133,7 @@ public class EndLadderBlock extends BaseBlockNotFull implements IRenderTypeable,
 
 	@Override
 	public FluidState getFluidState(BlockState state) {
-		return (Boolean) state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
+		return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
 	}
 
 	@Override
