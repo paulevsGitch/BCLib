@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import net.minecraft.core.Registry;
 import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Maps;
@@ -32,8 +33,11 @@ import ru.bclib.client.models.PatternsHelper;
 public class BasePathBlock extends BaseBlockNotFull {
 	private static final VoxelShape SHAPE = Block.box(0, 0, 0, 16, 15, 16);
 	
+	private final Block base;
+
 	public BasePathBlock(Block source) {
 		super(FabricBlockSettings.copyOf(source).isValidSpawn((state, world, pos, type) -> { return false; }));
+		this.base = source;
 		if (source instanceof BaseTerrainBlock) {
 			BaseTerrainBlock terrain = (BaseTerrainBlock) source;
 			terrain.setPathBlock(this);
@@ -67,10 +71,13 @@ public class BasePathBlock extends BaseBlockNotFull {
 	@Override
 	public @Nullable BlockModel getBlockModel(ResourceLocation resourceLocation, BlockState blockState) {
 		String name = resourceLocation.getPath();
+		ResourceLocation baseId = Registry.BLOCK.getKey(base);
+		String bottom = baseId.getNamespace() + ":block/" + baseId.getPath();
 		Map<String, String> textures = Maps.newHashMap();
 		textures.put("%modid%", resourceLocation.getNamespace());
 		textures.put("%top%", name + "_top");
 		textures.put("%side%", name.replace("_path", "") + "_side");
+		textures.put("%bottom%", bottom);
 		Optional<String> pattern = PatternsHelper.createJson(BasePatterns.BLOCK_PATH, textures);
 		return ModelsHelper.fromPattern(pattern);
 	}

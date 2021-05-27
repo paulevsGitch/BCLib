@@ -2,6 +2,6 @@
     "textures": {
         "top": "%modid%:block/%top%",
         "side": "%modid%:block/%side%",
-        "bottom": "%modid%:block/%bottom%"
+        "bottom": "%bottom%"
     }
 }
