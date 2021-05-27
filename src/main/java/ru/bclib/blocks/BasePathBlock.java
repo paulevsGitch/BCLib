@@ -30,14 +30,11 @@ import ru.bclib.client.models.BasePatterns;
 import ru.bclib.client.models.ModelsHelper;
 import ru.bclib.client.models.PatternsHelper;
 
-public class BasePathBlock extends BaseBlockNotFull {
+public abstract class BasePathBlock extends BaseBlockNotFull {
 	private static final VoxelShape SHAPE = Block.box(0, 0, 0, 16, 15, 16);
-	
-	private final Block base;
 
 	public BasePathBlock(Block source) {
 		super(FabricBlockSettings.copyOf(source).isValidSpawn((state, world, pos, type) -> { return false; }));
-		this.base = source;
 		if (source instanceof BaseTerrainBlock) {
 			BaseTerrainBlock terrain = (BaseTerrainBlock) source;
 			terrain.setPathBlock(this);
@@ -71,8 +68,9 @@ public class BasePathBlock extends BaseBlockNotFull {
 	@Override
 	public @Nullable BlockModel getBlockModel(ResourceLocation resourceLocation, BlockState blockState) {
 		String name = resourceLocation.getPath();
-		ResourceLocation baseId = Registry.BLOCK.getKey(base);
-		String bottom = baseId.getNamespace() + ":block/" + baseId.getPath();
+		Block bottomBlock = getBottomBlock();
+		ResourceLocation bottomId = Registry.BLOCK.getKey(bottomBlock);
+		String bottom = bottomId.getNamespace() + ":block/" + bottomId.getPath();
 		Map<String, String> textures = Maps.newHashMap();
 		textures.put("%modid%", resourceLocation.getNamespace());
 		textures.put("%top%", name + "_top");
@@ -88,4 +86,6 @@ public class BasePathBlock extends BaseBlockNotFull {
 		registerBlockModel(stateId, modelId, blockState, modelCache);
 		return ModelsHelper.createRandomTopModel(modelId);
 	}
+
+	protected abstract Block getBottomBlock();
 }
