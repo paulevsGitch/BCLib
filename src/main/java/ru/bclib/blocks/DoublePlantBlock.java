@@ -35,10 +35,10 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import ru.bclib.client.render.ERenderLayer;
-import ru.bclib.interfaces.IRenderTypeable;
+import ru.bclib.interfaces.IRenderTyped;
 import ru.bclib.util.BlocksHelper;
 
-public abstract class DoublePlantBlock extends BaseBlockNotFull implements IRenderTypeable, BonemealableBlock {
+public abstract class DoublePlantBlock extends BaseBlockNotFull implements IRenderTyped, BonemealableBlock {
 	private static final VoxelShape SHAPE = Block.box(4, 2, 4, 12, 16, 12);
 	public static final IntegerProperty ROTATION = BlockProperties.ROTATION;
 	public static final BooleanProperty TOP = BooleanProperty.create("top");

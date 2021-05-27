@@ -21,10 +21,10 @@ import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import ru.bclib.client.models.BlockModelProvider;
 import ru.bclib.client.render.ERenderLayer;
-import ru.bclib.interfaces.IRenderTypeable;
+import ru.bclib.interfaces.IRenderTyped;
 import ru.bclib.util.MHelper;
 
-public class BaseLeavesBlock extends LeavesBlock implements BlockModelProvider, IRenderTypeable {
+public class BaseLeavesBlock extends LeavesBlock implements BlockModelProvider, IRenderTyped {
 	private final Block sapling;
 	
 	public BaseLeavesBlock(Block sapling, MaterialColor color) {

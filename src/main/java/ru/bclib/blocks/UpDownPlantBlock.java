@@ -27,9 +27,9 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import ru.bclib.client.render.ERenderLayer;
-import ru.bclib.interfaces.IRenderTypeable;
+import ru.bclib.interfaces.IRenderTyped;
 
-public abstract class UpDownPlantBlock extends BaseBlockNotFull implements IRenderTypeable {
+public abstract class UpDownPlantBlock extends BaseBlockNotFull implements IRenderTyped {
 	private static final VoxelShape SHAPE = Block.box(4, 0, 4, 12, 16, 12);
 	
 	public UpDownPlantBlock() {

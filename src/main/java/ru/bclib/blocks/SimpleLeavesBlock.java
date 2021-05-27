@@ -5,9 +5,9 @@ import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
 import ru.bclib.client.render.ERenderLayer;
-import ru.bclib.interfaces.IRenderTypeable;
+import ru.bclib.interfaces.IRenderTyped;
 
-public class SimpleLeavesBlock extends BaseBlockNotFull implements IRenderTypeable {
+public class SimpleLeavesBlock extends BaseBlockNotFull implements IRenderTyped {
 	public SimpleLeavesBlock(MaterialColor color) {
 		super(FabricBlockSettings.of(Material.LEAVES)
 				.strength(0.2F)

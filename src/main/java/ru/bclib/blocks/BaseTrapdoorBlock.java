@@ -24,9 +24,9 @@ import ru.bclib.client.models.BlockModelProvider;
 import ru.bclib.client.models.ModelsHelper;
 import ru.bclib.client.models.PatternsHelper;
 import ru.bclib.client.render.ERenderLayer;
-import ru.bclib.interfaces.IRenderTypeable;
+import ru.bclib.interfaces.IRenderTyped;
 
-public class BaseTrapdoorBlock extends TrapDoorBlock implements IRenderTypeable, BlockModelProvider {
+public class BaseTrapdoorBlock extends TrapDoorBlock implements IRenderTyped, BlockModelProvider {
 	public BaseTrapdoorBlock(Block source) {
 		super(FabricBlockSettings.copyOf(source).strength(3.0F, 3.0F).noOcclusion());
 	}

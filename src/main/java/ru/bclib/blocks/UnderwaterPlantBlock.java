@@ -35,9 +35,9 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import ru.bclib.client.render.ERenderLayer;
-import ru.bclib.interfaces.IRenderTypeable;
+import ru.bclib.interfaces.IRenderTyped;
 
-public abstract class UnderwaterPlantBlock extends BaseBlockNotFull implements IRenderTypeable, BonemealableBlock, LiquidBlockContainer {
+public abstract class UnderwaterPlantBlock extends BaseBlockNotFull implements IRenderTyped, BonemealableBlock, LiquidBlockContainer {
 	private static final VoxelShape SHAPE = Block.box(4, 0, 4, 12, 14, 12);
 	
 	public UnderwaterPlantBlock() {

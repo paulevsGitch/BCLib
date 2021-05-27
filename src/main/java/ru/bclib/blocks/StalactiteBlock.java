@@ -39,9 +39,9 @@ import ru.bclib.client.models.BasePatterns;
 import ru.bclib.client.models.ModelsHelper;
 import ru.bclib.client.models.PatternsHelper;
 import ru.bclib.client.render.ERenderLayer;
-import ru.bclib.interfaces.IRenderTypeable;
+import ru.bclib.interfaces.IRenderTyped;
 
-public class StalactiteBlock extends BaseBlockNotFull implements SimpleWaterloggedBlock, LiquidBlockContainer, IRenderTypeable {
+public class StalactiteBlock extends BaseBlockNotFull implements SimpleWaterloggedBlock, LiquidBlockContainer, IRenderTyped {
 	public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 	public static final BooleanProperty IS_FLOOR = BlockProperties.IS_FLOOR;
 	public static final IntegerProperty SIZE = BlockProperties.SIZE;

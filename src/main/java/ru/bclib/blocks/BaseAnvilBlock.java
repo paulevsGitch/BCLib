@@ -29,11 +29,9 @@ import ru.bclib.client.models.PatternsHelper;
 
 public class BaseAnvilBlock extends AnvilBlock implements BlockModelProvider {
 	private static final IntegerProperty DESTRUCTION = BlockProperties.DESTRUCTION;
-	protected final int level;
 	
-	public BaseAnvilBlock(MaterialColor color, int level) {
+	public BaseAnvilBlock(MaterialColor color) {
 		super(FabricBlockSettings.copyOf(Blocks.ANVIL).materialColor(color));
-		this.level = level;
 	}
 	
 	@Override
@@ -44,10 +42,6 @@ public class BaseAnvilBlock extends AnvilBlock implements BlockModelProvider {
 
 	public IntegerProperty getDestructionProperty() {
 		return DESTRUCTION;
-	}
-
-	public int getCraftingLevel() {
-		return level;
 	}
 	
 	@Override

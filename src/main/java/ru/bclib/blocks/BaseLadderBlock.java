@@ -34,10 +34,10 @@ import ru.bclib.client.models.BasePatterns;
 import ru.bclib.client.models.BlockModelProvider;
 import ru.bclib.client.models.ModelsHelper;
 import ru.bclib.client.models.PatternsHelper;
-import ru.bclib.interfaces.IRenderTypeable;
+import ru.bclib.interfaces.IRenderTyped;
 import ru.bclib.util.BlocksHelper;
 
-public class BaseLadderBlock extends BaseBlockNotFull implements IRenderTypeable, BlockModelProvider {
+public class BaseLadderBlock extends BaseBlockNotFull implements IRenderTyped, BlockModelProvider {
 	public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
 	public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 	protected static final VoxelShape EAST_SHAPE = Block.box(0.0D, 0.0D, 0.0D, 3.0D, 16.0D, 16.0D);

@@ -17,7 +17,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SaplingBlock;
@@ -33,9 +32,9 @@ import ru.bclib.client.models.BlockModelProvider;
 import ru.bclib.client.models.ModelsHelper;
 import ru.bclib.client.models.PatternsHelper;
 import ru.bclib.client.render.ERenderLayer;
-import ru.bclib.interfaces.IRenderTypeable;
+import ru.bclib.interfaces.IRenderTyped;
 
-public abstract class FeatureSaplingBlock extends SaplingBlock implements IRenderTypeable, BlockModelProvider {
+public abstract class FeatureSaplingBlock extends SaplingBlock implements IRenderTyped, BlockModelProvider {
 	private static final VoxelShape SHAPE = Block.box(4, 0, 4, 12, 14, 12);
 
 	public FeatureSaplingBlock() {

@@ -23,9 +23,9 @@ import ru.bclib.client.models.BlockModelProvider;
 import ru.bclib.client.models.ModelsHelper;
 import ru.bclib.client.models.PatternsHelper;
 import ru.bclib.client.render.ERenderLayer;
-import ru.bclib.interfaces.IRenderTypeable;
+import ru.bclib.interfaces.IRenderTyped;
 
-public class BaseChainBlock extends ChainBlock implements BlockModelProvider, IRenderTypeable {
+public class BaseChainBlock extends ChainBlock implements BlockModelProvider, IRenderTyped {
 	public BaseChainBlock(MaterialColor color) {
 		super(FabricBlockSettings.copyOf(Blocks.CHAIN).materialColor(color));
 	}

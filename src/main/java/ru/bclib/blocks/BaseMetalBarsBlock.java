@@ -26,9 +26,9 @@ import ru.bclib.client.models.BlockModelProvider;
 import ru.bclib.client.models.ModelsHelper;
 import ru.bclib.client.models.PatternsHelper;
 import ru.bclib.client.render.ERenderLayer;
-import ru.bclib.interfaces.IRenderTypeable;
+import ru.bclib.interfaces.IRenderTyped;
 
-public class BaseMetalBarsBlock extends IronBarsBlock implements BlockModelProvider, IRenderTypeable {
+public class BaseMetalBarsBlock extends IronBarsBlock implements BlockModelProvider, IRenderTyped {
 	public BaseMetalBarsBlock(Block source) {
 		super(FabricBlockSettings.copyOf(source).strength(5.0F, 6.0F).noOcclusion());
 	}

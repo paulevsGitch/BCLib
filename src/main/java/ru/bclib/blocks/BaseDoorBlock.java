@@ -26,9 +26,9 @@ import ru.bclib.client.models.BlockModelProvider;
 import ru.bclib.client.models.ModelsHelper;
 import ru.bclib.client.models.PatternsHelper;
 import ru.bclib.client.render.ERenderLayer;
-import ru.bclib.interfaces.IRenderTypeable;
+import ru.bclib.interfaces.IRenderTyped;
 
-public class BaseDoorBlock extends DoorBlock implements IRenderTypeable, BlockModelProvider {
+public class BaseDoorBlock extends DoorBlock implements IRenderTyped, BlockModelProvider {
 	public BaseDoorBlock(Block source) {
 		super(FabricBlockSettings.copyOf(source).strength(3F, 3F).noOcclusion());
 	}
