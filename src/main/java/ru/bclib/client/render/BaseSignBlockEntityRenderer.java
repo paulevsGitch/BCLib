@@ -47,7 +47,7 @@ public class BaseSignBlockEntityRenderer extends BlockEntityRenderer<BaseSignBlo
 		matrixStack.pushPose();
 
 		matrixStack.translate(0.5D, 0.5D, 0.5D);
-		float angle = -((float) ((Integer) state.getValue(StandingSignBlock.ROTATION) * 360) / 16.0F);
+		float angle = -((float) (state.getValue(StandingSignBlock.ROTATION) * 360) / 16.0F);
 
 		BlockState blockState = signBlockEntity.getBlockState();
 		if (blockState.getValue(BaseSignBlock.FLOOR)) {
@@ -77,11 +77,11 @@ public class BaseSignBlockEntityRenderer extends BlockEntityRenderer<BaseSignBlo
 		for (int s = 0; s < 4; ++s) {
 			FormattedCharSequence orderedText = signBlockEntity.getRenderMessage(s, (text) -> {
 				List<FormattedCharSequence> list = textRenderer.split(text, 90);
-				return list.isEmpty() ? FormattedCharSequence.EMPTY : (FormattedCharSequence) list.get(0);
+				return list.isEmpty() ? FormattedCharSequence.EMPTY : list.get(0);
 			});
 			if (orderedText != null) {
 				float t = (float) (-textRenderer.width(orderedText) / 2);
-				textRenderer.drawInBatch((FormattedCharSequence) orderedText, t, (float) (s * 10 - 20), q, false, matrixStack.last().pose(), provider, false, 0, light);
+				textRenderer.drawInBatch(orderedText, t, (float) (s * 10 - 20), q, false, matrixStack.last().pose(), provider, false, 0, light);
 			}
 		}
 
