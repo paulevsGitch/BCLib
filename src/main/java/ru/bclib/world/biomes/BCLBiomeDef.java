@@ -41,9 +41,9 @@ import ru.bclib.world.structures.BCLStructureFeature;
 import ru.bclib.world.surface.DoubleBlockSurfaceBuilder;
 
 public class BCLBiomeDef {
-	private static final int DEF_FOLIAGE_OVERWORLD = Biomes.PLAINS.getFoliageColor();
-	private static final int DEF_FOLIAGE_NETHER =ColorUtil.color(117, 10, 10);
-	private static final int DEF_FOLIAGE_END = ColorUtil.color(197, 210, 112);
+	public static final int DEF_FOLIAGE_OVERWORLD = Biomes.PLAINS.getFoliageColor();
+	public static final int DEF_FOLIAGE_NETHER =ColorUtil.color(117, 10, 10);
+	public static final int DEF_FOLIAGE_END = ColorUtil.color(197, 210, 112);
 	
 	private final List<ConfiguredStructureFeature<?, ?>> structures = Lists.newArrayList();
 	private final List<FeatureInfo> features = Lists.newArrayList();
