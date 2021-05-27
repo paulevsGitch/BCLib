@@ -34,12 +34,10 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import ru.betterend.client.render.ERenderLayer;
-import ru.betterend.interfaces.IRenderTypeable;
-import ru.betterend.registry.EndBlocks;
-import ru.betterend.registry.EndTags;
+import ru.bclib.client.render.ERenderLayer;
+import ru.bclib.interfaces.IRenderTypeable;
 
-public class UnderwaterPlantBlock extends BlockBaseNotFull implements IRenderTypeable, BonemealableBlock, LiquidBlockContainer {
+public abstract class UnderwaterPlantBlock extends BaseBlockNotFull implements IRenderTypeable, BonemealableBlock, LiquidBlockContainer {
 	private static final VoxelShape SHAPE = Block.box(4, 0, 4, 12, 14, 12);
 	
 	public UnderwaterPlantBlock() {
@@ -81,9 +79,7 @@ public class UnderwaterPlantBlock extends BlockBaseNotFull implements IRenderTyp
 		return isTerrain(down) && state.getFluidState().getType().equals(Fluids.WATER.getSource());
 	}
 	
-	protected boolean isTerrain(BlockState state) {
-		return state.is(EndTags.END_GROUND) || state.getBlock() == EndBlocks.ENDSTONE_DUST;
-	}
+	protected abstract boolean isTerrain(BlockState state);
 
 	@Override
 	public BlockState updateShape(BlockState state, Direction facing, BlockState neighborState, LevelAccessor world, BlockPos pos, BlockPos neighborPos) {

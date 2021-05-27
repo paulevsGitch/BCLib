@@ -26,11 +26,10 @@ import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import ru.betterend.client.render.ERenderLayer;
-import ru.betterend.interfaces.IRenderTypeable;
-import ru.betterend.registry.EndTags;
+import ru.bclib.client.render.ERenderLayer;
+import ru.bclib.interfaces.IRenderTypeable;
 
-public class UpDownPlantBlock extends BlockBaseNotFull implements IRenderTypeable {
+public abstract class UpDownPlantBlock extends BaseBlockNotFull implements IRenderTypeable {
 	private static final VoxelShape SHAPE = Block.box(4, 0, 4, 12, 16, 12);
 	
 	public UpDownPlantBlock() {
@@ -40,6 +39,8 @@ public class UpDownPlantBlock extends BlockBaseNotFull implements IRenderTypeabl
 				.sound(SoundType.GRASS)
 				.noCollission());
 	}
+
+	protected abstract boolean isTerrain(BlockState state);
 
 	@Override
 	public VoxelShape getShape(BlockState state, BlockGetter view, BlockPos pos, CollisionContext ePos) {
@@ -51,10 +52,6 @@ public class UpDownPlantBlock extends BlockBaseNotFull implements IRenderTypeabl
 		BlockState down = world.getBlockState(pos.below());
 		BlockState up = world.getBlockState(pos.above());
 		return (isTerrain(down) || down.getBlock() == this) && (isSupport(up, world, pos) || up.getBlock() == this);
-	}
-	
-	protected boolean isTerrain(BlockState state) {
-		return state.is(EndTags.END_GROUND);
 	}
 	
 	protected boolean isSupport(BlockState state, LevelReader world, BlockPos pos) {

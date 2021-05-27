@@ -28,7 +28,7 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import ru.bclib.util.BlocksHelper;
 
-public class BaseWallPlantBlock extends BasePlantBlock {
+public abstract class BaseWallPlantBlock extends BasePlantBlock {
 	private static final EnumMap<Direction, VoxelShape> SHAPES = Maps.newEnumMap(ImmutableMap.of(
 			Direction.NORTH, Block.box(1, 1, 8, 15, 15, 16),
 			Direction.SOUTH, Block.box(1, 1, 0, 15, 15, 8),
@@ -74,7 +74,7 @@ public class BaseWallPlantBlock extends BasePlantBlock {
 
 	@Override
 	public boolean canSurvive(BlockState state, LevelReader world, BlockPos pos) {
-		Direction direction = (Direction) state.getValue(FACING);
+		Direction direction = state.getValue(FACING);
 		BlockPos blockPos = pos.relative(direction.getOpposite());
 		BlockState blockState = world.getBlockState(blockPos);
 		return isSupport(world, blockPos, blockState, direction);
@@ -90,8 +90,7 @@ public class BaseWallPlantBlock extends BasePlantBlock {
 		LevelReader worldView = ctx.getLevel();
 		BlockPos blockPos = ctx.getClickedPos();
 		Direction[] directions = ctx.getNearestLookingDirections();
-		for (int i = 0; i < directions.length; ++i) {
-			Direction direction = directions[i];
+		for (Direction direction : directions) {
 			if (direction.getAxis().isHorizontal()) {
 				Direction direction2 = direction.getOpposite();
 				blockState = blockState.setValue(FACING, direction2);

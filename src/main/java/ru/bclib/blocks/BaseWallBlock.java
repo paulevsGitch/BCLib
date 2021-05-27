@@ -19,15 +19,16 @@ import net.minecraft.world.level.block.WallBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.WallSide;
 import net.minecraft.world.level.storage.loot.LootContext;
-import ru.betterend.client.models.BlockModelProvider;
-import ru.betterend.client.models.ModelsHelper;
-import ru.betterend.client.models.Patterns;
+import ru.bclib.client.models.BasePatterns;
+import ru.bclib.client.models.BlockModelProvider;
+import ru.bclib.client.models.ModelsHelper;
+import ru.bclib.client.models.PatternsHelper;
 
-public class EndWallBlock extends WallBlock implements BlockModelProvider {
+public class BaseWallBlock extends WallBlock implements BlockModelProvider {
 	
 	private final Block parent;
 	
-	public EndWallBlock(Block source) {
+	public BaseWallBlock(Block source) {
 		super(FabricBlockSettings.copyOf(source).noOcclusion());
 		this.parent = source;
 	}
@@ -40,7 +41,7 @@ public class EndWallBlock extends WallBlock implements BlockModelProvider {
 	@Override
 	public BlockModel getItemModel(ResourceLocation blockId) {
 		ResourceLocation parentId = Registry.BLOCK.getKey(parent);
-		Optional<String> pattern = Patterns.createJson(Patterns.ITEM_WALL, parentId.getPath(), blockId.getPath());
+		Optional<String> pattern = PatternsHelper.createJson(BasePatterns.ITEM_WALL, parentId);
 		return ModelsHelper.fromPattern(pattern);
 	}
 
@@ -50,13 +51,13 @@ public class EndWallBlock extends WallBlock implements BlockModelProvider {
 		String path = blockId.getPath();
 		Optional<String> pattern = Optional.empty();
 		if (path.endsWith("_post")) {
-			pattern = Patterns.createJson(Patterns.BLOCK_WALL_POST, parentId.getPath(), blockId.getPath());
+			pattern = PatternsHelper.createJson(BasePatterns.BLOCK_WALL_POST, parentId);
 		}
 		if (path.endsWith("_side")) {
-			pattern = Patterns.createJson(Patterns.BLOCK_WALL_SIDE, parentId.getPath(), blockId.getPath());
+			pattern = PatternsHelper.createJson(BasePatterns.BLOCK_WALL_SIDE, parentId);
 		}
 		if (path.endsWith("_side_tall")) {
-			pattern = Patterns.createJson(Patterns.BLOCK_WALL_SIDE_TALL, parentId.getPath(), blockId.getPath());
+			pattern = PatternsHelper.createJson(BasePatterns.BLOCK_WALL_SIDE_TALL, parentId);
 		}
 		return ModelsHelper.fromPattern(pattern);
 	}

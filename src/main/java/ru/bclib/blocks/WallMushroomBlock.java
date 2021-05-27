@@ -15,7 +15,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.storage.loot.LootContext;
 
-public class WallMushroomBlock extends BaseWallPlantBlock {
+public abstract class WallMushroomBlock extends BaseWallPlantBlock {
 	public WallMushroomBlock(int light) {
 		super(FabricBlockSettings.of(Material.PLANT)
 				.breakByTool(FabricToolTags.AXES)

@@ -16,13 +16,14 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.ComposterBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootContext;
-import ru.betterend.client.models.BlockModelProvider;
-import ru.betterend.client.models.ModelsHelper;
-import ru.betterend.client.models.ModelsHelper.MultiPartBuilder;
-import ru.betterend.client.models.Patterns;
+import ru.bclib.client.models.BasePatterns;
+import ru.bclib.client.models.BlockModelProvider;
+import ru.bclib.client.models.ModelsHelper;
+import ru.bclib.client.models.ModelsHelper.MultiPartBuilder;
+import ru.bclib.client.models.PatternsHelper;
 
-public class EndComposterBlock extends ComposterBlock implements BlockModelProvider {
-	public EndComposterBlock(Block source) {
+public class BaseComposterBlock extends ComposterBlock implements BlockModelProvider {
+	public BaseComposterBlock(Block source) {
 		super(FabricBlockSettings.copyOf(source));
 	}
 	
@@ -38,7 +39,7 @@ public class EndComposterBlock extends ComposterBlock implements BlockModelProvi
 
 	@Override
 	public @Nullable BlockModel getBlockModel(ResourceLocation blockId, BlockState blockState) {
-		Optional<String> pattern = Patterns.createJson(Patterns.BLOCK_COMPOSTER, blockId.getPath());
+		Optional<String> pattern = PatternsHelper.createJson(BasePatterns.BLOCK_COMPOSTER, blockId);
 		return ModelsHelper.fromPattern(pattern);
 	}
 

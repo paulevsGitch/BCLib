@@ -30,10 +30,11 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import ru.bclib.api.TagAPI;
 import ru.bclib.client.render.ERenderLayer;
 import ru.bclib.interfaces.IRenderTypeable;
 
-public class BasePlantBlock extends BaseBlockNotFull implements IRenderTypeable, BonemealableBlock {
+public abstract class BasePlantBlock extends BaseBlockNotFull implements IRenderTypeable, BonemealableBlock {
 	private static final VoxelShape SHAPE = Block.box(4, 0, 4, 12, 14, 12);
 	
 	public BasePlantBlock() {
@@ -65,6 +66,8 @@ public class BasePlantBlock extends BaseBlockNotFull implements IRenderTypeable,
 		super(settings);
 	}
 
+	protected abstract boolean isTerrain(BlockState state);
+
 	@Override
 	public VoxelShape getShape(BlockState state, BlockGetter view, BlockPos pos, CollisionContext ePos) {
 		Vec3 vec3d = state.getOffset(view, pos);
@@ -80,10 +83,6 @@ public class BasePlantBlock extends BaseBlockNotFull implements IRenderTypeable,
 	public boolean canSurvive(BlockState state, LevelReader world, BlockPos pos) {
 		BlockState down = world.getBlockState(pos.below());
 		return isTerrain(down);
-	}
-	
-	protected boolean isTerrain(BlockState state) {
-		return state.is(EndTags.END_GROUND);
 	}
 
 	@Override

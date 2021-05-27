@@ -16,10 +16,10 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.MaterialColor;
 import net.minecraft.world.phys.BlockHitResult;
 
-public class EndBlockStripableLogLog extends EndPillarBlock {
+public class BaseStripableLogBlock extends BaseRotatedPillarBlock {
 	private final Block striped;
 	
-	public EndBlockStripableLogLog(MaterialColor color, Block striped) {
+	public BaseStripableLogBlock(MaterialColor color, Block striped) {
 		super(FabricBlockSettings.copyOf(striped).materialColor(color));
 		this.striped = striped;
 	}
@@ -30,7 +30,7 @@ public class EndBlockStripableLogLog extends EndPillarBlock {
 			world.playSound(player, pos, SoundEvents.AXE_STRIP, SoundSource.BLOCKS, 1.0F, 1.0F);
 			if (!world.isClientSide) {
 				world.setBlock(pos, striped.defaultBlockState().setValue(RotatedPillarBlock.AXIS, state.getValue(RotatedPillarBlock.AXIS)), 11);
-				if (player != null && !player.isCreative()) {
+				if (!player.isCreative()) {
 					player.getMainHandItem().hurt(1, world.random, (ServerPlayer) player);
 				}
 			}

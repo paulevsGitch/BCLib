@@ -21,14 +21,15 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.DoorHingeSide;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.level.storage.loot.LootContext;
-import ru.betterend.client.models.BlockModelProvider;
-import ru.betterend.client.models.ModelsHelper;
-import ru.betterend.client.models.Patterns;
-import ru.betterend.client.render.ERenderLayer;
-import ru.betterend.interfaces.IRenderTypeable;
+import ru.bclib.client.models.BasePatterns;
+import ru.bclib.client.models.BlockModelProvider;
+import ru.bclib.client.models.ModelsHelper;
+import ru.bclib.client.models.PatternsHelper;
+import ru.bclib.client.render.ERenderLayer;
+import ru.bclib.interfaces.IRenderTypeable;
 
-public class EndDoorBlock extends DoorBlock implements IRenderTypeable, BlockModelProvider {
-	public EndDoorBlock(Block source) {
+public class BaseDoorBlock extends DoorBlock implements IRenderTypeable, BlockModelProvider {
+	public BaseDoorBlock(Block source) {
 		super(FabricBlockSettings.copyOf(source).strength(3F, 3F).noOcclusion());
 	}
 
@@ -47,19 +48,17 @@ public class EndDoorBlock extends DoorBlock implements IRenderTypeable, BlockMod
 
 	@Override
 	public @Nullable BlockModel getBlockModel(ResourceLocation resourceLocation, BlockState blockState) {
-		String blockName = resourceLocation.getPath();
 		DoorType doorType = getDoorType(blockState);
-		Optional<String> pattern = Patterns.createJson(Patterns.BLOCK_DOOR_BOTTOM, blockName, blockName);
+		Optional<String> pattern = PatternsHelper.createJson(BasePatterns.BLOCK_DOOR_BOTTOM, resourceLocation);
 		switch (doorType) {
 			case TOP_HINGE:
-				pattern = Patterns.createJson(Patterns.BLOCK_DOOR_TOP_HINGE, blockName, blockName);
+				pattern = PatternsHelper.createJson(BasePatterns.BLOCK_DOOR_TOP_HINGE, resourceLocation);
 				break;
 			case BOTTOM_HINGE:
-				pattern = Patterns.createJson(Patterns.BLOCK_DOOR_BOTTOM_HINGE, blockName, blockName);
+				pattern = PatternsHelper.createJson(BasePatterns.BLOCK_DOOR_BOTTOM_HINGE, resourceLocation);
 				break;
 			case TOP:
-			default:
-				pattern = Patterns.createJson(Patterns.BLOCK_DOOR_TOP, blockName, blockName);
+				pattern = PatternsHelper.createJson(BasePatterns.BLOCK_DOOR_TOP, resourceLocation);
 				break;
 		}
 		return ModelsHelper.fromPattern(pattern);

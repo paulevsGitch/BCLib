@@ -32,10 +32,10 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.material.MaterialColor;
 import net.minecraft.world.phys.BlockHitResult;
-import ru.betterend.blocks.BlockProperties;
-import ru.betterend.blocks.BlockProperties.TripleShape;
-import ru.betterend.client.models.ModelsHelper;
-import ru.betterend.client.models.Patterns;
+import ru.bclib.blocks.BlockProperties.TripleShape;
+import ru.bclib.client.models.BasePatterns;
+import ru.bclib.client.models.ModelsHelper;
+import ru.bclib.client.models.PatternsHelper;
 
 public class TripleTerrainBlock extends BaseTerrainBlock {
 	public static final EnumProperty<TripleShape> SHAPE = BlockProperties.TRIPLE_SHAPE;
@@ -110,16 +110,17 @@ public class TripleTerrainBlock extends BaseTerrainBlock {
 
 	@Override
 	public @Nullable BlockModel getBlockModel(ResourceLocation resourceLocation, BlockState blockState) {
-		String name = resourceLocation.getPath();
+		String path = resourceLocation.getPath();
 		Optional<String> pattern;
 		if (isMiddle(blockState)) {
-			pattern = Patterns.createBlockSimple(name + "_top");
+			ResourceLocation topId = new ResourceLocation(resourceLocation.getNamespace(), path + "_top");
+			pattern = PatternsHelper.createBlockSimple(topId);
 		} else {
 			Map<String, String> textures = Maps.newHashMap();
-			textures.put("%top%", "betterend:block/" + name + "_top");
-			textures.put("%side%", "betterend:block/" + name + "_side");
+			textures.put("%top%", "betterend:block/" + path + "_top");
+			textures.put("%side%", "betterend:block/" + path + "_side");
 			textures.put("%bottom%", "minecraft:block/end_stone");
-			pattern = Patterns.createJson(Patterns.BLOCK_TOP_SIDE_BOTTOM, textures);
+			pattern = PatternsHelper.createJson(BasePatterns.BLOCK_TOP_SIDE_BOTTOM, textures);
 		}
 		return ModelsHelper.fromPattern(pattern);
 	}

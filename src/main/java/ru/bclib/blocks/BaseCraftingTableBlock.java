@@ -15,12 +15,13 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.CraftingTableBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootContext;
-import ru.betterend.client.models.BlockModelProvider;
-import ru.betterend.client.models.ModelsHelper;
-import ru.betterend.client.models.Patterns;
+import ru.bclib.client.models.BasePatterns;
+import ru.bclib.client.models.BlockModelProvider;
+import ru.bclib.client.models.ModelsHelper;
+import ru.bclib.client.models.PatternsHelper;
 
-public class EndCraftingTableBlock extends CraftingTableBlock implements BlockModelProvider {
-	public EndCraftingTableBlock(Block source) {
+public class BaseCraftingTableBlock extends CraftingTableBlock implements BlockModelProvider {
+	public BaseCraftingTableBlock(Block source) {
 		super(FabricBlockSettings.copyOf(source));
 	}
 
@@ -37,7 +38,7 @@ public class EndCraftingTableBlock extends CraftingTableBlock implements BlockMo
 	@Override
 	public @Nullable BlockModel getBlockModel(ResourceLocation blockId, BlockState blockState) {
 		String blockName = blockId.getPath();
-		Optional<String> pattern = Patterns.createJson(Patterns.BLOCK_SIDED, new HashMap<String, String>() {
+		Optional<String> pattern = PatternsHelper.createJson(BasePatterns.BLOCK_SIDED, new HashMap<String, String>() {
 			private static final long serialVersionUID = 1L;
 			{
 				put("%particle%", blockName + "_front");

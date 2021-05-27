@@ -25,13 +25,14 @@ import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import ru.betterend.client.models.ModelsHelper;
-import ru.betterend.client.models.Patterns;
+import ru.bclib.client.models.BasePatterns;
+import ru.bclib.client.models.ModelsHelper;
+import ru.bclib.client.models.PatternsHelper;
 
-public class EndPathBlock extends BlockBaseNotFull {
+public class BasePathBlock extends BaseBlockNotFull {
 	private static final VoxelShape SHAPE = Block.box(0, 0, 0, 16, 15, 16);
 	
-	public EndPathBlock(Block source) {
+	public BasePathBlock(Block source) {
 		super(FabricBlockSettings.copyOf(source).isValidSpawn((state, world, pos, type) -> { return false; }));
 		if (source instanceof BaseTerrainBlock) {
 			BaseTerrainBlock terrain = (BaseTerrainBlock) source;
@@ -69,7 +70,7 @@ public class EndPathBlock extends BlockBaseNotFull {
 		Map<String, String> textures = Maps.newHashMap();
 		textures.put("%top%", name + "_top");
 		textures.put("%side%", name.replace("_path", "") + "_side");
-		Optional<String> pattern = Patterns.createJson(Patterns.BLOCK_PATH, textures);
+		Optional<String> pattern = PatternsHelper.createJson(BasePatterns.BLOCK_PATH, textures);
 		return ModelsHelper.fromPattern(pattern);
 	}
 

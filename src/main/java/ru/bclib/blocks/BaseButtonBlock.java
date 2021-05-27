@@ -18,15 +18,16 @@ import net.minecraft.world.level.block.ButtonBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.AttachFace;
 import net.minecraft.world.level.storage.loot.LootContext;
-import ru.betterend.client.models.BlockModelProvider;
-import ru.betterend.client.models.ModelsHelper;
-import ru.betterend.client.models.Patterns;
+import ru.bclib.client.models.BasePatterns;
+import ru.bclib.client.models.BlockModelProvider;
+import ru.bclib.client.models.ModelsHelper;
+import ru.bclib.client.models.PatternsHelper;
 
-public abstract class EndButtonBlock extends ButtonBlock implements BlockModelProvider {
+public abstract class BaseButtonBlock extends ButtonBlock implements BlockModelProvider {
 
 	private final Block parent;
 
-	protected EndButtonBlock(Block parent, Properties properties, boolean sensitive) {
+	protected BaseButtonBlock(Block parent, Properties properties, boolean sensitive) {
 		super(sensitive, properties);
 		this.parent = parent;
 	}
@@ -39,17 +40,16 @@ public abstract class EndButtonBlock extends ButtonBlock implements BlockModelPr
 	@Override
 	public BlockModel getItemModel(ResourceLocation blockId) {
 		ResourceLocation parentId = Registry.BLOCK.getKey(parent);
-		Optional<String> pattern = Patterns.createJson(Patterns.ITEM_BUTTON, parentId.getPath(), blockId.getPath());
+		Optional<String> pattern = PatternsHelper.createJson(BasePatterns.ITEM_BUTTON, parentId);
 		return ModelsHelper.fromPattern(pattern);
 	}
 
 	@Override
 	public @Nullable BlockModel getBlockModel(ResourceLocation resourceLocation, BlockState blockState) {
-		ResourceLocation blockId = Registry.BLOCK.getKey(this);
 		ResourceLocation parentId = Registry.BLOCK.getKey(parent);
 		Optional<String> pattern = blockState.getValue(POWERED) ?
-				Patterns.createJson(Patterns.BLOCK_BUTTON_PRESSED, parentId.getPath(), blockId.getPath()) :
-				Patterns.createJson(Patterns.BLOCK_BUTTON, parentId.getPath(), blockId.getPath());
+				PatternsHelper.createJson(BasePatterns.BLOCK_BUTTON_PRESSED, parentId) :
+				PatternsHelper.createJson(BasePatterns.BLOCK_BUTTON, parentId);
 		return ModelsHelper.fromPattern(pattern);
 	}
 
@@ -64,15 +64,13 @@ public abstract class EndButtonBlock extends ButtonBlock implements BlockModelPr
 		int x = 0, y = 0;
 		switch (face) {
 			case CEILING: x = 180; break;
-			case WALL:
-			default: x = 90; break;
+			case WALL: x = 90; break;
 		}
 		switch (blockState.getValue(FACING)) {
 			case NORTH: if (isCeiling) { y = 180; } break;
 			case EAST: y = isCeiling ? 270 : 90; break;
 			case SOUTH: if(!isCeiling) { y = 180; } break;
-			case WEST:
-			default: y = isCeiling ? 90 : 270; break;
+			case WEST: y = isCeiling ? 90 : 270; break;
 		}
 		BlockModelRotation rotation = BlockModelRotation.by(x, y);
 		return ModelsHelper.createMultiVariant(modelId, rotation.getRotation(), face == AttachFace.WALL);

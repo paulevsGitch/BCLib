@@ -19,16 +19,16 @@ import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
+import ru.bclib.client.models.BlockModelProvider;
 import ru.bclib.util.MHelper;
-import ru.betterend.client.models.BlockModelProvider;
 
-public class EndOreBlock extends OreBlock implements BlockModelProvider {
+public class BaseOreBlock extends OreBlock implements BlockModelProvider {
 	private final Item dropItem;
 	private final int minCount;
 	private final int maxCount;
 	private final int experience;
 	
-	public EndOreBlock(Item drop, int minCount, int maxCount, int experience) {
+	public BaseOreBlock(Item drop, int minCount, int maxCount, int experience) {
 		super(FabricBlockSettings.of(Material.STONE, MaterialColor.SAND)
 				.hardness(3F)
 				.resistance(9F)
@@ -52,7 +52,7 @@ public class EndOreBlock extends OreBlock implements BlockModelProvider {
 			if (EnchantmentHelper.getItemEnchantmentLevel(Enchantments.SILK_TOUCH, tool) > 0) {
 				return Collections.singletonList(new ItemStack(this));
 			}
-			int count = 0;
+			int count;
 			int enchantment = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.BLOCK_FORTUNE, tool);
 			if (enchantment > 0) {
 				int min = Mth.clamp(minCount + enchantment, minCount, maxCount);

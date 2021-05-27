@@ -19,14 +19,15 @@ import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.SlabType;
 import net.minecraft.world.level.storage.loot.LootContext;
-import ru.betterend.client.models.BlockModelProvider;
-import ru.betterend.client.models.ModelsHelper;
-import ru.betterend.client.models.Patterns;
+import ru.bclib.client.models.BasePatterns;
+import ru.bclib.client.models.BlockModelProvider;
+import ru.bclib.client.models.ModelsHelper;
+import ru.bclib.client.models.PatternsHelper;
 
-public class EndSlabBlock extends SlabBlock implements BlockModelProvider {
+public class BaseSlabBlock extends SlabBlock implements BlockModelProvider {
 	private final Block parent;
 	
-	public EndSlabBlock(Block source) {
+	public BaseSlabBlock(Block source) {
 		super(FabricBlockSettings.copyOf(source));
 		this.parent = source;
 	}
@@ -44,7 +45,7 @@ public class EndSlabBlock extends SlabBlock implements BlockModelProvider {
 	@Override
 	public @Nullable BlockModel getBlockModel(ResourceLocation blockId, BlockState blockState) {
 		ResourceLocation parentId = Registry.BLOCK.getKey(parent);
-		Optional<String> pattern = Patterns.createJson(Patterns.BLOCK_SLAB, parentId.getPath(), blockId.getPath());
+		Optional<String> pattern = PatternsHelper.createJson(BasePatterns.BLOCK_SLAB, parentId);
 		return ModelsHelper.fromPattern(pattern);
 	}
 
