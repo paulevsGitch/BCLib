@@ -43,7 +43,7 @@ public abstract class BlocksRegistry extends BaseRegistry<Block> {
 	}
 
 	public Item registerBlockItem(ResourceLocation id, Item item) {
-		registerItem(id, item, BaseRegistry.MOD_BLOCKS);
+		registerItem(id, item, BaseRegistry.getModBlocks(id.getNamespace()));
 		return item;
 	}
 }

@@ -38,13 +38,13 @@ public abstract class ItemsRegistry extends BaseRegistry<Item> {
 
 	@Override
 	public Item register(ResourceLocation itemId, Item item) {
-		registerItem(itemId, item, BaseRegistry.MOD_ITEMS);
+		registerItem(itemId, item, BaseRegistry.getModItems(itemId.getNamespace()));
 		return item;
 	}
 
 	public TieredItem registerTool(String name, TieredItem item) {
 		ResourceLocation id = createModId(name);
-		registerItem(id, item, BaseRegistry.MOD_ITEMS);
+		registerItem(id, item, BaseRegistry.getModItems(id.getNamespace()));
 
 		if (item instanceof ShovelItem) {
 			TagHelper.addTag((Tag.Named<Item>) FabricToolTags.SHOVELS, item);

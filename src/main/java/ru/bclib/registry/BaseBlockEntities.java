@@ -1,9 +1,5 @@
 package ru.bclib.registry;
 
-import java.util.List;
-
-import com.google.common.collect.Lists;
-
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
@@ -36,55 +32,27 @@ public class BaseBlockEntities {
 	
 	public static void register() {}
 
-	private static Block[] getChests() {
-		List<Block> result = Lists.newArrayList();
-		BaseRegistry.getModBlocks().forEach((item) -> {
-			if (item instanceof BlockItem) {
-				Block block = ((BlockItem) item).getBlock();
-				if (block instanceof BaseChestBlock) {
-					result.add(block);
-				}
-			}
-		});
-		return result.toArray(new Block[] {});
+	public static Block[] getChests() {
+		return BaseRegistry.getRegisteredBlocks().values().stream()
+				.filter(item -> item instanceof BlockItem && ((BlockItem) item).getBlock() instanceof BaseChestBlock)
+				.map(item -> ((BlockItem) item).getBlock()).toArray(Block[]::new);
 	}
 
 	private static Block[] getBarrels() {
-		List<Block> result = Lists.newArrayList();
-		BaseRegistry.getModBlocks().forEach((item) -> {
-			if (item instanceof BlockItem) {
-				Block block = ((BlockItem) item).getBlock();
-				if (block instanceof BaseBarrelBlock) {
-					result.add(block);
-				}
-			}
-		});
-		return result.toArray(new Block[] {});
+		return BaseRegistry.getRegisteredBlocks().values().stream()
+				.filter(item -> item instanceof BlockItem && ((BlockItem) item).getBlock() instanceof BaseBarrelBlock)
+				.map(item -> ((BlockItem) item).getBlock()).toArray(Block[]::new);
 	}
 
-	private static Block[] getSigns() {
-		List<Block> result = Lists.newArrayList();
-		BaseRegistry.getModBlocks().forEach((item) -> {
-			if (item instanceof BlockItem) {
-				Block block = ((BlockItem) item).getBlock();
-				if (block instanceof BaseSignBlock) {
-					result.add(block);
-				}
-			}
-		});
-		return result.toArray(new Block[] {});
+	public static Block[] getSigns() {
+		return BaseRegistry.getRegisteredBlocks().values().stream()
+				.filter(item -> item instanceof BlockItem && ((BlockItem) item).getBlock() instanceof BaseSignBlock)
+				.map(item -> ((BlockItem) item).getBlock()).toArray(Block[]::new);
 	}
 
 	private static Block[] getFurnaces() {
-		List<Block> result = Lists.newArrayList();
-		BaseRegistry.getModBlocks().forEach((item) -> {
-			if (item instanceof BlockItem) {
-				Block block = ((BlockItem) item).getBlock();
-				if (block instanceof BaseFurnaceBlock) {
-					result.add(block);
-				}
-			}
-		});
-		return result.toArray(new Block[] {});
+		return BaseRegistry.getRegisteredBlocks().values().stream()
+				.filter(item -> item instanceof BlockItem && ((BlockItem) item).getBlock() instanceof BaseFurnaceBlock)
+				.map(item -> ((BlockItem) item).getBlock()).toArray(Block[]::new);
 	}
 }
