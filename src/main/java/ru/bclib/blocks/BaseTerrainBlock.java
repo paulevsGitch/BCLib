@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 
+import net.minecraft.core.Registry;
 import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Maps;
@@ -44,16 +45,23 @@ import ru.bclib.client.models.PatternsHelper;
 import ru.bclib.client.sound.BlockSounds;
 
 public class BaseTerrainBlock extends BaseBlock {
+
+	private final Block baseBlock;
 	private Block pathBlock;
 	
 	public BaseTerrainBlock(Block baseBlock, MaterialColor color) {
 		super(FabricBlockSettings.copyOf(baseBlock).materialColor(color).sound(BlockSounds.TERRAIN_SOUND).randomTicks());
+		this.baseBlock = baseBlock;
 	}
 	
 	public void setPathBlock(Block roadBlock) {
 		this.pathBlock = roadBlock;
 	}
-	
+
+	public Block getBaseBlock() {
+		return baseBlock;
+	}
+
 	@Override
 	public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
 		if (pathBlock != null && player.getMainHandItem().getItem().is(FabricToolTags.SHOVELS)) {
@@ -106,12 +114,15 @@ public class BaseTerrainBlock extends BaseBlock {
 	}
 
 	@Override
-	public @Nullable BlockModel getBlockModel(ResourceLocation resourceLocation, BlockState blockState) {
-		String name = resourceLocation.getPath();
+	public @Nullable BlockModel getBlockModel(ResourceLocation blockId, BlockState blockState) {
+		ResourceLocation baseId = Registry.BLOCK.getKey(baseBlock);
+		String modId = blockId.getNamespace();
+		String path = blockId.getPath();
+		String bottom = baseId.getNamespace() + ":block/" + baseId.getPath();
 		Map<String, String> textures = Maps.newHashMap();
-		textures.put("%top%", "betterend:block/" + name + "_top");
-		textures.put("%side%", "betterend:block/" + name + "_side");
-		textures.put("%bottom%", "minecraft:block/end_stone");
+		textures.put("%top%", modId + ":block/" + path + "_top");
+		textures.put("%side%", modId + ":block/" + path + "_side");
+		textures.put("%bottom%", bottom);
 		Optional<String> pattern = PatternsHelper.createJson(BasePatterns.BLOCK_TOP_SIDE_BOTTOM, textures);
 		return ModelsHelper.fromPattern(pattern);
 	}

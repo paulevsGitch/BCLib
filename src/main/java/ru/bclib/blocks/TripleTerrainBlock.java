@@ -109,11 +109,11 @@ public class TripleTerrainBlock extends BaseTerrainBlock {
 	}
 
 	@Override
-	public @Nullable BlockModel getBlockModel(ResourceLocation resourceLocation, BlockState blockState) {
-		String path = resourceLocation.getPath();
+	public @Nullable BlockModel getBlockModel(ResourceLocation blockId, BlockState blockState) {
+		String path = blockId.getPath();
 		Optional<String> pattern;
 		if (isMiddle(blockState)) {
-			ResourceLocation topId = new ResourceLocation(resourceLocation.getNamespace(), path + "_top");
+			ResourceLocation topId = new ResourceLocation(blockId.getNamespace(), path + "_top");
 			pattern = PatternsHelper.createBlockSimple(topId);
 		} else {
 			Map<String, String> textures = Maps.newHashMap();
