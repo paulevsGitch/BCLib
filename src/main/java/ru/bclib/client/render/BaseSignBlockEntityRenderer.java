@@ -21,16 +21,13 @@ import net.minecraft.client.resources.model.Material;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
-import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SignBlock;
 import net.minecraft.world.level.block.StandingSignBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.WoodType;
 import ru.bclib.blockentities.BaseSignBlockEntity;
-import ru.bclib.blocks.BaseChestBlock;
 import ru.bclib.blocks.BaseSignBlock;
-import ru.bclib.registry.BaseRegistry;
 
 public class BaseSignBlockEntityRenderer extends BlockEntityRenderer<BaseSignBlockEntity> {
 	private static final HashMap<Block, RenderType> LAYERS = Maps.newHashMap();

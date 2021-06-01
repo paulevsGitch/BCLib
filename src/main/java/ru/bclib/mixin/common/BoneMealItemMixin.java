@@ -16,9 +16,9 @@ import net.minecraft.world.level.biome.Biome.BiomeCategory;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import ru.bclib.api.TagAPI;
 import ru.bclib.api.BiomeAPI;
 import ru.bclib.api.BonemealAPI;
+import ru.bclib.api.TagAPI;
 import ru.bclib.util.BlocksHelper;
 import ru.bclib.util.MHelper;
 

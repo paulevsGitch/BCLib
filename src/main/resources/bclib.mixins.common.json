@@ -8,6 +8,7 @@
 		"PotionBrewingAccessor",
 		"RecipeManagerAccessor",
 		"EnchantmentMenuMixin",
+		"MinecraftServerMixin",
 		"RecipeManagerMixin",
 		"BoneMealItemMixin",
 		"ServerLevelMixin",

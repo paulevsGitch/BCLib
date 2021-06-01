@@ -24,7 +24,6 @@ import net.minecraft.world.level.block.state.StateDefinition;
 
 @Environment(EnvType.CLIENT)
 public class ModelsHelper {
-	@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 	public static BlockModel fromPattern(Optional<String> pattern) {
 		return pattern.map(BlockModel::fromString).orElse(null);
 	}

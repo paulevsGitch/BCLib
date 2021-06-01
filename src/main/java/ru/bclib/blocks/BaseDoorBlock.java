@@ -60,6 +60,7 @@ public class BaseDoorBlock extends DoorBlock implements IRenderTyped, BlockModel
 			case TOP:
 				pattern = PatternsHelper.createJson(BasePatterns.BLOCK_DOOR_TOP, resourceLocation);
 				break;
+			default: break;
 		}
 		return ModelsHelper.fromPattern(pattern);
 	}

@@ -13,8 +13,8 @@ import net.minecraft.world.item.crafting.RecipeType;
 @Mixin(RecipeManager.class)
 public interface RecipeManagerAccessor {
 	@Accessor("recipes")
-	Map<RecipeType<?>, Map<ResourceLocation, Recipe<?>>> be_getRecipes();
+	Map<RecipeType<?>, Map<ResourceLocation, Recipe<?>>> bcl_getRecipes();
 
 	@Accessor("recipes")
-	void be_setRecipes(Map<RecipeType<?>, Map<ResourceLocation, Recipe<?>>> recipes);
+	void bcl_setRecipes(Map<RecipeType<?>, Map<ResourceLocation, Recipe<?>>> recipes);
 }

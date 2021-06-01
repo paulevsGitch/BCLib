@@ -91,7 +91,6 @@ public class BaseBarrelBlockEntity extends RandomizableContainerBlockEntity {
 		}
 	}
 
-	@SuppressWarnings("ConstantConditions")
 	private void scheduleUpdate() {
 		level.getBlockTicks().scheduleTick(getBlockPos(), getBlockState().getBlock(), 5);
 	}

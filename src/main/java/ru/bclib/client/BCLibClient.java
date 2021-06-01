@@ -1,5 +1,7 @@
 package ru.bclib.client;
 
+import java.util.Arrays;
+
 import net.fabricmc.api.ClientModInitializer;
 import ru.bclib.blocks.BaseChestBlock;
 import ru.bclib.blocks.BaseSignBlock;
@@ -7,8 +9,6 @@ import ru.bclib.client.render.BaseChestBlockEntityRenderer;
 import ru.bclib.client.render.BaseSignBlockEntityRenderer;
 import ru.bclib.registry.BaseBlockEntities;
 import ru.bclib.registry.BaseBlockEntityRenders;
-
-import java.util.Arrays;
 
 public class BCLibClient implements ClientModInitializer {
 	@Override

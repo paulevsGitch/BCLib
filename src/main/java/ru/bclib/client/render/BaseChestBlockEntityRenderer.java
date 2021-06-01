@@ -20,7 +20,6 @@ import net.minecraft.client.renderer.blockentity.BrightnessCombiner;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.AbstractChestBlock;
 import net.minecraft.world.level.block.Block;
@@ -34,7 +33,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.ChestType;
 import ru.bclib.blockentities.BaseChestBlockEntity;
 import ru.bclib.blocks.BaseChestBlock;
-import ru.bclib.registry.BaseRegistry;
 
 @Environment(EnvType.CLIENT)
 public class BaseChestBlockEntityRenderer extends BlockEntityRenderer<BaseChestBlockEntity> {

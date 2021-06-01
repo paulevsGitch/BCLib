@@ -32,13 +32,11 @@ public class BiomeAPI {
 	private static Registry<Biome> biomeRegistry;
 	
 	/**
-	 * Initialize registry if it was not initialized in world generation (when using mods/datapacks, that overrides the End generation)
+	 * Initialize registry for current server.
 	 * @param server - {@link MinecraftServer}
 	 */
 	public static void initRegistry(MinecraftServer server) {
-		if (biomeRegistry == null || biomeRegistry == BuiltinRegistries.BIOME) {
-			biomeRegistry = server.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY);
-		}
+		biomeRegistry = server.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY);
 	}
 	
 	public static void registerBiomeDirectly(BCLBiome biome) {

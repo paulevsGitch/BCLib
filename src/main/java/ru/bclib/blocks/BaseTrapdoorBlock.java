@@ -80,6 +80,7 @@ public class BaseTrapdoorBlock extends TrapDoorBlock implements IRenderTyped, Bl
 			case WEST:
 				y = (isTop && isOpen) ? 90 : 270;
 				break;
+			default: break;
 		}
 		BlockModelRotation rotation = BlockModelRotation.by(x, y);
 		return ModelsHelper.createMultiVariant(modelId, rotation.getRotation(), false);
