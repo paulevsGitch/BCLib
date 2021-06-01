@@ -1,6 +1,12 @@
-import java.util.function.BiConsumer
+buildscript {
+	dependencies {
+		classpath 'org.kohsuke:github-api:1.114'
+	}
+}
 
 plugins {
+	id 'idea'
+	id 'eclipse'
 	id 'fabric-loom' version '0.7-SNAPSHOT'
 	id 'maven-publish'
 }
@@ -77,17 +83,21 @@ tasks.withType(JavaCompile) {
 	options.encoding = "UTF-8"
 }
 
-// Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
-// if it is present.
-// If you remove this task, sources will not be generated.
-task sourcesJar(type: Jar, dependsOn: classes) {
-	classifier = "sources"
-	from sourceSets.main.allSource
+javadoc {
+	options.tags = [ "reason" ]
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
 	classifier = 'javadoc'
 	from javadoc.destinationDir
+}
+
+// Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
+// if it is present.
+// If you remove this task, sources will not be generated.
+task sourcesJar(type: Jar, dependsOn: classes) {
+	classifier = 'sources'
+	from sourceSets.main.allSource
 }
 
 jar {
@@ -100,6 +110,30 @@ artifacts {
 }
 
 def env = System.getenv()
+
+import org.kohsuke.github.GHReleaseBuilder
+import org.kohsuke.github.GitHub
+
+task github(dependsOn: [remapJar, sourcesJar, javadocJar]) {
+	onlyIf {
+		env.GITHUB_TOKEN
+	}
+
+	doLast {
+		def github = GitHub.connectUsingOAuth(env.GITHUB_TOKEN as String)
+		def repository = github.getRepository("paulevsGitch/BCLib")
+
+		def releaseBuilder = new GHReleaseBuilder(repository, version as String)
+		releaseBuilder.name("${archivesBaseName}-${version}")
+		releaseBuilder.body("A changelog can be found at https://github.com/paulevsGitch/BCLib/commits")
+		releaseBuilder.commitish("main")
+
+		def ghRelease = releaseBuilder.create()
+		ghRelease.uploadAsset(file("${project.buildDir}/libs/${archivesBaseName}-${version}.jar"), "application/java-archive");
+		ghRelease.uploadAsset(file("${project.buildDir}/libs/${archivesBaseName}-${version}-sources.jar"), "application/java-archive");
+		ghRelease.uploadAsset(file("${project.buildDir}/libs/${archivesBaseName}-${version}-javadoc.jar"), "application/java-archive");
+	}
+}
 
 // configure the maven publication
 publishing {
