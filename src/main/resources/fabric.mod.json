@@ -22,6 +22,9 @@
 	"entrypoints": {
 		"main": [
 			"ru.bclib.BCLib"
+		],
+		"client": [
+			"ru.bclib.client.BCLibClient"
 		]
 	},
 	"mixins": [

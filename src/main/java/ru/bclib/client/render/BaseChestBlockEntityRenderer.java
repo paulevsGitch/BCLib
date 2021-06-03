@@ -155,7 +155,7 @@ public class BaseChestBlockEntityRenderer extends BlockEntityRenderer<BaseChestB
 		return provider.getBuffer(getChestTexture(chestType, layers));
 	}
 
-	public static void registerRenderLayer(BaseChestBlock block) {
+	public static void registerRenderLayer(Block block) {
 		ResourceLocation blockId = Registry.BLOCK.getKey(block);
 		String modId = blockId.getNamespace();
 		String path = blockId.getPath();

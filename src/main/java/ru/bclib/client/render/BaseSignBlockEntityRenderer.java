@@ -100,7 +100,7 @@ public class BaseSignBlockEntityRenderer extends BlockEntityRenderer<BaseSignBlo
 		return provider.getBuffer(LAYERS.getOrDefault(block, defaultLayer));
 	}
 
-	public static void registerRenderLayer(BaseSignBlock block) {
+	public static void registerRenderLayer(Block block) {
 		ResourceLocation blockId = Registry.BLOCK.getKey(block);
 		RenderType layer = RenderType.entitySolid(new ResourceLocation(blockId.getNamespace(),
 				"textures/entity/sign/" + blockId.getPath() + ".png"));
@@ -108,6 +108,6 @@ public class BaseSignBlockEntityRenderer extends BlockEntityRenderer<BaseSignBlo
 	}
 
 	static {
-		defaultLayer = RenderType.entitySolid(new ResourceLocation("textures/entity/sign/oak.png"));
+		defaultLayer = RenderType.entitySolid(new ResourceLocation("textures/entity/signs/oak.png"));
 	}
 }
