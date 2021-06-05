@@ -1,20 +1,22 @@
 package ru.bclib.registry;
 
+import java.util.function.Supplier;
+
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityType;
 import ru.bclib.BCLib;
-import ru.bclib.blockentities.*;
+import ru.bclib.blockentities.BaseBarrelBlockEntity;
+import ru.bclib.blockentities.BaseChestBlockEntity;
+import ru.bclib.blockentities.BaseFurnaceBlockEntity;
+import ru.bclib.blockentities.BaseSignBlockEntity;
+import ru.bclib.blockentities.DynamicBlockEntityType;
 import ru.bclib.blocks.BaseBarrelBlock;
 import ru.bclib.blocks.BaseChestBlock;
 import ru.bclib.blocks.BaseFurnaceBlock;
 import ru.bclib.blocks.BaseSignBlock;
-
-import java.util.Arrays;
-import java.util.function.Supplier;
 
 public class BaseBlockEntities {
 	public static final DynamicBlockEntityType<BaseChestBlockEntity> CHEST = registerBlockEntityType(BCLib.makeID("chest"), BaseChestBlockEntity::new);
@@ -34,7 +36,7 @@ public class BaseBlockEntities {
 				.map(item -> ((BlockItem) item).getBlock()).toArray(Block[]::new);
 	}
 
-	private static Block[] getBarrels() {
+	public static Block[] getBarrels() {
 		return BaseRegistry.getRegisteredBlocks().values().stream()
 				.filter(item -> item instanceof BlockItem && ((BlockItem) item).getBlock() instanceof BaseBarrelBlock)
 				.map(item -> ((BlockItem) item).getBlock()).toArray(Block[]::new);
@@ -46,7 +48,7 @@ public class BaseBlockEntities {
 				.map(item -> ((BlockItem) item).getBlock()).toArray(Block[]::new);
 	}
 
-	private static Block[] getFurnaces() {
+	public static Block[] getFurnaces() {
 		return BaseRegistry.getRegisteredBlocks().values().stream()
 				.filter(item -> item instanceof BlockItem && ((BlockItem) item).getBlock() instanceof BaseFurnaceBlock)
 				.map(item -> ((BlockItem) item).getBlock()).toArray(Block[]::new);

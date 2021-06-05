@@ -32,7 +32,6 @@ import net.minecraft.world.level.block.entity.LidBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.ChestType;
 import ru.bclib.blockentities.BaseChestBlockEntity;
-import ru.bclib.blocks.BaseChestBlock;
 
 @Environment(EnvType.CLIENT)
 public class BaseChestBlockEntityRenderer extends BlockEntityRenderer<BaseChestBlockEntity> {

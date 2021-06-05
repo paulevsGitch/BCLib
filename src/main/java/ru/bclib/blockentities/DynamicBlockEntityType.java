@@ -1,13 +1,14 @@
 package ru.bclib.blockentities;
 
-import com.google.common.collect.Sets;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityType;
-
 import java.util.Collections;
 import java.util.Set;
 import java.util.function.Supplier;
+
+import com.google.common.collect.Sets;
+
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 
 public class DynamicBlockEntityType<T extends BlockEntity> extends BlockEntityType<T> {
 

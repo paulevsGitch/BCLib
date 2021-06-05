@@ -21,7 +21,6 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import ru.bclib.BCLib;
 
-@Environment(EnvType.CLIENT)
 public class ColorUtil {
 	private static final float[] FLOAT_BUFFER = new float[4];
 	private static final int ALPHA = 255 << 24;
@@ -208,6 +207,7 @@ public class ColorUtil {
 
 	private static Map<ResourceLocation, Integer> colorPalette = Maps.newHashMap();
 
+	@Environment(EnvType.CLIENT)
 	public static int extractColor(Item item) {
 		ResourceLocation id = Registry.ITEM.getKey(item);
 		if (id.equals(Registry.ITEM.getDefaultKey())) return -1;
@@ -242,6 +242,7 @@ public class ColorUtil {
 		return color;
 	}
 
+	@Environment(EnvType.CLIENT)
 	public static NativeImage loadImage(ResourceLocation image, int w, int h) {
 		Minecraft minecraft = Minecraft.getInstance();
 		ResourceManager resourceManager = minecraft.getResourceManager();
