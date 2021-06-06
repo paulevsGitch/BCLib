@@ -86,7 +86,6 @@ public class BCLBiomeDef {
 	
 	/** 
 	 * Create default definition for The Nether biome.
-	 * @param id
 	 * @return {@link BCLBiomeDef}.
 	 */
 	public BCLBiomeDef netherBiome() {
@@ -98,7 +97,6 @@ public class BCLBiomeDef {
 	
 	/** 
 	 * Create default definition for The End biome.
-	 * @param id
 	 * @return {@link BCLBiomeDef}.
 	 */
 	public BCLBiomeDef endBiome() {
