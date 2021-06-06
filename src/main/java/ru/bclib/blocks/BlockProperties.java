@@ -6,7 +6,6 @@ import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 
 public class BlockProperties {
-	public static final EnumProperty<CactusBottom> CACTUS_BOTTOM = EnumProperty.create("bottom", CactusBottom.class);
 	public static final EnumProperty<TripleShape> TRIPLE_SHAPE = EnumProperty.create("shape", TripleShape.class);
 	public static final EnumProperty<PentaShape> PENTA_SHAPE = EnumProperty.create("shape", PentaShape.class);
 	
@@ -67,28 +66,6 @@ public class BlockProperties {
 		private final String name;
 		
 		PentaShape(String name) {
-			this.name = name;
-		}
-
-		@Override
-		public String getSerializedName() {
-			return name;
-		}
-		
-		@Override
-		public String toString() {
-			return name;
-		}
-	}
-	
-	public enum CactusBottom implements StringRepresentable {
-		EMPTY("empty"),
-		SAND("sand"),
-		MOSS("moss");
-		
-		private final String name;
-		
-		CactusBottom(String name) {
 			this.name = name;
 		}
 

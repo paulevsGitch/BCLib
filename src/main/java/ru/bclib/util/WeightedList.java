@@ -85,7 +85,6 @@ public class WeightedList<T> {
 			list.weights.add(weights.get(i));
 			list.values.add(values.get(i));
 		}
-		list.maxWeight = list.weights.get(end - 1);
 		return list;
 	}
 
