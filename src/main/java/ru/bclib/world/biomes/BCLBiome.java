@@ -2,9 +2,11 @@ package ru.bclib.world.biomes;
 
 import java.io.InputStream;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
@@ -31,6 +33,7 @@ public class BCLBiome {
 	protected float maxSubBiomeChance = 1;
 	protected final float genChance;
 
+	private final Map<String, Object> customData;
 	private final float fogDensity;
 	private BCLFeature structuresFeature;
 	private Biome actualBiome;
@@ -44,6 +47,7 @@ public class BCLBiome {
 		this.biome = definition.build();
 		this.genChance = definition.getGenChance();
 		this.fogDensity = definition.getFodDensity();
+		this.customData = definition.getCustomData();
 	}
 
 	public BCLBiome(ResourceLocation id, Biome biome, float fogDensity, float genChance) {
@@ -52,6 +56,7 @@ public class BCLBiome {
 		this.genChance = genChance;
 		this.fogDensity = fogDensity;
 		this.readStructureList();
+		this.customData = Maps.newHashMap();
 	}
 
 	public BCLBiome getEdge() {
@@ -178,5 +183,10 @@ public class BCLBiome {
 	@Override
 	public int hashCode() {
 		return mcID.hashCode();
+	}
+	
+	@SuppressWarnings("unchecked")
+	public <T> T getCustomData(String name) {
+		return (T) customData.get(name);
 	}
 }

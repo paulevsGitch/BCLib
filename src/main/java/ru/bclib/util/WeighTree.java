@@ -1,5 +1,6 @@
 package ru.bclib.util;
 
+import java.util.Locale;
 import java.util.Random;
 
 public class WeighTree<T> {
@@ -20,20 +21,20 @@ public class WeighTree<T> {
 		return root.get(random.nextFloat() * maxWeight);
 	}
 	
-	private Node getNode(WeightedList<T> biomes) {
-		int size = biomes.size();
+	private Node getNode(WeightedList<T> list) {
+		int size = list.size();
 		if (size == 1) {
-			return new Leaf(biomes.get(0));
+			return new Leaf(list.get(0));
 		}
 		else if (size == 2) {
-			T first = biomes.get(0);
-			return new Branch(biomes.getWeight(0), new Leaf(first), new Leaf(biomes.get(1)));
+			T first = list.get(0);
+			return new Branch(list.getWeight(0), new Leaf(first), new Leaf(list.get(1)));
 		}
 		else {
 			int index = size >> 1;
-			float separator = biomes.getWeight(index);
-			Node a = getNode(biomes.subList(0, index + 1));
-			Node b = getNode(biomes.subList(index, size));
+			float separator = list.getWeight(index);
+			Node a = getNode(list.subList(0, index + 1));
+			Node b = getNode(list.subList(index, size));
 			return new Branch(separator, a, b);
 		}
 	}
@@ -57,18 +58,33 @@ public class WeighTree<T> {
 		T get(float value) {
 			return value < separator ? min.get(value) : max.get(value);
 		}
+		
+		@Override
+		public String toString() {
+			return String.format(Locale.ROOT, "[%f, %s, %s]", separator, min.toString(), max.toString());
+		}
 	}
 	
 	private class Leaf extends Node {
 		final T biome;
 		
-		Leaf(T biome) {
-			this.biome = biome;
+		Leaf(T value) {
+			this.biome = value;
 		}
 
 		@Override
 		T get(float value) {
 			return biome;
 		}
+		
+		@Override
+		public String toString() {
+			return String.format(Locale.ROOT, "[%s]", biome.toString());
+		}
+	}
+	
+	@Override
+	public String toString() {
+		return root.toString();
 	}
 }

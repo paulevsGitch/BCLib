@@ -1,8 +1,10 @@
 package ru.bclib.world.biomes;
 
 import java.util.List;
+import java.util.Map;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 import net.minecraft.core.Registry;
 import net.minecraft.core.particles.ParticleOptions;
@@ -50,6 +52,7 @@ public class BCLBiomeDef {
 	private final List<CarverInfo> carvers = Lists.newArrayList();
 	private final List<SpawnInfo> mobs = Lists.newArrayList();
 	private final List<SpawnerData> spawns = Lists.newArrayList();
+	private final Map<String, Object> customData = Maps.newHashMap();
 	
 	private final ResourceLocation id;
 
@@ -368,5 +371,13 @@ public class BCLBiomeDef {
 		info.carver = carver;
 		carvers.add(info);
 		return this;
+	}
+	
+	public void addCustomData(String name, Object value) {
+		customData.put(name, value);
+	}
+	
+	protected Map<String, Object> getCustomData() {
+		return customData;
 	}
 }
