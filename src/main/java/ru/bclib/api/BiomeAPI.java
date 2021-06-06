@@ -143,7 +143,7 @@ public class BiomeAPI {
 	/**
 	 * Check if biome with {@link ResourceLocation} exists in API registry.
 	 * @param biomeID - biome {@link ResourceLocation}.
-	 * @return 
+	 * @return {@code true} if biome exists in API registry and {@code false} if not.
 	 */
 	public static boolean hasBiome(ResourceLocation biomeID) {
 		return ID_MAP.containsKey(biomeID);

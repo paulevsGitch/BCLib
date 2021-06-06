@@ -24,6 +24,7 @@ public class DataFixerAPI {
 	private static final Map<String, Integer> FIX_VERSIONS = Maps.newHashMap();
 	
 	public static void fixData(File dir) {
+		REPLACEMENT.clear(); // API is not finished yet!
 		if (REPLACEMENT.isEmpty()) {
 			return;
 		}
@@ -117,7 +118,7 @@ public class DataFixerAPI {
 	/**
 	 * Get mod version from string. String should be in format: %d.%d.%d
 	 * @param version - {@link String} mod version.
-	 * @return
+	 * @return int mod version.
 	 */
 	public static int getModVersion(String version) {
 		if (version.isEmpty()) {
@@ -134,8 +135,8 @@ public class DataFixerAPI {
 	
 	/**
 	 * Get mod version from integer. String will be in format %d.%d.%d
-	 * @param version
-	 * @return
+	 * @param version - mod version in integer form.
+	 * @return {@link String} mod version.
 	 */
 	public static String getModVersion(int version) {
 		int a = (version >> 12) & 63;

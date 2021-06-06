@@ -131,7 +131,7 @@ public class BlocksHelper {
 
 	/**
 	 * Creates a new {@link Direction} array with clockwise order:
-	 * NORTH -> EAST -> SOUTH -> WEST
+	 * NORTH, EAST, SOUTH, WEST
 	 * @return Array of {@link Direction}.
 	 */
 	public static Direction[] makeHorizontal() {

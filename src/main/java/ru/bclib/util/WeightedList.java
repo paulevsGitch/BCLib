@@ -77,7 +77,7 @@ public class WeightedList<T> {
 	 * Makes a sublist of this list with same weights. Used only in {@link WeighTree}
 	 * @param start - {@code int} start index (inclusive).
 	 * @param end - {@code int} end index (exclusive).
-	 * @return {@link WeightedList<T>}.
+	 * @return {@link WeightedList}.
 	 */
 	protected WeightedList<T> subList(int start, int end) {
 		WeightedList<T> list = new WeightedList<T>();
