@@ -16,11 +16,9 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.Property;
 
 public class BlocksHelper {
-	public static final BooleanProperty ROOTS = BooleanProperty.create("roots");
 	private static final Map<Block, Integer> COLOR_BY_BLOCK = Maps.newHashMap();
 
 	public static final int FLAG_UPDATE_BLOCK = 1;
