@@ -89,12 +89,11 @@ public class BCLBiomeDef {
 	 * @param id
 	 * @return {@link BCLBiomeDef}.
 	 */
-	public static BCLBiomeDef netherBiome(ResourceLocation id) {
-		BCLBiomeDef def = new BCLBiomeDef(id);
-		def.foliageColor = DEF_FOLIAGE_NETHER;
-		def.grassColor = DEF_FOLIAGE_NETHER;
-		def.setCategory(BiomeCategory.NETHER);
-		return def;
+	public BCLBiomeDef netherBiome() {
+		this.foliageColor = DEF_FOLIAGE_NETHER;
+		this.grassColor = DEF_FOLIAGE_NETHER;
+		this.setCategory(BiomeCategory.NETHER);
+		return this;
 	}
 	
 	/** 
@@ -102,12 +101,11 @@ public class BCLBiomeDef {
 	 * @param id
 	 * @return {@link BCLBiomeDef}.
 	 */
-	public static BCLBiomeDef endBiome(ResourceLocation id) {
-		BCLBiomeDef def = new BCLBiomeDef(id);
-		def.foliageColor = DEF_FOLIAGE_END;
-		def.grassColor = DEF_FOLIAGE_END;
-		def.setCategory(BiomeCategory.THEEND);
-		return def;
+	public BCLBiomeDef endBiome() {
+		this.foliageColor = DEF_FOLIAGE_END;
+		this.grassColor = DEF_FOLIAGE_END;
+		this.setCategory(BiomeCategory.THEEND);
+		return this;
 	}
 	
 	/**
