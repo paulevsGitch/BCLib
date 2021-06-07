@@ -377,6 +377,11 @@ public class BCLBiomeDef {
 		customData.put(name, value);
 	}
 	
+	@SuppressWarnings("unchecked")
+	public <T> T getCustomData(String name, Object defaultValue) {
+		return (T) customData.getOrDefault(name, defaultValue);
+	}
+	
 	protected Map<String, Object> getCustomData() {
 		return customData;
 	}
