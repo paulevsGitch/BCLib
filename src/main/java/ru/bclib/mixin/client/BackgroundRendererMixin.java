@@ -28,7 +28,9 @@ import ru.bclib.world.biomes.BCLBiome;
 
 @Mixin(FogRenderer.class)
 public class BackgroundRendererMixin {
+	private static final MutableBlockPos BCL_LAST_POS = new MutableBlockPos(0, -100, 0);
 	private static final MutableBlockPos BCL_MUT_POS = new MutableBlockPos();
+	private static final float[] BCL_FOG_DENSITY = new float[8];
 	
 	@Shadow
 	private static float fogRed;
@@ -109,26 +111,29 @@ public class BackgroundRendererMixin {
 		int x1 = (MHelper.floor(x) >> 3) << 3;
 		int y1 = (MHelper.floor(y) >> 3) << 3;
 		int z1 = (MHelper.floor(z) >> 3) << 3;
-		int x2 = x1 + 8;
-		int y2 = y1 + 8;
-		int z2 = z1 + 8;
 		float dx = (float) (x - x1) / 8F;
 		float dy = (float) (y - y1) / 8F;
 		float dz = (float) (z - z1) / 8F;
 		
-		float a = bcl_getFogDensityI(level, x1, y1, z1);
-		float b = bcl_getFogDensityI(level, x2, y1, z1);
-		float c = bcl_getFogDensityI(level, x1, y2, z1);
-		float d = bcl_getFogDensityI(level, x2, y2, z1);
-		float e = bcl_getFogDensityI(level, x1, y1, z2);
-		float f = bcl_getFogDensityI(level, x2, y1, z2);
-		float g = bcl_getFogDensityI(level, x1, y2, z2);
-		float h = bcl_getFogDensityI(level, x2, y2, z2);
+		if (BCL_LAST_POS.getX() != x1 || BCL_LAST_POS.getY() != y1 || BCL_LAST_POS.getZ() != z1) {
+			int x2 = x1 + 8;
+			int y2 = y1 + 8;
+			int z2 = z1 + 8;
+			BCL_LAST_POS.set(x1, y1, z1);
+			BCL_FOG_DENSITY[0] = bcl_getFogDensityI(level, x1, y1, z1);
+			BCL_FOG_DENSITY[1] = bcl_getFogDensityI(level, x2, y1, z1);
+			BCL_FOG_DENSITY[2] = bcl_getFogDensityI(level, x1, y2, z1);
+			BCL_FOG_DENSITY[3] = bcl_getFogDensityI(level, x2, y2, z1);
+			BCL_FOG_DENSITY[4] = bcl_getFogDensityI(level, x1, y1, z2);
+			BCL_FOG_DENSITY[5] = bcl_getFogDensityI(level, x2, y1, z2);
+			BCL_FOG_DENSITY[6] = bcl_getFogDensityI(level, x1, y2, z2);
+			BCL_FOG_DENSITY[7] = bcl_getFogDensityI(level, x2, y2, z2);
+		}
 		
-		a = Mth.lerp(dx, a, b);
-		b = Mth.lerp(dx, c, d);
-		c = Mth.lerp(dx, e, f);
-		d = Mth.lerp(dx, g, h);
+		float a = Mth.lerp(dx, BCL_FOG_DENSITY[0], BCL_FOG_DENSITY[1]);
+		float b = Mth.lerp(dx, BCL_FOG_DENSITY[2], BCL_FOG_DENSITY[3]);
+		float c = Mth.lerp(dx, BCL_FOG_DENSITY[4], BCL_FOG_DENSITY[5]);
+		float d = Mth.lerp(dx, BCL_FOG_DENSITY[6], BCL_FOG_DENSITY[7]);
 		
 		a = Mth.lerp(dy, a, b);
 		b = Mth.lerp(dy, c, d);
