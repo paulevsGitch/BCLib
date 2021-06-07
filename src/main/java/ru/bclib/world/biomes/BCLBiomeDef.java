@@ -373,8 +373,9 @@ public class BCLBiomeDef {
 		return this;
 	}
 	
-	public void addCustomData(String name, Object value) {
+	public BCLBiomeDef addCustomData(String name, Object value) {
 		customData.put(name, value);
+		return this;
 	}
 	
 	@SuppressWarnings("unchecked")
