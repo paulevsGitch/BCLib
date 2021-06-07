@@ -37,10 +37,14 @@ public class BiomeAPI {
 	 */
 	public static void initRegistry(MinecraftServer server) {
 		biomeRegistry = server.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY);
+		CLIENT.clear();
 	}
 	
-	public static void registerBiomeDirectly(BCLBiome biome) {
-		Registry.register(BuiltinRegistries.BIOME, biome.getID(), biome.getBiome());
+	public static void registerBiome(BCLBiome biome) {
+		if (!BuiltinRegistries.BIOME.containsKey(biome.getID())) {
+			Registry.register(BuiltinRegistries.BIOME, biome.getID(), biome.getBiome());
+		}
+		ID_MAP.put(biome.getID(), biome);
 	}
 	
 	/**
