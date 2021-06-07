@@ -186,7 +186,7 @@ public class BCLBiome {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public <T> T getCustomData(String name) {
-		return (T) customData.get(name);
+	public <T> T getCustomData(String name, T defaultValue) {
+		return (T) customData.getOrDefault(name, defaultValue);
 	}
 }
