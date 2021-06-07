@@ -100,8 +100,7 @@ public class BackgroundRendererMixin {
 	}
 	
 	private static float bcl_getFogDensityI(Level level, int x, int y, int z) {
-		BCL_MUT_POS.set(x, y, z);
-		Biome biome = level.getBiome(BCL_MUT_POS);
+		Biome biome = level.getBiome(BCL_MUT_POS.set(x, y, z));
 		BCLBiome renderBiome = BiomeAPI.getRenderBiome(biome);
 		return renderBiome.getFogDensity();
 	}
@@ -134,6 +133,6 @@ public class BackgroundRendererMixin {
 		a = Mth.lerp(dy, a, b);
 		b = Mth.lerp(dy, c, d);
 		
-		return Mth.lerp(dz, c, d);
+		return Mth.lerp(dz, a, b);
 	}
 }
