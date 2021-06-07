@@ -190,4 +190,8 @@ public class BCLBiome {
 	public <T> T getCustomData(String name, T defaultValue) {
 		return (T) customData.getOrDefault(name, defaultValue);
 	}
+	
+	public void addCustomData(String name, Object obj) {
+		customData.put(name, obj);
+	}
 }
