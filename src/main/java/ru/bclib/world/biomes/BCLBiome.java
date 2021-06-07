@@ -86,7 +86,8 @@ public class BCLBiome {
 	}
 
 	public BCLBiome getSubBiome(Random random) {
-		return subbiomes.get(random);
+		BCLBiome biome = subbiomes.get(random);
+		return biome == null ? this : biome;
 	}
 
 	public BCLBiome getParentBiome() {

@@ -27,19 +27,19 @@ import ru.bclib.api.WorldDataAPI;
 
 @Mixin(ServerLevel.class)
 public abstract class ServerLevelMixin extends Level {
-	private static String be_lastWorld = null;
+	private static String bcl_lastWorld = null;
 	
 	protected ServerLevelMixin(WritableLevelData writableLevelData, ResourceKey<Level> resourceKey, DimensionType dimensionType, Supplier<ProfilerFiller> supplier, boolean bl, boolean bl2, long l) {
 		super(writableLevelData, resourceKey, dimensionType, supplier, bl, bl2, l);
 	}
 	
 	@Inject(method = "<init>*", at = @At("TAIL"))
-	private void be_onServerWorldInit(MinecraftServer server, Executor workerExecutor, LevelStorageSource.LevelStorageAccess session, ServerLevelData properties, ResourceKey<Level> registryKey, DimensionType dimensionType, ChunkProgressListener worldGenerationProgressListener, ChunkGenerator chunkGenerator, boolean debugWorld, long l, List<CustomSpawner> list, boolean bl, CallbackInfo info) {
-		if (be_lastWorld != null && be_lastWorld.equals(session.getLevelId())) {
+	private void bcl_onServerWorldInit(MinecraftServer server, Executor workerExecutor, LevelStorageSource.LevelStorageAccess session, ServerLevelData properties, ResourceKey<Level> registryKey, DimensionType dimensionType, ChunkProgressListener worldGenerationProgressListener, ChunkGenerator chunkGenerator, boolean debugWorld, long l, List<CustomSpawner> list, boolean bl, CallbackInfo info) {
+		if (bcl_lastWorld != null && bcl_lastWorld.equals(session.getLevelId())) {
 			return;
 		}
 		
-		be_lastWorld = session.getLevelId();
+		bcl_lastWorld = session.getLevelId();
 		
 		ServerLevel world = ServerLevel.class.cast(this);
 		File dir = session.getDimensionPath(world.dimension());
