@@ -25,7 +25,7 @@ public class BiomeAPI {
 	 * Empty biome used as default value if requested biome doesn't exist or linked. Shouldn't be registered anywhere to prevent bugs.
 	 * Have {@code Biomes.THE_VOID} as the reference biome.
 	 */
-	public static final BCLBiome EMPTY_BIOME = new BCLBiome(Biomes.THE_VOID.location(), BuiltinRegistries.BIOME.get(Biomes.THE_VOID), 0, 0);
+	public static final BCLBiome EMPTY_BIOME = new BCLBiome(Biomes.THE_VOID.location(), BuiltinRegistries.BIOME.get(Biomes.THE_VOID), 1, 0);
 	
 	private static final HashMap<ResourceLocation, BCLBiome> ID_MAP = Maps.newHashMap();
 	private static final HashMap<Biome, BCLBiome> CLIENT = Maps.newHashMap();
