@@ -1,6 +1,6 @@
 {
-	"parent": "betterend:block/chest_item",
+	"parent": "bclib:block/chest_item",
 	"textures": {
-		"texture": "betterend:entity/chest/%texture%"
+		"texture": "%modid%:entity/chest/%texture%"
 	}
 }

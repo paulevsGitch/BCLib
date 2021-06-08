@@ -1,6 +1,6 @@
 {
 	"parent": "block/fence_inventory",
 	"textures": {
-		"texture": "betterend:block/%texture%"
+		"texture": "%modid%:block/%texture%"
 	}
 }
