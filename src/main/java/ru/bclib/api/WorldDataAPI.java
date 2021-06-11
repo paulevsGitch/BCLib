@@ -4,10 +4,13 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
 import ru.bclib.BCLib;
@@ -22,6 +25,7 @@ public class WorldDataAPI {
 		MODS.stream().parallel().forEach(modID -> {
 			File file = new File(dataDir, modID + ".nbt");
 			CompoundTag root = new CompoundTag();
+			TAGS.put(modID, root);
 			if (file.exists()) {
 				try {
 					root = NbtIo.readCompressed(file);
@@ -30,7 +34,19 @@ public class WorldDataAPI {
 					BCLib.LOGGER.error("World data loading failed", e);
 				}
 			}
-			TAGS.put(modID, root);
+			else {
+				Optional<ModContainer> optional = FabricLoader.getInstance().getModContainer(modID);
+				if (optional.isPresent()) {
+					ModContainer modContainer = optional.get();
+					if (BCLib.isDevEnvironment()) {
+						root.putString("version", "63.63.63");
+					}
+					else {
+						root.putString("version", modContainer.getMetadata().getVersion().toString());
+					}
+					saveFile(modID);
+				}
+			}
 		});
 	}
 	

@@ -33,9 +33,11 @@ public class DataFixerAPI {
 		Collection<ModContainer> mods = FabricLoader.getInstance().getAllMods();
 		for (ModContainer mod: mods) {
 			String name = mod.getMetadata().getId();
+			int preVersion = getModVersion(WorldDataAPI.getRootTag(name).getString("version"));
 			int version = getModVersion(mod.getMetadata().getVersion().toString());
-			if (version > 0) {
-				shoudFix |= FIX_VERSIONS.getOrDefault(name, version) < version;
+			if (version > preVersion) {
+				int fixVersion = FIX_VERSIONS.getOrDefault(name, version);
+				shoudFix |= fixVersion < version && fixVersion >= preVersion;
 			}
 		};
 		if (!shoudFix) {
