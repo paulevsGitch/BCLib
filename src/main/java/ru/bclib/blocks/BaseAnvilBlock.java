@@ -27,14 +27,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class BaseAnvilBlock extends AnvilBlock implements BlockModelProvider {
+public abstract class BaseAnvilBlock extends AnvilBlock implements BlockModelProvider {
 	public static final IntegerProperty DESTRUCTION = BlockProperties.DESTRUCTION;
 
-	protected final Item anvilItem;
-
-	public BaseAnvilBlock(Item anvilItem, MaterialColor color) {
+	public BaseAnvilBlock(MaterialColor color) {
 		super(FabricBlockSettings.copyOf(Blocks.ANVIL).materialColor(color));
-		this.anvilItem = anvilItem;
 	}
 	
 	@Override
@@ -60,9 +57,7 @@ public class BaseAnvilBlock extends AnvilBlock implements BlockModelProvider {
 	}
 
 	@Override
-	public Item asItem() {
-		return anvilItem;
-	}
+	public abstract Item asItem();
 
 	@Override
 	public BlockModel getItemModel(ResourceLocation blockId) {
