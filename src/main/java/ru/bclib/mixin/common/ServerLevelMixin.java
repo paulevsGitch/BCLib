@@ -48,6 +48,6 @@ public abstract class ServerLevelMixin extends Level {
 		}
 		
 		DataFixerAPI.fixData(dir);
-		WorldDataAPI.load(dir);
+		WorldDataAPI.load(new File(dir, "data"));
 	}
 }

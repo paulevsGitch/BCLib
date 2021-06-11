@@ -1,5 +1,9 @@
 package ru.bclib.items;
 
+import java.util.List;
+
+import org.jetbrains.annotations.Nullable;
+
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.block.model.BlockModel;
@@ -14,11 +18,8 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import org.jetbrains.annotations.Nullable;
 import ru.bclib.blocks.BaseAnvilBlock;
 import ru.bclib.client.models.ItemModelProvider;
-
-import java.util.List;
 
 public class BaseAnvilItem extends BlockItem implements ItemModelProvider {
 
