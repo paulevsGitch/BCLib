@@ -20,7 +20,7 @@ public class WorldDataAPI {
 	public static void load(File dataDir) {
 		WorldDataAPI.dataDir = dataDir;
 		MODS.stream().parallel().forEach(modID -> {
-			File file = new File(dataDir, modID);
+			File file = new File(dataDir, modID + ".nbt");
 			CompoundTag root = new CompoundTag();
 			if (file.exists()) {
 				try {
