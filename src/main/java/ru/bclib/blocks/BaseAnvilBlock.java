@@ -1,18 +1,12 @@
 package ru.bclib.blocks;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
-import org.jetbrains.annotations.Nullable;
-
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.AnvilBlock;
 import net.minecraft.world.level.block.Block;
@@ -22,34 +16,39 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.material.MaterialColor;
 import net.minecraft.world.level.storage.loot.LootContext;
+import org.jetbrains.annotations.Nullable;
 import ru.bclib.client.models.BasePatterns;
 import ru.bclib.client.models.BlockModelProvider;
 import ru.bclib.client.models.ModelsHelper;
 import ru.bclib.client.models.PatternsHelper;
+import ru.bclib.items.BaseAnvilItem;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 public class BaseAnvilBlock extends AnvilBlock implements BlockModelProvider {
-	private static final IntegerProperty DESTRUCTION = BlockProperties.DESTRUCTION;
-	
-	public BaseAnvilBlock(MaterialColor color) {
+	public static final IntegerProperty DESTRUCTION = BlockProperties.DESTRUCTION;
+
+	protected final Item anvilItem;
+
+	public BaseAnvilBlock(Item anvilItem, MaterialColor color) {
 		super(FabricBlockSettings.copyOf(Blocks.ANVIL).materialColor(color));
+		this.anvilItem = anvilItem;
 	}
 	
 	@Override
 	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
 		super.createBlockStateDefinition(builder);
-		builder.add(getDestructionProperty());
-	}
-
-	public IntegerProperty getDestructionProperty() {
-		return DESTRUCTION;
+		builder.add(DESTRUCTION);
 	}
 	
 	@Override
 	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
-		ItemStack stack = new ItemStack(this);
-		int level = state.getValue(getDestructionProperty());
-		stack.getOrCreateTag().putInt("level", level);
-		return Collections.singletonList(stack);
+		ItemStack dropStack = new ItemStack(this);
+		int destruction = state.getValue(DESTRUCTION);
+		dropStack.getOrCreateTag().putInt(BaseAnvilItem.DESTRUCTION, destruction);
+		return Lists.newArrayList(dropStack);
 	}
 
 	protected String getTop(ResourceLocation blockId, String block) {
@@ -61,14 +60,18 @@ public class BaseAnvilBlock extends AnvilBlock implements BlockModelProvider {
 	}
 
 	@Override
+	public Item asItem() {
+		return anvilItem;
+	}
+
+	@Override
 	public BlockModel getItemModel(ResourceLocation blockId) {
 		return getBlockModel(blockId, defaultBlockState());
 	}
 
 	@Override
 	public @Nullable BlockModel getBlockModel(ResourceLocation blockId, BlockState blockState) {
-		IntegerProperty destructionProperty = getDestructionProperty();
-		int destruction = blockState.getValue(destructionProperty);
+		int destruction = blockState.getValue(DESTRUCTION);
 		String name = blockId.getPath();
 		Map<String, String> textures = Maps.newHashMap();
 		textures.put("%modid%", blockId.getNamespace());
@@ -80,8 +83,7 @@ public class BaseAnvilBlock extends AnvilBlock implements BlockModelProvider {
 
 	@Override
 	public UnbakedModel getModelVariant(ResourceLocation stateId, BlockState blockState, Map<ResourceLocation, UnbakedModel> modelCache) {
-		IntegerProperty destructionProperty = getDestructionProperty();
-		int destruction = blockState.getValue(destructionProperty);
+		int destruction = blockState.getValue(DESTRUCTION);
 		String modId = stateId.getNamespace();
 		String modelId = "block/" + stateId.getPath() + "_top_" + destruction;
 		ResourceLocation modelLocation = new ResourceLocation(modId, modelId);
