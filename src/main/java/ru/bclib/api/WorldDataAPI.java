@@ -93,6 +93,10 @@ public class WorldDataAPI {
 		return tag;
 	}
 	
+	/**
+	 * Forces mod cache file to be saved.
+	 * @param modID {@link String} mod ID.
+	 */
 	public static void saveFile(String modID) {
 		try {
 			NbtIo.writeCompressed(getRootTag(modID), new File(dataDir, modID + ".nbt"));
@@ -100,5 +104,21 @@ public class WorldDataAPI {
 		catch (IOException e) {
 			BCLib.LOGGER.error("World data saving failed", e);
 		}
+	}
+	
+	/**
+	 * Get stored mod version (only for mods with registered cache).
+	 * @return {@link String} mod version.
+	 */
+	public static String getModVersion(String modID) {
+		return getRootTag(modID).getString("version");
+	}
+	
+	/**
+	 * Get stored mod version as integer (only for mods with registered cache).
+	 * @return {@code int} mod version.
+	 */
+	public static int getIntModVersion(String modID) {
+		return DataFixerAPI.getModVersion(getModVersion(modID));
 	}
 }
