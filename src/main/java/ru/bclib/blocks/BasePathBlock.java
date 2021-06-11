@@ -30,13 +30,14 @@ import ru.bclib.client.models.BasePatterns;
 import ru.bclib.client.models.ModelsHelper;
 import ru.bclib.client.models.PatternsHelper;
 
-public abstract class BasePathBlock extends BaseBlockNotFull {
+@SuppressWarnings("deprecation")
+public class BasePathBlock extends BaseBlockNotFull {
 	private static final VoxelShape SHAPE = Block.box(0, 0, 0, 16, 15, 16);
 
 	private Block baseBlock;
 
 	public BasePathBlock(Block source) {
-		super(FabricBlockSettings.copyOf(source).isValidSpawn((state, world, pos, type) -> { return false; }));
+		super(FabricBlockSettings.copyOf(source).isValidSpawn((state, world, pos, type) -> false));
 		this.baseBlock = Blocks.DIRT;
 		if (source instanceof BaseTerrainBlock) {
 			BaseTerrainBlock terrain = (BaseTerrainBlock) source;

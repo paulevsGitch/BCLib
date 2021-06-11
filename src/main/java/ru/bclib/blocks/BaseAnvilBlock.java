@@ -71,6 +71,7 @@ public class BaseAnvilBlock extends AnvilBlock implements BlockModelProvider {
 		int destruction = blockState.getValue(destructionProperty);
 		String name = blockId.getPath();
 		Map<String, String> textures = Maps.newHashMap();
+		textures.put("%modid%", blockId.getNamespace());
 		textures.put("%anvil%", name);
 		textures.put("%top%", name + "_top_" + destruction);
 		Optional<String> pattern = PatternsHelper.createJson(BasePatterns.BLOCK_ANVIL, textures);

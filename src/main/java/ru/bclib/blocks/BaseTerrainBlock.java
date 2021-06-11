@@ -44,6 +44,7 @@ import ru.bclib.client.models.ModelsHelper;
 import ru.bclib.client.models.PatternsHelper;
 import ru.bclib.client.sound.BlockSounds;
 
+@SuppressWarnings("deprecation")
 public class BaseTerrainBlock extends BaseBlock {
 
 	private final Block baseBlock;
@@ -96,7 +97,7 @@ public class BaseTerrainBlock extends BaseBlock {
 	public boolean canStay(BlockState state, LevelReader worldView, BlockPos pos) {
 		BlockPos blockPos = pos.above();
 		BlockState blockState = worldView.getBlockState(blockPos);
-		if (blockState.is(Blocks.SNOW) && (Integer) blockState.getValue(SnowLayerBlock.LAYERS) == 1) {
+		if (blockState.is(Blocks.SNOW) && blockState.getValue(SnowLayerBlock.LAYERS) == 1) {
 			return true;
 		}
 		else if (blockState.getFluidState().getAmount() == 8) {

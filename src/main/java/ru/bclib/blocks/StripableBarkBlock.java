@@ -16,10 +16,10 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.MaterialColor;
 import net.minecraft.world.phys.BlockHitResult;
 
-public class BaseStripableLogBlock extends BaseRotatedPillarBlock {
+public class StripableBarkBlock extends BaseBarkBlock {
 	private final Block striped;
 	
-	public BaseStripableLogBlock(MaterialColor color, Block striped) {
+	public StripableBarkBlock(MaterialColor color, Block striped) {
 		super(FabricBlockSettings.copyOf(striped).materialColor(color));
 		this.striped = striped;
 	}
