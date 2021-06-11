@@ -3,6 +3,7 @@ package ru.bclib.items;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.block.model.BlockModel;
+import net.minecraft.core.Registry;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
@@ -49,6 +50,8 @@ public class BaseAnvilItem extends BlockItem implements ItemModelProvider {
 
 	@Override
 	public BlockModel getItemModel(ResourceLocation resourceLocation) {
-		return ((ItemModelProvider) getBlock()).getItemModel(resourceLocation);
+		Block anvilBlock = getBlock();
+		ResourceLocation blockId = Registry.BLOCK.getKey(anvilBlock);
+		return ((ItemModelProvider) anvilBlock).getItemModel(blockId);
 	}
 }
