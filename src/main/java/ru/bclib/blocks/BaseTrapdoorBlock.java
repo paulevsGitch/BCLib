@@ -52,6 +52,7 @@ public class BaseTrapdoorBlock extends TrapDoorBlock implements IRenderTyped, Bl
 		Optional<String> pattern = PatternsHelper.createJson(BasePatterns.BLOCK_TRAPDOOR, new HashMap<String, String>() {
 			private static final long serialVersionUID = 1L;
 			{
+				put("%modid%", resourceLocation.getNamespace());
 				put("%texture%", name);
 				put("%side%", name.replace("trapdoor", "door_side"));
 			}

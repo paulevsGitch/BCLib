@@ -41,6 +41,7 @@ public class BaseCraftingTableBlock extends CraftingTableBlock implements BlockM
 		Optional<String> pattern = PatternsHelper.createJson(BasePatterns.BLOCK_SIDED, new HashMap<String, String>() {
 			private static final long serialVersionUID = 1L;
 			{
+				put("%modid%", blockId.getNamespace());
 				put("%particle%", blockName + "_front");
 				put("%down%", blockName + "_bottom");
 				put("%up%", blockName + "_top");
