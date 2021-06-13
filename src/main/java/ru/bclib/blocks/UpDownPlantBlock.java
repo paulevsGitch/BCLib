@@ -26,7 +26,7 @@ import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import ru.bclib.client.render.ERenderLayer;
+import ru.bclib.client.render.BCLRenderLayer;
 import ru.bclib.interfaces.IRenderTyped;
 
 public abstract class UpDownPlantBlock extends BaseBlockNotFull implements IRenderTyped {
@@ -80,8 +80,8 @@ public abstract class UpDownPlantBlock extends BaseBlockNotFull implements IRend
 	}
 	
 	@Override
-	public ERenderLayer getRenderLayer() {
-		return ERenderLayer.CUTOUT;
+	public BCLRenderLayer getRenderLayer() {
+		return BCLRenderLayer.CUTOUT;
 	}
 	
 	@Override

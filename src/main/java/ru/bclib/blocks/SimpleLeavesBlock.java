@@ -4,7 +4,7 @@ import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
-import ru.bclib.client.render.ERenderLayer;
+import ru.bclib.client.render.BCLRenderLayer;
 import ru.bclib.interfaces.IRenderTyped;
 
 public class SimpleLeavesBlock extends BaseBlockNotFull implements IRenderTyped {
@@ -32,7 +32,7 @@ public class SimpleLeavesBlock extends BaseBlockNotFull implements IRenderTyped 
 	}
 
 	@Override
-	public ERenderLayer getRenderLayer() {
-		return ERenderLayer.CUTOUT;
+	public BCLRenderLayer getRenderLayer() {
+		return BCLRenderLayer.CUTOUT;
 	}
 }

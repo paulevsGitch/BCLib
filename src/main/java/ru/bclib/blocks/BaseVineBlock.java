@@ -33,7 +33,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import ru.bclib.blocks.BlockProperties.TripleShape;
-import ru.bclib.client.render.ERenderLayer;
+import ru.bclib.client.render.BCLRenderLayer;
 import ru.bclib.interfaces.IRenderTyped;
 import ru.bclib.util.BlocksHelper;
 
@@ -115,8 +115,8 @@ public class BaseVineBlock extends BaseBlockNotFull implements IRenderTyped, Bon
 	}
 	
 	@Override
-	public ERenderLayer getRenderLayer() {
-		return ERenderLayer.CUTOUT;
+	public BCLRenderLayer getRenderLayer() {
+		return BCLRenderLayer.CUTOUT;
 	}
 
 	@Override

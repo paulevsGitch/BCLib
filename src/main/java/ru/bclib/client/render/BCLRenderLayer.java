@@ -1,6 +1,6 @@
 package ru.bclib.client.render;
 
-public enum ERenderLayer {
+public enum BCLRenderLayer {
 	CUTOUT,
 	TRANSLUCENT;
 }

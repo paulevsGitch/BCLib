@@ -20,7 +20,7 @@ import net.minecraft.world.level.material.MaterialColor;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import ru.bclib.client.models.BlockModelProvider;
-import ru.bclib.client.render.ERenderLayer;
+import ru.bclib.client.render.BCLRenderLayer;
 import ru.bclib.interfaces.IRenderTyped;
 import ru.bclib.util.MHelper;
 
@@ -52,8 +52,8 @@ public class BaseLeavesBlock extends LeavesBlock implements BlockModelProvider, 
 	}
 
 	@Override
-	public ERenderLayer getRenderLayer() {
-		return ERenderLayer.CUTOUT;
+	public BCLRenderLayer getRenderLayer() {
+		return BCLRenderLayer.CUTOUT;
 	}
 	
 	@Override

@@ -31,7 +31,7 @@ import ru.bclib.client.models.BasePatterns;
 import ru.bclib.client.models.BlockModelProvider;
 import ru.bclib.client.models.ModelsHelper;
 import ru.bclib.client.models.PatternsHelper;
-import ru.bclib.client.render.ERenderLayer;
+import ru.bclib.client.render.BCLRenderLayer;
 import ru.bclib.interfaces.IRenderTyped;
 
 public class BaseFurnaceBlock extends FurnaceBlock implements BlockModelProvider, IRenderTyped {
@@ -87,8 +87,8 @@ public class BaseFurnaceBlock extends FurnaceBlock implements BlockModelProvider
 	}
 
 	@Override
-	public ERenderLayer getRenderLayer() {
-		return ERenderLayer.CUTOUT;
+	public BCLRenderLayer getRenderLayer() {
+		return BCLRenderLayer.CUTOUT;
 	}
 	
 	@Override
