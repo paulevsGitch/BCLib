@@ -35,7 +35,7 @@ public abstract class ItemsRegistry extends BaseRegistry<Item> {
 	}
 
 	public Item registerDisc(String name, int power, SoundEvent sound) {
-		return register(name, new EndDiscItem(power, sound, makeItemSettings()));
+		return register(name, new EndDiscItem(power, sound, makeItemSettings().stacksTo(1)));
 	}
 
 	public Item registerItem(String name) {
