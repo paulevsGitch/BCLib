@@ -21,7 +21,7 @@ import net.minecraft.world.item.TieredItem;
 import net.minecraft.world.level.block.DispenserBlock;
 import ru.bclib.items.BaseDrinkItem;
 import ru.bclib.items.BaseSpawnEggItem;
-import ru.bclib.items.EndDiscItem;
+import ru.bclib.items.BaseDiscItem;
 import ru.bclib.items.ModelProviderItem;
 import ru.bclib.items.tool.BaseAxeItem;
 import ru.bclib.items.tool.BaseHoeItem;
@@ -35,7 +35,7 @@ public abstract class ItemsRegistry extends BaseRegistry<Item> {
 	}
 
 	public Item registerDisc(String name, int power, SoundEvent sound) {
-		return register(name, new EndDiscItem(power, sound, makeItemSettings().stacksTo(1)));
+		return register(name, new BaseDiscItem(power, sound, makeItemSettings().stacksTo(1)));
 	}
 
 	public Item registerItem(String name) {

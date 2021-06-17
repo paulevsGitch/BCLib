@@ -34,7 +34,13 @@ public class BaseDrinkItem extends ModelProviderItem {
 	}
 
 	@Override
-	public ItemStack finishUsingItem(ItemStack stack, Level world, LivingEntity user) {
+	public ItemStack finishUsingItem(ItemStack stack, Level level, LivingEntity user) {
+		if (this.isEdible()) {
+			int count = stack.getCount();
+			user.eat(level, stack);
+			stack.setCount(count);
+		}
+		
 		if (user instanceof ServerPlayer) {
 			ServerPlayer serverPlayerEntity = (ServerPlayer) user;
 			CriteriaTriggers.CONSUME_ITEM.trigger(serverPlayerEntity, stack);
@@ -45,7 +51,7 @@ public class BaseDrinkItem extends ModelProviderItem {
 			stack.shrink(1);
 		}
 
-		if (!world.isClientSide) {
+		if (!level.isClientSide) {
 			user.removeAllEffects();
 		}
 

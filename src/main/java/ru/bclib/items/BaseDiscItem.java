@@ -4,8 +4,8 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.item.RecordItem;
 import ru.bclib.client.models.ItemModelProvider;
 
-public class EndDiscItem extends RecordItem implements ItemModelProvider {
-	public EndDiscItem(int comparatorOutput, SoundEvent sound, Properties settings) {
+public class BaseDiscItem extends RecordItem implements ItemModelProvider {
+	public BaseDiscItem(int comparatorOutput, SoundEvent sound, Properties settings) {
 		super(comparatorOutput, sound, settings);
 	}
 }
