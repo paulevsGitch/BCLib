@@ -25,6 +25,9 @@
 		],
 		"client": [
 			"ru.bclib.client.BCLibClient"
+		],
+		"server": [
+			"ru.bclib.server.BCLibServer"
 		]
 	},
 	"mixins": [
