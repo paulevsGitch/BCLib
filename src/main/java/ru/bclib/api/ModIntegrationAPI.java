@@ -16,9 +16,6 @@ public class ModIntegrationAPI {
 	 */
 	public static ModIntegration register(ModIntegration integration) {
 		INTEGRATIONS.add(integration);
-		if (integration.modIsInstalled()) {
-			integration.init();
-		}
 		return integration;
 	}
 	
@@ -28,5 +25,16 @@ public class ModIntegrationAPI {
 	 */
 	public static List<ModIntegration> getIntegrations() {
 		return INTEGRATIONS;
+	}
+	
+	/**
+	 * Initialize all integrations, only for internal usage.
+	 */
+	public static void registerAll() {
+		INTEGRATIONS.forEach(integration -> {
+			if (integration.modIsInstalled()) {
+				integration.init();
+			}
+		});
 	}
 }
