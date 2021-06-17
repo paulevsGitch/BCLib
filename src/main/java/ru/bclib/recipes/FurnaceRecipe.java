@@ -39,7 +39,7 @@ public class FurnaceRecipe {
 	}
 	
 	public FurnaceRecipe checkConfig(PathConfig config) {
-		exist = config.getBoolean("furnace", id.getPath(), true);
+		exist |= config.getBoolean("furnace", id.getPath(), true);
 		return this;
 	}
 	

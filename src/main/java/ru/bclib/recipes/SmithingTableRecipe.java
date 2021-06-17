@@ -40,7 +40,7 @@ public class SmithingTableRecipe {
 	private SmithingTableRecipe() {}
 	
 	public SmithingTableRecipe checkConfig(PathConfig config) {
-		exist = config.getBoolean("smithing", id.getPath(), true);
+		exist |= config.getBoolean("smithing", id.getPath(), true);
 		return this;
 	}
 	
