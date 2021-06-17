@@ -16,7 +16,9 @@ public class ModIntegrationAPI {
 	 */
 	public static ModIntegration register(ModIntegration integration) {
 		INTEGRATIONS.add(integration);
-		integration.init();
+		if (integration.modIsInstalled()) {
+			integration.init();
+		}
 		return integration;
 	}
 	
