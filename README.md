@@ -14,6 +14,7 @@ BCLib is a library mod for BetterX team mods, developed for Fabric, MC 1.16.5
 
 ### Libs:
 * Spline library (simple);
+* Recipe manager;
 * Noise library;
 * Math library;
 * SDF library.
