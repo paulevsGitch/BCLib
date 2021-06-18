@@ -17,11 +17,13 @@ import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkGenerator;
+import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
 import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import net.minecraft.world.level.levelgen.surfacebuilders.SurfaceBuilderConfiguration;
+import net.minecraft.world.phys.Vec3;
 import ru.bclib.api.BiomeAPI;
 import ru.bclib.api.TagAPI;
 import ru.bclib.util.BlocksHelper;
@@ -76,7 +78,11 @@ public abstract class NBTStructureFeature extends DefaultFeature {
 	}
 
 	@Override
-	public boolean place(WorldGenLevel world, ChunkGenerator chunkGenerator, Random random, BlockPos center, NoneFeatureConfiguration featureConfig) {
+	public boolean place(FeaturePlaceContext<NoneFeatureConfiguration> context) {
+		WorldGenLevel world = context.level();
+		Random random = context.random();
+		BlockPos center = context.origin();
+
 		center = new BlockPos(((center.getX() >> 4) << 4) | 8, 128, ((center.getZ() >> 4) << 4) | 8);
 		center = getGround(world, center);
 
@@ -88,14 +94,14 @@ public abstract class NBTStructureFeature extends DefaultFeature {
 		StructureTemplate structure = getStructure(world, center, random);
 		Rotation rotation = getRotation(world, center, random);
 		Mirror mirror = getMirror(world, center, random);
-		BlockPos offset = StructureTemplate.transform(structure.getSize(), mirror, rotation, BlockPos.ZERO);
+		BlockPos offset = StructureTemplate.transform(new BlockPos(structure.getSize()), mirror, rotation, BlockPos.ZERO);
 		center = center.offset(0, getYOffset(structure, world, center, random) + 0.5, 0);
 
 		BoundingBox bounds = makeBox(center);
 		StructurePlaceSettings placementData = new StructurePlaceSettings().setRotation(rotation).setMirror(mirror).setBoundingBox(bounds);
 		addStructureData(placementData);
 		center = center.offset(-offset.getX() * 0.5, 0, -offset.getZ() * 0.5);
-		structure.placeInWorldChunk(world, center, placementData, random);
+		structure.placeInWorld(world, center, placementData, random);
 
 		TerrainMerge merge = getTerrainMerge(world, center, random);
 		int x1 = center.getX();
