@@ -29,7 +29,7 @@ import net.minecraft.world.level.block.state.properties.WoodType;
 import ru.bclib.blockentities.BaseSignBlockEntity;
 import ru.bclib.blocks.BaseSignBlock;
 
-public class BaseSignBlockEntityRenderer extends BlockEntityRenderer<BaseSignBlockEntity> {
+public class BaseSignBlockEntityRenderer implements BlockEntityRenderer<BaseSignBlockEntity> {
 	private static final HashMap<Block, RenderType> LAYERS = Maps.newHashMap();
 	private static final RenderType defaultLayer;
 	private final SignModel model = new SignRenderer.SignModel();

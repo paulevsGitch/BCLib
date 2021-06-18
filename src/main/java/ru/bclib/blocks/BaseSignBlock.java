@@ -75,8 +75,8 @@ public class BaseSignBlock extends SignBlock implements BlockModelProvider, ISpe
 	}
 
 	@Override
-	public BlockEntity newBlockEntity(BlockGetter world) {
-		return new BaseSignBlockEntity();
+	public BlockEntity newBlockEntity(BlockPos blockPos, BlockState blockState) {
+		return new BaseSignBlockEntity(blockPos, blockState);
 	}
 	
 	@Override
@@ -85,7 +85,7 @@ public class BaseSignBlock extends SignBlock implements BlockModelProvider, ISpe
 			BaseSignBlockEntity sign = (BaseSignBlockEntity) world.getBlockEntity(pos);
 			if (sign != null) {
 				if (!world.isClientSide) {
-					sign.setAllowedPlayerEditor((Player) placer);
+					sign.setAllowedPlayerEditor(placer.getUUID());
 					((ServerPlayer) placer).connection.send(new ClientboundOpenSignEditorPacket(pos));
 				} else {
 					sign.setEditable(true);
@@ -164,12 +164,6 @@ public class BaseSignBlock extends SignBlock implements BlockModelProvider, ISpe
 	@Override
 	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
 		return Collections.singletonList(new ItemStack(this));
-	}
-
-	@Override
-	public Fluid takeLiquid(LevelAccessor world, BlockPos pos, BlockState state) {
-		// TODO Auto-generated method stub
-		return super.takeLiquid(world, pos, state);
 	}
 
 	@Override

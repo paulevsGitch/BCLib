@@ -34,7 +34,7 @@ import net.minecraft.world.level.block.state.properties.ChestType;
 import ru.bclib.blockentities.BaseChestBlockEntity;
 
 @Environment(EnvType.CLIENT)
-public class BaseChestBlockEntityRenderer extends BlockEntityRenderer<BaseChestBlockEntity> {
+public class BaseChestBlockEntityRenderer implements BlockEntityRenderer<BaseChestBlockEntity> {
 	private static final HashMap<Block, RenderType[]> LAYERS = Maps.newHashMap();
 	private static final RenderType[] defaultLayer;
 

@@ -7,12 +7,12 @@ buildscript {
 plugins {
 	id 'idea'
 	id 'eclipse'
-	id 'fabric-loom' version '0.7-SNAPSHOT'
+	id 'fabric-loom' version '0.8-SNAPSHOT'
 	id 'maven-publish'
 }
 
-sourceCompatibility = JavaVersion.VERSION_1_8
-targetCompatibility = JavaVersion.VERSION_1_8
+sourceCompatibility = JavaVersion.VERSION_16
+targetCompatibility = JavaVersion.VERSION_16
 
 archivesBaseName = project.archives_base_name
 version = project.mod_version
@@ -20,7 +20,7 @@ group = project.maven_group
 
 repositories {
     maven { url "https://maven.dblsaiko.net/" }
-    maven { url "http://server.bbkr.space:8081/artifactory/libs-release/" }
+    maven { url "https://server.bbkr.space:8081/artifactory/libs-release/" }
 	maven { url "https://maven.fabricmc.net/" }
 	maven { url 'https://maven.blamejared.com' }
 	maven { url "https://maven.shedaniel.me/" }
@@ -33,7 +33,7 @@ dependencies {
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 	
-	useApi "vazkii.patchouli:Patchouli:1.16.4-${project.patchouli_version}"
+	//useApi "vazkii.patchouli:Patchouli:1.16.4-${project.patchouli_version}"
 }
 
 def useOptional(String dep) {
