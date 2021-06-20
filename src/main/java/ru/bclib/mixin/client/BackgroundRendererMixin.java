@@ -1,5 +1,6 @@
 package ru.bclib.mixin.client;
 
+import net.minecraft.world.level.material.FogType;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -41,8 +42,8 @@ public class BackgroundRendererMixin {
 	
 	@Inject(method = "setupColor", at = @At("RETURN"))
 	private static void bcl_onRender(Camera camera, float tickDelta, ClientLevel world, int i, float f, CallbackInfo info) {
-		FluidState fluidState = camera.getFluidInCamera();
-		if (fluidState.isEmpty() && world.dimension().equals(Level.END)) {
+		FogType fogType = camera.getFluidInCamera();
+		if (fogType != FogType.WATER && world.dimension().equals(Level.END)) {
 			Entity entity = camera.getEntity();
 			boolean skip = false;
 			if (entity instanceof LivingEntity) {
@@ -62,10 +63,10 @@ public class BackgroundRendererMixin {
 	}
 	
 	@Inject(method = "setupFog", at = @At("HEAD"), cancellable = true)
-	private static void bcl_fogDensity(Camera camera, FogRenderer.FogMode fogType, float viewDistance, boolean thickFog, CallbackInfo info) {
+	private static void bcl_fogDensity(Camera camera, FogRenderer.FogMode fogMode, float viewDistance, boolean thickFog, CallbackInfo info) {
 		Entity entity = camera.getEntity();
-		FluidState fluidState = camera.getFluidInCamera();
-		if (fluidState.isEmpty()) {
+		FogType fogType = camera.getFluidInCamera();
+		if (fogType != FogType.WATER) {
 			float fog = bcl_getFogDensity(entity.level, entity.getX(), entity.getEyeY(), entity.getZ());
 			BackgroundInfo.fogDensity = fog;
 			float start = viewDistance * 0.75F / fog;
@@ -93,10 +94,8 @@ public class BackgroundRendererMixin {
 				}
 			}
 			
-			RenderSystem.fogStart(start);
-			RenderSystem.fogEnd(end);
-			RenderSystem.fogMode(GlStateManager.FogMode.LINEAR);
-			RenderSystem.setupNvFogDistance();
+			RenderSystem.setShaderFogStart(start);
+			RenderSystem.setShaderFogEnd(end);
 			info.cancel();
 		}
 	}
