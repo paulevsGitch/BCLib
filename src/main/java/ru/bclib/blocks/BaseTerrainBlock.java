@@ -10,6 +10,8 @@ import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Maps;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.tool.attribute.v1.FabricToolTags;
 import net.minecraft.client.renderer.block.model.BlockModel;
@@ -110,11 +112,13 @@ public class BaseTerrainBlock extends BaseBlock {
 	}
 	
 	@Override
+	@Environment(EnvType.CLIENT)
 	public BlockModel getItemModel(ResourceLocation blockId) {
 		return getBlockModel(blockId, defaultBlockState());
 	}
 
 	@Override
+	@Environment(EnvType.CLIENT)
 	public @Nullable BlockModel getBlockModel(ResourceLocation blockId, BlockState blockState) {
 		ResourceLocation baseId = Registry.BLOCK.getKey(baseBlock);
 		String modId = blockId.getNamespace();
@@ -129,6 +133,7 @@ public class BaseTerrainBlock extends BaseBlock {
 	}
 
 	@Override
+	@Environment(EnvType.CLIENT)
 	public UnbakedModel getModelVariant(ResourceLocation stateId, BlockState blockState, Map<ResourceLocation, UnbakedModel> modelCache) {
 		ResourceLocation modelId = new ResourceLocation(stateId.getNamespace(), "block/" + stateId.getPath());
 		registerBlockModel(stateId, modelId, blockState, modelCache);

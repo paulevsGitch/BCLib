@@ -5,6 +5,8 @@ import java.util.Optional;
 
 import org.jetbrains.annotations.Nullable;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.resources.model.BlockModelRotation;
@@ -200,12 +202,14 @@ public class StalactiteBlock extends BaseBlockNotFull implements SimpleWaterlogg
 	}
 	
 	@Override
+	@Environment(EnvType.CLIENT)
 	public @Nullable BlockModel getBlockModel(ResourceLocation resourceLocation, BlockState blockState) {
 		Optional<String> pattern = PatternsHelper.createJson(BasePatterns.BLOCK_CROSS_SHADED, resourceLocation);
 		return ModelsHelper.fromPattern(pattern);
 	}
 
 	@Override
+	@Environment(EnvType.CLIENT)
 	public UnbakedModel getModelVariant(ResourceLocation stateId, BlockState blockState, Map<ResourceLocation, UnbakedModel> modelCache) {
 		BlockModelRotation rotation = blockState.getValue(IS_FLOOR) ? BlockModelRotation.X0_Y0 : BlockModelRotation.X180_Y0;
 		ResourceLocation modelId = new ResourceLocation(stateId.getNamespace(),

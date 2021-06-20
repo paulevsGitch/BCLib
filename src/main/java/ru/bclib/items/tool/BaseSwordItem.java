@@ -1,5 +1,7 @@
 package ru.bclib.items.tool;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.tool.attribute.v1.DynamicAttributeTool;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.resources.ResourceLocation;
@@ -14,6 +16,7 @@ public class BaseSwordItem extends SwordItem implements DynamicAttributeTool, It
 	}
 	
 	@Override
+	@Environment(EnvType.CLIENT)
 	public BlockModel getItemModel(ResourceLocation resourceLocation) {
 		return ModelsHelper.createHandheldItem(resourceLocation);
 	}

@@ -9,6 +9,8 @@ import org.jetbrains.annotations.Nullable;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.resources.model.UnbakedModel;
@@ -62,11 +64,13 @@ public abstract class BaseAnvilBlock extends AnvilBlock implements BlockModelPro
 	public abstract Item asItem();
 
 	@Override
+	@Environment(EnvType.CLIENT)
 	public BlockModel getItemModel(ResourceLocation blockId) {
 		return getBlockModel(blockId, defaultBlockState());
 	}
 
 	@Override
+	@Environment(EnvType.CLIENT)
 	public @Nullable BlockModel getBlockModel(ResourceLocation blockId, BlockState blockState) {
 		int destruction = blockState.getValue(DESTRUCTION);
 		String name = blockId.getPath();
@@ -79,6 +83,7 @@ public abstract class BaseAnvilBlock extends AnvilBlock implements BlockModelPro
 	}
 
 	@Override
+	@Environment(EnvType.CLIENT)
 	public UnbakedModel getModelVariant(ResourceLocation stateId, BlockState blockState, Map<ResourceLocation, UnbakedModel> modelCache) {
 		int destruction = blockState.getValue(DESTRUCTION);
 		String modId = stateId.getNamespace();

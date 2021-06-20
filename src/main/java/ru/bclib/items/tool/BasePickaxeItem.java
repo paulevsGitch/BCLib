@@ -1,5 +1,7 @@
 package ru.bclib.items.tool;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.tool.attribute.v1.DynamicAttributeTool;
 import net.fabricmc.fabric.api.tool.attribute.v1.FabricToolTags;
 import net.fabricmc.fabric.impl.tool.attribute.ToolManagerImpl;
@@ -36,6 +38,7 @@ public class BasePickaxeItem extends PickaxeItem implements DynamicAttributeTool
 	}
 	
 	@Override
+	@Environment(EnvType.CLIENT)
 	public BlockModel getItemModel(ResourceLocation resourceLocation) {
 		return ModelsHelper.createHandheldItem(resourceLocation);
 	}

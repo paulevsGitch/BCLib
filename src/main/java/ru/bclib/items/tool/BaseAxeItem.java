@@ -1,5 +1,7 @@
 package ru.bclib.items.tool;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.tool.attribute.v1.DynamicAttributeTool;
 import net.fabricmc.fabric.api.tool.attribute.v1.FabricToolTags;
 import net.minecraft.client.renderer.block.model.BlockModel;
@@ -28,6 +30,7 @@ public class BaseAxeItem extends AxeItem implements DynamicAttributeTool, ItemMo
 	}
 	
 	@Override
+	@Environment(EnvType.CLIENT)
 	public BlockModel getItemModel(ResourceLocation resourceLocation) {
 		return ModelsHelper.createHandheldItem(resourceLocation);
 	}
