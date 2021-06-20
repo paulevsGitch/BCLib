@@ -30,7 +30,6 @@ public class BaseAnvilItem extends BlockItem implements ItemModelProvider {
 	}
 
 	@Override
-	@SuppressWarnings("ConstantConditions")
 	protected BlockState getPlacementState(BlockPlaceContext blockPlaceContext) {
 		BlockState blockState = super.getPlacementState(blockPlaceContext);
 		ItemStack stack = blockPlaceContext.getItemInHand();
@@ -50,6 +49,7 @@ public class BaseAnvilItem extends BlockItem implements ItemModelProvider {
 	}
 
 	@Override
+	@Environment(EnvType.CLIENT)
 	public BlockModel getItemModel(ResourceLocation resourceLocation) {
 		Block anvilBlock = getBlock();
 		ResourceLocation blockId = Registry.BLOCK.getKey(anvilBlock);
