@@ -182,6 +182,11 @@ public class BlocksHelper {
 	 * @return {@code true} if block is "invulnerable" and {@code false} if not.
 	 */
 	public static boolean isInvulnerableUnsafe(BlockState state) {
-		return isInvulnerable(state, null, null);
+		try {
+			return isInvulnerable(state, null, null);
+		}
+		catch (Exception e) {
+			return false;
+		}
 	}
 }
