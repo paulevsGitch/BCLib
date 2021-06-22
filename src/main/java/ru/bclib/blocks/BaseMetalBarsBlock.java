@@ -52,11 +52,13 @@ public class BaseMetalBarsBlock extends IronBarsBlock implements BlockModelProvi
 	}
 
 	@Override
+	@Environment(EnvType.CLIENT)
 	public BlockModel getItemModel(ResourceLocation resourceLocation) {
 		return ModelsHelper.createBlockItem(resourceLocation);
 	}
 
 	@Override
+	@Environment(EnvType.CLIENT)
 	public @Nullable BlockModel getBlockModel(ResourceLocation blockId, BlockState blockState) {
 		ResourceLocation thisId = Registry.BLOCK.getKey(this);
 		String path = blockId.getPath();
@@ -71,6 +73,7 @@ public class BaseMetalBarsBlock extends IronBarsBlock implements BlockModelProvi
 	}
 
 	@Override
+	@Environment(EnvType.CLIENT)
 	public UnbakedModel getModelVariant(ResourceLocation stateId, BlockState blockState, Map<ResourceLocation, UnbakedModel> modelCache) {
 		ResourceLocation postId = new ResourceLocation(stateId.getNamespace(),
 				"block/" + stateId.getPath() + "_post");

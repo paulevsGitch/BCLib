@@ -41,7 +41,7 @@ public class BiomeAPI {
 	}
 	
 	public static void registerBiome(BCLBiome biome) {
-		if (!BuiltinRegistries.BIOME.containsKey(biome.getID())) {
+		if (BuiltinRegistries.BIOME.get(biome.getID()) == null) {
 			Registry.register(BuiltinRegistries.BIOME, biome.getID(), biome.getBiome());
 		}
 		ID_MAP.put(biome.getID(), biome);

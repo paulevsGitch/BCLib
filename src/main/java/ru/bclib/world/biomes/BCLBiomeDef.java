@@ -8,7 +8,6 @@ import com.google.common.collect.Maps;
 
 import net.minecraft.core.Registry;
 import net.minecraft.core.particles.ParticleOptions;
-import net.minecraft.data.worldgen.biome.Biomes;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.Music;
 import net.minecraft.sounds.Musics;
@@ -44,8 +43,8 @@ import ru.bclib.world.structures.BCLStructureFeature;
 import ru.bclib.world.surface.DoubleBlockSurfaceBuilder;
 
 public class BCLBiomeDef {
-	public static final int DEF_FOLIAGE_OVERWORLD = Biomes.PLAINS.getFoliageColor();
-	public static final int DEF_FOLIAGE_NETHER =ColorUtil.color(117, 10, 10);
+	public static final int DEF_FOLIAGE_OVERWORLD = ColorUtil.color(110, 143, 64);
+	public static final int DEF_FOLIAGE_NETHER = ColorUtil.color(117, 10, 10);
 	public static final int DEF_FOLIAGE_END = ColorUtil.color(197, 210, 112);
 	
 	private final List<ConfiguredStructureFeature<?, ?>> structures = Lists.newArrayList();

@@ -7,6 +7,8 @@ import java.util.Optional;
 
 import org.jetbrains.annotations.Nullable;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.resources.model.BlockModelRotation;
@@ -40,11 +42,13 @@ public class BaseStairsBlock extends StairBlock implements BlockModelProvider {
 	}
 
 	@Override
+	@Environment(EnvType.CLIENT)
 	public BlockModel getItemModel(ResourceLocation resourceLocation) {
 		return getBlockModel(resourceLocation, defaultBlockState());
 	}
 
 	@Override
+	@Environment(EnvType.CLIENT)
 	public @Nullable BlockModel getBlockModel(ResourceLocation blockId, BlockState blockState) {
 		ResourceLocation parentId = Registry.BLOCK.getKey(parent);
 		Optional<String> pattern = Optional.empty();
@@ -65,6 +69,7 @@ public class BaseStairsBlock extends StairBlock implements BlockModelProvider {
 	}
 
 	@Override
+	@Environment(EnvType.CLIENT)
 	public UnbakedModel getModelVariant(ResourceLocation stateId, BlockState blockState, Map<ResourceLocation, UnbakedModel> modelCache) {
 		String state;
 		StairsShape shape = blockState.getValue(SHAPE);
