@@ -42,8 +42,8 @@ public class BaseFurnaceBlock extends FurnaceBlock implements BlockModelProvider
 	}
 
 	@Override
-	public BlockEntity newBlockEntity(BlockGetter world) {
-		return new BaseFurnaceBlockEntity();
+	public BlockEntity newBlockEntity(BlockPos blockPos, BlockState blockState) {
+		return new BaseFurnaceBlockEntity(blockPos, blockState);
 	}
 	
 	@Override
@@ -95,8 +95,9 @@ public class BaseFurnaceBlock extends FurnaceBlock implements BlockModelProvider
 	public BCLRenderLayer getRenderLayer() {
 		return BCLRenderLayer.CUTOUT;
 	}
-	
+
 	@Override
+	@SuppressWarnings("deprecation")
 	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
 		List<ItemStack> drop = Lists.newArrayList(new ItemStack(this));
 		BlockEntity blockEntity = builder.getOptionalParameter(LootContextParams.BLOCK_ENTITY);

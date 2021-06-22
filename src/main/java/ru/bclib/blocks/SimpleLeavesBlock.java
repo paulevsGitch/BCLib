@@ -11,7 +11,7 @@ public class SimpleLeavesBlock extends BaseBlockNotFull implements IRenderTyped 
 	public SimpleLeavesBlock(MaterialColor color) {
 		super(FabricBlockSettings.of(Material.LEAVES)
 				.strength(0.2F)
-				.materialColor(color)
+				.mapColor(color)
 				.sound(SoundType.GRASS)
 				.noOcclusion()
 				.isValidSpawn((state, world, pos, type) -> false)
@@ -22,7 +22,7 @@ public class SimpleLeavesBlock extends BaseBlockNotFull implements IRenderTyped 
 	public SimpleLeavesBlock(MaterialColor color, int light) {
 		super(FabricBlockSettings.of(Material.LEAVES)
 				.luminance(light)
-				.materialColor(color)
+				.mapColor(color)
 				.strength(0.2F)
 				.sound(SoundType.GRASS)
 				.noOcclusion()

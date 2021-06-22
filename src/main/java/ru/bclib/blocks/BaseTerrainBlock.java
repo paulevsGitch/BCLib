@@ -67,7 +67,7 @@ public class BaseTerrainBlock extends BaseBlock {
 
 	@Override
 	public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-		if (pathBlock != null && player.getMainHandItem().getItem().is(FabricToolTags.SHOVELS)) {
+		if (pathBlock != null && FabricToolTags.SHOVELS.contains(player.getMainHandItem().getItem())) {
 			world.playSound(player, pos, SoundEvents.SHOVEL_FLATTEN, SoundSource.BLOCKS, 1.0F, 1.0F);
 			if (!world.isClientSide) {
 				world.setBlockAndUpdate(pos, pathBlock.defaultBlockState());

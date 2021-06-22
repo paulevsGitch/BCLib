@@ -29,10 +29,11 @@ import ru.bclib.interfaces.IRenderTyped;
 
 public class BaseChainBlock extends ChainBlock implements BlockModelProvider, IRenderTyped {
 	public BaseChainBlock(MaterialColor color) {
-		super(FabricBlockSettings.copyOf(Blocks.CHAIN).materialColor(color));
+		super(FabricBlockSettings.copyOf(Blocks.CHAIN).mapColor(color));
 	}
-	
+
 	@Override
+	@SuppressWarnings("deprecation")
 	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
 		return Collections.singletonList(new ItemStack(this));
 	}

@@ -38,6 +38,7 @@ public class DynamicBlockEntityType<T extends BlockEntity> extends BlockEntityTy
 	}
 
 	@FunctionalInterface
+	public
 	interface BlockEntitySupplier<T extends BlockEntity> {
 		T create(BlockPos blockPos, BlockState blockState);
 	}

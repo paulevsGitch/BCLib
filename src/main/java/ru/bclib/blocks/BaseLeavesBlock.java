@@ -29,7 +29,7 @@ public class BaseLeavesBlock extends LeavesBlock implements BlockModelProvider, 
 	
 	public BaseLeavesBlock(Block sapling, MaterialColor color) {
 		super(FabricBlockSettings.copyOf(Blocks.OAK_LEAVES)
-				.materialColor(color)
+				.mapColor(color)
 				.breakByTool(FabricToolTags.HOES)
 				.breakByTool(FabricToolTags.SHEARS)
 				.breakByHand(true)
@@ -41,7 +41,7 @@ public class BaseLeavesBlock extends LeavesBlock implements BlockModelProvider, 
 	
 	public BaseLeavesBlock(Block sapling, MaterialColor color, int light) {
 		super(FabricBlockSettings.copyOf(Blocks.OAK_LEAVES)
-				.materialColor(color)
+				.mapColor(color)
 				.luminance(light)
 				.breakByTool(FabricToolTags.HOES)
 				.breakByTool(FabricToolTags.SHEARS)
@@ -55,12 +55,13 @@ public class BaseLeavesBlock extends LeavesBlock implements BlockModelProvider, 
 	public BCLRenderLayer getRenderLayer() {
 		return BCLRenderLayer.CUTOUT;
 	}
-	
+
 	@Override
+	@SuppressWarnings("deprecation")
 	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
 		ItemStack tool = builder.getParameter(LootContextParams.TOOL);
 		if (tool != null) {
-			if (tool.getItem().is(FabricToolTags.SHEARS) || EnchantmentHelper.getItemEnchantmentLevel(Enchantments.SILK_TOUCH, tool) > 0) {
+			if (FabricToolTags.SHEARS.contains(tool.getItem()) || EnchantmentHelper.getItemEnchantmentLevel(Enchantments.SILK_TOUCH, tool) > 0) {
 				return Collections.singletonList(new ItemStack(this));
 			}
 			int fortune = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.BLOCK_FORTUNE, tool);

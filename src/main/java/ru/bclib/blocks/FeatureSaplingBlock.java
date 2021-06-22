@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
+import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
 import org.jetbrains.annotations.Nullable;
 
 import net.fabricmc.api.EnvType;
@@ -36,6 +37,7 @@ import ru.bclib.client.models.PatternsHelper;
 import ru.bclib.client.render.BCLRenderLayer;
 import ru.bclib.interfaces.IRenderTyped;
 
+@SuppressWarnings("deprecation")
 public abstract class FeatureSaplingBlock extends SaplingBlock implements IRenderTyped, BlockModelProvider {
 	private static final VoxelShape SHAPE = Block.box(4, 0, 4, 12, 14, 12);
 

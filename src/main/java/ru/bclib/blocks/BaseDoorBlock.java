@@ -36,6 +36,7 @@ public class BaseDoorBlock extends DoorBlock implements IRenderTyped, BlockModel
 	}
 
 	@Override
+	@SuppressWarnings("deprecation")
 	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
 		if (state.getValue(HALF) == DoubleBlockHalf.LOWER)
 			return Collections.singletonList(new ItemStack(this.asItem()));

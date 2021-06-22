@@ -39,6 +39,7 @@ import ru.bclib.client.render.BCLRenderLayer;
 import ru.bclib.interfaces.IRenderTyped;
 import ru.bclib.util.BlocksHelper;
 
+@SuppressWarnings("deprecation")
 public class BaseLadderBlock extends BaseBlockNotFull implements IRenderTyped, BlockModelProvider {
 	public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
 	public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
@@ -57,17 +58,14 @@ public class BaseLadderBlock extends BaseBlockNotFull implements IRenderTyped, B
 		stateManager.add(WATERLOGGED);
 	}
 
+	@Override
 	public VoxelShape getShape(BlockState state, BlockGetter view, BlockPos pos, CollisionContext ePos) {
-		switch (state.getValue(FACING)) {
-		case SOUTH:
-			return SOUTH_SHAPE;
-		case WEST:
-			return WEST_SHAPE;
-		case EAST:
-			return EAST_SHAPE;
-		default:
-			return NORTH_SHAPE;
-		}
+		return switch (state.getValue(FACING)) {
+			case SOUTH -> SOUTH_SHAPE;
+			case WEST -> WEST_SHAPE;
+			case EAST -> EAST_SHAPE;
+			default -> NORTH_SHAPE;
+		};
 	}
 
 	private boolean canPlaceOn(BlockGetter world, BlockPos pos, Direction side) {
@@ -78,7 +76,7 @@ public class BaseLadderBlock extends BaseBlockNotFull implements IRenderTyped, B
 	@Override
 	public boolean canSurvive(BlockState state, LevelReader world, BlockPos pos) {
 		Direction direction = state.getValue(FACING);
-		return this.canPlaceOn(world, pos.relative(direction.getOpposite()), direction);
+		return canPlaceOn(world, pos.relative(direction.getOpposite()), direction);
 	}
 
 	@Override

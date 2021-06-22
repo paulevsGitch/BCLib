@@ -1,12 +1,9 @@
 package ru.bclib.client.render;
 
-import java.util.HashMap;
-
 import com.google.common.collect.Maps;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Vector3f;
-
 import it.unimi.dsi.fastutil.floats.Float2FloatFunction;
 import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 import net.fabricmc.api.EnvType;
@@ -21,17 +18,14 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.AbstractChestBlock;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.ChestBlock;
-import net.minecraft.world.level.block.DoubleBlockCombiner;
+import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.DoubleBlockCombiner.NeighborCombineResult;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
-import net.minecraft.world.level.block.entity.LidBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.ChestType;
 import ru.bclib.blockentities.BaseChestBlockEntity;
+
+import java.util.HashMap;
 
 @Environment(EnvType.CLIENT)
 public class BaseChestBlockEntityRenderer implements BlockEntityRenderer<BaseChestBlockEntity> {
@@ -87,8 +81,8 @@ public class BaseChestBlockEntityRenderer implements BlockEntityRenderer<BaseChe
 	public void render(BaseChestBlockEntity entity, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
 		Level world = entity.getLevel();
 		boolean worldExists = world != null;
-		BlockState blockState = worldExists ? entity.getBlockState() : (BlockState) Blocks.CHEST.defaultBlockState().setValue(ChestBlock.FACING, Direction.SOUTH);
-		ChestType chestType = blockState.hasProperty(ChestBlock.TYPE) ? (ChestType) blockState.getValue(ChestBlock.TYPE) : ChestType.SINGLE;
+		BlockState blockState = worldExists ? entity.getBlockState() : Blocks.CHEST.defaultBlockState().setValue(ChestBlock.FACING, Direction.SOUTH);
+		ChestType chestType = blockState.hasProperty(ChestBlock.TYPE) ? blockState.getValue(ChestBlock.TYPE) : ChestType.SINGLE;
 		Block block = blockState.getBlock();
 		if (block instanceof AbstractChestBlock) {
 			AbstractChestBlock<?> abstractChestBlock = (AbstractChestBlock<?>) block;
@@ -107,7 +101,7 @@ public class BaseChestBlockEntityRenderer implements BlockEntityRenderer<BaseChe
 				propertySource = DoubleBlockCombiner.Combiner::acceptNone;
 			}
 
-			float pitch = ((Float2FloatFunction) propertySource.apply(ChestBlock.opennessCombiner((LidBlockEntity) entity))).get(tickDelta);
+			float pitch = ((Float2FloatFunction) propertySource.apply(ChestBlock.opennessCombiner(entity))).get(tickDelta);
 			pitch = 1.0F - pitch;
 			pitch = 1.0F - pitch * pitch * pitch;
 			@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -138,15 +132,11 @@ public class BaseChestBlockEntityRenderer implements BlockEntityRenderer<BaseChe
 	}
 
 	private static RenderType getChestTexture(ChestType type, RenderType[] layers) {
-		switch (type) {
-		case LEFT:
-			return layers[ID_LEFT];
-		case RIGHT:
-			return layers[ID_RIGHT];
-		case SINGLE:
-		default:
-			return layers[ID_NORMAL];
-		}
+		return switch (type) {
+			case LEFT -> layers[ID_LEFT];
+			case RIGHT -> layers[ID_RIGHT];
+			default -> layers[ID_NORMAL];
+		};
 	}
 
 	public static VertexConsumer getConsumer(MultiBufferSource provider, Block block, ChestType chestType) {

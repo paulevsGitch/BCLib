@@ -53,8 +53,9 @@ public abstract class BasePlantWithAgeBlock extends BasePlantBlock {
 	public boolean isBonemealSuccess(Level world, Random random, BlockPos pos, BlockState state) {
 		return true;
 	}
-	
+
 	@Override
+	@SuppressWarnings("deprecation")
 	public void tick(BlockState state, ServerLevel world, BlockPos pos, Random random) {
 		super.tick(state, world, pos, random);
 		if (random.nextInt(8) == 0) {

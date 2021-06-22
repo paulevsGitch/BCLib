@@ -48,6 +48,7 @@ import ru.bclib.client.models.ModelsHelper;
 import ru.bclib.interfaces.ISpetialItem;
 import ru.bclib.util.BlocksHelper;
 
+@SuppressWarnings("deprecation")
 public class BaseSignBlock extends SignBlock implements BlockModelProvider, ISpetialItem {
 	public static final IntegerProperty ROTATION = BlockStateProperties.ROTATION_16;
 	public static final BooleanProperty FLOOR = BooleanProperty.create("floor");
