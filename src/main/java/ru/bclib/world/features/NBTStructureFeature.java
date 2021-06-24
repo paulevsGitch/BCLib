@@ -7,6 +7,7 @@ import java.util.Random;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.BlockPos.MutableBlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Vec3i;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.resources.ResourceLocation;
@@ -101,7 +102,7 @@ public abstract class NBTStructureFeature extends DefaultFeature {
 		StructurePlaceSettings placementData = new StructurePlaceSettings().setRotation(rotation).setMirror(mirror).setBoundingBox(bounds);
 		addStructureData(placementData);
 		center = center.offset(-offset.getX() * 0.5, 0, -offset.getZ() * 0.5);
-		structure.placeInWorld(world, center, placementData, random);
+		structure.placeInWorld(world, center, center, placementData, random, 4);
 
 		TerrainMerge merge = getTerrainMerge(world, center, random);
 		int x1 = center.getX();
@@ -173,7 +174,7 @@ public abstract class NBTStructureFeature extends DefaultFeature {
 		int sz = ((pos.getZ() >> 4) << 4) - 16;
 		int ex = sx + 47;
 		int ez = sz + 47;
-		return BoundingBox.createProper(sx, 0, sz, ex, 255, ez);
+		return BoundingBox.fromCorners(new Vec3i(sx, 0, sz), new Vec3i(ex, 255, ez));
 	}
 
 	protected static StructureTemplate readStructure(ResourceLocation resource) {
