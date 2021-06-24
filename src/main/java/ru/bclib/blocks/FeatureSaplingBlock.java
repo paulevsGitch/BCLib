@@ -87,7 +87,8 @@ public abstract class FeatureSaplingBlock extends SaplingBlock implements IRende
 
 	@Override
 	public void advanceTree(ServerLevel world, BlockPos pos, BlockState blockState, Random random) {
-		getFeature().place(world, world.getChunkSource().getGenerator(), random, pos, null);
+		FeaturePlaceContext context = new FeaturePlaceContext(world, world.getChunkSource().getGenerator(), random, pos, null);
+		getFeature().place(context);
 	}
 
 	@Override
