@@ -15,10 +15,9 @@ import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.font.TextFieldHelper;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.model.geom.PartNames;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.blockentity.SignRenderer.SignModel;
+import net.minecraft.client.renderer.blockentity.SignRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.TextComponent;
@@ -28,10 +27,10 @@ import net.minecraft.world.level.block.state.BlockState;
 import ru.bclib.blockentities.BaseSignBlockEntity;
 import ru.bclib.blocks.BaseSignBlock;
 import ru.bclib.client.render.BaseSignBlockEntityRenderer;
+import ru.bclib.client.SignModelFactory;
 
 @Environment(EnvType.CLIENT)
 public class BlockSignEditScreen extends Screen {
-	private final SignModel model = new SignModel();
 	private final BaseSignBlockEntity sign;
 	private int ticksSinceOpened;
 	private int currentRow;
@@ -39,10 +38,12 @@ public class BlockSignEditScreen extends Screen {
 	private final String[] text = (String[]) Util.make(new String[4], (strings) -> {
 		Arrays.fill(strings, "");
 	});
+	final private SignModelFactory signModelFactory;
 
 	public BlockSignEditScreen(BaseSignBlockEntity sign) {
 		super(new TranslatableComponent("sign.edit"));
 		this.sign = sign;
+		signModelFactory = new SignModelFactory(this.minecraft.getEntityModels());
 	}
 
 	protected void init() {
@@ -119,6 +120,7 @@ public class BlockSignEditScreen extends Screen {
 		matrices.scale(93.75F, -93.75F, 93.75F);
 		matrices.translate(0.0D, -1.3125D, 0.0D);
 		BlockState blockState = this.sign.getBlockState();
+		final SignRenderer.SignModel model = signModelFactory.getSignModel(blockState);
 		boolean bl = blockState.getValue(BaseSignBlock.FLOOR);
 
 		if (!bl) {
