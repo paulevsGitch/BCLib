@@ -22,6 +22,6 @@ public class BCLDecorators {
 	static {
 		Class<?>[] classes = Features.class.getDeclaredClasses();
 		Field[] fields = classes[1].getDeclaredFields(); // Decorators class
-		HEIGHTMAP_SQUARE = getDecorator(fields, 27);
+		HEIGHTMAP_SQUARE = getDecorator(fields, 17);
 	}
 }
