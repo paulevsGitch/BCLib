@@ -65,6 +65,7 @@ def useApi(String dep) {
 
 processResources {
 	inputs.property "version", project.version
+	duplicatesStrategy = 'WARN'
 
 	from(sourceSets.main.resources.srcDirs) {
 		include "fabric.mod.json"
