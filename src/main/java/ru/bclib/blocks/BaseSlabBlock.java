@@ -49,7 +49,12 @@ public class BaseSlabBlock extends SlabBlock implements BlockModelProvider {
 	@Environment(EnvType.CLIENT)
 	public @Nullable BlockModel getBlockModel(ResourceLocation blockId, BlockState blockState) {
 		ResourceLocation parentId = Registry.BLOCK.getKey(parent);
-		Optional<String> pattern = PatternsHelper.createJson(BasePatterns.BLOCK_SLAB, parentId);
+		Optional<String> pattern;
+		if (blockState.getValue(TYPE) == SlabType.DOUBLE) {
+			pattern = PatternsHelper.createBlockSimple(parentId);
+		} else {
+			pattern = PatternsHelper.createJson(BasePatterns.BLOCK_SLAB, parentId);
+		}
 		return ModelsHelper.fromPattern(pattern);
 	}
 
