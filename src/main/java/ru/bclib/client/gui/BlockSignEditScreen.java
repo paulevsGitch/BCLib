@@ -18,6 +18,7 @@ import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.font.TextFieldHelper;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.SignRenderer;
@@ -27,9 +28,9 @@ import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.network.protocol.game.ServerboundSignUpdatePacket;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.WoodType;
 import ru.bclib.blockentities.BaseSignBlockEntity;
 import ru.bclib.blocks.BaseSignBlock;
-import ru.bclib.client.SignModelFactory;
 import ru.bclib.client.render.BaseSignBlockEntityRenderer;
 
 import java.util.Arrays;
@@ -43,12 +44,14 @@ public class BlockSignEditScreen extends Screen {
 	private final String[] text = (String[]) Util.make(new String[4], (strings) -> {
 		Arrays.fill(strings, "");
 	});
-	final private SignModelFactory signModelFactory;
+	private final SignRenderer.SignModel model;
 
 	public BlockSignEditScreen(BaseSignBlockEntity sign) {
 		super(new TranslatableComponent("sign.edit"));
 		this.sign = sign;
-		signModelFactory = new SignModelFactory(this.minecraft.getEntityModels());
+
+		//set up a default model
+		model = new SignRenderer.SignModel(this.minecraft.getEntityModels().bakeLayer(ModelLayers.createSignModelName(WoodType.OAK)));
 	}
 
 	protected void init() {
@@ -125,7 +128,6 @@ public class BlockSignEditScreen extends Screen {
 		matrices.scale(93.75F, -93.75F, 93.75F);
 		matrices.translate(0.0D, -1.3125D, 0.0D);
 		BlockState blockState = this.sign.getBlockState();
-		final SignRenderer.SignModel model = signModelFactory.getSignModel(blockState);
 		boolean bl = blockState.getValue(BaseSignBlock.FLOOR);
 
 		if (!bl) {

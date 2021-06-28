@@ -5,7 +5,6 @@ import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Vector3f;
-import net.fabricmc.fabric.api.client.rendereregistry.v1.EntityModelLayerRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.model.geom.ModelLayers;
@@ -15,7 +14,7 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.client.renderer.blockentity.SignRenderer.SignModel;
+import net.minecraft.client.renderer.blockentity.SignRenderer;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
@@ -24,13 +23,13 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SignBlock;
 import net.minecraft.world.level.block.StandingSignBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.WoodType;
 import net.minecraft.world.phys.Vec3;
 import ru.bclib.blockentities.BaseSignBlockEntity;
 import ru.bclib.blocks.BaseSignBlock;
-import ru.bclib.client.SignModelFactory;
 
 import java.util.HashMap;
 import java.util.List;
@@ -39,21 +38,22 @@ public class BaseSignBlockEntityRenderer implements BlockEntityRenderer<BaseSign
 	private static final HashMap<Block, RenderType> LAYERS = Maps.newHashMap();
 	private static final RenderType defaultLayer;
 	private final Font font;
-	private final SignModelFactory signModelFactory;
+	private final SignRenderer.SignModel model;
 
 
 	private static final int OUTLINE_RENDER_DISTANCE = Mth.square(16);
 
 	public BaseSignBlockEntityRenderer(BlockEntityRendererProvider.Context ctx) {
 		super();
-		this.signModelFactory = new SignModelFactory(ctx.getModelSet());
 		this.font = ctx.getFont();
+
+		//set up a default model
+		model = new SignRenderer.SignModel(ctx.bakeLayer(ModelLayers.createSignModelName(WoodType.OAK)));
 	}
 
 	public void render(BaseSignBlockEntity signBlockEntity, float tickDelta, PoseStack matrixStack,
 			MultiBufferSource provider, int light, int overlay) {
 		BlockState state = signBlockEntity.getBlockState();
-		SignModel model = signModelFactory.getSignModel(state);
 
 		matrixStack.pushPose();
 
@@ -139,22 +139,23 @@ public class BaseSignBlockEntityRenderer implements BlockEntityRenderer<BaseSign
 		}
 	}
 
+	public static WoodType getSignType(Block block) {
+		WoodType signType2;
+		if (block instanceof SignBlock) {
+			signType2 = ((SignBlock) block).type();
+		} else {
+			signType2 = WoodType.OAK;
+		}
 
+		return signType2;
+	}
 
 	public static Material getModelTexture(Block block) {
-		return Sheets.getSignMaterial(SignModelFactory.getSignType(block));
+		return Sheets.getSignMaterial(getSignType(block));
 	}
 	
 	public static VertexConsumer getConsumer(MultiBufferSource provider, Block block) {
 		return provider.getBuffer(LAYERS.getOrDefault(block, defaultLayer));
-	}
-
-	public static void registerCustomModel(Block block, EntityModelLayerRegistry.TexturedModelDataProvider provider) {
-		ResourceLocation blockId = Registry.BLOCK.getKey(block);
-		SignType type = new SignType(blockId.getPath());
-		SignModelFactory.TYPES.add(type);
-
-		EntityModelLayerRegistry.registerModelLayer(ModelLayers.createSignModelName(type), provider);
 	}
 
 	public static void registerRenderLayer(Block block) {
@@ -166,11 +167,5 @@ public class BaseSignBlockEntityRenderer implements BlockEntityRenderer<BaseSign
 
 	static {
 		defaultLayer = RenderType.entitySolid(new ResourceLocation("textures/entity/signs/oak.png"));
-	}
-
-	public static class SignType extends WoodType {
-		protected SignType(String string) {
-			super(string);
-		}
 	}
 }
