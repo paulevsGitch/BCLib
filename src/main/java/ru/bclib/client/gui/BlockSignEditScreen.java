@@ -44,17 +44,17 @@ public class BlockSignEditScreen extends Screen {
 	private final String[] text = (String[]) Util.make(new String[4], (strings) -> {
 		Arrays.fill(strings, "");
 	});
-	private final SignRenderer.SignModel model;
+	private SignRenderer.SignModel model;
 
 	public BlockSignEditScreen(BaseSignBlockEntity sign) {
 		super(new TranslatableComponent("sign.edit"));
 		this.sign = sign;
-
-		//set up a default model
-		model = new SignRenderer.SignModel(this.minecraft.getEntityModels().bakeLayer(ModelLayers.createSignModelName(WoodType.OAK)));
 	}
 
 	protected void init() {
+		//set up a default model
+		model = new SignRenderer.SignModel(this.minecraft.getEntityModels().bakeLayer(ModelLayers.createSignModelName(WoodType.OAK)));
+
 		minecraft.keyboardHandler.setSendRepeatsToGui(true);
 		this.addRenderableWidget(new Button(this.width / 2 - 100, this.height / 4 + 120, 200, 20, CommonComponents.GUI_DONE,
 				(buttonWidget) -> {
