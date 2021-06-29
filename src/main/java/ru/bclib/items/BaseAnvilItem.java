@@ -34,7 +34,9 @@ public class BaseAnvilItem extends BlockItem implements ItemModelProvider {
 		BlockState blockState = super.getPlacementState(blockPlaceContext);
 		ItemStack stack = blockPlaceContext.getItemInHand();
 		int destruction = stack.getOrCreateTag().getInt(DESTRUCTION);
-		blockState = blockState.setValue(BaseAnvilBlock.DESTRUCTION, destruction);
+		if (blockState != null) {
+			blockState = blockState.setValue(BaseAnvilBlock.DESTRUCTION, destruction);
+		}
 		return blockState;
 	}
 
