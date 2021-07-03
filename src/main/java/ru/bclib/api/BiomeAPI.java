@@ -91,6 +91,9 @@ public class BiomeAPI {
 	 * @return {@link BCLBiome} or {@code BiomeAPI.EMPTY_BIOME}.
 	 */
 	public static BCLBiome getFromBiome(Biome biome) {
+		if (biomeRegistry == null) {
+			return EMPTY_BIOME;
+		}
 		return ID_MAP.getOrDefault(biomeRegistry.getKey(biome), EMPTY_BIOME);
 	}
 	

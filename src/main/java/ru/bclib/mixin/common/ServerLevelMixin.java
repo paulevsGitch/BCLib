@@ -22,6 +22,7 @@ import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.ServerLevelData;
 import net.minecraft.world.level.storage.WritableLevelData;
+import ru.bclib.api.BiomeAPI;
 import ru.bclib.api.DataFixerAPI;
 import ru.bclib.api.WorldDataAPI;
 
@@ -35,6 +36,8 @@ public abstract class ServerLevelMixin extends Level {
 	
 	@Inject(method = "<init>*", at = @At("TAIL"))
 	private void bcl_onServerWorldInit(MinecraftServer server, Executor workerExecutor, LevelStorageSource.LevelStorageAccess session, ServerLevelData properties, ResourceKey<Level> registryKey, DimensionType dimensionType, ChunkProgressListener worldGenerationProgressListener, ChunkGenerator chunkGenerator, boolean debugWorld, long l, List<CustomSpawner> list, boolean bl, CallbackInfo info) {
+		BiomeAPI.initRegistry(server);
+		
 		if (bcl_lastWorld != null && bcl_lastWorld.equals(session.getLevelId())) {
 			return;
 		}
