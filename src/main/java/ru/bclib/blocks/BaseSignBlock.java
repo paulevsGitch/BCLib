@@ -62,7 +62,7 @@ public class BaseSignBlock extends SignBlock implements BlockModelProvider, ISpe
 	private final Block parent;
 	
 	public BaseSignBlock(Block source) {
-		super(FabricBlockSettings.copyOf(source).strength(1.0F, 1.0F).noCollission().noOcclusion(), WoodType.OAK);
+		super(BlocksHelper.copySettingsOf(source).strength(1.0F, 1.0F).noCollission().noOcclusion(), WoodType.OAK);
 		this.registerDefaultState(this.stateDefinition.any().setValue(ROTATION, 0).setValue(FLOOR, false).setValue(WATERLOGGED, false));
 		this.parent = source;
 	}

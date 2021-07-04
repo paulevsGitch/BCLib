@@ -5,11 +5,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 
-import org.jetbrains.annotations.Nullable;
-
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.resources.model.BlockModelRotation;
 import net.minecraft.client.resources.model.UnbakedModel;
@@ -24,7 +21,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.monster.piglin.PiglinAi;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BarrelBlock;
 import net.minecraft.world.level.block.Block;
@@ -33,16 +29,18 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.phys.BlockHitResult;
+import org.jetbrains.annotations.Nullable;
 import ru.bclib.blockentities.BaseBarrelBlockEntity;
 import ru.bclib.client.models.BasePatterns;
 import ru.bclib.client.models.BlockModelProvider;
 import ru.bclib.client.models.ModelsHelper;
 import ru.bclib.client.models.PatternsHelper;
 import ru.bclib.registry.BaseBlockEntities;
+import ru.bclib.util.BlocksHelper;
 
 public class BaseBarrelBlock extends BarrelBlock implements BlockModelProvider {
 	public BaseBarrelBlock(Block source) {
-		super(FabricBlockSettings.copyOf(source).noOcclusion());
+		super(BlocksHelper.copySettingsOf(source).noOcclusion());
 	}
 
 	@Override

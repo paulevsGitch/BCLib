@@ -4,8 +4,6 @@ import java.util.Collections;
 import java.util.List;
 
 import com.google.common.collect.Lists;
-
-import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.tool.attribute.v1.FabricToolTags;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.resources.ResourceLocation;
@@ -22,13 +20,14 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import ru.bclib.client.models.BlockModelProvider;
 import ru.bclib.client.render.BCLRenderLayer;
 import ru.bclib.interfaces.IRenderTyped;
+import ru.bclib.util.BlocksHelper;
 import ru.bclib.util.MHelper;
 
 public class BaseLeavesBlock extends LeavesBlock implements BlockModelProvider, IRenderTyped {
 	private final Block sapling;
 	
 	public BaseLeavesBlock(Block sapling, MaterialColor color) {
-		super(FabricBlockSettings.copyOf(Blocks.OAK_LEAVES)
+		super(BlocksHelper.copySettingsOf(Blocks.OAK_LEAVES)
 				.mapColor(color)
 				.breakByTool(FabricToolTags.HOES)
 				.breakByTool(FabricToolTags.SHEARS)
@@ -40,7 +39,7 @@ public class BaseLeavesBlock extends LeavesBlock implements BlockModelProvider, 
 	}
 	
 	public BaseLeavesBlock(Block sapling, MaterialColor color, int light) {
-		super(FabricBlockSettings.copyOf(Blocks.OAK_LEAVES)
+		super(BlocksHelper.copySettingsOf(Blocks.OAK_LEAVES)
 				.mapColor(color)
 				.luminance(light)
 				.breakByTool(FabricToolTags.HOES)

@@ -45,6 +45,7 @@ import ru.bclib.client.models.BasePatterns;
 import ru.bclib.client.models.ModelsHelper;
 import ru.bclib.client.models.PatternsHelper;
 import ru.bclib.client.sound.BlockSounds;
+import ru.bclib.util.BlocksHelper;
 
 @SuppressWarnings("deprecation")
 public class BaseTerrainBlock extends BaseBlock {
@@ -53,7 +54,7 @@ public class BaseTerrainBlock extends BaseBlock {
 	private Block pathBlock;
 	
 	public BaseTerrainBlock(Block baseBlock, MaterialColor color) {
-		super(FabricBlockSettings.copyOf(baseBlock).materialColor(color).sound(BlockSounds.TERRAIN_SOUND).randomTicks());
+		super(BlocksHelper.copySettingsOf(baseBlock).materialColor(color).sound(BlockSounds.TERRAIN_SOUND).randomTicks());
 		this.baseBlock = baseBlock;
 	}
 	

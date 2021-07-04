@@ -49,7 +49,7 @@ public class BaseLadderBlock extends BaseBlockNotFull implements IRenderTyped, B
 	protected static final VoxelShape NORTH_SHAPE = Block.box(0.0D, 0.0D, 13.0D, 16.0D, 16.0D, 16.0D);
 
 	public BaseLadderBlock(Block block) {
-		super(FabricBlockSettings.copyOf(block).noOcclusion());
+		super(BlocksHelper.copySettingsOf(block).noOcclusion());
 	}
 
 	@Override

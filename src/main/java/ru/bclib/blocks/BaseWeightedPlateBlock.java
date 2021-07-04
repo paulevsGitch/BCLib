@@ -5,11 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.jetbrains.annotations.Nullable;
-
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.core.Registry;
@@ -19,16 +16,18 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.WeightedPressurePlateBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootContext;
+import org.jetbrains.annotations.Nullable;
 import ru.bclib.client.models.BasePatterns;
 import ru.bclib.client.models.BlockModelProvider;
 import ru.bclib.client.models.ModelsHelper;
 import ru.bclib.client.models.PatternsHelper;
+import ru.bclib.util.BlocksHelper;
 
 public class BaseWeightedPlateBlock extends WeightedPressurePlateBlock implements BlockModelProvider {
 	private final Block parent;
 	
 	public BaseWeightedPlateBlock(Block source) {
-		super(15, FabricBlockSettings.copyOf(source).noCollission().noOcclusion().requiresCorrectToolForDrops().strength(0.5F));
+		super(15, BlocksHelper.copySettingsOf(source).noCollission().noOcclusion().requiresCorrectToolForDrops().strength(0.5F));
 		this.parent = source;
 	}
 
