@@ -5,12 +5,6 @@ import java.util.Random;
 
 import com.google.common.collect.Maps;
 
-import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
-import net.fabricmc.fabric.api.tool.attribute.v1.FabricToolTags;
-import net.fabricmc.fabric.impl.object.builder.BlockSettingsInternals;
-import net.fabricmc.fabric.impl.object.builder.FabricBlockInternals;
-import net.fabricmc.fabric.mixin.object.builder.AbstractBlockAccessor;
-import net.fabricmc.fabric.mixin.object.builder.AbstractBlockSettingsAccessor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.BlockPos.MutableBlockPos;
 import net.minecraft.core.Direction;
@@ -194,26 +188,5 @@ public class BlocksHelper {
 		catch (Exception e) {
 			return false;
 		}
-	}
-
-	public static FabricBlockSettings copySettingsOf(Block block) {
-		FabricBlockSettings fbs = FabricBlockSettings.copyOf(block);
-
-		AbstractBlockSettingsAccessor blockSettings = (AbstractBlockSettingsAccessor) ((AbstractBlockAccessor)block).getSettings();
-
-		//When settings are copied from a vanilla Block, extraData is not copied
-		//When a Block requires a tool, that data contains the Tag for the tool and is (by default) empty
-		//We will check if we created a copy of vanilla settings and if those settings require a tool.
-		//If so, we set the tool to a pickaxe.
-		if (!(blockSettings instanceof FabricBlockSettings)) {
-			BlockSettingsInternals blockInternals = (BlockSettingsInternals) blockSettings;
-			FabricBlockInternals.ExtraData extraData = blockInternals.getExtraData();
-
-			if (blockSettings.isToolRequired() && extraData == null) {
-				System.out.println("Adding PIckAXE to settings of " + block );
-				fbs.breakByTool(FabricToolTags.PICKAXES);
-			}
-		}
-		return fbs;
 	}
 }

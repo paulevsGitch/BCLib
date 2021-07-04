@@ -6,8 +6,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.jetbrains.annotations.Nullable;
+
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.resources.model.BlockModelRotation;
 import net.minecraft.client.resources.model.UnbakedModel;
@@ -18,18 +21,16 @@ import net.minecraft.world.level.block.TrapDoorBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Half;
 import net.minecraft.world.level.storage.loot.LootContext;
-import org.jetbrains.annotations.Nullable;
 import ru.bclib.client.models.BasePatterns;
 import ru.bclib.client.models.BlockModelProvider;
 import ru.bclib.client.models.ModelsHelper;
 import ru.bclib.client.models.PatternsHelper;
 import ru.bclib.client.render.BCLRenderLayer;
 import ru.bclib.interfaces.IRenderTyped;
-import ru.bclib.util.BlocksHelper;
 
 public class BaseTrapdoorBlock extends TrapDoorBlock implements IRenderTyped, BlockModelProvider {
 	public BaseTrapdoorBlock(Block source) {
-		super(BlocksHelper.copySettingsOf(source).strength(3.0F, 3.0F).noOcclusion());
+		super(FabricBlockSettings.copyOf(source).strength(3.0F, 3.0F).noOcclusion());
 	}
 
 	@Override

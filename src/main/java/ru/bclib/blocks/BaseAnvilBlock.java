@@ -4,10 +4,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.jetbrains.annotations.Nullable;
+
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.resources.ResourceLocation;
@@ -21,19 +25,17 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.material.MaterialColor;
 import net.minecraft.world.level.storage.loot.LootContext;
-import org.jetbrains.annotations.Nullable;
 import ru.bclib.client.models.BasePatterns;
 import ru.bclib.client.models.BlockModelProvider;
 import ru.bclib.client.models.ModelsHelper;
 import ru.bclib.client.models.PatternsHelper;
 import ru.bclib.items.BaseAnvilItem;
-import ru.bclib.util.BlocksHelper;
 
 public abstract class BaseAnvilBlock extends AnvilBlock implements BlockModelProvider {
 	public static final IntegerProperty DESTRUCTION = BlockProperties.DESTRUCTION;
 
 	public BaseAnvilBlock(MaterialColor color) {
-		super(BlocksHelper.copySettingsOf(Blocks.ANVIL).mapColor(color));
+		super(FabricBlockSettings.copyOf(Blocks.ANVIL).mapColor(color));
 	}
 	
 	@Override

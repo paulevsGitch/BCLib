@@ -1,5 +1,6 @@
 package ru.bclib.blocks;
 
+import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.tool.attribute.v1.FabricToolTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
@@ -14,13 +15,12 @@ import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.MaterialColor;
 import net.minecraft.world.phys.BlockHitResult;
-import ru.bclib.util.BlocksHelper;
 
 public class StripableBarkBlock extends BaseBarkBlock {
 	private final Block striped;
 	
 	public StripableBarkBlock(MaterialColor color, Block striped) {
-		super(BlocksHelper.copySettingsOf(striped).mapColor(color));
+		super(FabricBlockSettings.copyOf(striped).mapColor(color));
 		this.striped = striped;
 	}
 	

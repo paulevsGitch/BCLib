@@ -1,14 +1,14 @@
 package ru.bclib.blocks;
 
+import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.level.block.Block;
-import ru.bclib.util.BlocksHelper;
 
 public class BaseStoneButtonBlock extends BaseButtonBlock {
 
 	public BaseStoneButtonBlock(Block source) {
-		super(source, BlocksHelper.copySettingsOf(source).noOcclusion(), false);
+		super(source, FabricBlockSettings.copyOf(source).noOcclusion(), false);
 	}
 
 	@Override
