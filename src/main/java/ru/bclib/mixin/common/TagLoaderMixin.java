@@ -1,5 +1,7 @@
 package ru.bclib.mixin.common;
 
+import java.util.Map;
+
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.Tag;
 import net.minecraft.tags.TagLoader;
@@ -8,8 +10,6 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import ru.bclib.util.TagHelper;
-
-import java.util.Map;
 
 @Mixin(TagLoader.class)
 public class TagLoaderMixin {

@@ -58,11 +58,11 @@ public class TagHelper {
 		return builder;
 	}
 	
-	public static Map<ResourceLocation, Tag.Builder> apply(String entry, Map<ResourceLocation, Tag.Builder> tagsMap) {
+	public static Map<ResourceLocation, Tag.Builder> apply(String directory, Map<ResourceLocation, Tag.Builder> tagsMap) {
 		Map<ResourceLocation, Set<ResourceLocation>> endTags = null;
-		if (entry.equals("block")) {
+		if ("tags/blocks".equals(directory)) {
 			endTags = TAGS_BLOCK;
-		} else if (entry.equals("item")) {
+		} else if ("tags/items".equals(directory)) {
 			endTags = TAGS_ITEM;
 		}
 		if (endTags != null) {
