@@ -7,6 +7,7 @@ import java.util.Random;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.BlockPos.MutableBlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Vec3i;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.resources.ResourceLocation;
@@ -17,11 +18,13 @@ import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkGenerator;
+import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
 import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import net.minecraft.world.level.levelgen.surfacebuilders.SurfaceBuilderConfiguration;
+import net.minecraft.world.phys.Vec3;
 import ru.bclib.api.BiomeAPI;
 import ru.bclib.api.TagAPI;
 import ru.bclib.util.BlocksHelper;
@@ -76,7 +79,11 @@ public abstract class NBTStructureFeature extends DefaultFeature {
 	}
 
 	@Override
-	public boolean place(WorldGenLevel world, ChunkGenerator chunkGenerator, Random random, BlockPos center, NoneFeatureConfiguration featureConfig) {
+	public boolean place(FeaturePlaceContext<NoneFeatureConfiguration> context) {
+		WorldGenLevel world = context.level();
+		Random random = context.random();
+		BlockPos center = context.origin();
+
 		center = new BlockPos(((center.getX() >> 4) << 4) | 8, 128, ((center.getZ() >> 4) << 4) | 8);
 		center = getGround(world, center);
 
@@ -88,14 +95,14 @@ public abstract class NBTStructureFeature extends DefaultFeature {
 		StructureTemplate structure = getStructure(world, center, random);
 		Rotation rotation = getRotation(world, center, random);
 		Mirror mirror = getMirror(world, center, random);
-		BlockPos offset = StructureTemplate.transform(structure.getSize(), mirror, rotation, BlockPos.ZERO);
+		BlockPos offset = StructureTemplate.transform(new BlockPos(structure.getSize()), mirror, rotation, BlockPos.ZERO);
 		center = center.offset(0, getYOffset(structure, world, center, random) + 0.5, 0);
 
 		BoundingBox bounds = makeBox(center);
 		StructurePlaceSettings placementData = new StructurePlaceSettings().setRotation(rotation).setMirror(mirror).setBoundingBox(bounds);
 		addStructureData(placementData);
 		center = center.offset(-offset.getX() * 0.5, 0, -offset.getZ() * 0.5);
-		structure.placeInWorldChunk(world, center, placementData, random);
+		structure.placeInWorld(world, center, center, placementData, random, 4);
 
 		TerrainMerge merge = getTerrainMerge(world, center, random);
 		int x1 = center.getX();
@@ -167,7 +174,7 @@ public abstract class NBTStructureFeature extends DefaultFeature {
 		int sz = ((pos.getZ() >> 4) << 4) - 16;
 		int ex = sx + 47;
 		int ez = sz + 47;
-		return BoundingBox.createProper(sx, 0, sz, ex, 255, ez);
+		return BoundingBox.fromCorners(new Vec3i(sx, 0, sz), new Vec3i(ex, 255, ez));
 	}
 
 	protected static StructureTemplate readStructure(ResourceLocation resource) {

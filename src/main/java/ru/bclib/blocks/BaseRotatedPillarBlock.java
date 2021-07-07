@@ -30,8 +30,9 @@ public class BaseRotatedPillarBlock extends RotatedPillarBlock implements BlockM
 	public BaseRotatedPillarBlock(Block block) {
 		super(FabricBlockSettings.copyOf(block));
 	}
-	
+
 	@Override
+	@SuppressWarnings("deprecation")
 	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
 		return Collections.singletonList(new ItemStack(this));
 	}

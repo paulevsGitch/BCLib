@@ -1,7 +1,5 @@
 package ru.bclib.client.gui;
 
-import java.util.Arrays;
-
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -11,8 +9,8 @@ import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.math.Matrix4f;
-
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.Util;
@@ -20,22 +18,25 @@ import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.font.TextFieldHelper;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.blockentity.SignRenderer.SignModel;
+import net.minecraft.client.renderer.blockentity.SignRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.network.protocol.game.ServerboundSignUpdatePacket;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.WoodType;
 import ru.bclib.blockentities.BaseSignBlockEntity;
 import ru.bclib.blocks.BaseSignBlock;
 import ru.bclib.client.render.BaseSignBlockEntityRenderer;
 
+import java.util.Arrays;
+
 @Environment(EnvType.CLIENT)
 public class BlockSignEditScreen extends Screen {
-	private final SignModel model = new SignModel();
 	private final BaseSignBlockEntity sign;
 	private int ticksSinceOpened;
 	private int currentRow;
@@ -43,6 +44,7 @@ public class BlockSignEditScreen extends Screen {
 	private final String[] text = (String[]) Util.make(new String[4], (strings) -> {
 		Arrays.fill(strings, "");
 	});
+	private SignRenderer.SignModel model;
 
 	public BlockSignEditScreen(BaseSignBlockEntity sign) {
 		super(new TranslatableComponent("sign.edit"));
@@ -50,8 +52,11 @@ public class BlockSignEditScreen extends Screen {
 	}
 
 	protected void init() {
+		//set up a default model
+		model = new SignRenderer.SignModel(this.minecraft.getEntityModels().bakeLayer(ModelLayers.createSignModelName(WoodType.OAK)));
+
 		minecraft.keyboardHandler.setSendRepeatsToGui(true);
-		this.addButton(new Button(this.width / 2 - 100, this.height / 4 + 120, 200, 20, CommonComponents.GUI_DONE,
+		this.addRenderableWidget(new Button(this.width / 2 - 100, this.height / 4 + 120, 200, 20, CommonComponents.GUI_DONE,
 				(buttonWidget) -> {
 					this.finishEditing();
 				}));
@@ -80,7 +85,7 @@ public class BlockSignEditScreen extends Screen {
 
 	public void tick() {
 		++this.ticksSinceOpened;
-		if (!this.sign.getType().isValid(this.sign.getBlockState().getBlock())) {
+		if (!this.sign.getType().isValid(this.sign.getBlockState())) {
 			this.finishEditing();
 		}
 	}
@@ -135,7 +140,7 @@ public class BlockSignEditScreen extends Screen {
 		matrices.scale(0.6666667F, -0.6666667F, -0.6666667F);
 		MultiBufferSource.BufferSource immediate = minecraft.renderBuffers().bufferSource();
 		VertexConsumer vertexConsumer = BaseSignBlockEntityRenderer.getConsumer(immediate, blockState.getBlock());
-		model.sign.render(matrices, vertexConsumer, 15728880, OverlayTexture.NO_OVERLAY);
+		model.root.getChild("sign").render(matrices, vertexConsumer, 15728880, OverlayTexture.NO_OVERLAY);
 
 		if (bl) {
 			model.stick.render(matrices, vertexConsumer, 15728880, OverlayTexture.NO_OVERLAY);
@@ -206,7 +211,7 @@ public class BlockSignEditScreen extends Screen {
 					RenderSystem.disableTexture();
 					RenderSystem.enableColorLogicOp();
 					RenderSystem.logicOp(GlStateManager.LogicOp.OR_REVERSE);
-					bufferBuilder.begin(7, DefaultVertexFormat.POSITION_COLOR);
+					bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
 					float var32 = (float) x;
 					bufferBuilder.vertex(matrix4f, var32, (float) (l + 9), 0.0F).color(0, 0, 255, 255).endVertex();
 					var32 = (float) y;

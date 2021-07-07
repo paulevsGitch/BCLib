@@ -28,8 +28,9 @@ public class BaseComposterBlock extends ComposterBlock implements BlockModelProv
 	public BaseComposterBlock(Block source) {
 		super(FabricBlockSettings.copyOf(source));
 	}
-	
+
 	@Override
+	@SuppressWarnings("deprecation")
 	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
 		return Collections.singletonList(new ItemStack(this.asItem()));
 	}

@@ -37,6 +37,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import ru.bclib.client.render.BCLRenderLayer;
 import ru.bclib.interfaces.IRenderTyped;
 
+@SuppressWarnings("deprecation")
 public abstract class UnderwaterPlantBlock extends BaseBlockNotFull implements IRenderTyped, BonemealableBlock, LiquidBlockContainer {
 	private static final VoxelShape SHAPE = Block.box(4, 0, 4, 12, 14, 12);
 	
@@ -95,7 +96,7 @@ public abstract class UnderwaterPlantBlock extends BaseBlockNotFull implements I
 	@Override
 	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
 		ItemStack tool = builder.getParameter(LootContextParams.TOOL);
-		if (tool != null && tool.getItem().is(FabricToolTags.SHEARS) || EnchantmentHelper.getItemEnchantmentLevel(Enchantments.SILK_TOUCH, tool) > 0) {
+		if (tool != null && FabricToolTags.SHEARS.contains(tool.getItem()) || EnchantmentHelper.getItemEnchantmentLevel(Enchantments.SILK_TOUCH, tool) > 0) {
 			return Lists.newArrayList(new ItemStack(this));
 		}
 		else {

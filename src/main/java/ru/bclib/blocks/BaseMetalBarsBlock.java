@@ -34,6 +34,7 @@ public class BaseMetalBarsBlock extends IronBarsBlock implements BlockModelProvi
 	}
 
 	@Override
+	@SuppressWarnings("deprecation")
 	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
 		return Collections.singletonList(new ItemStack(this));
 	}
@@ -99,7 +100,7 @@ public class BaseMetalBarsBlock extends IronBarsBlock implements BlockModelProvi
 
 	@Environment(EnvType.CLIENT)
 	public boolean skipRendering(BlockState state, BlockState stateFrom, Direction direction) {
-		if (direction.getAxis().isVertical() && stateFrom.getBlock().is(this) && !stateFrom.equals(state)) {
+		if (direction.getAxis().isVertical() && stateFrom.getBlock() == this && !stateFrom.equals(state)) {
 			return false;
 		}
 		return super.skipRendering(state, stateFrom, direction);

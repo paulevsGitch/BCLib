@@ -30,7 +30,7 @@ public class BaseDrinkItem extends ModelProviderItem {
 
 	@Override
 	public InteractionResultHolder<ItemStack> use(Level world, Player user, InteractionHand hand) {
-		return ItemUtils.useDrink(world, user, hand);
+		return ItemUtils.startUsingInstantly(world, user, hand);
 	}
 
 	@Override
@@ -41,13 +41,12 @@ public class BaseDrinkItem extends ModelProviderItem {
 			stack.setCount(count);
 		}
 		
-		if (user instanceof ServerPlayer) {
-			ServerPlayer serverPlayerEntity = (ServerPlayer) user;
+		if (user instanceof ServerPlayer serverPlayerEntity) {
 			CriteriaTriggers.CONSUME_ITEM.trigger(serverPlayerEntity, stack);
 			serverPlayerEntity.awardStat(Stats.ITEM_USED.get(this));
 		}
 
-		if (user instanceof Player && !((Player) user).abilities.instabuild) {
+		if (user instanceof Player && !((Player) user).getAbilities().instabuild) {
 			stack.shrink(1);
 		}
 

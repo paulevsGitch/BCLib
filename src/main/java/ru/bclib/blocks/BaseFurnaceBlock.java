@@ -1,14 +1,7 @@
 package ru.bclib.blocks;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
-import org.jetbrains.annotations.Nullable;
-
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
@@ -20,14 +13,17 @@ import net.minecraft.stats.Stats;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.FurnaceBlock;
+import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
+import org.jetbrains.annotations.Nullable;
 import ru.bclib.blockentities.BaseFurnaceBlockEntity;
 import ru.bclib.client.models.BasePatterns;
 import ru.bclib.client.models.BlockModelProvider;
@@ -35,6 +31,11 @@ import ru.bclib.client.models.ModelsHelper;
 import ru.bclib.client.models.PatternsHelper;
 import ru.bclib.client.render.BCLRenderLayer;
 import ru.bclib.interfaces.IRenderTyped;
+import ru.bclib.registry.BaseBlockEntities;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 public class BaseFurnaceBlock extends FurnaceBlock implements BlockModelProvider, IRenderTyped {
 	public BaseFurnaceBlock(Block source) {
@@ -42,8 +43,8 @@ public class BaseFurnaceBlock extends FurnaceBlock implements BlockModelProvider
 	}
 
 	@Override
-	public BlockEntity newBlockEntity(BlockGetter world) {
-		return new BaseFurnaceBlockEntity();
+	public BlockEntity newBlockEntity(BlockPos blockPos, BlockState blockState) {
+		return new BaseFurnaceBlockEntity(blockPos, blockState);
 	}
 	
 	@Override
@@ -95,8 +96,9 @@ public class BaseFurnaceBlock extends FurnaceBlock implements BlockModelProvider
 	public BCLRenderLayer getRenderLayer() {
 		return BCLRenderLayer.CUTOUT;
 	}
-	
+
 	@Override
+	@SuppressWarnings("deprecation")
 	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
 		List<ItemStack> drop = Lists.newArrayList(new ItemStack(this));
 		BlockEntity blockEntity = builder.getOptionalParameter(LootContextParams.BLOCK_ENTITY);
@@ -107,5 +109,16 @@ public class BaseFurnaceBlock extends FurnaceBlock implements BlockModelProvider
 			}
 		}
 		return drop;
+	}
+
+	@Override
+	@Nullable
+	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState blockState, BlockEntityType<T> blockEntityType) {
+		return createFurnaceTicker(level, blockEntityType, BaseBlockEntities.FURNACE);
+	}
+
+	@Nullable
+	protected static <T extends BlockEntity> BlockEntityTicker<T> createFurnaceTicker(Level level, BlockEntityType<T> blockEntityType, BlockEntityType<? extends AbstractFurnaceBlockEntity> blockEntityType2) {
+		return level.isClientSide ? null : createTickerHelper(blockEntityType, blockEntityType2, AbstractFurnaceBlockEntity::serverTick);
 	}
 }

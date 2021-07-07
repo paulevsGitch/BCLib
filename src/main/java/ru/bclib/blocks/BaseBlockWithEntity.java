@@ -3,6 +3,7 @@ package ru.bclib.blocks;
 import java.util.Collections;
 import java.util.List;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.BaseEntityBlock;
@@ -16,11 +17,12 @@ public class BaseBlockWithEntity extends BaseEntityBlock {
 	}
 
 	@Override
-	public BlockEntity newBlockEntity(BlockGetter world) {
+	public BlockEntity newBlockEntity(BlockPos blockPos, BlockState blockState) {
 		return null;
 	}
-	
+
 	@Override
+	@SuppressWarnings("deprecation")
 	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
 		return Collections.singletonList(new ItemStack(this));
 	}

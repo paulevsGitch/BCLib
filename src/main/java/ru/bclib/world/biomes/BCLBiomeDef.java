@@ -28,6 +28,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.GenerationStep.Carving;
 import net.minecraft.world.level.levelgen.GenerationStep.Decoration;
+import net.minecraft.world.level.levelgen.carver.CarverConfiguration;
 import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
@@ -345,7 +346,7 @@ public class BCLBiomeDef {
 	
 	private static final class CarverInfo {
 		Carving carverStep;
-		ConfiguredWorldCarver<ProbabilityFeatureConfiguration> carver;
+		ConfiguredWorldCarver<CarverConfiguration> carver;
 	}
 
 	public ResourceLocation getID() {
@@ -364,7 +365,7 @@ public class BCLBiomeDef {
 		return edgeSize;
 	}
 
-	public BCLBiomeDef addCarver(Carving carverStep, ConfiguredWorldCarver<ProbabilityFeatureConfiguration> carver) {
+	public BCLBiomeDef addCarver(Carving carverStep, ConfiguredWorldCarver<CarverConfiguration> carver) {
 		CarverInfo info = new CarverInfo();
 		info.carverStep = carverStep;
 		info.carver = carver;

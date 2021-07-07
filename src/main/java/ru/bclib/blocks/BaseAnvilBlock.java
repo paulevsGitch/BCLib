@@ -35,7 +35,7 @@ public abstract class BaseAnvilBlock extends AnvilBlock implements BlockModelPro
 	public static final IntegerProperty DESTRUCTION = BlockProperties.DESTRUCTION;
 
 	public BaseAnvilBlock(MaterialColor color) {
-		super(FabricBlockSettings.copyOf(Blocks.ANVIL).materialColor(color));
+		super(FabricBlockSettings.copyOf(Blocks.ANVIL).mapColor(color));
 	}
 	
 	@Override
@@ -43,8 +43,9 @@ public abstract class BaseAnvilBlock extends AnvilBlock implements BlockModelPro
 		super.createBlockStateDefinition(builder);
 		builder.add(DESTRUCTION);
 	}
-	
+
 	@Override
+	@SuppressWarnings("deprecation")
 	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
 		ItemStack dropStack = new ItemStack(this);
 		int destruction = state.getValue(DESTRUCTION);

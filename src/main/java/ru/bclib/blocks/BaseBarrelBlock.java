@@ -46,11 +46,12 @@ public class BaseBarrelBlock extends BarrelBlock implements BlockModelProvider {
 	}
 
 	@Override
-	public BlockEntity newBlockEntity(BlockGetter world) {
-		return BaseBlockEntities.BARREL.create();
+	public BlockEntity newBlockEntity(BlockPos blockPos, BlockState blockState) {
+		return BaseBlockEntities.BARREL.create(blockPos, blockState);
 	}
 
 	@Override
+	@SuppressWarnings("deprecation")
 	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
 		List<ItemStack> drop = super.getDrops(state, builder);
 		drop.add(new ItemStack(this.asItem()));

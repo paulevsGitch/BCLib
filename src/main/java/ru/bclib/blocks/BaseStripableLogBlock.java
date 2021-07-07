@@ -20,13 +20,14 @@ public class BaseStripableLogBlock extends BaseRotatedPillarBlock {
 	private final Block striped;
 	
 	public BaseStripableLogBlock(MaterialColor color, Block striped) {
-		super(FabricBlockSettings.copyOf(striped).materialColor(color));
+		super(FabricBlockSettings.copyOf(striped).mapColor(color));
 		this.striped = striped;
 	}
 	
 	@Override
+	@SuppressWarnings("deprecation")
 	public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-		if (player.getMainHandItem().getItem().is(FabricToolTags.AXES)) {
+		if (FabricToolTags.AXES.contains(player.getMainHandItem().getItem())) {
 			world.playSound(player, pos, SoundEvents.AXE_STRIP, SoundSource.BLOCKS, 1.0F, 1.0F);
 			if (!world.isClientSide) {
 				world.setBlock(pos, striped.defaultBlockState().setValue(RotatedPillarBlock.AXIS, state.getValue(RotatedPillarBlock.AXIS)), 11);

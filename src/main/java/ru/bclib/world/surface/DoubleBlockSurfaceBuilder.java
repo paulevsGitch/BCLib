@@ -34,12 +34,6 @@ public class DoubleBlockSurfaceBuilder extends SurfaceBuilder<SurfaceBuilderBase
 		config2 = new SurfaceBuilderBaseConfiguration(block.defaultBlockState(), stone, stone);
 		return this;
 	}
-
-	@Override
-	public void apply(Random random, ChunkAccess chunk, Biome biome, int x, int z, int height, double noise, BlockState defaultBlock, BlockState defaultFluid, int seaLevel, long seed, SurfaceBuilderBaseConfiguration surfaceBlocks) {
-		noise = NOISE.eval(x * 0.1, z * 0.1) + MHelper.randRange(-0.4, 0.4, random);
-		SurfaceBuilder.DEFAULT.apply(random, chunk, biome, x, z, height, noise, defaultBlock, defaultFluid, seaLevel, seed, noise > 0 ? config1 : config2);
-	}
 	
 	public static DoubleBlockSurfaceBuilder register(String name) {
 		return Registry.register(Registry.SURFACE_BUILDER, name, new DoubleBlockSurfaceBuilder());
@@ -48,5 +42,11 @@ public class DoubleBlockSurfaceBuilder extends SurfaceBuilder<SurfaceBuilderBase
 	public ConfiguredSurfaceBuilder<SurfaceBuilderBaseConfiguration> configured() {
 		BlockState stone = Blocks.END_STONE.defaultBlockState();
 		return this.configured(new SurfaceBuilderBaseConfiguration(config1.getTopMaterial(), stone, stone));
+	}
+
+	@Override
+	public void apply(Random random, ChunkAccess chunkAccess, Biome biome, int x, int z, int height, double noise, BlockState defaultBlock, BlockState defaultFluid, int l, int m, long seed, SurfaceBuilderBaseConfiguration surfaceBuilderConfiguration) {
+		noise = NOISE.eval(x * 0.1, z * 0.1) + MHelper.randRange(-0.4, 0.4, random);
+		SurfaceBuilder.DEFAULT.apply(random, chunkAccess, biome, x, z, height, noise, defaultBlock, defaultFluid, l, m, seed, noise > 0 ? config1 : config2);
 	}
 }

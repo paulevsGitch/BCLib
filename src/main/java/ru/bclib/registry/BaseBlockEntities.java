@@ -13,6 +13,7 @@ import ru.bclib.blockentities.BaseChestBlockEntity;
 import ru.bclib.blockentities.BaseFurnaceBlockEntity;
 import ru.bclib.blockentities.BaseSignBlockEntity;
 import ru.bclib.blockentities.DynamicBlockEntityType;
+import ru.bclib.blockentities.DynamicBlockEntityType.BlockEntitySupplier;
 import ru.bclib.blocks.BaseBarrelBlock;
 import ru.bclib.blocks.BaseChestBlock;
 import ru.bclib.blocks.BaseFurnaceBlock;
@@ -24,7 +25,7 @@ public class BaseBlockEntities {
 	public static final DynamicBlockEntityType<BaseSignBlockEntity> SIGN = registerBlockEntityType(BCLib.makeID("sign"), BaseSignBlockEntity::new);
 	public static final DynamicBlockEntityType<BaseFurnaceBlockEntity> FURNACE = registerBlockEntityType(BCLib.makeID("furnace"), BaseFurnaceBlockEntity::new);
 
-	public static <T extends BlockEntity> DynamicBlockEntityType<T> registerBlockEntityType(ResourceLocation typeId, Supplier<? extends T> supplier) {
+	public static <T extends BlockEntity> DynamicBlockEntityType<T> registerBlockEntityType(ResourceLocation typeId, BlockEntitySupplier<? extends T> supplier) {
 		return Registry.register(Registry.BLOCK_ENTITY_TYPE, typeId, new DynamicBlockEntityType<>(supplier));
 	}
 	

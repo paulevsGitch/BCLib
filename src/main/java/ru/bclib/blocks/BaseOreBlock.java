@@ -8,6 +8,7 @@ import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
@@ -26,26 +27,20 @@ public class BaseOreBlock extends OreBlock implements BlockModelProvider {
 	private final Item dropItem;
 	private final int minCount;
 	private final int maxCount;
-	private final int experience;
 	
 	public BaseOreBlock(Item drop, int minCount, int maxCount, int experience) {
 		super(FabricBlockSettings.of(Material.STONE, MaterialColor.SAND)
 				.hardness(3F)
 				.resistance(9F)
 				.requiresCorrectToolForDrops()
-				.sound(SoundType.STONE));
+				.sound(SoundType.STONE), UniformInt.of(1, experience));
 		this.dropItem = drop;
 		this.minCount = minCount;
 		this.maxCount = maxCount;
-		this.experience = experience;
-	}
-	
-	@Override
-	protected int xpOnDrop(Random random) {
-		return this.experience > 0 ? random.nextInt(experience) + 1 : 0;
 	}
 
 	@Override
+	@SuppressWarnings("deprecation")
 	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
 		ItemStack tool = builder.getParameter(LootContextParams.TOOL);
 		if (tool != null && tool.isCorrectToolForDrops(state)) {
