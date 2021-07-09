@@ -4,9 +4,11 @@ import net.minecraft.core.Registry;
 import net.minecraft.data.BuiltinRegistries;
 import net.minecraft.data.worldgen.Features;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.GenerationStep;
+import net.minecraft.world.level.levelgen.VerticalAnchor;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.configurations.CountConfiguration;
@@ -17,12 +19,16 @@ import net.minecraft.world.level.levelgen.feature.configurations.RangeDecoratorC
 import net.minecraft.world.level.levelgen.placement.ChanceDecoratorConfiguration;
 import net.minecraft.world.level.levelgen.placement.FeatureDecorator;
 import net.minecraft.world.level.levelgen.structure.templatesystem.BlockMatchTest;
+import net.minecraft.world.level.levelgen.structure.templatesystem.RuleTest;
+import net.minecraft.world.level.levelgen.structure.templatesystem.TagMatchTest;
+import ru.bclib.api.TagAPI;
 
 public class BCLFeature {
-	private Feature<?> feature;
+	private static final RuleTest ANY_TERRAIN = new TagMatchTest(TagAPI.GEN_TERRAIN);
 	private ConfiguredFeature<?, ?> featureConfigured;
 	private GenerationStep.Decoration featureStep;
-	
+	private Feature<?> feature;
+
 	public BCLFeature(Feature<?> feature, ConfiguredFeature<?, ?> configuredFeature, GenerationStep.Decoration featureStep) {
 		this.featureConfigured = configuredFeature;
 		this.featureStep = featureStep;
@@ -36,7 +42,7 @@ public class BCLFeature {
 	}
 	
 	public static BCLFeature makeVegetationFeature(ResourceLocation id, Feature<NoneFeatureConfiguration> feature, int density) {
-		ConfiguredFeature<?, ?> configured = feature.configured(FeatureConfiguration.NONE).decorated(Features.Decorators.HEIGHTMAP_SQUARE).countRandom(density);
+		ConfiguredFeature<?, ?> configured = feature.configured(FeatureConfiguration.NONE).decorated(BCLDecorators.HEIGHTMAP_SQUARE).countRandom(density);
 		return new BCLFeature(id, feature, GenerationStep.Decoration.VEGETAL_DECORATION, configured);
 	}
 	
@@ -46,17 +52,17 @@ public class BCLFeature {
 	}
 	
 	public static BCLFeature makeLakeFeature(ResourceLocation id, Feature<NoneFeatureConfiguration> feature, int chance) {
-		ConfiguredFeature<?, ?> configured = feature.configured(FeatureConfiguration.NONE).decorated(FeatureDecorator.WATER_LAKE.configured(new ChanceDecoratorConfiguration(chance)));
+		ConfiguredFeature<?, ?> configured = feature.configured(FeatureConfiguration.NONE).decorated(FeatureDecorator.LAVA_LAKE.configured(new ChanceDecoratorConfiguration(chance)));
 		return new BCLFeature(id, feature, GenerationStep.Decoration.LAKES, configured);
 	}
 	
 	public static BCLFeature makeOreFeature(ResourceLocation id, Block blockOre, int veins, int veinSize, int offset, int minY, int maxY) {
 		OreConfiguration featureConfig = new OreConfiguration(new BlockMatchTest(Blocks.END_STONE), blockOre.defaultBlockState(), veinSize);
-		RangeDecoratorConfiguration rangeDecorator = new RangeDecoratorConfiguration(offset, minY, maxY);
+		OreConfiguration config = new OreConfiguration(ANY_TERRAIN, blockOre.defaultBlockState(), 33);
 		ConfiguredFeature<?, ?> oreFeature = Feature.ORE.configured(featureConfig)
-			  .decorated(FeatureDecorator.RANGE.configured(rangeDecorator))
-			  .squared()
-			  .count(veins);
+			.rangeUniform(VerticalAnchor.absolute(minY), VerticalAnchor.absolute(maxY))
+			.squared()
+			.count(veins);
 		return new BCLFeature(Feature.ORE, Registry.register(BuiltinRegistries.CONFIGURED_FEATURE, id, oreFeature), GenerationStep.Decoration.UNDERGROUND_ORES);
 	}
 	

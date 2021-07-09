@@ -38,6 +38,7 @@ import ru.bclib.client.render.BCLRenderLayer;
 import ru.bclib.interfaces.IRenderTyped;
 import ru.bclib.util.BlocksHelper;
 
+@SuppressWarnings("deprecation")
 public abstract class BaseDoublePlantBlock extends BaseBlockNotFull implements IRenderTyped, BonemealableBlock {
 	private static final VoxelShape SHAPE = Block.box(4, 2, 4, 12, 16, 12);
 	public static final IntegerProperty ROTATION = BlockProperties.ROTATION;
@@ -110,7 +111,7 @@ public abstract class BaseDoublePlantBlock extends BaseBlockNotFull implements I
 		}
 		
 		ItemStack tool = builder.getParameter(LootContextParams.TOOL);
-		if (tool != null && tool.getItem().is(FabricToolTags.SHEARS) || EnchantmentHelper.getItemEnchantmentLevel(Enchantments.SILK_TOUCH, tool) > 0) {
+		if (tool != null && FabricToolTags.SHEARS.contains(tool.getItem()) || EnchantmentHelper.getItemEnchantmentLevel(Enchantments.SILK_TOUCH, tool) > 0) {
 			return Lists.newArrayList(new ItemStack(this));
 		}
 		else {

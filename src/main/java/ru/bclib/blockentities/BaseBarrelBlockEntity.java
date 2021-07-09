@@ -1,5 +1,6 @@
 package ru.bclib.blockentities;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.Vec3i;
 import net.minecraft.nbt.CompoundTag;
@@ -26,13 +27,13 @@ public class BaseBarrelBlockEntity extends RandomizableContainerBlockEntity {
 	private NonNullList<ItemStack> inventory;
 	private int viewerCount;
 
-	private BaseBarrelBlockEntity(BlockEntityType<?> type) {
-		super(type);
+	private BaseBarrelBlockEntity(BlockEntityType<?> type, BlockPos blockPos, BlockState blockState) {
+		super(type, blockPos, blockState);
 		this.inventory = NonNullList.withSize(27, ItemStack.EMPTY);
 	}
 
-	public BaseBarrelBlockEntity() {
-		this(BaseBlockEntities.BARREL);
+	public BaseBarrelBlockEntity(BlockPos blockPos, BlockState blockState) {
+		this(BaseBlockEntities.BARREL, blockPos, blockState);
 	}
 
 	public CompoundTag save(CompoundTag tag) {
@@ -44,8 +45,8 @@ public class BaseBarrelBlockEntity extends RandomizableContainerBlockEntity {
 		return tag;
 	}
 
-	public void load(BlockState state, CompoundTag tag) {
-		super.load(state, tag);
+	public void load(CompoundTag tag) {
+		super.load(tag);
 		this.inventory = NonNullList.withSize(this.getContainerSize(), ItemStack.EMPTY);
 		if (!this.tryLoadLootTable(tag)) {
 			ContainerHelper.loadAllItems(tag, this.inventory);
@@ -97,10 +98,7 @@ public class BaseBarrelBlockEntity extends RandomizableContainerBlockEntity {
 
 	public void tick() {
 		if (level != null) {
-			int x = worldPosition.getX();
-			int y = worldPosition.getY();
-			int z = worldPosition.getZ();
-			viewerCount = ChestBlockEntity.getOpenCount(level, this, x, y, z);
+			viewerCount = ChestBlockEntity.getOpenCount(level, worldPosition);
 			if (viewerCount > 0) {
 				scheduleUpdate();
 			} else {

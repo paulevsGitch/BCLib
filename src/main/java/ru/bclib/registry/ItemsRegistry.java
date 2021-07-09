@@ -9,6 +9,7 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.tags.Tag;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.CreativeModeTab;
@@ -67,7 +68,7 @@ public abstract class ItemsRegistry extends BaseRegistry<Item> {
 		return item;
 	}
 
-	public Item registerEgg(String name, EntityType<?> type, int background, int dots) {
+	public Item registerEgg(String name, EntityType<? extends Mob> type, int background, int dots) {
 		SpawnEggItem item = new BaseSpawnEggItem(type, background, dots, makeItemSettings());
 		DefaultDispenseItemBehavior behavior = new DefaultDispenseItemBehavior() {
 			public ItemStack execute(BlockSource pointer, ItemStack stack) {

@@ -14,6 +14,7 @@ import com.google.common.collect.Sets;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.BlockPos.MutableBlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Vec3i;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.resources.ResourceLocation;
@@ -27,6 +28,7 @@ import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import net.minecraft.world.level.material.Material;
+import net.minecraft.world.phys.Vec3;
 import ru.bclib.api.TagAPI;
 
 public class StructureHelper {
@@ -86,8 +88,8 @@ public class StructureHelper {
 	}
 	
 	public static BlockPos offsetPos(BlockPos pos, StructureTemplate structure, Rotation rotation, Mirror mirror) {
-		BlockPos offset = StructureTemplate.transform(structure.getSize(), mirror, rotation, BlockPos.ZERO);
-		return pos.offset(-offset.getX() * 0.5, 0, -offset.getZ() * 0.5);
+		Vec3 offset = StructureTemplate.transform(Vec3.atCenterOf(structure.getSize()), mirror, rotation, BlockPos.ZERO);
+		return pos.offset(-offset.x * 0.5, 0, -offset.z * 0.5);
 	}
 	
 	public static void placeCenteredBottom(WorldGenLevel world, BlockPos pos, StructureTemplate structure, Rotation rotation, Mirror mirror, Random random) {
@@ -97,7 +99,7 @@ public class StructureHelper {
 	public static void placeCenteredBottom(WorldGenLevel world, BlockPos pos, StructureTemplate structure, Rotation rotation, Mirror mirror, BoundingBox bounds, Random random) {
 		BlockPos offset = offsetPos(pos, structure, rotation, mirror);
 		StructurePlaceSettings placementData = new StructurePlaceSettings().setRotation(rotation).setMirror(mirror).setBoundingBox(bounds);
-		structure.placeInWorldChunk(world, offset, placementData, random);
+		structure.placeInWorld(world, offset, offset, placementData, random, 4);
 	}
 	
 	private static BoundingBox makeBox(BlockPos pos) {
@@ -105,37 +107,37 @@ public class StructureHelper {
 		int sz = ((pos.getZ() >> 4) << 4) - 16;
 		int ex = sx + 47;
 		int ez = sz + 47;
-		return BoundingBox.createProper(sx, 0, sz, ex, 255, ez);
+		return BoundingBox.fromCorners(new Vec3i(sx, 0, sz), new Vec3i(ex, 255, ez));
 	}
 	
 	public static BoundingBox getStructureBounds(BlockPos pos, StructureTemplate structure, Rotation rotation, Mirror mirror) {
-		BlockPos max = structure.getSize();
-		BlockPos min = StructureTemplate.transform(structure.getSize(), mirror, rotation, BlockPos.ZERO);
-		max = max.subtract(min);
-		return new BoundingBox(min.offset(pos), max.offset(pos));
+		Vec3i max = structure.getSize();
+		Vec3 min = StructureTemplate.transform(Vec3.atCenterOf(structure.getSize()), mirror, rotation, BlockPos.ZERO);
+		max = max.offset(-min.x, -min.y, -min.z);
+		return BoundingBox.fromCorners(pos.offset(min.x, min.y, min.z), max.offset(pos));
 	}
 	
 	public static BoundingBox intersectBoxes(BoundingBox box1, BoundingBox box2) {
-		int x1 = MHelper.max(box1.x0, box2.x0);
-		int y1 = MHelper.max(box1.y0, box2.y0);
-		int z1 = MHelper.max(box1.z0, box2.z0);
+		int x1 = MHelper.max(box1.minX(), box2.minX());
+		int y1 = MHelper.max(box1.minY(), box2.minY());
+		int z1 = MHelper.max(box1.minZ(), box2.minZ());
 		
-		int x2 = MHelper.min(box1.x1, box2.x1);
-		int y2 = MHelper.min(box1.y1, box2.y1);
-		int z2 = MHelper.min(box1.z1, box2.z1);
+		int x2 = MHelper.min(box1.maxX(), box2.maxX());
+		int y2 = MHelper.min(box1.maxY(), box2.maxY());
+		int z2 = MHelper.min(box1.maxZ(), box2.maxZ());
 		
-		return BoundingBox.createProper(x1, y1, z1, x2, y2, z2);
+		return BoundingBox.fromCorners(new Vec3i(x1, y1, z1), new Vec3i(x2, y2, z2));
 	}
 	
 	public static void erode(WorldGenLevel world, BoundingBox bounds, int iterations, Random random) {
 		MutableBlockPos mut = new MutableBlockPos();
 		boolean canDestruct = true;
 		for (int i = 0; i < iterations; i++) {
-			for (int x = bounds.x0; x <= bounds.x1; x++) {
+			for (int x = bounds.minX(); x <= bounds.maxX(); x++) {
 				mut.setX(x);
-				for (int z = bounds.z0; z <= bounds.z1; z++) {
+				for (int z = bounds.minZ(); z <= bounds.maxZ(); z++) {
 					mut.setZ(z);
-					for (int y = bounds.y1; y >= bounds.y0; y--) {
+					for (int y = bounds.maxY(); y >= bounds.minY(); y--) {
 						mut.setY(y);
 						BlockState state = world.getBlockState(mut);
 						boolean ignore = ignore(state, world, mut);
@@ -183,7 +185,7 @@ public class StructureHelper {
 								if (world.isEmptyBlock(mut.relative(dir)) && world.isEmptyBlock(mut.below().relative(dir))) {
 									BlocksHelper.setWithoutUpdate(world, mut, Blocks.AIR);
 									mut.move(dir).move(Direction.DOWN);
-									for (int py = mut.getY(); y >= bounds.y0 - 10; y--) {
+									for (int py = mut.getY(); y >= bounds.minY() - 10; y--) {
 										mut.setY(py - 1);
 										if (!world.isEmptyBlock(mut)) {
 											mut.setY(py);
@@ -202,16 +204,16 @@ public class StructureHelper {
 				}
 			}
 		}
-		for (int x = bounds.x0; x <= bounds.x1; x++) {
+		for (int x = bounds.minX(); x <= bounds.maxX(); x++) {
 			mut.setX(x);
-			for (int z = bounds.z0; z <= bounds.z1; z++) {
+			for (int z = bounds.minZ(); z <= bounds.maxZ(); z++) {
 				mut.setZ(z);
-				for (int y = bounds.y1; y >= bounds.y0; y--) {
+				for (int y = bounds.maxY(); y >= bounds.minY(); y--) {
 					mut.setY(y);
 					BlockState state = world.getBlockState(mut);
 					if (!ignore(state, world, mut) && world.isEmptyBlock(mut.below())) {
 						BlocksHelper.setWithoutUpdate(world, mut, Blocks.AIR);
-						for (int py = mut.getY(); py >= bounds.y0 - 10; py--) {
+						for (int py = mut.getY(); py >= bounds.minY() - 10; py--) {
 							mut.setY(py - 1);
 							if (!world.isEmptyBlock(mut)) {
 								mut.setY(py);
@@ -228,12 +230,12 @@ public class StructureHelper {
 	public static void erodeIntense(WorldGenLevel world, BoundingBox bounds, Random random) {
 		MutableBlockPos mut = new MutableBlockPos();
 		MutableBlockPos mut2 = new MutableBlockPos();
-		int minY = bounds.y0 - 10;
-		for (int x = bounds.x0; x <= bounds.x1; x++) {
+		int minY = bounds.minY() - 10;
+		for (int x = bounds.minX(); x <= bounds.maxX(); x++) {
 			mut.setX(x);
-			for (int z = bounds.z0; z <= bounds.z1; z++) {
+			for (int z = bounds.minZ(); z <= bounds.maxZ(); z++) {
 				mut.setZ(z);
-				for (int y = bounds.y1; y >= bounds.y0; y--) {
+				for (int y = bounds.maxY(); y >= bounds.minY(); y--) {
 					mut.setY(y);
 					BlockState state = world.getBlockState(mut);
 					if (!ignore(state, world, mut)) {
@@ -279,11 +281,11 @@ public class StructureHelper {
 		Set<BlockPos> edge = Sets.newHashSet();
 		Set<BlockPos> add = Sets.newHashSet();
 		
-		for (int x = bounds.x0; x <= bounds.x1; x++) {
+		for (int x = bounds.minX(); x <= bounds.maxX(); x++) {
 			mut.setX(x);
-			for (int z = bounds.z0; z <= bounds.z1; z++) {
+			for (int z = bounds.minZ(); z <= bounds.maxZ(); z++) {
 				mut.setZ(z);
-				for (int y = bounds.y0; y <= bounds.y1; y++) {
+				for (int y = bounds.minY(); y <= bounds.maxY(); y++) {
 					mut.setY(y);
 					BlockState state = world.getBlockState(mut);
 					if (!ignore(state, world, mut) && isTerrainNear(world, mut)) {
@@ -319,12 +321,12 @@ public class StructureHelper {
 			add.clear();
 		}
 		
-		int minY = bounds.y0 - 10;
-		for (int x = bounds.x0; x <= bounds.x1; x++) {
+		int minY = bounds.minY() - 10;
+		for (int x = bounds.minX(); x <= bounds.maxX(); x++) {
 			mut.setX(x);
-			for (int z = bounds.z0; z <= bounds.z1; z++) {
+			for (int z = bounds.minZ(); z <= bounds.maxZ(); z++) {
 				mut.setZ(z);
-				for (int y = bounds.y0; y <= bounds.y1; y++) {
+				for (int y = bounds.minY(); y <= bounds.maxY(); y++) {
 					mut.setY(y);
 					BlockState state = world.getBlockState(mut);
 					if (!ignore(state, world, mut) && !blocks.contains(mut)) {
@@ -355,12 +357,12 @@ public class StructureHelper {
 	
 	public static void cover(WorldGenLevel world, BoundingBox bounds, Random random) {
 		MutableBlockPos mut = new MutableBlockPos();
-		for (int x = bounds.x0; x <= bounds.x1; x++) {
+		for (int x = bounds.minX(); x <= bounds.maxX(); x++) {
 			mut.setX(x);
-			for (int z = bounds.z0; z <= bounds.z1; z++) {
+			for (int z = bounds.minZ(); z <= bounds.maxZ(); z++) {
 				mut.setZ(z);
 				BlockState top = world.getBiome(mut).getGenerationSettings().getSurfaceBuilderConfig().getTopMaterial();
-				for (int y = bounds.y1; y >= bounds.y0; y--) {
+				for (int y = bounds.maxY(); y >= bounds.minY(); y--) {
 					mut.setY(y);
 					BlockState state = world.getBlockState(mut);
 					if (state.is(TagAPI.END_GROUND) && !world.getBlockState(mut.above()).getMaterial().isSolidBlocking()) {

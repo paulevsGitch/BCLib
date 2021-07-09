@@ -34,6 +34,7 @@ public class BaseTrapdoorBlock extends TrapDoorBlock implements IRenderTyped, Bl
 	}
 
 	@Override
+	@SuppressWarnings("deprecation")
 	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
 		return Collections.singletonList(new ItemStack(this));
 	}

@@ -48,6 +48,7 @@ public abstract class BaseUnderwaterWallPlantBlock extends BaseWallPlantBlock im
 	}
 	
 	@Override
+	@SuppressWarnings("deprecation")
 	public FluidState getFluidState(BlockState state) {
 		return Fluids.WATER.getSource(false);
 	}

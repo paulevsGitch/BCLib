@@ -100,7 +100,7 @@ public class StructureWorld {
 	
 	public BoundingBox getBounds() {
 		if (minX == Integer.MAX_VALUE || maxX == Integer.MIN_VALUE || minZ == Integer.MAX_VALUE || maxZ == Integer.MIN_VALUE) {
-			return BoundingBox.getUnknownBox();
+			return BoundingBox.infinite();
 		}
 		return new BoundingBox(minX << 4, minY, minZ << 4, (maxX << 4) | 15, maxY, (maxZ << 4) | 15);
 	}

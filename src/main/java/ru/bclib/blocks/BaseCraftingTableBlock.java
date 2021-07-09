@@ -28,6 +28,7 @@ public class BaseCraftingTableBlock extends CraftingTableBlock implements BlockM
 	}
 
 	@Override
+	@SuppressWarnings("deprecation")
 	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
 		return Collections.singletonList(new ItemStack(this.asItem()));
 	}

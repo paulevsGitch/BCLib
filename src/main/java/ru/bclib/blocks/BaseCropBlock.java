@@ -106,8 +106,9 @@ public class BaseCropBlock extends BasePlantBlock {
 	public boolean isBonemealSuccess(Level world, Random random, BlockPos pos, BlockState state) {
 		return state.getValue(AGE) < 3;
 	}
-	
+
 	@Override
+	@SuppressWarnings("deprecation")
 	public void tick(BlockState state, ServerLevel world, BlockPos pos, Random random) {
 		super.tick(state, world, pos, random);
 		if (isBonemealSuccess(world, random, pos, state) && random.nextInt(8) == 0) {

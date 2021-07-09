@@ -47,6 +47,7 @@ public abstract class UnderwaterPlantWithAgeBlock extends UnderwaterPlantBlock {
 	}
 	
 	@Override
+	@SuppressWarnings("deprecation")
 	public void tick(BlockState state, ServerLevel world, BlockPos pos, Random random) {
 		super.tick(state, world, pos, random);
 		if (isBonemealSuccess(world, random, pos, state)) {

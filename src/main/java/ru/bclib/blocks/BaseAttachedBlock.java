@@ -16,12 +16,13 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import ru.bclib.util.BlocksHelper;
 
+@SuppressWarnings("deprecation")
 public abstract class BaseAttachedBlock extends BaseBlockNotFull {
 	public static final DirectionProperty FACING = BlockStateProperties.FACING;
 	
 	public BaseAttachedBlock(Properties settings) {
 		super(settings);
-		this.registerDefaultState(this.defaultBlockState().setValue(FACING, Direction.UP));
+		registerDefaultState(defaultBlockState().setValue(FACING, Direction.UP));
 	}
 	
 	@Override
@@ -31,7 +32,7 @@ public abstract class BaseAttachedBlock extends BaseBlockNotFull {
 	
 	@Override
 	public BlockState getStateForPlacement(BlockPlaceContext ctx) {
-		BlockState blockState = this.defaultBlockState();
+		BlockState blockState = defaultBlockState();
 		LevelReader worldView = ctx.getLevel();
 		BlockPos blockPos = ctx.getClickedPos();
 		Direction[] directions = ctx.getNearestLookingDirections();
@@ -47,7 +48,7 @@ public abstract class BaseAttachedBlock extends BaseBlockNotFull {
 
 	@Override
 	public boolean canSurvive(BlockState state, LevelReader world, BlockPos pos) {
-		Direction direction = (Direction) state.getValue(FACING);
+		Direction direction = state.getValue(FACING);
 		BlockPos blockPos = pos.relative(direction.getOpposite());
 		return canSupportCenter(world, blockPos, direction) || world.getBlockState(blockPos).is(BlockTags.LEAVES);
 	}
