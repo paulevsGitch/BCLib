@@ -6,6 +6,7 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.Registry;
 import ru.bclib.api.ModIntegrationAPI;
 import ru.bclib.client.render.BCLRenderLayer;
+import ru.bclib.interfaces.IPostInit;
 import ru.bclib.interfaces.IRenderTyped;
 import ru.bclib.registry.BaseBlockEntityRenders;
 
@@ -15,6 +16,11 @@ public class BCLibClient implements ClientModInitializer {
 		ModIntegrationAPI.registerAll();
 		BaseBlockEntityRenders.register();
 		registerRenderLayers();
+		Registry.BLOCK.forEach(block -> {
+			if (block instanceof IPostInit) {
+				((IPostInit) block).postInit();
+			}
+		});
 	}
 	
 	private void registerRenderLayers() {
