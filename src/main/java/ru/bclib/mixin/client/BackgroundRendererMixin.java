@@ -63,6 +63,9 @@ public class BackgroundRendererMixin {
 		Entity entity = camera.getEntity();
 		FogType fogType = camera.getFluidInCamera();
 		if (fogType != FogType.WATER) {
+			if (bcl_shouldIgnore(entity.level, (int) entity.getX(), (int) entity.getEyeY(), (int) entity.getZ())) {
+				return;
+			}
 			float fog = bcl_getFogDensity(entity.level, entity.getX(), entity.getEyeY(), entity.getZ());
 			BackgroundInfo.fogDensity = fog;
 			float start = viewDistance * 0.75F / fog;
@@ -94,6 +97,11 @@ public class BackgroundRendererMixin {
 			RenderSystem.setShaderFogEnd(end);
 			info.cancel();
 		}
+	}
+	
+	private static boolean bcl_shouldIgnore(Level level, int x, int y, int z) {
+		Biome biome = level.getBiome(BCL_MUT_POS.set(x, y, z));
+		return BiomeAPI.getRenderBiome(biome) == BiomeAPI.EMPTY_BIOME;
 	}
 	
 	private static float bcl_getFogDensityI(Level level, int x, int y, int z) {
