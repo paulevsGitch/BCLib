@@ -4,6 +4,10 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import net.minecraft.client.Minecraft;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.Resource;
+import net.minecraft.server.packs.resources.ResourceManager;
 import ru.bclib.BCLib;
 
 import java.io.File;
@@ -41,6 +45,30 @@ public class JsonFactory {
 			}
 		}
 		return new JsonObject();
+	}
+	
+	/**
+	 * Loads {@link JsonObject} from resource location using Minecraft resource manager. Can be used to load JSON from resourcepacks and resources.
+	 * @param location {@link ResourceLocation} to JSON file
+	 * @return {@link JsonObject}
+	 */
+	public static JsonObject getJsonObject(ResourceLocation location) {
+		ResourceManager manager = Minecraft.getInstance().getResourceManager();
+		JsonObject obj = null;
+		try {
+			Resource resource = manager.getResource(location);
+			if (resource != null) {
+				InputStream stream = resource.getInputStream();
+				InputStreamReader reader = new InputStreamReader(stream);
+				obj = JsonFactory.GSON.fromJson(reader, JsonObject.class);
+				reader.close();
+				stream.close();
+			}
+		}
+		catch (IOException ex) {
+			BCLib.LOGGER.catching(ex);
+		}
+		return obj == null ? new JsonObject() : obj;
 	}
 	
 	public static JsonElement loadJson(File jsonFile) {
