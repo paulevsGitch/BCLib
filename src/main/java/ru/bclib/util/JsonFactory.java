@@ -4,10 +4,13 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
+import org.jetbrains.annotations.Nullable;
 import ru.bclib.BCLib;
 
 import java.io.File;
@@ -52,6 +55,8 @@ public class JsonFactory {
 	 * @param location {@link ResourceLocation} to JSON file
 	 * @return {@link JsonObject}
 	 */
+	@Nullable
+	@Environment(EnvType.CLIENT)
 	public static JsonObject getJsonObject(ResourceLocation location) {
 		ResourceManager manager = Minecraft.getInstance().getResourceManager();
 		JsonObject obj = null;
@@ -65,10 +70,8 @@ public class JsonFactory {
 				stream.close();
 			}
 		}
-		catch (IOException ex) {
-			BCLib.LOGGER.catching(ex);
-		}
-		return obj == null ? new JsonObject() : obj;
+		catch (IOException ex) {}
+		return obj;
 	}
 	
 	public static JsonElement loadJson(File jsonFile) {
