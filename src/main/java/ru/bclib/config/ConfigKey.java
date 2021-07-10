@@ -17,11 +17,11 @@ public class ConfigKey {
 	public ConfigKey(String entry, ResourceLocation path) {
 		this(entry, path.getNamespace(), path.getPath());
 	}
-
+	
 	public String[] getPath() {
 		return path;
 	}
-
+	
 	public String getEntry() {
 		return entry;
 	}
@@ -29,7 +29,7 @@ public class ConfigKey {
 	public boolean isRoot() {
 		return root;
 	}
-
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -38,7 +38,7 @@ public class ConfigKey {
 		result = prime * result + entry.hashCode();
 		return result;
 	}
-
+	
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {

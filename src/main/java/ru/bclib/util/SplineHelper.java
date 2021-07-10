@@ -1,13 +1,7 @@
 package ru.bclib.util;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.function.Function;
-
 import com.google.common.collect.Lists;
 import com.mojang.math.Vector3f;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.BlockPos.MutableBlockPos;
 import net.minecraft.util.Mth;
@@ -16,6 +10,11 @@ import net.minecraft.world.level.block.state.BlockState;
 import ru.bclib.sdf.SDF;
 import ru.bclib.sdf.operator.SDFUnion;
 import ru.bclib.sdf.primitive.SDFLine;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.util.function.Function;
 
 public class SplineHelper {
 	public static List<Vector3f> makeSpline(float x1, float y1, float z1, float x2, float y2, float z2, int points) {
@@ -86,11 +85,7 @@ public class SplineHelper {
 		for (int i = 1; i < count; i++) {
 			Vector3f pos = spline.get(i);
 			float delta = (float) (i - 1) / max;
-			SDF line = new SDFLine()
-					.setRadius(Mth.lerp(delta, radius1, radius2))
-					.setStart(start.x(), start.y(), start.z())
-					.setEnd(pos.x(), pos.y(), pos.z())
-					.setBlock(placerFunction);
+			SDF line = new SDFLine().setRadius(Mth.lerp(delta, radius1, radius2)).setStart(start.x(), start.y(), start.z()).setEnd(pos.x(), pos.y(), pos.z()).setBlock(placerFunction);
 			result = result == null ? line : new SDFUnion().setSourceA(result).setSourceB(line);
 			start = pos;
 		}
@@ -105,11 +100,7 @@ public class SplineHelper {
 		for (int i = 1; i < count; i++) {
 			Vector3f pos = spline.get(i);
 			float delta = (float) (i - 1) / max;
-			SDF line = new SDFLine()
-					.setRadius(radiusFunction.apply(delta))
-					.setStart(start.x(), start.y(), start.z())
-					.setEnd(pos.x(), pos.y(), pos.z())
-					.setBlock(placerFunction);
+			SDF line = new SDFLine().setRadius(radiusFunction.apply(delta)).setStart(start.x(), start.y(), start.z()).setEnd(pos.x(), pos.y(), pos.z()).setBlock(placerFunction);
 			result = result == null ? line : new SDFUnion().setSourceA(result).setSourceB(line);
 			start = pos;
 		}
@@ -309,7 +300,7 @@ public class SplineHelper {
 	}
 	
 	public static void rotateSpline(List<Vector3f> spline, float angle) {
-		for (Vector3f v: spline) {
+		for (Vector3f v : spline) {
 			float sin = (float) Math.sin(angle);
 			float cos = (float) Math.cos(angle);
 			float x = v.x() * cos + v.z() * sin;
@@ -320,7 +311,7 @@ public class SplineHelper {
 	
 	public static List<Vector3f> copySpline(List<Vector3f> spline) {
 		List<Vector3f> result = new ArrayList<Vector3f>(spline.size());
-		for (Vector3f v: spline) {
+		for (Vector3f v : spline) {
 			result.add(new Vector3f(v.x(), v.y(), v.z()));
 		}
 		return result;
@@ -331,13 +322,13 @@ public class SplineHelper {
 	}
 	
 	public static void scale(List<Vector3f> spline, float x, float y, float z) {
-		for (Vector3f v: spline) {
+		for (Vector3f v : spline) {
 			v.set(v.x() * x, v.y() * y, v.z() * z);
 		}
 	}
 	
 	public static void offset(List<Vector3f> spline, Vector3f offset) {
-		for (Vector3f v: spline) {
+		for (Vector3f v : spline) {
 			v.set(offset.x() + v.x(), offset.y() + v.y(), offset.z() + v.z());
 		}
 	}

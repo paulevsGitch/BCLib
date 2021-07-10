@@ -1,9 +1,5 @@
 package ru.bclib.items;
 
-import java.util.List;
-
-import org.jetbrains.annotations.Nullable;
-
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.block.model.BlockModel;
@@ -18,17 +14,20 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.Nullable;
 import ru.bclib.blocks.BaseAnvilBlock;
 import ru.bclib.client.models.ItemModelProvider;
 
+import java.util.List;
+
 public class BaseAnvilItem extends BlockItem implements ItemModelProvider {
-
+	
 	public final static String DESTRUCTION = "destruction";
-
+	
 	public BaseAnvilItem(Block block, Properties properties) {
 		super(block, properties);
 	}
-
+	
 	@Override
 	protected BlockState getPlacementState(BlockPlaceContext blockPlaceContext) {
 		BlockState blockState = super.getPlacementState(blockPlaceContext);
@@ -39,7 +38,7 @@ public class BaseAnvilItem extends BlockItem implements ItemModelProvider {
 		}
 		return blockState;
 	}
-
+	
 	@Override
 	@Environment(EnvType.CLIENT)
 	public void appendHoverText(ItemStack itemStack, @Nullable Level level, List<Component> list, TooltipFlag tooltipFlag) {
@@ -49,7 +48,7 @@ public class BaseAnvilItem extends BlockItem implements ItemModelProvider {
 			list.add(new TranslatableComponent("message.bclib.anvil_damage").append(": " + l));
 		}
 	}
-
+	
 	@Override
 	@Environment(EnvType.CLIENT)
 	public BlockModel getItemModel(ResourceLocation resourceLocation) {

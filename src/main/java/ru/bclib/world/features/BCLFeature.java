@@ -2,9 +2,7 @@ package ru.bclib.world.features;
 
 import net.minecraft.core.Registry;
 import net.minecraft.data.BuiltinRegistries;
-import net.minecraft.data.worldgen.Features;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.GenerationStep;
@@ -15,7 +13,6 @@ import net.minecraft.world.level.levelgen.feature.configurations.CountConfigurat
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
 import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
 import net.minecraft.world.level.levelgen.feature.configurations.OreConfiguration;
-import net.minecraft.world.level.levelgen.feature.configurations.RangeDecoratorConfiguration;
 import net.minecraft.world.level.levelgen.placement.ChanceDecoratorConfiguration;
 import net.minecraft.world.level.levelgen.placement.FeatureDecorator;
 import net.minecraft.world.level.levelgen.structure.templatesystem.BlockMatchTest;
@@ -28,7 +25,7 @@ public class BCLFeature {
 	private ConfiguredFeature<?, ?> featureConfigured;
 	private GenerationStep.Decoration featureStep;
 	private Feature<?> feature;
-
+	
 	public BCLFeature(Feature<?> feature, ConfiguredFeature<?, ?> configuredFeature, GenerationStep.Decoration featureStep) {
 		this.featureConfigured = configuredFeature;
 		this.featureStep = featureStep;
@@ -59,10 +56,7 @@ public class BCLFeature {
 	public static BCLFeature makeOreFeature(ResourceLocation id, Block blockOre, int veins, int veinSize, int offset, int minY, int maxY) {
 		OreConfiguration featureConfig = new OreConfiguration(new BlockMatchTest(Blocks.END_STONE), blockOre.defaultBlockState(), veinSize);
 		OreConfiguration config = new OreConfiguration(ANY_TERRAIN, blockOre.defaultBlockState(), 33);
-		ConfiguredFeature<?, ?> oreFeature = Feature.ORE.configured(featureConfig)
-			.rangeUniform(VerticalAnchor.absolute(minY), VerticalAnchor.absolute(maxY))
-			.squared()
-			.count(veins);
+		ConfiguredFeature<?, ?> oreFeature = Feature.ORE.configured(featureConfig).rangeUniform(VerticalAnchor.absolute(minY), VerticalAnchor.absolute(maxY)).squared().count(veins);
 		return new BCLFeature(Feature.ORE, Registry.register(BuiltinRegistries.CONFIGURED_FEATURE, id, oreFeature), GenerationStep.Decoration.UNDERGROUND_ORES);
 	}
 	
@@ -89,11 +83,11 @@ public class BCLFeature {
 	public Feature<?> getFeature() {
 		return feature;
 	}
-
+	
 	public ConfiguredFeature<?, ?> getFeatureConfigured() {
 		return featureConfigured;
 	}
-
+	
 	public GenerationStep.Decoration getFeatureStep() {
 		return featureStep;
 	}

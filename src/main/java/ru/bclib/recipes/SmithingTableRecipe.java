@@ -89,7 +89,7 @@ public class SmithingTableRecipe {
 			BCLib.LOGGER.warning("Addition input for Smithing recipe can't be 'null', recipe {} will be ignored!", id);
 			return;
 		}
-		if(result == null) {
+		if (result == null) {
 			BCLib.LOGGER.warning("Result for Smithing recipe can't be 'null', recipe {} will be ignored!", id);
 			return;
 		}

@@ -1,11 +1,7 @@
 package ru.bclib.world.biomes;
 
-import java.util.List;
-import java.util.Map;
-
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-
 import net.minecraft.core.Registry;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.resources.ResourceLocation;
@@ -32,7 +28,6 @@ import net.minecraft.world.level.levelgen.carver.CarverConfiguration;
 import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
-import net.minecraft.world.level.levelgen.feature.configurations.ProbabilityFeatureConfiguration;
 import net.minecraft.world.level.levelgen.surfacebuilders.ConfiguredSurfaceBuilder;
 import net.minecraft.world.level.levelgen.surfacebuilders.SurfaceBuilder;
 import net.minecraft.world.level.levelgen.surfacebuilders.SurfaceBuilderBaseConfiguration;
@@ -41,6 +36,9 @@ import ru.bclib.util.ColorUtil;
 import ru.bclib.world.features.BCLFeature;
 import ru.bclib.world.structures.BCLStructureFeature;
 import ru.bclib.world.surface.DoubleBlockSurfaceBuilder;
+
+import java.util.List;
+import java.util.Map;
 
 public class BCLBiomeDef {
 	public static final int DEF_FOLIAGE_OVERWORLD = ColorUtil.color(110, 143, 64);
@@ -55,13 +53,13 @@ public class BCLBiomeDef {
 	private final Map<String, Object> customData = Maps.newHashMap();
 	
 	private final ResourceLocation id;
-
+	
 	private AmbientParticleSettings particleConfig;
 	private AmbientAdditionsSettings additions;
 	private AmbientMoodSettings mood;
 	private SoundEvent music;
 	private SoundEvent loop;
-
+	
 	private int foliageColor = DEF_FOLIAGE_OVERWORLD;
 	private int grassColor = DEF_FOLIAGE_OVERWORLD;
 	private int waterFogColor = 329011;
@@ -78,17 +76,19 @@ public class BCLBiomeDef {
 	private int edgeSize = 32;
 	
 	private ConfiguredSurfaceBuilder<?> surface;
-
+	
 	/**
 	 * Custom biome definition. Can be extended with new parameters.
+	 *
 	 * @param id - Biome {@link ResourceLocation} (identifier).
 	 */
 	public BCLBiomeDef(ResourceLocation id) {
 		this.id = id;
 	}
 	
-	/** 
+	/**
 	 * Create default definition for The Nether biome.
+	 *
 	 * @return {@link BCLBiomeDef}.
 	 */
 	public BCLBiomeDef netherBiome() {
@@ -98,8 +98,9 @@ public class BCLBiomeDef {
 		return this;
 	}
 	
-	/** 
+	/**
 	 * Create default definition for The End biome.
+	 *
 	 * @return {@link BCLBiomeDef}.
 	 */
 	public BCLBiomeDef endBiome() {
@@ -111,6 +112,7 @@ public class BCLBiomeDef {
 	
 	/**
 	 * Used to load biome settings from config.
+	 *
 	 * @param config - {@link IdConfig}.
 	 * @return this {@link BCLBiomeDef}.
 	 */
@@ -123,6 +125,7 @@ public class BCLBiomeDef {
 	
 	/**
 	 * Set category of the biome.
+	 *
 	 * @param category - {@link BiomeCategory}.
 	 * @return this {@link BCLBiomeDef}.
 	 */
@@ -137,11 +140,7 @@ public class BCLBiomeDef {
 	}
 	
 	public BCLBiomeDef setSurface(Block block) {
-		setSurface(SurfaceBuilder.DEFAULT.configured(new SurfaceBuilderBaseConfiguration(
-				block.defaultBlockState(),
-				Blocks.END_STONE.defaultBlockState(),
-				Blocks.END_STONE.defaultBlockState()
-		)));
+		setSurface(SurfaceBuilder.DEFAULT.configured(new SurfaceBuilderBaseConfiguration(block.defaultBlockState(), Blocks.END_STONE.defaultBlockState(), Blocks.END_STONE.defaultBlockState())));
 		return this;
 	}
 	
@@ -154,7 +153,7 @@ public class BCLBiomeDef {
 		this.surface = builder;
 		return this;
 	}
-
+	
 	public BCLBiomeDef setParticles(ParticleOptions particle, float probability) {
 		this.particleConfig = new AmbientParticleSettings(particle, probability);
 		return this;
@@ -184,7 +183,7 @@ public class BCLBiomeDef {
 		this.edgeSize = edgeSize;
 		return this;
 	}
-
+	
 	public BCLBiomeDef addMobSpawn(EntityType<?> type, int weight, int minGroupSize, int maxGroupSize) {
 		ResourceLocation eID = Registry.ENTITY_TYPE.getKey(type);
 		if (eID != Registry.ENTITY_TYPE.getDefaultKey()) {
@@ -202,7 +201,7 @@ public class BCLBiomeDef {
 		spawns.add(entry);
 		return this;
 	}
-
+	
 	public BCLBiomeDef addStructureFeature(ConfiguredStructureFeature<?, ?> feature) {
 		structures.add(feature);
 		return this;
@@ -220,7 +219,7 @@ public class BCLBiomeDef {
 		features.add(info);
 		return this;
 	}
-
+	
 	public BCLBiomeDef addFeature(Decoration featureStep, ConfiguredFeature<?, ?> feature) {
 		FeatureInfo info = new FeatureInfo();
 		info.featureStep = featureStep;
@@ -235,22 +234,22 @@ public class BCLBiomeDef {
 		b = Mth.clamp(b, 0, 255);
 		return ColorUtil.color(r, g, b);
 	}
-
+	
 	public BCLBiomeDef setFogColor(int r, int g, int b) {
 		this.fogColor = getColor(r, g, b);
 		return this;
 	}
-
+	
 	public BCLBiomeDef setFogDensity(float density) {
 		this.fogDensity = density;
 		return this;
 	}
-
+	
 	public BCLBiomeDef setWaterColor(int r, int g, int b) {
 		this.waterColor = getColor(r, g, b);
 		return this;
 	}
-
+	
 	public BCLBiomeDef setWaterFogColor(int r, int g, int b) {
 		this.waterFogColor = getColor(r, g, b);
 		return this;
@@ -273,32 +272,32 @@ public class BCLBiomeDef {
 	public BCLBiomeDef setPlantsColor(int r, int g, int b) {
 		return this.setFoliageColor(r, g, b).setGrassColor(r, g, b);
 	}
-
+	
 	public BCLBiomeDef setLoop(SoundEvent loop) {
 		this.loop = loop;
 		return this;
 	}
-
+	
 	public BCLBiomeDef setMood(SoundEvent mood) {
 		this.mood = new AmbientMoodSettings(mood, 6000, 8, 2.0D);
 		return this;
 	}
-
+	
 	public BCLBiomeDef setAdditions(SoundEvent additions) {
 		this.additions = new AmbientAdditionsSettings(additions, 0.0111);
 		return this;
 	}
-
+	
 	public BCLBiomeDef setMusic(SoundEvent music) {
 		this.music = music;
 		return this;
 	}
-
+	
 	public Biome build() {
 		MobSpawnSettings.Builder spawnSettings = new MobSpawnSettings.Builder();
 		BiomeGenerationSettings.Builder generationSettings = new BiomeGenerationSettings.Builder();
 		Builder effects = new Builder();
-
+		
 		mobs.forEach((spawn) -> {
 			spawnSettings.addSpawn(spawn.type.getCategory(), new MobSpawnSettings.SpawnerData(spawn.type, spawn.weight, spawn.minGroupSize, spawn.maxGroupSize));
 		});
@@ -311,34 +310,24 @@ public class BCLBiomeDef {
 		structures.forEach((structure) -> generationSettings.addStructureStart(structure));
 		features.forEach((info) -> generationSettings.addFeature(info.featureStep, info.feature));
 		carvers.forEach((info) -> generationSettings.addCarver(info.carverStep, info.carver));
-
+		
 		effects.skyColor(0).waterColor(waterColor).waterFogColor(waterFogColor).fogColor(fogColor).foliageColorOverride(foliageColor).grassColorOverride(grassColor);
 		if (loop != null) effects.ambientLoopSound(loop);
 		if (mood != null) effects.ambientMoodSound(mood);
 		if (additions != null) effects.ambientAdditionsSound(additions);
 		if (particleConfig != null) effects.ambientParticle(particleConfig);
 		effects.backgroundMusic(music != null ? new Music(music, 600, 2400, true) : Musics.END);
-
-		return new Biome.BiomeBuilder()
-			.precipitation(precipitation)
-			.biomeCategory(category)
-			.depth(depth)
-			.scale(0.2F)
-			.temperature(temperature)
-			.downfall(downfall)
-			.specialEffects(effects.build())
-			.mobSpawnSettings(spawnSettings.build())
-			.generationSettings(generationSettings.build())
-			.build();
+		
+		return new Biome.BiomeBuilder().precipitation(precipitation).biomeCategory(category).depth(depth).scale(0.2F).temperature(temperature).downfall(downfall).specialEffects(effects.build()).mobSpawnSettings(spawnSettings.build()).generationSettings(generationSettings.build()).build();
 	}
-
+	
 	private static final class SpawnInfo {
 		EntityType<?> type;
 		int weight;
 		int minGroupSize;
 		int maxGroupSize;
 	}
-
+	
 	private static final class FeatureInfo {
 		Decoration featureStep;
 		ConfiguredFeature<?, ?> feature;
@@ -348,7 +337,7 @@ public class BCLBiomeDef {
 		Carving carverStep;
 		ConfiguredWorldCarver<CarverConfiguration> carver;
 	}
-
+	
 	public ResourceLocation getID() {
 		return id;
 	}
@@ -356,7 +345,7 @@ public class BCLBiomeDef {
 	public float getFodDensity() {
 		return fogDensity;
 	}
-
+	
 	public float getGenChance() {
 		return genChance;
 	}
@@ -364,7 +353,7 @@ public class BCLBiomeDef {
 	public int getEdgeSize() {
 		return edgeSize;
 	}
-
+	
 	public BCLBiomeDef addCarver(Carving carverStep, ConfiguredWorldCarver<CarverConfiguration> carver) {
 		CarverInfo info = new CarverInfo();
 		info.carverStep = carverStep;

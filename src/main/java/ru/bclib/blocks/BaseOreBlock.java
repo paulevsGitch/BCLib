@@ -1,9 +1,5 @@
 package ru.bclib.blocks;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
-
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.resources.ResourceLocation;
@@ -23,22 +19,21 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import ru.bclib.client.models.BlockModelProvider;
 import ru.bclib.util.MHelper;
 
+import java.util.Collections;
+import java.util.List;
+
 public class BaseOreBlock extends OreBlock implements BlockModelProvider {
 	private final Item dropItem;
 	private final int minCount;
 	private final int maxCount;
 	
 	public BaseOreBlock(Item drop, int minCount, int maxCount, int experience) {
-		super(FabricBlockSettings.of(Material.STONE, MaterialColor.SAND)
-				.hardness(3F)
-				.resistance(9F)
-				.requiresCorrectToolForDrops()
-				.sound(SoundType.STONE), UniformInt.of(1, experience));
+		super(FabricBlockSettings.of(Material.STONE, MaterialColor.SAND).hardness(3F).resistance(9F).requiresCorrectToolForDrops().sound(SoundType.STONE), UniformInt.of(1, experience));
 		this.dropItem = drop;
 		this.minCount = minCount;
 		this.maxCount = maxCount;
 	}
-
+	
 	@Override
 	@SuppressWarnings("deprecation")
 	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
@@ -56,14 +51,15 @@ public class BaseOreBlock extends OreBlock implements BlockModelProvider {
 					return Collections.singletonList(new ItemStack(dropItem, max));
 				}
 				count = MHelper.randRange(min, max, MHelper.RANDOM);
-			} else {
+			}
+			else {
 				count = MHelper.randRange(minCount, maxCount, MHelper.RANDOM);
 			}
 			return Collections.singletonList(new ItemStack(dropItem, count));
 		}
 		return Collections.emptyList();
 	}
-
+	
 	@Override
 	public BlockModel getItemModel(ResourceLocation resourceLocation) {
 		return getBlockModel(resourceLocation, defaultBlockState());

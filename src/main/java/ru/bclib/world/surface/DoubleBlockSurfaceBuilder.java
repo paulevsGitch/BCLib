@@ -1,7 +1,5 @@
 package ru.bclib.world.surface;
 
-import java.util.Random;
-
 import net.minecraft.core.Registry;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
@@ -13,6 +11,8 @@ import net.minecraft.world.level.levelgen.surfacebuilders.SurfaceBuilder;
 import net.minecraft.world.level.levelgen.surfacebuilders.SurfaceBuilderBaseConfiguration;
 import ru.bclib.noise.OpenSimplexNoise;
 import ru.bclib.util.MHelper;
+
+import java.util.Random;
 
 public class DoubleBlockSurfaceBuilder extends SurfaceBuilder<SurfaceBuilderBaseConfiguration> {
 	private static final OpenSimplexNoise NOISE = new OpenSimplexNoise(4141);
@@ -43,7 +43,7 @@ public class DoubleBlockSurfaceBuilder extends SurfaceBuilder<SurfaceBuilderBase
 		BlockState stone = Blocks.END_STONE.defaultBlockState();
 		return this.configured(new SurfaceBuilderBaseConfiguration(config1.getTopMaterial(), stone, stone));
 	}
-
+	
 	@Override
 	public void apply(Random random, ChunkAccess chunkAccess, Biome biome, int x, int z, int height, double noise, BlockState defaultBlock, BlockState defaultFluid, int l, int m, long seed, SurfaceBuilderBaseConfiguration surfaceBuilderConfiguration) {
 		noise = NOISE.eval(x * 0.1, z * 0.1) + MHelper.randRange(-0.4, 0.4, random);

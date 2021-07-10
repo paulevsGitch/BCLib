@@ -1,9 +1,6 @@
 package ru.bclib.blocks;
 
-import java.util.List;
-
 import com.google.common.collect.Lists;
-
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.tool.attribute.v1.FabricToolTags;
 import net.minecraft.core.BlockPos;
@@ -29,25 +26,23 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import ru.bclib.client.render.BCLRenderLayer;
 import ru.bclib.interfaces.IRenderTyped;
 
+import java.util.List;
+
 @SuppressWarnings("deprecation")
 public abstract class UpDownPlantBlock extends BaseBlockNotFull implements IRenderTyped {
 	private static final VoxelShape SHAPE = Block.box(4, 0, 4, 12, 16, 12);
 	
 	public UpDownPlantBlock() {
-		super(FabricBlockSettings.of(Material.PLANT)
-				.breakByTool(FabricToolTags.SHEARS)
-				.breakByHand(true)
-				.sound(SoundType.GRASS)
-				.noCollission());
+		super(FabricBlockSettings.of(Material.PLANT).breakByTool(FabricToolTags.SHEARS).breakByHand(true).sound(SoundType.GRASS).noCollission());
 	}
-
+	
 	protected abstract boolean isTerrain(BlockState state);
-
+	
 	@Override
 	public VoxelShape getShape(BlockState state, BlockGetter view, BlockPos pos, CollisionContext ePos) {
 		return SHAPE;
 	}
-
+	
 	@Override
 	public boolean canSurvive(BlockState state, LevelReader world, BlockPos pos) {
 		BlockState down = world.getBlockState(pos.below());
@@ -58,7 +53,7 @@ public abstract class UpDownPlantBlock extends BaseBlockNotFull implements IRend
 	protected boolean isSupport(BlockState state, LevelReader world, BlockPos pos) {
 		return canSupportCenter(world, pos.above(), Direction.UP);
 	}
-
+	
 	@Override
 	public BlockState updateShape(BlockState state, Direction facing, BlockState neighborState, LevelAccessor world, BlockPos pos, BlockPos neighborPos) {
 		if (!canSurvive(state, world, pos)) {

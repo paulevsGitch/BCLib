@@ -4,7 +4,7 @@ import net.minecraft.util.Mth;
 
 public class SDFSmoothIntersection extends SDFBinary {
 	private float radius;
-
+	
 	public SDFSmoothIntersection setRadius(float radius) {
 		this.radius = radius;
 		return this;

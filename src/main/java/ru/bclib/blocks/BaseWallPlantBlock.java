@@ -1,10 +1,7 @@
 package ru.bclib.blocks;
 
-import java.util.EnumMap;
-
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
-
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.tool.attribute.v1.FabricToolTags;
 import net.minecraft.core.BlockPos;
@@ -28,29 +25,18 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import ru.bclib.util.BlocksHelper;
 
+import java.util.EnumMap;
+
 public abstract class BaseWallPlantBlock extends BasePlantBlock {
-	private static final EnumMap<Direction, VoxelShape> SHAPES = Maps.newEnumMap(ImmutableMap.of(
-			Direction.NORTH, Block.box(1, 1, 8, 15, 15, 16),
-			Direction.SOUTH, Block.box(1, 1, 0, 15, 15, 8),
-			Direction.WEST, Block.box(8, 1, 1, 16, 15, 15),
-			Direction.EAST, Block.box(0, 1, 1, 8, 15, 15)));
+	private static final EnumMap<Direction, VoxelShape> SHAPES = Maps.newEnumMap(ImmutableMap.of(Direction.NORTH, Block.box(1, 1, 8, 15, 15, 16), Direction.SOUTH, Block.box(1, 1, 0, 15, 15, 8), Direction.WEST, Block.box(8, 1, 1, 16, 15, 15), Direction.EAST, Block.box(0, 1, 1, 8, 15, 15)));
 	public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
 	
 	public BaseWallPlantBlock() {
-		this(FabricBlockSettings.of(Material.PLANT)
-				.breakByTool(FabricToolTags.SHEARS)
-				.breakByHand(true)
-				.sound(SoundType.GRASS)
-				.noCollission());
+		this(FabricBlockSettings.of(Material.PLANT).breakByTool(FabricToolTags.SHEARS).breakByHand(true).sound(SoundType.GRASS).noCollission());
 	}
 	
 	public BaseWallPlantBlock(int light) {
-		this(FabricBlockSettings.of(Material.PLANT)
-				.breakByTool(FabricToolTags.SHEARS)
-				.breakByHand(true)
-				.luminance(light)
-				.sound(SoundType.GRASS)
-				.noCollission());
+		this(FabricBlockSettings.of(Material.PLANT).breakByTool(FabricToolTags.SHEARS).breakByHand(true).luminance(light).sound(SoundType.GRASS).noCollission());
 	}
 	
 	public BaseWallPlantBlock(Properties settings) {
@@ -61,17 +47,17 @@ public abstract class BaseWallPlantBlock extends BasePlantBlock {
 	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> stateManager) {
 		stateManager.add(FACING);
 	}
-
+	
 	@Override
 	public VoxelShape getShape(BlockState state, BlockGetter view, BlockPos pos, CollisionContext ePos) {
 		return SHAPES.get(state.getValue(FACING));
 	}
-
+	
 	@Override
 	public BlockBehaviour.OffsetType getOffsetType() {
 		return BlockBehaviour.OffsetType.NONE;
 	}
-
+	
 	@Override
 	public boolean canSurvive(BlockState state, LevelReader world, BlockPos pos) {
 		Direction direction = state.getValue(FACING);
@@ -101,7 +87,7 @@ public abstract class BaseWallPlantBlock extends BasePlantBlock {
 		}
 		return null;
 	}
-
+	
 	@Override
 	public BlockState updateShape(BlockState state, Direction facing, BlockState neighborState, LevelAccessor world, BlockPos pos, BlockPos neighborPos) {
 		if (!canSurvive(state, world, pos)) {
@@ -117,7 +103,7 @@ public abstract class BaseWallPlantBlock extends BasePlantBlock {
 	public BlockState rotate(BlockState state, Rotation rotation) {
 		return BlocksHelper.rotateHorizontal(state, rotation, FACING);
 	}
-
+	
 	@Override
 	@SuppressWarnings("deprecation")
 	public BlockState mirror(BlockState state, Mirror mirror) {

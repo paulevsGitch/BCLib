@@ -1,12 +1,5 @@
 package ru.bclib.blocks;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
-import org.jetbrains.annotations.Nullable;
-
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
@@ -22,10 +15,16 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Half;
 import net.minecraft.world.level.block.state.properties.StairsShape;
 import net.minecraft.world.level.storage.loot.LootContext;
+import org.jetbrains.annotations.Nullable;
 import ru.bclib.client.models.BasePatterns;
 import ru.bclib.client.models.BlockModelProvider;
 import ru.bclib.client.models.ModelsHelper;
 import ru.bclib.client.models.PatternsHelper;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 public class BaseStairsBlock extends StairBlock implements BlockModelProvider {
 	
@@ -41,13 +40,13 @@ public class BaseStairsBlock extends StairBlock implements BlockModelProvider {
 	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
 		return Collections.singletonList(new ItemStack(this));
 	}
-
+	
 	@Override
 	@Environment(EnvType.CLIENT)
 	public BlockModel getItemModel(ResourceLocation resourceLocation) {
 		return getBlockModel(resourceLocation, defaultBlockState());
 	}
-
+	
 	@Override
 	@Environment(EnvType.CLIENT)
 	public @Nullable BlockModel getBlockModel(ResourceLocation blockId, BlockState blockState) {
@@ -68,7 +67,7 @@ public class BaseStairsBlock extends StairBlock implements BlockModelProvider {
 		}
 		return ModelsHelper.fromPattern(pattern);
 	}
-
+	
 	@Override
 	@Environment(EnvType.CLIENT)
 	public UnbakedModel getModelVariant(ResourceLocation stateId, BlockState blockState, Map<ResourceLocation, UnbakedModel> modelCache) {
@@ -77,21 +76,21 @@ public class BaseStairsBlock extends StairBlock implements BlockModelProvider {
 		switch (shape) {
 			case INNER_LEFT:
 			case INNER_RIGHT:
-				state = "_inner"; break;
+				state = "_inner";
+				break;
 			case OUTER_LEFT:
 			case OUTER_RIGHT:
-				state = "_outer"; break;
+				state = "_outer";
+				break;
 			default:
 				state = "";
 		}
 		ResourceLocation modelId = new ResourceLocation(stateId.getNamespace(), "block/" + stateId.getPath() + state);
 		registerBlockModel(stateId, modelId, blockState, modelCache);
-
+		
 		boolean isTop = blockState.getValue(HALF) == Half.TOP;
-		boolean isLeft = shape == StairsShape.INNER_LEFT ||
-						shape == StairsShape.OUTER_LEFT;
-		boolean isRight = shape == StairsShape.INNER_RIGHT ||
-						shape == StairsShape.OUTER_RIGHT;
+		boolean isLeft = shape == StairsShape.INNER_LEFT || shape == StairsShape.OUTER_LEFT;
+		boolean isRight = shape == StairsShape.INNER_RIGHT || shape == StairsShape.OUTER_RIGHT;
 		int y = 0;
 		int x = isTop ? 180 : 0;
 		switch (blockState.getValue(FACING)) {

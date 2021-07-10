@@ -22,7 +22,7 @@ public class SDFCappedCone extends SDFPrimitive {
 		this.height = height;
 		return this;
 	}
-
+	
 	@Override
 	public float getDistance(float x, float y, float z) {
 		float qx = MHelper.length(x, z);

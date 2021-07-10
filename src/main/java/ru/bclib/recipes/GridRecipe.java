@@ -1,10 +1,6 @@
 package ru.bclib.recipes;
 
-import java.util.Arrays;
-import java.util.Map;
-
 import com.google.common.collect.Maps;
-
 import net.minecraft.core.NonNullList;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.Tag;
@@ -18,6 +14,9 @@ import net.minecraft.world.item.crafting.ShapelessRecipe;
 import net.minecraft.world.level.ItemLike;
 import ru.bclib.BCLib;
 import ru.bclib.config.PathConfig;
+
+import java.util.Arrays;
+import java.util.Map;
 
 public class GridRecipe {
 	private static final GridRecipe INSTANCE = new GridRecipe();
@@ -55,7 +54,7 @@ public class GridRecipe {
 		exist |= config.getBoolean("grid", id.getPath(), true);
 		return this;
 	}
-
+	
 	public GridRecipe setGroup(String group) {
 		this.group = group;
 		return this;
@@ -67,7 +66,7 @@ public class GridRecipe {
 	}
 	
 	public GridRecipe setList(String shape) {
-		this.shape = new String[] { shape };
+		this.shape = new String[] {shape};
 		this.shaped = false;
 		return this;
 	}
@@ -81,7 +80,7 @@ public class GridRecipe {
 	}
 	
 	public GridRecipe addMaterial(char key, ItemLike... values) {
-		for (ItemLike item: values) {
+		for (ItemLike item : values) {
 			exist &= BCLRecipeManager.exists(item);
 		}
 		return addMaterial(key, Ingredient.of(values));
@@ -100,11 +99,11 @@ public class GridRecipe {
 	private NonNullList<Ingredient> getMaterials(int width, int height) {
 		NonNullList<Ingredient> materials = NonNullList.withSize(width * height, Ingredient.EMPTY);
 		int pos = 0;
-		for (String line: shape) {
+		for (String line : shape) {
 			for (int i = 0; i < width; i++) {
 				char c = line.charAt(i);
 				Ingredient material = materialKeys.get(c);
-				materials.set(pos ++, material == null ? Ingredient.EMPTY : material);
+				materials.set(pos++, material == null ? Ingredient.EMPTY : material);
 			}
 		}
 		return materials;
@@ -119,7 +118,8 @@ public class GridRecipe {
 			
 			CraftingRecipe recipe = shaped ? new ShapedRecipe(id, group, width, height, materials, result) : new ShapelessRecipe(id, group, result, materials);
 			BCLRecipeManager.addRecipe(type, recipe);
-		} else {
+		}
+		else {
 			BCLib.LOGGER.debug("Recipe {} couldn't be added", id);
 		}
 	}

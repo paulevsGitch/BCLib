@@ -1,11 +1,6 @@
 package ru.bclib.blocks;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
-
 import com.google.common.collect.Lists;
-
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.tool.attribute.v1.FabricToolTags;
 import net.minecraft.core.BlockPos;
@@ -31,6 +26,10 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import ru.bclib.util.BlocksHelper;
 import ru.bclib.util.MHelper;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
+
 public class BaseCropBlock extends BasePlantBlock {
 	private static final VoxelShape SHAPE = Block.box(2, 0, 2, 14, 14, 14);
 	public static final IntegerProperty AGE = IntegerProperty.create("age", 0, 3);
@@ -39,12 +38,7 @@ public class BaseCropBlock extends BasePlantBlock {
 	private final Item drop;
 	
 	public BaseCropBlock(Item drop, Block... terrain) {
-		super(FabricBlockSettings.of(Material.PLANT)
-				.breakByTool(FabricToolTags.HOES)
-				.breakByHand(true)
-				.sound(SoundType.GRASS)
-				.randomTicks()
-				.noCollission());
+		super(FabricBlockSettings.of(Material.PLANT).breakByTool(FabricToolTags.HOES).breakByHand(true).sound(SoundType.GRASS).randomTicks().noCollission());
 		this.drop = drop;
 		this.terrain = terrain;
 		this.registerDefaultState(defaultBlockState().setValue(AGE, 0));
@@ -57,7 +51,7 @@ public class BaseCropBlock extends BasePlantBlock {
 	
 	@Override
 	protected boolean isTerrain(BlockState state) {
-		for (Block block: terrain) {
+		for (Block block : terrain) {
 			if (state.is(block)) {
 				return true;
 			}
@@ -106,7 +100,7 @@ public class BaseCropBlock extends BasePlantBlock {
 	public boolean isBonemealSuccess(Level world, Random random, BlockPos pos, BlockState state) {
 		return state.getValue(AGE) < 3;
 	}
-
+	
 	@Override
 	@SuppressWarnings("deprecation")
 	public void tick(BlockState state, ServerLevel world, BlockPos pos, Random random) {

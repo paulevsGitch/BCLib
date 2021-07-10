@@ -45,14 +45,14 @@ public abstract class BaseAttachedBlock extends BaseBlockNotFull {
 		}
 		return null;
 	}
-
+	
 	@Override
 	public boolean canSurvive(BlockState state, LevelReader world, BlockPos pos) {
 		Direction direction = state.getValue(FACING);
 		BlockPos blockPos = pos.relative(direction.getOpposite());
 		return canSupportCenter(world, blockPos, direction) || world.getBlockState(blockPos).is(BlockTags.LEAVES);
 	}
-
+	
 	@Override
 	public BlockState updateShape(BlockState state, Direction facing, BlockState neighborState, LevelAccessor world, BlockPos pos, BlockPos neighborPos) {
 		if (!canSurvive(state, world, pos)) {
@@ -62,13 +62,13 @@ public abstract class BaseAttachedBlock extends BaseBlockNotFull {
 			return state;
 		}
 	}
-
+	
 	
 	@Override
 	public BlockState rotate(BlockState state, Rotation rotation) {
 		return BlocksHelper.rotateHorizontal(state, rotation, FACING);
 	}
-
+	
 	@Override
 	public BlockState mirror(BlockState state, Mirror mirror) {
 		return BlocksHelper.mirrorHorizontal(state, mirror, FACING);

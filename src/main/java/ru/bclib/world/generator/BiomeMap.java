@@ -1,14 +1,13 @@
 package ru.bclib.world.generator;
 
-import java.util.Map;
-
 import com.google.common.collect.Maps;
-
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.levelgen.WorldgenRandom;
 import ru.bclib.noise.OpenSimplexNoise;
 import ru.bclib.util.MHelper;
 import ru.bclib.world.biomes.BCLBiome;
+
+import java.util.Map;
 
 public class BiomeMap {
 	private static final WorldgenRandom RANDOM = new WorldgenRandom();

@@ -39,42 +39,42 @@ public class BaseSignBlockEntityRenderer implements BlockEntityRenderer<BaseSign
 	private static final RenderType defaultLayer;
 	private final Font font;
 	private final SignRenderer.SignModel model;
-
-
+	
+	
 	private static final int OUTLINE_RENDER_DISTANCE = Mth.square(16);
-
+	
 	public BaseSignBlockEntityRenderer(BlockEntityRendererProvider.Context ctx) {
 		super();
 		this.font = ctx.getFont();
-
+		
 		//set up a default model
 		model = new SignRenderer.SignModel(ctx.bakeLayer(ModelLayers.createSignModelName(WoodType.OAK)));
 	}
-
-	public void render(BaseSignBlockEntity signBlockEntity, float tickDelta, PoseStack matrixStack,
-			MultiBufferSource provider, int light, int overlay) {
+	
+	public void render(BaseSignBlockEntity signBlockEntity, float tickDelta, PoseStack matrixStack, MultiBufferSource provider, int light, int overlay) {
 		BlockState state = signBlockEntity.getBlockState();
-
+		
 		matrixStack.pushPose();
-
-
+		
+		
 		matrixStack.translate(0.5D, 0.5D, 0.5D);
 		float angle = -((float) (state.getValue(StandingSignBlock.ROTATION) * 360) / 16.0F);
-
+		
 		BlockState blockState = signBlockEntity.getBlockState();
 		if (blockState.getValue(BaseSignBlock.FLOOR)) {
 			matrixStack.mulPose(Vector3f.YP.rotationDegrees(angle));
 			model.stick.visible = true;
-		} else {
+		}
+		else {
 			matrixStack.mulPose(Vector3f.YP.rotationDegrees(angle + 180));
 			matrixStack.translate(0.0D, -0.3125D, -0.4375D);
 			model.stick.visible = false;
 		}
-
+		
 		matrixStack.pushPose();
 		matrixStack.scale(0.6666667F, -0.6666667F, -0.6666667F);
 		VertexConsumer vertexConsumer = getConsumer(provider, state.getBlock());
-
+		
 		model.root.render(matrixStack, vertexConsumer, light, overlay);
 		//model.stick.render(matrixStack, vertexConsumer, light, overlay);
 		matrixStack.popPose();
@@ -86,12 +86,11 @@ public class BaseSignBlockEntityRenderer implements BlockEntityRenderer<BaseSign
 		int o = (int) (NativeImage.getG(m) * 0.4D);
 		int p = (int) (NativeImage.getB(m) * 0.4D);
 		int q = NativeImage.combine(0, p, o, n);
-
-		FormattedCharSequence[] formattedCharSequences = signBlockEntity
-				.getRenderMessages(Minecraft.getInstance().isTextFilteringEnabled(), (component) -> {
-					List<FormattedCharSequence> list = this.font.split(component, 90);
-					return list.isEmpty() ? FormattedCharSequence.EMPTY : (FormattedCharSequence) list.get(0);
-				});
+		
+		FormattedCharSequence[] formattedCharSequences = signBlockEntity.getRenderMessages(Minecraft.getInstance().isTextFilteringEnabled(), (component) -> {
+			List<FormattedCharSequence> list = this.font.split(component, 90);
+			return list.isEmpty() ? FormattedCharSequence.EMPTY : (FormattedCharSequence) list.get(0);
+		});
 		int drawColor;
 		boolean drawOutlined;
 		int drawLight;
@@ -99,57 +98,58 @@ public class BaseSignBlockEntityRenderer implements BlockEntityRenderer<BaseSign
 			drawColor = signBlockEntity.getColor().getTextColor();
 			drawOutlined = isOutlineVisible(signBlockEntity, drawColor);
 			drawLight = 15728880;
-		} else {
+		}
+		else {
 			drawColor = m;
 			drawOutlined = false;
 			drawLight = light;
 		}
-
+		
 		for (int s = 0; s < 4; ++s) {
 			FormattedCharSequence formattedCharSequence = formattedCharSequences[s];
 			float t = (float) (-this.font.width(formattedCharSequence) / 2);
 			if (drawOutlined) {
-				this.font.drawInBatch8xOutline(formattedCharSequence, t, (float) (s * 10 - 20), drawColor, m,
-						matrixStack.last().pose(), provider, drawLight);
-			} else {
-				this.font.drawInBatch((FormattedCharSequence) formattedCharSequence, t, (float) (s * 10 - 20), drawColor, false,
-						matrixStack.last().pose(), provider, false, 0, drawLight);
+				this.font.drawInBatch8xOutline(formattedCharSequence, t, (float) (s * 10 - 20), drawColor, m, matrixStack.last().pose(), provider, drawLight);
+			}
+			else {
+				this.font.drawInBatch((FormattedCharSequence) formattedCharSequence, t, (float) (s * 10 - 20), drawColor, false, matrixStack.last().pose(), provider, false, 0, drawLight);
 			}
 		}
-
-
+		
+		
 		matrixStack.popPose();
 	}
-
-
-
+	
+	
 	private static boolean isOutlineVisible(BaseSignBlockEntity signBlockEntity, int i) {
 		if (i == DyeColor.BLACK.getTextColor()) {
 			return true;
-		} else {
+		}
+		else {
 			Minecraft minecraft = Minecraft.getInstance();
 			LocalPlayer localPlayer = minecraft.player;
 			if (localPlayer != null && minecraft.options.getCameraType().isFirstPerson() && localPlayer.isScoping()) {
 				return true;
-			} else {
+			}
+			else {
 				Entity entity = minecraft.getCameraEntity();
-				return entity != null && entity.distanceToSqr(
-						Vec3.atCenterOf(signBlockEntity.getBlockPos())) < (double) OUTLINE_RENDER_DISTANCE;
+				return entity != null && entity.distanceToSqr(Vec3.atCenterOf(signBlockEntity.getBlockPos())) < (double) OUTLINE_RENDER_DISTANCE;
 			}
 		}
 	}
-
+	
 	public static WoodType getSignType(Block block) {
 		WoodType signType2;
 		if (block instanceof SignBlock) {
 			signType2 = ((SignBlock) block).type();
-		} else {
+		}
+		else {
 			signType2 = WoodType.OAK;
 		}
-
+		
 		return signType2;
 	}
-
+	
 	public static Material getModelTexture(Block block) {
 		return Sheets.getSignMaterial(getSignType(block));
 	}
@@ -157,14 +157,13 @@ public class BaseSignBlockEntityRenderer implements BlockEntityRenderer<BaseSign
 	public static VertexConsumer getConsumer(MultiBufferSource provider, Block block) {
 		return provider.getBuffer(LAYERS.getOrDefault(block, defaultLayer));
 	}
-
+	
 	public static void registerRenderLayer(Block block) {
 		ResourceLocation blockId = Registry.BLOCK.getKey(block);
-		RenderType layer = RenderType.entitySolid(new ResourceLocation(blockId.getNamespace(),
-				"textures/entity/sign/" + blockId.getPath() + ".png"));
+		RenderType layer = RenderType.entitySolid(new ResourceLocation(blockId.getNamespace(), "textures/entity/sign/" + blockId.getPath() + ".png"));
 		LAYERS.put(block, layer);
 	}
-
+	
 	static {
 		defaultLayer = RenderType.entitySolid(new ResourceLocation("textures/entity/signs/oak.png"));
 	}

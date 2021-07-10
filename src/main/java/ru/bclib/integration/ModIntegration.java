@@ -1,10 +1,5 @@
 package ru.bclib.integration;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
 import net.fabricmc.fabric.api.tag.TagRegistry;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.Registry;
@@ -24,6 +19,11 @@ import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import ru.bclib.BCLib;
 import ru.bclib.world.features.BCLFeature;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 public abstract class ModIntegration {
 	private final String modID;
@@ -45,7 +45,7 @@ public abstract class ModIntegration {
 	public Item getItem(String name) {
 		return Registry.ITEM.get(getID(name));
 	}
-
+	
 	public BlockState getDefaultState(String name) {
 		return getBlock(name).defaultBlockState();
 	}
@@ -178,7 +178,7 @@ public abstract class ModIntegration {
 	
 	public Object newInstance(Class<?> cl, Object... args) {
 		if (cl != null) {
-			for (Constructor<?> constructor: cl.getConstructors()) {
+			for (Constructor<?> constructor : cl.getConstructors()) {
 				if (constructor.getParameterCount() == args.length) {
 					try {
 						return constructor.newInstance(args);

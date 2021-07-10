@@ -20,7 +20,7 @@ public class BaseAxeItem extends AxeItem implements DynamicAttributeTool, ItemMo
 	public BaseAxeItem(Tier material, float attackDamage, float attackSpeed, Properties settings) {
 		super(material, attackDamage, attackSpeed, settings);
 	}
-
+	
 	@Override
 	public int getMiningLevel(Tag<Item> tag, BlockState state, ItemStack stack, LivingEntity user) {
 		if (tag.equals(FabricToolTags.AXES)) {

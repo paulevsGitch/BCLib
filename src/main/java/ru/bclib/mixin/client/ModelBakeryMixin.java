@@ -1,16 +1,5 @@
 package ru.bclib.mixin.client;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
-import org.spongepowered.asm.mixin.Final;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
 import net.minecraft.client.renderer.block.BlockModelShaper;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.renderer.block.model.multipart.MultiPart;
@@ -24,9 +13,19 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import ru.bclib.BCLib;
 import ru.bclib.client.models.BlockModelProvider;
 import ru.bclib.client.models.ItemModelProvider;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @Mixin(ModelBakery.class)
 public abstract class ModelBakeryMixin {
@@ -36,10 +35,10 @@ public abstract class ModelBakeryMixin {
 	@Final
 	@Shadow
 	private Map<ResourceLocation, UnbakedModel> unbakedCache;
-
+	
 	@Shadow
 	protected abstract void cacheAndQueueDependencies(ResourceLocation resourceLocation, UnbakedModel unbakedModel);
-
+	
 	@Inject(method = "loadModel", at = @At("HEAD"), cancellable = true)
 	private void bclib_loadModels(ResourceLocation resourceLocation, CallbackInfo info) {
 		if (resourceLocation instanceof ModelResourceLocation) {
@@ -55,7 +54,8 @@ public abstract class ModelBakeryMixin {
 					ItemModelProvider modelProvider = null;
 					if (item instanceof ItemModelProvider) {
 						modelProvider = (ItemModelProvider) item;
-					} else if (item instanceof BlockItem) {
+					}
+					else if (item instanceof BlockItem) {
 						Block block = Registry.BLOCK.get(clearLoc);
 						if (block instanceof ItemModelProvider) {
 							modelProvider = (ItemModelProvider) block;
@@ -67,21 +67,21 @@ public abstract class ModelBakeryMixin {
 							model.name = itemLoc.toString();
 							cacheAndQueueDependencies(modelId, model);
 							unbakedCache.put(itemLoc, model);
-						} else {
+						}
+						else {
 							BCLib.LOGGER.warning("Error loading model: {}", itemLoc);
 						}
 						info.cancel();
 					}
 				}
-			} else {
+			}
+			else {
 				ResourceLocation stateLoc = new ResourceLocation(modId, "blockstates/" + path + ".json");
 				if (!resourceManager.hasResource(stateLoc)) {
 					Block block = Registry.BLOCK.get(clearLoc);
 					if (block instanceof BlockModelProvider) {
 						List<BlockState> possibleStates = block.getStateDefinition().getPossibleStates();
-						Optional<BlockState> possibleState = possibleStates.stream()
-								.filter(state -> modelId.equals(BlockModelShaper.stateToModelLocation(clearLoc, state)))
-								.findFirst();
+						Optional<BlockState> possibleState = possibleStates.stream().filter(state -> modelId.equals(BlockModelShaper.stateToModelLocation(clearLoc, state))).findFirst();
 						if (possibleState.isPresent()) {
 							UnbakedModel modelVariant = ((BlockModelProvider) block).getModelVariant(modelId, possibleState.get(), unbakedCache);
 							if (modelVariant != null) {
@@ -90,10 +90,12 @@ public abstract class ModelBakeryMixin {
 										ResourceLocation stateId = BlockModelShaper.stateToModelLocation(clearLoc, state);
 										cacheAndQueueDependencies(stateId, modelVariant);
 									});
-								} else {
+								}
+								else {
 									cacheAndQueueDependencies(modelId, modelVariant);
 								}
-							} else {
+							}
+							else {
 								BCLib.LOGGER.warning("Error loading variant: {}", modelId);
 							}
 							info.cancel();

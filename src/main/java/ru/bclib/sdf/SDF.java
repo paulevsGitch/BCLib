@@ -1,16 +1,8 @@
 package ru.bclib.sdf;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.Function;
-
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.BlockPos.MutableBlockPos;
 import net.minecraft.core.Direction;
@@ -20,12 +12,19 @@ import net.minecraft.world.phys.AABB;
 import ru.bclib.util.BlocksHelper;
 import ru.bclib.world.structures.StructureWorld;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+
 public abstract class SDF {
 	private List<Function<PosInfo, BlockState>> postProcesses = Lists.newArrayList();
 	private Function<BlockState, Boolean> canReplace = (state) -> {
 		return state.getMaterial().isReplaceable();
 	};
-
+	
 	public abstract float getDistance(float x, float y, float z);
 	
 	public abstract BlockState getBlockState(BlockPos pos);
@@ -52,8 +51,8 @@ public abstract class SDF {
 		MutableBlockPos bPos = new MutableBlockPos();
 		
 		while (run) {
-			for (BlockPos center: ends) {
-				for (Direction dir: Direction.values()) {
+			for (BlockPos center : ends) {
+				for (Direction dir : Direction.values()) {
 					bPos.set(center).move(dir);
 					BlockPos wpos = bPos.offset(start);
 					
@@ -86,7 +85,7 @@ public abstract class SDF {
 			infos.forEach((info) -> {
 				BlocksHelper.setWithoutUpdate(world, info.getPos(), info.getState());
 			});
-
+			
 			infos.clear();
 			infos.addAll(addInfo.values());
 			Collections.sort(infos);
@@ -135,7 +134,7 @@ public abstract class SDF {
 			infos.forEach((info) -> {
 				BlocksHelper.setWithoutUpdate(world, info.getPos(), info.getState());
 			});
-
+			
 			infos.clear();
 			infos.addAll(addInfo.values());
 			Collections.sort(infos);
@@ -164,8 +163,8 @@ public abstract class SDF {
 		MutableBlockPos bPos = new MutableBlockPos();
 		
 		while (run) {
-			for (BlockPos center: ends) {
-				for (Direction dir: Direction.values()) {
+			for (BlockPos center : ends) {
+				for (Direction dir : Direction.values()) {
 					bPos.set(center).move(dir);
 					BlockPos wpos = bPos.offset(start);
 					BlockState state = world.getBlockState(wpos);
@@ -198,7 +197,7 @@ public abstract class SDF {
 			infos.forEach((info) -> {
 				BlocksHelper.setWithoutUpdate(world, info.getPos(), info.getState());
 			});
-
+			
 			infos.clear();
 			infos.addAll(addInfo.values());
 			Collections.sort(infos);
@@ -227,8 +226,8 @@ public abstract class SDF {
 		MutableBlockPos bPos = new MutableBlockPos();
 		
 		while (run) {
-			for (BlockPos center: ends) {
-				for (Direction dir: Direction.values()) {
+			for (BlockPos center : ends) {
+				for (Direction dir : Direction.values()) {
 					bPos.set(center).move(dir);
 					BlockPos wpos = bPos.offset(start);
 					
@@ -284,8 +283,8 @@ public abstract class SDF {
 		MutableBlockPos bPos = new MutableBlockPos();
 		
 		while (run) {
-			for (BlockPos center: ends) {
-				for (Direction dir: Direction.values()) {
+			for (BlockPos center : ends) {
+				for (Direction dir : Direction.values()) {
 					bPos.set(center).move(dir);
 					BlockPos wpos = bPos.offset(start);
 					BlockState state = world.getBlockState(wpos);

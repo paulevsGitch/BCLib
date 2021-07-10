@@ -22,10 +22,10 @@ public class SDFPie extends SDFPrimitive {
 	@Override
 	public float getDistance(float x, float y, float z) {
 		float px = Math.abs(x);
-	    float l = MHelper.length(px, y, z) - radius;
-	    float m = MHelper.dot(px, z, sin, cos);
-	    m = Mth.clamp(m, 0, radius);
+		float l = MHelper.length(px, y, z) - radius;
+		float m = MHelper.dot(px, z, sin, cos);
+		m = Mth.clamp(m, 0, radius);
 		m = MHelper.length(px - sin * m, z - cos * m);
-	    return MHelper.max(l, m * (float) Math.signum(cos * px - sin * z));
+		return MHelper.max(l, m * (float) Math.signum(cos * px - sin * z));
 	}
 }

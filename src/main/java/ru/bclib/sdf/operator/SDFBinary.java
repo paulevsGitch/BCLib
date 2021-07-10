@@ -27,7 +27,8 @@ public abstract class SDFBinary extends SDF {
 	public BlockState getBlockState(BlockPos pos) {
 		if (firstValue) {
 			return sourceA.getBlockState(pos);
-		} else {
+		}
+		else {
 			return sourceB.getBlockState(pos);
 		}
 	}

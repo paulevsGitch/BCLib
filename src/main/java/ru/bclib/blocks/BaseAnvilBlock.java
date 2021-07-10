@@ -1,14 +1,7 @@
 package ru.bclib.blocks;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
-import org.jetbrains.annotations.Nullable;
-
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
@@ -25,15 +18,20 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.material.MaterialColor;
 import net.minecraft.world.level.storage.loot.LootContext;
+import org.jetbrains.annotations.Nullable;
 import ru.bclib.client.models.BasePatterns;
 import ru.bclib.client.models.BlockModelProvider;
 import ru.bclib.client.models.ModelsHelper;
 import ru.bclib.client.models.PatternsHelper;
 import ru.bclib.items.BaseAnvilItem;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 public abstract class BaseAnvilBlock extends AnvilBlock implements BlockModelProvider {
 	public static final IntegerProperty DESTRUCTION = BlockProperties.DESTRUCTION;
-
+	
 	public BaseAnvilBlock(MaterialColor color) {
 		super(FabricBlockSettings.copyOf(Blocks.ANVIL).mapColor(color));
 	}
@@ -43,7 +41,7 @@ public abstract class BaseAnvilBlock extends AnvilBlock implements BlockModelPro
 		super.createBlockStateDefinition(builder);
 		builder.add(DESTRUCTION);
 	}
-
+	
 	@Override
 	@SuppressWarnings("deprecation")
 	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
@@ -52,7 +50,7 @@ public abstract class BaseAnvilBlock extends AnvilBlock implements BlockModelPro
 		dropStack.getOrCreateTag().putInt(BaseAnvilItem.DESTRUCTION, destruction);
 		return Lists.newArrayList(dropStack);
 	}
-
+	
 	protected String getTop(ResourceLocation blockId, String block) {
 		if (block.contains("item")) {
 			return blockId.getPath() + "_top_0";
@@ -60,16 +58,16 @@ public abstract class BaseAnvilBlock extends AnvilBlock implements BlockModelPro
 		char last = block.charAt(block.length() - 1);
 		return blockId.getPath() + "_top_" + last;
 	}
-
+	
 	@Override
 	public abstract Item asItem();
-
+	
 	@Override
 	@Environment(EnvType.CLIENT)
 	public BlockModel getItemModel(ResourceLocation blockId) {
 		return getBlockModel(blockId, defaultBlockState());
 	}
-
+	
 	@Override
 	@Environment(EnvType.CLIENT)
 	public @Nullable BlockModel getBlockModel(ResourceLocation blockId, BlockState blockState) {
@@ -82,7 +80,7 @@ public abstract class BaseAnvilBlock extends AnvilBlock implements BlockModelPro
 		Optional<String> pattern = PatternsHelper.createJson(BasePatterns.BLOCK_ANVIL, textures);
 		return ModelsHelper.fromPattern(pattern);
 	}
-
+	
 	@Override
 	@Environment(EnvType.CLIENT)
 	public UnbakedModel getModelVariant(ResourceLocation stateId, BlockState blockState, Map<ResourceLocation, UnbakedModel> modelCache) {

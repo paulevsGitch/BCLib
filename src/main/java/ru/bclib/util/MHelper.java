@@ -1,10 +1,9 @@
 package ru.bclib.util;
 
-import java.util.Random;
-
 import com.mojang.math.Vector3f;
-
 import net.minecraft.core.Vec3i;
+
+import java.util.Random;
 
 public class MHelper {
 	private static final Vec3i[] RANDOM_OFFSETS = new Vec3i[3 * 3 * 3 - 1];
@@ -12,7 +11,7 @@ public class MHelper {
 	public static final float PHI = (float) (Math.PI * (3 - Math.sqrt(5)));
 	public static final float PI2 = (float) (Math.PI * 2);
 	public static final Random RANDOM = new Random();
-
+	
 	public static int randRange(int min, int max, Random random) {
 		return min + random.nextInt(max - min + 1);
 	}
@@ -20,37 +19,37 @@ public class MHelper {
 	public static double randRange(double min, double max, Random random) {
 		return min + random.nextDouble() * (max - min);
 	}
-
+	
 	public static float randRange(float min, float max, Random random) {
 		return min + random.nextFloat() * (max - min);
 	}
-
+	
 	public static byte setBit(byte source, int pos, boolean value) {
 		return value ? setBitTrue(source, pos) : setBitFalse(source, pos);
 	}
-
+	
 	public static byte setBitTrue(byte source, int pos) {
 		source |= 1 << pos;
 		return source;
 	}
-
+	
 	public static byte setBitFalse(byte source, int pos) {
 		source &= ~(1 << pos);
 		return source;
 	}
-
+	
 	public static boolean getBit(byte source, int pos) {
 		return ((source >> pos) & 1) == 1;
 	}
-
+	
 	public static float wrap(float x, float side) {
 		return x - floor(x / side) * side;
 	}
-
+	
 	public static int floor(double x) {
 		return x < 0 ? (int) (x - 1) : (int) x;
 	}
-
+	
 	public static int min(int a, int b) {
 		return a < b ? a : b;
 	}
@@ -134,7 +133,7 @@ public class MHelper {
 		h = (h ^ (h >> 13)) * 1274126177;
 		return h ^ (h >> 16);
 	}
-
+	
 	public static int getSeed(int seed, int x, int y, int z) {
 		int h = seed + x * 374761393 + y * 668265263 + z;
 		h = (h ^ (h >> 13)) * 1274126177;
@@ -149,7 +148,7 @@ public class MHelper {
 			array[i2] = element;
 		}
 	}
-
+	
 	public static int sqr(int i) {
 		return i * i;
 	}
@@ -170,8 +169,7 @@ public class MHelper {
 		return value / RAD_TO_DEG;
 	}
 	
-	public static Vector3f cross(Vector3f vec1, Vector3f vec2)
-	{
+	public static Vector3f cross(Vector3f vec1, Vector3f vec2) {
 		float cx = vec1.y() * vec2.z() - vec1.z() * vec2.y();
 		float cy = vec1.z() * vec2.x() - vec1.x() * vec2.z();
 		float cz = vec1.x() * vec2.y() - vec1.y() * vec2.x();

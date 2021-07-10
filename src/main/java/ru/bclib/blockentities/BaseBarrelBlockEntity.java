@@ -26,25 +26,25 @@ import ru.bclib.registry.BaseBlockEntities;
 public class BaseBarrelBlockEntity extends RandomizableContainerBlockEntity {
 	private NonNullList<ItemStack> inventory;
 	private int viewerCount;
-
+	
 	private BaseBarrelBlockEntity(BlockEntityType<?> type, BlockPos blockPos, BlockState blockState) {
 		super(type, blockPos, blockState);
 		this.inventory = NonNullList.withSize(27, ItemStack.EMPTY);
 	}
-
+	
 	public BaseBarrelBlockEntity(BlockPos blockPos, BlockState blockState) {
 		this(BaseBlockEntities.BARREL, blockPos, blockState);
 	}
-
+	
 	public CompoundTag save(CompoundTag tag) {
 		super.save(tag);
 		if (!this.trySaveLootTable(tag)) {
 			ContainerHelper.saveAllItems(tag, this.inventory);
 		}
-
+		
 		return tag;
 	}
-
+	
 	public void load(CompoundTag tag) {
 		super.load(tag);
 		this.inventory = NonNullList.withSize(this.getContainerSize(), ItemStack.EMPTY);
@@ -52,56 +52,57 @@ public class BaseBarrelBlockEntity extends RandomizableContainerBlockEntity {
 			ContainerHelper.loadAllItems(tag, this.inventory);
 		}
 	}
-
+	
 	public int getContainerSize() {
 		return 27;
 	}
-
+	
 	protected NonNullList<ItemStack> getItems() {
 		return this.inventory;
 	}
-
+	
 	protected void setItems(NonNullList<ItemStack> list) {
 		this.inventory = list;
 	}
-
+	
 	protected Component getDefaultName() {
 		return new TranslatableComponent("container.barrel");
 	}
-
+	
 	protected AbstractContainerMenu createMenu(int syncId, Inventory playerInventory) {
 		return ChestMenu.threeRows(syncId, playerInventory, this);
 	}
-
+	
 	public void startOpen(Player player) {
 		if (!player.isSpectator()) {
 			if (viewerCount < 0) {
 				viewerCount = 0;
 			}
-
+			
 			++viewerCount;
 			BlockState blockState = this.getBlockState();
 			if (!blockState.getValue(BarrelBlock.OPEN)) {
 				playSound(blockState, SoundEvents.BARREL_OPEN);
 				setOpen(blockState, true);
 			}
-
+			
 			if (level != null) {
 				scheduleUpdate();
 			}
 		}
 	}
-
+	
 	private void scheduleUpdate() {
 		level.getBlockTicks().scheduleTick(getBlockPos(), getBlockState().getBlock(), 5);
 	}
-
+	
 	public void tick() {
 		if (level != null) {
 			viewerCount = ChestBlockEntity.getOpenCount(level, worldPosition);
 			if (viewerCount > 0) {
 				scheduleUpdate();
-			} else {
+			}
+			else {
 				BlockState blockState = getBlockState();
 				if (!(blockState.getBlock() instanceof BaseBarrelBlock)) {
 					setRemoved();
@@ -114,27 +115,26 @@ public class BaseBarrelBlockEntity extends RandomizableContainerBlockEntity {
 			}
 		}
 	}
-
+	
 	public void stopOpen(Player player) {
 		if (!player.isSpectator()) {
 			--this.viewerCount;
 		}
 	}
-
+	
 	private void setOpen(BlockState state, boolean open) {
 		if (level != null) {
 			level.setBlock(this.getBlockPos(), state.setValue(BarrelBlock.OPEN, open), 3);
 		}
 	}
-
+	
 	private void playSound(BlockState blockState, SoundEvent soundEvent) {
 		if (level != null) {
 			Vec3i vec3i = blockState.getValue(BarrelBlock.FACING).getNormal();
 			double d = (double) this.worldPosition.getX() + 0.5D + (double) vec3i.getX() / 2.0D;
 			double e = (double) this.worldPosition.getY() + 0.5D + (double) vec3i.getY() / 2.0D;
 			double f = (double) this.worldPosition.getZ() + 0.5D + (double) vec3i.getZ() / 2.0D;
-			level.playSound(null, d, e, f, soundEvent, SoundSource.BLOCKS, 0.5F,
-					this.level.random.nextFloat() * 0.1F + 0.9F);
+			level.playSound(null, d, e, f, soundEvent, SoundSource.BLOCKS, 0.5F, this.level.random.nextFloat() * 0.1F + 0.9F);
 		}
 	}
 }

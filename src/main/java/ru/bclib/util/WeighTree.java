@@ -14,6 +14,7 @@ public class WeighTree<T> {
 	
 	/**
 	 * Get eandom value from tree.
+	 *
 	 * @param random - {@link Random}.
 	 * @return {@link T} value.
 	 */
@@ -53,7 +54,7 @@ public class WeighTree<T> {
 			this.min = min;
 			this.max = max;
 		}
-
+		
 		@Override
 		T get(float value) {
 			return value < separator ? min.get(value) : max.get(value);
@@ -71,7 +72,7 @@ public class WeighTree<T> {
 		Leaf(T value) {
 			this.biome = value;
 		}
-
+		
 		@Override
 		T get(float value) {
 			return biome;

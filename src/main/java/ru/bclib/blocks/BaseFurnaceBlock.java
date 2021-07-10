@@ -41,7 +41,7 @@ public class BaseFurnaceBlock extends FurnaceBlock implements BlockModelProvider
 	public BaseFurnaceBlock(Block source) {
 		super(FabricBlockSettings.copyOf(source).luminance(state -> state.getValue(LIT) ? 13 : 0));
 	}
-
+	
 	@Override
 	public BlockEntity newBlockEntity(BlockPos blockPos, BlockState blockState) {
 		return new BaseFurnaceBlockEntity(blockPos, blockState);
@@ -55,7 +55,7 @@ public class BaseFurnaceBlock extends FurnaceBlock implements BlockModelProvider
 			player.awardStat(Stats.INTERACT_WITH_FURNACE);
 		}
 	}
-
+	
 	@Override
 	@Environment(EnvType.CLIENT)
 	public @Nullable BlockModel getBlockModel(ResourceLocation blockId, BlockState blockState) {
@@ -69,34 +69,34 @@ public class BaseFurnaceBlock extends FurnaceBlock implements BlockModelProvider
 			textures.put("%front%", blockName + "_front_on");
 			textures.put("%glow%", blockName + "_glow");
 			pattern = PatternsHelper.createJson(BasePatterns.BLOCK_FURNACE_LIT, textures);
-		} else {
+		}
+		else {
 			textures.put("%front%", blockName + "_front");
 			pattern = PatternsHelper.createJson(BasePatterns.BLOCK_FURNACE, textures);
 		}
 		return ModelsHelper.fromPattern(pattern);
 	}
-
+	
 	@Override
 	@Environment(EnvType.CLIENT)
 	public BlockModel getItemModel(ResourceLocation resourceLocation) {
 		return getBlockModel(resourceLocation, defaultBlockState());
 	}
-
+	
 	@Override
 	@Environment(EnvType.CLIENT)
 	public UnbakedModel getModelVariant(ResourceLocation stateId, BlockState blockState, Map<ResourceLocation, UnbakedModel> modelCache) {
 		String lit = blockState.getValue(LIT) ? "_lit" : "";
-		ResourceLocation modelId = new ResourceLocation(stateId.getNamespace(),
-				"block/" + stateId.getPath() + lit);
+		ResourceLocation modelId = new ResourceLocation(stateId.getNamespace(), "block/" + stateId.getPath() + lit);
 		registerBlockModel(stateId, modelId, blockState, modelCache);
 		return ModelsHelper.createFacingModel(modelId, blockState.getValue(FACING), false, true);
 	}
-
+	
 	@Override
 	public BCLRenderLayer getRenderLayer() {
 		return BCLRenderLayer.CUTOUT;
 	}
-
+	
 	@Override
 	@SuppressWarnings("deprecation")
 	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
@@ -110,13 +110,13 @@ public class BaseFurnaceBlock extends FurnaceBlock implements BlockModelProvider
 		}
 		return drop;
 	}
-
+	
 	@Override
 	@Nullable
 	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState blockState, BlockEntityType<T> blockEntityType) {
 		return createFurnaceTicker(level, blockEntityType, BaseBlockEntities.FURNACE);
 	}
-
+	
 	@Nullable
 	protected static <T extends BlockEntity> BlockEntityTicker<T> createFurnaceTicker(Level level, BlockEntityType<T> blockEntityType, BlockEntityType<? extends AbstractFurnaceBlockEntity> blockEntityType2) {
 		return level.isClientSide ? null : createTickerHelper(blockEntityType, blockEntityType2, AbstractFurnaceBlockEntity::serverTick);

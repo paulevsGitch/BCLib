@@ -23,7 +23,7 @@ public class DestructionStructureProcessor extends StructureProcessor {
 		}
 		return structureBlockInfo2;
 	}
-
+	
 	@Override
 	protected StructureProcessorType<?> getType() {
 		return StructureProcessorType.RULE;

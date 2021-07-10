@@ -8,7 +8,7 @@ import java.lang.reflect.Field;
 
 public class BCLDecorators {
 	public static final ConfiguredDecorator<?> HEIGHTMAP_SQUARE;
-
+	
 	private static final ConfiguredDecorator<?> getDecorator(Field[] fields, int index) {
 		try {
 			return (ConfiguredDecorator<?>) fields[index].get(null);
@@ -18,7 +18,7 @@ public class BCLDecorators {
 			return null;
 		}
 	}
-
+	
 	static {
 		Class<?>[] classes = Features.class.getDeclaredClasses();
 		Field[] fields = classes[1].getDeclaredFields(); // Decorators class

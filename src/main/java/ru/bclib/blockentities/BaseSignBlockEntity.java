@@ -10,7 +10,7 @@ public class BaseSignBlockEntity extends SignBlockEntity {
 	public BaseSignBlockEntity(BlockPos blockPos, BlockState blockState) {
 		super(blockPos, blockState);
 	}
-
+	
 	@Override
 	public BlockEntityType<?> getType() {
 		return BaseBlockEntities.SIGN;

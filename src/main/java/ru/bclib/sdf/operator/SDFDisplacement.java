@@ -1,8 +1,8 @@
 package ru.bclib.sdf.operator;
 
-import java.util.function.Function;
-
 import com.mojang.math.Vector3f;
+
+import java.util.function.Function;
 
 public class SDFDisplacement extends SDFUnary {
 	private static final Vector3f POS = new Vector3f();

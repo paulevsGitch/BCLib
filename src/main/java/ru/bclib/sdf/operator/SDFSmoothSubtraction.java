@@ -4,7 +4,7 @@ import net.minecraft.util.Mth;
 
 public class SDFSmoothSubtraction extends SDFBinary {
 	private float radius;
-
+	
 	public SDFSmoothSubtraction setRadius(float radius) {
 		this.radius = radius;
 		return this;

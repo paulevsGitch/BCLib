@@ -6,7 +6,7 @@ public class SDFSphere extends SDFPrimitive {
 	private float radius;
 	
 	public SDFSphere setRadius(float radius) {
-		this.radius =  radius;
+		this.radius = radius;
 		return this;
 	}
 	

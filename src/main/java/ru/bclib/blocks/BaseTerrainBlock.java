@@ -1,15 +1,6 @@
 package ru.bclib.blocks;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Random;
-
-import org.jetbrains.annotations.Nullable;
-
 import com.google.common.collect.Maps;
-
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
@@ -41,14 +32,21 @@ import net.minecraft.world.level.material.MaterialColor;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.BlockHitResult;
+import org.jetbrains.annotations.Nullable;
 import ru.bclib.client.models.BasePatterns;
 import ru.bclib.client.models.ModelsHelper;
 import ru.bclib.client.models.PatternsHelper;
 import ru.bclib.client.sound.BlockSounds;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Random;
+
 @SuppressWarnings("deprecation")
 public class BaseTerrainBlock extends BaseBlock {
-
+	
 	private final Block baseBlock;
 	private Block pathBlock;
 	
@@ -60,11 +58,11 @@ public class BaseTerrainBlock extends BaseBlock {
 	public void setPathBlock(Block roadBlock) {
 		this.pathBlock = roadBlock;
 	}
-
+	
 	public Block getBaseBlock() {
 		return baseBlock;
 	}
-
+	
 	@Override
 	public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
 		if (pathBlock != null && FabricToolTags.SHOVELS.contains(player.getMainHandItem().getItem())) {
@@ -95,7 +93,7 @@ public class BaseTerrainBlock extends BaseBlock {
 			world.setBlockAndUpdate(pos, Blocks.END_STONE.defaultBlockState());
 		}
 	}
-
+	
 	public boolean canStay(BlockState state, LevelReader worldView, BlockPos pos) {
 		BlockPos blockPos = pos.above();
 		BlockState blockState = worldView.getBlockState(blockPos);
@@ -116,7 +114,7 @@ public class BaseTerrainBlock extends BaseBlock {
 	public BlockModel getItemModel(ResourceLocation blockId) {
 		return getBlockModel(blockId, defaultBlockState());
 	}
-
+	
 	@Override
 	@Environment(EnvType.CLIENT)
 	public @Nullable BlockModel getBlockModel(ResourceLocation blockId, BlockState blockState) {
@@ -131,7 +129,7 @@ public class BaseTerrainBlock extends BaseBlock {
 		Optional<String> pattern = PatternsHelper.createJson(BasePatterns.BLOCK_TOP_SIDE_BOTTOM, textures);
 		return ModelsHelper.fromPattern(pattern);
 	}
-
+	
 	@Override
 	@Environment(EnvType.CLIENT)
 	public UnbakedModel getModelVariant(ResourceLocation stateId, BlockState blockState, Map<ResourceLocation, UnbakedModel> modelCache) {

@@ -20,18 +20,8 @@ public class CraftingRecipes {
 		GridRecipe.make(BCLib.MOD_ID, "tag_minecart", Items.MINECART).setShape("I I", "III").addMaterial('I', TagAPI.IRON_INGOTS).checkConfig(Configs.RECIPE_CONFIG).build();
 		GridRecipe.make(BCLib.MOD_ID, "tag_shield", Items.SHIELD).setShape("WIW", "WWW", " W ").addMaterial('I', TagAPI.IRON_INGOTS).addMaterial('W', ItemTags.PLANKS).checkConfig(Configs.RECIPE_CONFIG).build();
 		
-		GridRecipe.make(BCLib.MOD_ID, "tag_hopper", Blocks.HOPPER)
-		.setShape("I I", "ICI", " I ")
-		.addMaterial('I', TagAPI.IRON_INGOTS)
-		.addMaterial('C', TagAPI.ITEM_CHEST)
-		.checkConfig(Configs.RECIPE_CONFIG)
-		.build();
-	
-		GridRecipe.make(BCLib.MOD_ID, "tag_shulker_box", Blocks.SHULKER_BOX)
-		.setShape("S", "C", "S")
-		.addMaterial('S', Items.SHULKER_SHELL)
-		.addMaterial('C', TagAPI.ITEM_CHEST)
-		.checkConfig(Configs.RECIPE_CONFIG)
-		.build();
+		GridRecipe.make(BCLib.MOD_ID, "tag_hopper", Blocks.HOPPER).setShape("I I", "ICI", " I ").addMaterial('I', TagAPI.IRON_INGOTS).addMaterial('C', TagAPI.ITEM_CHEST).checkConfig(Configs.RECIPE_CONFIG).build();
+		
+		GridRecipe.make(BCLib.MOD_ID, "tag_shulker_box", Blocks.SHULKER_BOX).setShape("S", "C", "S").addMaterial('S', Items.SHULKER_SHELL).addMaterial('C', TagAPI.ITEM_CHEST).checkConfig(Configs.RECIPE_CONFIG).build();
 	}
 }

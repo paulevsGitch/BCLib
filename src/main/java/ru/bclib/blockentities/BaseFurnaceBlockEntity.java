@@ -15,11 +15,11 @@ public class BaseFurnaceBlockEntity extends AbstractFurnaceBlockEntity {
 	public BaseFurnaceBlockEntity(BlockPos blockPos, BlockState blockState) {
 		super(BaseBlockEntities.FURNACE, blockPos, blockState, RecipeType.SMELTING);
 	}
-
+	
 	protected Component getDefaultName() {
 		return new TranslatableComponent("container.furnace");
 	}
-
+	
 	protected AbstractContainerMenu createMenu(int syncId, Inventory playerInventory) {
 		return new FurnaceMenu(syncId, playerInventory, this, this.dataAccess);
 	}

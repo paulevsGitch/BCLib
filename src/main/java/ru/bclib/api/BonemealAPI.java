@@ -1,15 +1,14 @@
 package ru.bclib.api;
 
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import ru.bclib.util.WeightedList;
+
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
 
 public class BonemealAPI {
 	private static final Map<ResourceLocation, Map<Block, WeightedList<Block>>> WATER_GRASS_BIOMES = Maps.newHashMap();
@@ -27,13 +26,13 @@ public class BonemealAPI {
 	}
 	
 	public static void addLandGrass(Block plant, Block... terrain) {
-		for (Block block: terrain) {
+		for (Block block : terrain) {
 			addLandGrass(block, plant, 1F);
 		}
 	}
 	
 	public static void addLandGrass(ResourceLocation biome, Block plant, Block... terrain) {
-		for (Block block: terrain) {
+		for (Block block : terrain) {
 			addLandGrass(biome, block, plant, 1F);
 		}
 	}
@@ -62,13 +61,13 @@ public class BonemealAPI {
 	}
 	
 	public static void addWaterGrass(Block plant, Block... terrain) {
-		for (Block block: terrain) {
+		for (Block block : terrain) {
 			addWaterGrass(block, plant, 1F);
 		}
 	}
 	
 	public static void addWaterGrass(ResourceLocation biome, Block plant, Block... terrain) {
-		for (Block block: terrain) {
+		for (Block block : terrain) {
 			addWaterGrass(biome, block, plant, 1F);
 		}
 	}

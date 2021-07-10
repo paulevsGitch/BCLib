@@ -1,10 +1,6 @@
 package ru.bclib.blocks;
 
-import java.util.List;
-import java.util.Random;
-
 import com.google.common.collect.Lists;
-
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.tool.attribute.v1.FabricToolTags;
 import net.minecraft.core.BlockPos;
@@ -38,6 +34,9 @@ import ru.bclib.client.render.BCLRenderLayer;
 import ru.bclib.interfaces.IRenderTyped;
 import ru.bclib.util.BlocksHelper;
 
+import java.util.List;
+import java.util.Random;
+
 @SuppressWarnings("deprecation")
 public abstract class BaseDoublePlantBlock extends BaseBlockNotFull implements IRenderTyped, BonemealableBlock {
 	private static final VoxelShape SHAPE = Block.box(4, 2, 4, 12, 16, 12);
@@ -45,21 +44,12 @@ public abstract class BaseDoublePlantBlock extends BaseBlockNotFull implements I
 	public static final BooleanProperty TOP = BooleanProperty.create("top");
 	
 	public BaseDoublePlantBlock() {
-		super(FabricBlockSettings.of(Material.PLANT)
-				.breakByTool(FabricToolTags.SHEARS)
-				.breakByHand(true)
-				.sound(SoundType.WET_GRASS)
-				.noCollission());
+		super(FabricBlockSettings.of(Material.PLANT).breakByTool(FabricToolTags.SHEARS).breakByHand(true).sound(SoundType.WET_GRASS).noCollission());
 		this.registerDefaultState(this.stateDefinition.any().setValue(TOP, false));
 	}
 	
 	public BaseDoublePlantBlock(int light) {
-		super(FabricBlockSettings.of(Material.PLANT)
-				.breakByTool(FabricToolTags.SHEARS)
-				.breakByHand(true)
-				.sound(SoundType.WET_GRASS)
-				.lightLevel((state) -> state.getValue(TOP) ? light : 0)
-				.noCollission());
+		super(FabricBlockSettings.of(Material.PLANT).breakByTool(FabricToolTags.SHEARS).breakByHand(true).sound(SoundType.WET_GRASS).lightLevel((state) -> state.getValue(TOP) ? light : 0).noCollission());
 		this.registerDefaultState(this.stateDefinition.any().setValue(TOP, false));
 	}
 	
@@ -67,18 +57,18 @@ public abstract class BaseDoublePlantBlock extends BaseBlockNotFull implements I
 	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> stateManager) {
 		stateManager.add(TOP, ROTATION);
 	}
-
+	
 	@Override
 	public VoxelShape getShape(BlockState state, BlockGetter view, BlockPos pos, CollisionContext ePos) {
 		Vec3 vec3d = state.getOffset(view, pos);
 		return SHAPE.move(vec3d.x, vec3d.y, vec3d.z);
 	}
-
+	
 	@Override
 	public BlockBehaviour.OffsetType getOffsetType() {
 		return BlockBehaviour.OffsetType.XZ;
 	}
-
+	
 	@Override
 	public boolean canSurvive(BlockState state, LevelReader world, BlockPos pos) {
 		BlockState down = world.getBlockState(pos.below());
@@ -91,7 +81,7 @@ public abstract class BaseDoublePlantBlock extends BaseBlockNotFull implements I
 		BlockState up = world.getBlockState(pos.above());
 		return state.getValue(TOP) ? down.getBlock() == this : isTerrain(down) && (up.getBlock() == this);
 	}
-
+	
 	protected abstract boolean isTerrain(BlockState state);
 	
 	@Override
@@ -123,17 +113,17 @@ public abstract class BaseDoublePlantBlock extends BaseBlockNotFull implements I
 	public BCLRenderLayer getRenderLayer() {
 		return BCLRenderLayer.CUTOUT;
 	}
-
+	
 	@Override
 	public boolean isValidBonemealTarget(BlockGetter world, BlockPos pos, BlockState state, boolean isClient) {
 		return true;
 	}
-
+	
 	@Override
 	public boolean isBonemealSuccess(Level world, Random random, BlockPos pos, BlockState state) {
 		return true;
 	}
-
+	
 	@Override
 	public void performBonemeal(ServerLevel world, Random random, BlockPos pos, BlockState state) {
 		ItemEntity item = new ItemEntity(world, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, new ItemStack(this));

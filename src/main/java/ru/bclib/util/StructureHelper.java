@@ -1,16 +1,6 @@
 package ru.bclib.util;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Enumeration;
-import java.util.Random;
-import java.util.Set;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-
 import com.google.common.collect.Sets;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.BlockPos.MutableBlockPos;
 import net.minecraft.core.Direction;
@@ -30,6 +20,15 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemp
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.Vec3;
 import ru.bclib.api.TagAPI;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Enumeration;
+import java.util.Random;
+import java.util.Set;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 public class StructureHelper {
 	private static final Direction[] DIR = BlocksHelper.makeHorizontal();
@@ -54,7 +53,7 @@ public class StructureHelper {
 					long compressedSize = entry.getCompressedSize();
 					long normalSize = entry.getSize();
 					String type = entry.isDirectory() ? "DIR" : "FILE";
-
+					
 					System.out.println(name);
 					System.out.format("\t %s - %d - %d\n", type, compressedSize, normalSize);
 				}
@@ -80,10 +79,10 @@ public class StructureHelper {
 	
 	private static StructureTemplate readStructureFromStream(InputStream stream) throws IOException {
 		CompoundTag nbttagcompound = NbtIo.readCompressed(stream);
-
+		
 		StructureTemplate template = new StructureTemplate();
 		template.load(nbttagcompound);
-
+		
 		return template;
 	}
 	
@@ -181,7 +180,7 @@ public class StructureHelper {
 						}
 						if (!state.isAir() && random.nextBoolean()) {
 							MHelper.shuffle(DIR, random);
-							for (Direction dir: DIR) {
+							for (Direction dir : DIR) {
 								if (world.isEmptyBlock(mut.relative(dir)) && world.isEmptyBlock(mut.below().relative(dir))) {
 									BlocksHelper.setWithoutUpdate(world, mut, Blocks.AIR);
 									mut.move(dir).move(Direction.DOWN);
@@ -226,7 +225,7 @@ public class StructureHelper {
 			}
 		}
 	}
-
+	
 	public static void erodeIntense(WorldGenLevel world, BoundingBox bounds, Random random) {
 		MutableBlockPos mut = new MutableBlockPos();
 		MutableBlockPos mut2 = new MutableBlockPos();
@@ -261,12 +260,12 @@ public class StructureHelper {
 				}
 			}
 		}
-
+		
 		drop(world, bounds);
 	}
 	
 	private static boolean isTerrainNear(WorldGenLevel world, BlockPos pos) {
-		for (Direction dir: BlocksHelper.DIRECTIONS) {
+		for (Direction dir : BlocksHelper.DIRECTIONS) {
 			if (world.getBlockState(pos.relative(dir)).is(TagAPI.GEN_TERRAIN)) {
 				return true;
 			}
@@ -300,8 +299,8 @@ public class StructureHelper {
 		}
 		
 		while (!edge.isEmpty()) {
-			for (BlockPos center: edge) {
-				for (Direction dir: BlocksHelper.DIRECTIONS) {
+			for (BlockPos center : edge) {
+				for (Direction dir : BlocksHelper.DIRECTIONS) {
 					BlockState state = world.getBlockState(center);
 					if (state.isCollisionShapeFullBlock(world, center)) {
 						mut.set(center).move(dir);
@@ -343,16 +342,9 @@ public class StructureHelper {
 			}
 		}
 	}
-
+	
 	private static boolean ignore(BlockState state, WorldGenLevel world, BlockPos pos) {
-		return state.getMaterial().isReplaceable() ||
-				!state.getFluidState().isEmpty() ||
-				state.is(TagAPI.END_GROUND) ||
-				state.is(BlockTags.LOGS) ||
-				state.is(BlockTags.LEAVES) ||
-				state.getMaterial().equals(Material.PLANT) ||
-				state.getMaterial().equals(Material.LEAVES) ||
-				BlocksHelper.isInvulnerable(state, world, pos);
+		return state.getMaterial().isReplaceable() || !state.getFluidState().isEmpty() || state.is(TagAPI.END_GROUND) || state.is(BlockTags.LOGS) || state.is(BlockTags.LEAVES) || state.getMaterial().equals(Material.PLANT) || state.getMaterial().equals(Material.LEAVES) || BlocksHelper.isInvulnerable(state, world, pos);
 	}
 	
 	public static void cover(WorldGenLevel world, BoundingBox bounds, Random random) {

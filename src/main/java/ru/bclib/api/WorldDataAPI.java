@@ -1,19 +1,18 @@
 package ru.bclib.api;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
 import ru.bclib.BCLib;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 public class WorldDataAPI {
 	private static final Map<String, CompoundTag> TAGS = Maps.newHashMap();
@@ -52,6 +51,7 @@ public class WorldDataAPI {
 	
 	/**
 	 * Register mod cache, world cache is located in world data folder.
+	 *
 	 * @param modID - {@link String} modID.
 	 */
 	public static void registerModCache(String modID) {
@@ -60,6 +60,7 @@ public class WorldDataAPI {
 	
 	/**
 	 * Get root {@link CompoundTag} for mod cache in world data folder.
+	 *
 	 * @param modID - {@link String} modID.
 	 * @return {@link CompoundTag}
 	 */
@@ -74,13 +75,14 @@ public class WorldDataAPI {
 	
 	/**
 	 * Get {@link CompoundTag} with specified path from mod cache in world data folder.
+	 *
 	 * @param modID - {@link String} path to tag, dot-separated.
 	 * @return {@link CompoundTag}
 	 */
 	public static CompoundTag getCompoundTag(String modID, String path) {
 		String[] parts = path.split("\\.");
 		CompoundTag tag = getRootTag(modID);
-		for (String part: parts) {
+		for (String part : parts) {
 			if (tag.contains(part)) {
 				tag = tag.getCompound(part);
 			}
@@ -95,6 +97,7 @@ public class WorldDataAPI {
 	
 	/**
 	 * Forces mod cache file to be saved.
+	 *
 	 * @param modID {@link String} mod ID.
 	 */
 	public static void saveFile(String modID) {
@@ -108,6 +111,7 @@ public class WorldDataAPI {
 	
 	/**
 	 * Get stored mod version (only for mods with registered cache).
+	 *
 	 * @return {@link String} mod version.
 	 */
 	public static String getModVersion(String modID) {
@@ -116,6 +120,7 @@ public class WorldDataAPI {
 	
 	/**
 	 * Get stored mod version as integer (only for mods with registered cache).
+	 *
 	 * @return {@code int} mod version.
 	 */
 	public static int getIntModVersion(String modID) {

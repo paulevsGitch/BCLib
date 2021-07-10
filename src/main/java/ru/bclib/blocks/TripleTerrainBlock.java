@@ -1,15 +1,7 @@
 package ru.bclib.blocks;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Random;
-
-import org.jetbrains.annotations.Nullable;
-
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.block.model.BlockModel;
@@ -34,10 +26,16 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.material.MaterialColor;
 import net.minecraft.world.phys.BlockHitResult;
+import org.jetbrains.annotations.Nullable;
 import ru.bclib.blocks.BlockProperties.TripleShape;
 import ru.bclib.client.models.BasePatterns;
 import ru.bclib.client.models.ModelsHelper;
 import ru.bclib.client.models.PatternsHelper;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Random;
 
 public class TripleTerrainBlock extends BaseTerrainBlock {
 	public static final EnumProperty<TripleShape> SHAPE = BlockProperties.TRIPLE_SHAPE;
@@ -46,7 +44,7 @@ public class TripleTerrainBlock extends BaseTerrainBlock {
 		super(baseBlock, baseBlock.defaultMaterialColor());
 		this.registerDefaultState(defaultBlockState().setValue(SHAPE, TripleShape.BOTTOM));
 	}
-
+	
 	public TripleTerrainBlock(Block baseBlock, MaterialColor color) {
 		super(baseBlock, color);
 		this.registerDefaultState(defaultBlockState().setValue(SHAPE, TripleShape.BOTTOM));
@@ -63,7 +61,7 @@ public class TripleTerrainBlock extends BaseTerrainBlock {
 		TripleShape shape = dir == Direction.UP ? TripleShape.BOTTOM : dir == Direction.DOWN ? TripleShape.TOP : TripleShape.MIDDLE;
 		return defaultBlockState().setValue(SHAPE, shape);
 	}
-
+	
 	@Override
 	public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
 		TripleShape shape = state.getValue(SHAPE);
@@ -78,7 +76,8 @@ public class TripleTerrainBlock extends BaseTerrainBlock {
 		TripleShape shape = state.getValue(SHAPE);
 		if (shape == TripleShape.BOTTOM) {
 			super.randomTick(state, world, pos, random);
-		} else if (random.nextInt(16) == 0) {
+		}
+		else if (random.nextInt(16) == 0) {
 			boolean bottom = canStayBottom(world, pos);
 			if (shape == TripleShape.TOP) {
 				if (!bottom) {
@@ -89,9 +88,11 @@ public class TripleTerrainBlock extends BaseTerrainBlock {
 				boolean top = canStay(state, world, pos) || isMiddle(world.getBlockState(pos.above()));
 				if (!top && !bottom) {
 					world.setBlockAndUpdate(pos, Blocks.END_STONE.defaultBlockState());
-				} else if (top && !bottom) {
+				}
+				else if (top && !bottom) {
 					world.setBlockAndUpdate(pos, state.setValue(SHAPE, TripleShape.BOTTOM));
-				} else if (!top) {
+				}
+				else if (!top) {
 					world.setBlockAndUpdate(pos, state.setValue(SHAPE, TripleShape.TOP));
 				}
 			}
@@ -103,19 +104,21 @@ public class TripleTerrainBlock extends BaseTerrainBlock {
 		BlockState blockState = world.getBlockState(blockPos);
 		if (isMiddle(blockState)) {
 			return true;
-		} else if (blockState.getFluidState().getAmount() == 8) {
+		}
+		else if (blockState.getFluidState().getAmount() == 8) {
 			return false;
-		} else {
+		}
+		else {
 			return !blockState.isFaceSturdy(world, blockPos, Direction.UP);
 		}
 	}
-
+	
 	@Override
 	@Environment(EnvType.CLIENT)
 	public BlockModel getItemModel(ResourceLocation blockId) {
 		return getBlockModel(blockId, defaultBlockState());
 	}
-
+	
 	@Override
 	@Environment(EnvType.CLIENT)
 	public @Nullable BlockModel getBlockModel(ResourceLocation blockId, BlockState blockState) {
@@ -124,7 +127,8 @@ public class TripleTerrainBlock extends BaseTerrainBlock {
 		if (isMiddle(blockState)) {
 			ResourceLocation topId = new ResourceLocation(blockId.getNamespace(), path + "_top");
 			pattern = PatternsHelper.createBlockSimple(topId);
-		} else {
+		}
+		else {
 			Map<String, String> textures = Maps.newHashMap();
 			textures.put("%top%", "betterend:block/" + path + "_top");
 			textures.put("%side%", "betterend:block/" + path + "_side");
@@ -133,14 +137,13 @@ public class TripleTerrainBlock extends BaseTerrainBlock {
 		}
 		return ModelsHelper.fromPattern(pattern);
 	}
-
+	
 	@Override
 	@Environment(EnvType.CLIENT)
 	public UnbakedModel getModelVariant(ResourceLocation stateId, BlockState blockState, Map<ResourceLocation, UnbakedModel> modelCache) {
 		boolean isMiddle = isMiddle(blockState);
 		String middle = isMiddle ? "_middle" : "";
-		ResourceLocation modelId = new ResourceLocation(stateId.getNamespace(),
-				"block/" + stateId.getPath() + middle);
+		ResourceLocation modelId = new ResourceLocation(stateId.getNamespace(), "block/" + stateId.getPath() + middle);
 		registerBlockModel(stateId, modelId, blockState, modelCache);
 		if (isMiddle) {
 			List<Variant> variants = Lists.newArrayList();
@@ -148,17 +151,13 @@ public class TripleTerrainBlock extends BaseTerrainBlock {
 				variants.add(new Variant(modelId, rotation.getRotation(), false, 1));
 			}
 			return new MultiVariant(variants);
-		} else if (blockState.getValue(SHAPE) == TripleShape.TOP) {
-			return new MultiVariant(Lists.newArrayList(
-				new Variant(modelId, BlockModelRotation.X180_Y0.getRotation(), false, 1),
-				new Variant(modelId, BlockModelRotation.X180_Y90.getRotation(), false, 1),
-				new Variant(modelId, BlockModelRotation.X180_Y180.getRotation(), false, 1),
-				new Variant(modelId, BlockModelRotation.X180_Y270.getRotation(), false, 1)
-			));
+		}
+		else if (blockState.getValue(SHAPE) == TripleShape.TOP) {
+			return new MultiVariant(Lists.newArrayList(new Variant(modelId, BlockModelRotation.X180_Y0.getRotation(), false, 1), new Variant(modelId, BlockModelRotation.X180_Y90.getRotation(), false, 1), new Variant(modelId, BlockModelRotation.X180_Y180.getRotation(), false, 1), new Variant(modelId, BlockModelRotation.X180_Y270.getRotation(), false, 1)));
 		}
 		return ModelsHelper.createRandomTopModel(modelId);
 	}
-
+	
 	protected boolean isMiddle(BlockState blockState) {
 		return blockState.is(this) && blockState.getValue(SHAPE) == TripleShape.MIDDLE;
 	}

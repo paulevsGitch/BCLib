@@ -1,15 +1,5 @@
 package ru.bclib.mixin.common;
 
-import java.util.List;
-import java.util.Random;
-
-import org.spongepowered.asm.mixin.Final;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
 import net.minecraft.core.Registry;
 import net.minecraft.world.Container;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -20,42 +10,51 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.EnchantmentInstance;
+import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import ru.bclib.api.TagAPI;
+
+import java.util.List;
+import java.util.Random;
 
 @Mixin(EnchantmentMenu.class)
 public abstract class EnchantmentMenuMixin extends AbstractContainerMenu {
 	@Final
 	@Shadow
 	private Container enchantSlots;
-
+	
 	@Final
 	@Shadow
 	private ContainerLevelAccess access;
-
+	
 	@Final
 	@Shadow
 	private Random random;
-
+	
 	@Final
 	@Shadow
 	private DataSlot enchantmentSeed;
-
+	
 	@Shadow
 	@Final
 	public int[] costs;
-
+	
 	@Shadow
 	@Final
 	public int[] enchantClue;
-
+	
 	@Shadow
 	@Final
 	public int[] levelClue;
-
+	
 	protected EnchantmentMenuMixin(MenuType<?> type, int syncId) {
 		super(type, syncId);
 	}
-
+	
 	@Inject(method = "slotsChanged", at = @At("HEAD"), cancellable = true)
 	private void be_slotsChanged(Container inventory, CallbackInfo info) {
 		if (inventory == this.enchantSlots) {
@@ -63,7 +62,7 @@ public abstract class EnchantmentMenuMixin extends AbstractContainerMenu {
 			if (!itemStack.isEmpty() && itemStack.isEnchantable()) {
 				this.access.execute((world, blockPos) -> {
 					int i = 0;
-
+					
 					int j;
 					for (j = -1; j <= 1; ++j) {
 						for (int k = -1; k <= 1; ++k) {
@@ -71,24 +70,24 @@ public abstract class EnchantmentMenuMixin extends AbstractContainerMenu {
 								if (world.getBlockState(blockPos.offset(k * 2, 0, j * 2)).is(TagAPI.BOOKSHELVES)) {
 									++i;
 								}
-
+								
 								if (world.getBlockState(blockPos.offset(k * 2, 1, j * 2)).is(TagAPI.BOOKSHELVES)) {
 									++i;
 								}
-
+								
 								if (k != 0 && j != 0) {
 									if (world.getBlockState(blockPos.offset(k * 2, 0, j)).is(TagAPI.BOOKSHELVES)) {
 										++i;
 									}
-
+									
 									if (world.getBlockState(blockPos.offset(k * 2, 1, j)).is(TagAPI.BOOKSHELVES)) {
 										++i;
 									}
-
+									
 									if (world.getBlockState(blockPos.offset(k, 0, j * 2)).is(TagAPI.BOOKSHELVES)) {
 										++i;
 									}
-
+									
 									if (world.getBlockState(blockPos.offset(k, 1, j * 2)).is(TagAPI.BOOKSHELVES)) {
 										++i;
 									}
@@ -96,9 +95,9 @@ public abstract class EnchantmentMenuMixin extends AbstractContainerMenu {
 							}
 						}
 					}
-
+					
 					random.setSeed(enchantmentSeed.get());
-
+					
 					for (j = 0; j < 3; ++j) {
 						costs[j] = EnchantmentHelper.getEnchantmentCost(this.random, j, i, itemStack);
 						enchantClue[j] = -1;
@@ -107,7 +106,7 @@ public abstract class EnchantmentMenuMixin extends AbstractContainerMenu {
 							costs[j] = 0;
 						}
 					}
-
+					
 					for (j = 0; j < 3; ++j) {
 						if (this.costs[j] > 0) {
 							List<EnchantmentInstance> list = this.getEnchantmentList(itemStack, j, this.costs[j]);
@@ -118,7 +117,7 @@ public abstract class EnchantmentMenuMixin extends AbstractContainerMenu {
 							}
 						}
 					}
-
+					
 					broadcastChanges();
 				});
 			}
@@ -132,7 +131,7 @@ public abstract class EnchantmentMenuMixin extends AbstractContainerMenu {
 			info.cancel();
 		}
 	}
-
+	
 	@Shadow
 	private List<EnchantmentInstance> getEnchantmentList(ItemStack stack, int slot, int level) {
 		return null;

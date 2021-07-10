@@ -1,9 +1,6 @@
 package ru.bclib.world.structures;
 
-import java.util.Map;
-
 import com.google.common.collect.Maps;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -14,6 +11,8 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
+
+import java.util.Map;
 
 public class StructureWorld {
 	private Map<ChunkPos, Part> parts = Maps.newHashMap();
@@ -153,7 +152,7 @@ public class StructureWorld {
 			blocks.forEach((pos, state) -> {
 				int stateID = states.getOrDefault(states, -1);
 				if (stateID < 0) {
-					stateID = id[0] ++;
+					stateID = id[0]++;
 					states.put(state, stateID);
 					stateMap.add(NbtUtils.writeBlockState(state));
 				}

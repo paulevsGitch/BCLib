@@ -1,7 +1,6 @@
 package ru.bclib.config;
 
 import org.jetbrains.annotations.Nullable;
-
 import ru.bclib.BCLib;
 import ru.bclib.config.ConfigKeeper.BooleanEntry;
 import ru.bclib.config.ConfigKeeper.Entry;
@@ -55,14 +54,15 @@ public abstract class Config {
 			if (entry == null) return false;
 			entry.setValue(value);
 			return true;
-		} catch (NullPointerException ex) {
+		}
+		catch (NullPointerException ex) {
 			BCLib.LOGGER.catching(ex);
 		}
 		return false;
 	}
 	
 	protected int getInt(ConfigKey key, int defaultValue) {
-		Integer val = keeper.getValue(key, IntegerEntry.class);		
+		Integer val = keeper.getValue(key, IntegerEntry.class);
 		if (val == null) {
 			IntegerEntry entry = keeper.registerEntry(key, new IntegerEntry(defaultValue));
 			return entry.getValue();
@@ -71,7 +71,7 @@ public abstract class Config {
 	}
 	
 	protected int getInt(ConfigKey key) {
-		Integer val = keeper.getValue(key, IntegerEntry.class);		
+		Integer val = keeper.getValue(key, IntegerEntry.class);
 		return val != null ? val : 0;
 	}
 	
@@ -81,7 +81,8 @@ public abstract class Config {
 			if (entry == null) return false;
 			entry.setValue(value);
 			return true;
-		} catch (NullPointerException ex) {
+		}
+		catch (NullPointerException ex) {
 			BCLib.LOGGER.catching(ex);
 		}
 		return false;
@@ -93,7 +94,8 @@ public abstract class Config {
 			if (entry == null) return false;
 			entry.setValue(value);
 			return true;
-		} catch (NullPointerException | ClassCastException ex) {
+		}
+		catch (NullPointerException | ClassCastException ex) {
 			BCLib.LOGGER.catching(ex);
 		}
 		return false;
@@ -119,7 +121,8 @@ public abstract class Config {
 			if (entry == null) return false;
 			entry.setValue(value);
 			return true;
-		} catch (NullPointerException ex) {
+		}
+		catch (NullPointerException ex) {
 			BCLib.LOGGER.catching(ex);
 		}
 		return false;
@@ -145,7 +148,8 @@ public abstract class Config {
 			if (entry == null) return false;
 			entry.setValue(value);
 			return true;
-		} catch (NullPointerException ex) {
+		}
+		catch (NullPointerException ex) {
 			BCLib.LOGGER.catching(ex);
 		}
 		return false;

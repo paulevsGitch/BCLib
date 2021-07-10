@@ -1,16 +1,7 @@
 package ru.bclib.api;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.util.Collection;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.nbt.CompoundTag;
@@ -18,6 +9,14 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.chunk.storage.RegionFile;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.util.Collection;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 public class DataFixerAPI {
 	private static final Map<String, String> REPLACEMENT = Maps.newHashMap();
@@ -31,7 +30,7 @@ public class DataFixerAPI {
 		
 		boolean shoudFix = false;
 		Collection<ModContainer> mods = FabricLoader.getInstance().getAllMods();
-		for (ModContainer mod: mods) {
+		for (ModContainer mod : mods) {
 			String name = mod.getMetadata().getId();
 			int preVersion = WorldDataAPI.getIntModVersion(name);
 			int version = getModVersion(mod.getMetadata().getVersion().toString());
@@ -39,7 +38,8 @@ public class DataFixerAPI {
 				int fixVersion = FIX_VERSIONS.getOrDefault(name, version);
 				shoudFix |= fixVersion < version && fixVersion >= preVersion;
 			}
-		};
+		}
+		;
 		if (!shoudFix) {
 			return;
 		}
@@ -90,14 +90,15 @@ public class DataFixerAPI {
 	
 	/**
 	 * Register block data fix. Fix will be applied on world load if current mod version will be newer than specified one.
-	 * @param modID - {@link String} mod id;
+	 *
+	 * @param modID      - {@link String} mod id;
 	 * @param modVersion - {@link String} mod version, should be in format: %d.%d.%d
-	 * @param result - {@link String} new block name;
-	 * @param names - array of {@link String}, old block names to convert.
+	 * @param result     - {@link String} new block name;
+	 * @param names      - array of {@link String}, old block names to convert.
 	 */
 	protected static void addFix(String modID, String modVersion, String result, String... names) {
 		FIX_VERSIONS.put(modID, getModVersion(modVersion));
-		for (String name: names) {
+		for (String name : names) {
 			REPLACEMENT.put(name, result);
 		}
 	}
@@ -106,7 +107,7 @@ public class DataFixerAPI {
 		if (list == null) {
 			list = Lists.newArrayList();
 		}
-		for (File file: dir.listFiles()) {
+		for (File file : dir.listFiles()) {
 			if (file.isDirectory()) {
 				getAllRegions(file, list);
 			}
@@ -119,6 +120,7 @@ public class DataFixerAPI {
 	
 	/**
 	 * Get mod version from string. String should be in format: %d.%d.%d
+	 *
 	 * @param version - {@link String} mod version.
 	 * @return int mod version.
 	 */
@@ -137,6 +139,7 @@ public class DataFixerAPI {
 	
 	/**
 	 * Get mod version from integer. String will be in format %d.%d.%d
+	 *
 	 * @param version - mod version in integer form.
 	 * @return {@link String} mod version.
 	 */

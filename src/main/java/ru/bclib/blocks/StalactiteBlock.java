@@ -1,10 +1,5 @@
 package ru.bclib.blocks;
 
-import java.util.Map;
-import java.util.Optional;
-
-import org.jetbrains.annotations.Nullable;
-
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
@@ -37,11 +32,15 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jetbrains.annotations.Nullable;
 import ru.bclib.client.models.BasePatterns;
 import ru.bclib.client.models.ModelsHelper;
 import ru.bclib.client.models.PatternsHelper;
 import ru.bclib.client.render.BCLRenderLayer;
 import ru.bclib.interfaces.IRenderTyped;
+
+import java.util.Map;
+import java.util.Optional;
 
 @SuppressWarnings("deprecation")
 public class StalactiteBlock extends BaseBlockNotFull implements SimpleWaterloggedBlock, LiquidBlockContainer, IRenderTyped {
@@ -49,17 +48,17 @@ public class StalactiteBlock extends BaseBlockNotFull implements SimpleWaterlogg
 	public static final BooleanProperty IS_FLOOR = BlockProperties.IS_FLOOR;
 	public static final IntegerProperty SIZE = BlockProperties.SIZE;
 	private static final VoxelShape[] SHAPES;
-
+	
 	public StalactiteBlock(Block source) {
 		super(FabricBlockSettings.copy(source).noOcclusion());
 		this.registerDefaultState(getStateDefinition().any().setValue(SIZE, 0).setValue(IS_FLOOR, true).setValue(WATERLOGGED, false));
 	}
-
+	
 	@Override
 	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> stateManager) {
 		stateManager.add(WATERLOGGED, IS_FLOOR, SIZE);
 	}
-
+	
 	@Override
 	public VoxelShape getShape(BlockState state, BlockGetter view, BlockPos pos, CollisionContext ePos) {
 		return SHAPES[state.getValue(SIZE)];
@@ -95,7 +94,7 @@ public class StalactiteBlock extends BaseBlockNotFull implements SimpleWaterlogg
 			}
 		}
 	}
-
+	
 	@Override
 	public void setPlacedBy(Level world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack itemStack) {
 		boolean hasUp = isThis(world, pos.above());
@@ -183,7 +182,7 @@ public class StalactiteBlock extends BaseBlockNotFull implements SimpleWaterlogg
 		}
 		return state;
 	}
-
+	
 	@Override
 	public boolean canSurvive(BlockState state, LevelReader world, BlockPos pos) {
 		int size = state.getValue(SIZE);
@@ -208,22 +207,21 @@ public class StalactiteBlock extends BaseBlockNotFull implements SimpleWaterlogg
 		Optional<String> pattern = PatternsHelper.createJson(BasePatterns.BLOCK_CROSS_SHADED, resourceLocation);
 		return ModelsHelper.fromPattern(pattern);
 	}
-
+	
 	@Override
 	@Environment(EnvType.CLIENT)
 	public UnbakedModel getModelVariant(ResourceLocation stateId, BlockState blockState, Map<ResourceLocation, UnbakedModel> modelCache) {
 		BlockModelRotation rotation = blockState.getValue(IS_FLOOR) ? BlockModelRotation.X0_Y0 : BlockModelRotation.X180_Y0;
-		ResourceLocation modelId = new ResourceLocation(stateId.getNamespace(),
-				stateId.getPath() +  "_" + blockState.getValue(SIZE));
+		ResourceLocation modelId = new ResourceLocation(stateId.getNamespace(), stateId.getPath() + "_" + blockState.getValue(SIZE));
 		registerBlockModel(modelId, modelId, blockState, modelCache);
 		return ModelsHelper.createMultiVariant(modelId, rotation.getRotation(), false);
 	}
-
+	
 	@Override
 	public boolean canPlaceLiquid(BlockGetter world, BlockPos pos, BlockState state, Fluid fluid) {
 		return false;
 	}
-
+	
 	@Override
 	public boolean placeLiquid(LevelAccessor world, BlockPos pos, BlockState state, FluidState fluidState) {
 		return false;
@@ -233,12 +231,12 @@ public class StalactiteBlock extends BaseBlockNotFull implements SimpleWaterlogg
 	public FluidState getFluidState(BlockState state) {
 		return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : Fluids.EMPTY.defaultFluidState();
 	}
-
+	
 	@Override
 	public BCLRenderLayer getRenderLayer() {
 		return BCLRenderLayer.CUTOUT;
 	}
-
+	
 	static {
 		float end = 2F / 8F;
 		float start = 5F / 8F;

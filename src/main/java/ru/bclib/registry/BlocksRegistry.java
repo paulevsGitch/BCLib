@@ -12,7 +12,7 @@ import net.minecraft.world.level.block.Block;
 import ru.bclib.interfaces.ISpetialItem;
 
 public abstract class BlocksRegistry extends BaseRegistry<Block> {
-
+	
 	protected BlocksRegistry(CreativeModeTab creativeTab) {
 		super(creativeTab);
 	}
@@ -29,7 +29,8 @@ public abstract class BlocksRegistry extends BaseRegistry<Block> {
 		Properties item = makeItemSettings().stacksTo(maxCount);
 		if (placeOnWater) {
 			registerBlockItem(id, new WaterLilyBlockItem(block, item));
-		} else {
+		}
+		else {
 			registerBlockItem(id, new BlockItem(block, item));
 		}
 		if (block.defaultBlockState().getMaterial().isFlammable() && FlammableBlockRegistry.getDefaultInstance().get(block).getBurnChance() == 0) {
@@ -41,7 +42,7 @@ public abstract class BlocksRegistry extends BaseRegistry<Block> {
 	public Block registerBlockOnly(String name, Block block) {
 		return Registry.register(Registry.BLOCK, createModId(name), block);
 	}
-
+	
 	public Item registerBlockItem(ResourceLocation id, Item item) {
 		registerItem(id, item, BaseRegistry.getModBlocks(id.getNamespace()));
 		return item;

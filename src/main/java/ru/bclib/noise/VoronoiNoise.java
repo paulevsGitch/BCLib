@@ -1,9 +1,9 @@
 package ru.bclib.noise;
 
-import java.util.Random;
-
 import net.minecraft.core.BlockPos;
 import ru.bclib.util.MHelper;
+
+import java.util.Random;
 
 public class VoronoiNoise {
 	private static final Random RANDOM = new Random();
@@ -12,7 +12,7 @@ public class VoronoiNoise {
 	public VoronoiNoise() {
 		this(0);
 	}
-
+	
 	public VoronoiNoise(int seed) {
 		this.seed = seed;
 	}
@@ -22,7 +22,7 @@ public class VoronoiNoise {
 		h = (h ^ (h >> 13)) * 1274126177;
 		return h ^ (h >> 16);
 	}
-
+	
 	public double sample(double x, double y, double z) {
 		int ix = MHelper.floor(x);
 		int iy = MHelper.floor(y);

@@ -15,7 +15,7 @@ public class SDFHexPrism extends SDFPrimitive {
 		this.height = height;
 		return this;
 	}
-
+	
 	@Override
 	public float getDistance(float x, float y, float z) {
 		float px = Math.abs(x);

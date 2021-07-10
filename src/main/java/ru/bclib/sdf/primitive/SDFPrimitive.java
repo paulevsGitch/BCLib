@@ -1,11 +1,11 @@
 package ru.bclib.sdf.primitive;
 
-import java.util.function.Function;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import ru.bclib.sdf.SDF;
+
+import java.util.function.Function;
 
 public abstract class SDFPrimitive extends SDF {
 	protected Function<BlockPos, BlockState> placerFunction;

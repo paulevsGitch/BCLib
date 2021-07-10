@@ -30,17 +30,17 @@ public class SDFLine extends SDFPrimitive {
 		this.z2 = z;
 		return this;
 	}
-
+	
 	@Override
 	public float getDistance(float x, float y, float z) {
 		float pax = x - x1;
 		float pay = y - y1;
 		float paz = z - z1;
-
+		
 		float bax = x2 - x1;
 		float bay = y2 - y1;
 		float baz = z2 - z1;
-
+		
 		float dpb = MHelper.dot(pax, pay, paz, bax, bay, baz);
 		float dbb = MHelper.dot(bax, bay, baz, bax, bay, baz);
 		float h = Mth.clamp(dpb / dbb, 0F, 1F);

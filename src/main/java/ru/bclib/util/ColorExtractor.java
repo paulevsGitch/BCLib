@@ -9,7 +9,7 @@ public class ColorExtractor {
 	private List<Center> centers = new ArrayList<>();
 	private List<Integer> colors;
 	private Integer result;
-
+	
 	public ColorExtractor(List<Integer> colors) {
 		this.colors = colors;
 		Random rnd = new Random();
@@ -19,7 +19,7 @@ public class ColorExtractor {
 			this.centers.add(new Center(color));
 		}
 	}
-
+	
 	public int analize() {
 		boolean moved = true;
 		while (moved) {
@@ -41,10 +41,10 @@ public class ColorExtractor {
 			toClear.forEach(clear -> centers.remove(clear));
 		}
 		this.centers.sort(Center.COMPARATOR);
-
+		
 		return this.getResult();
 	}
-
+	
 	public int getResult() {
 		if (result == null) {
 			double weights = 0;
@@ -59,19 +59,20 @@ public class ColorExtractor {
 				red += center.r * weight;
 				green += center.g * weight;
 				blue += center.b * weight;
-			} ;
-
+			}
+			;
+			
 			int a = (int) Math.round(alpha / weights);
 			int r = (int) Math.round(red / weights);
 			int g = (int) Math.round(green / weights);
 			int b = (int) Math.round(blue / weights);
-
+			
 			this.result = a << 24 | r << 16 | g << 8 | b;
 		}
-
+		
 		return this.result;
 	}
-
+	
 	private void remap() {
 		this.centers.forEach(entry -> entry.colors.clear());
 		this.colors.forEach(color -> {
@@ -89,7 +90,7 @@ public class ColorExtractor {
 			this.centers.get(id).colors.add(color);
 		});
 	}
-
+	
 	private static class Center {
 		static final Comparator<Center> COMPARATOR = new Comparator<Center>() {
 			@Override
@@ -97,24 +98,24 @@ public class ColorExtractor {
 				return Integer.compare(c1.getColor(), c2.getColor());
 			}
 		};
-
+		
 		List<Integer> colors = new ArrayList<>();
 		double a, r, g, b;
-
+		
 		Center(int color) {
 			this.a = (color >> 24) & 255;
 			this.r = (color >> 16) & 255;
 			this.g = (color >> 8) & 255;
 			this.b = color & 255;
 		}
-
+		
 		private void update(double a, double r, double g, double b) {
 			this.a = a;
 			this.r = r;
 			this.g = g;
 			this.b = b;
 		}
-
+		
 		public int getColor() {
 			int a = (int) Math.round(this.a);
 			int r = (int) Math.round(this.r);
@@ -122,7 +123,7 @@ public class ColorExtractor {
 			int b = (int) Math.round(this.b);
 			return a << 24 | r << 16 | g << 8 | b;
 		}
-
+		
 		public boolean move() {
 			double or = r;
 			double og = g;
@@ -139,9 +140,9 @@ public class ColorExtractor {
 			r /= size;
 			g /= size;
 			b /= size;
-
+			
 			this.update(a, r, g, b);
-
+			
 			return Math.abs(r - or) > 0.1 || Math.abs(g - og) > 0.1 || Math.abs(b - ob) > 0.1;
 		}
 	}

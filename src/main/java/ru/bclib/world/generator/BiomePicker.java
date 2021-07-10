@@ -1,16 +1,15 @@
 package ru.bclib.world.generator;
 
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
-
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-
 import net.minecraft.resources.ResourceLocation;
 import ru.bclib.util.WeighTree;
 import ru.bclib.util.WeightedList;
 import ru.bclib.world.biomes.BCLBiome;
+
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
 
 public class BiomePicker {
 	private final Set<ResourceLocation> immutableIDs = Sets.newHashSet();
@@ -21,7 +20,7 @@ public class BiomePicker {
 	public void addBiome(BCLBiome biome) {
 		immutableIDs.add(biome.getID());
 		biomes.add(biome);
-		biomeCount ++;
+		biomeCount++;
 	}
 	
 	public void addBiomeMutable(BCLBiome biome) {

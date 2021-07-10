@@ -1,7 +1,5 @@
 package ru.bclib.items;
 
-import java.util.Optional;
-
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.block.model.BlockModel;
@@ -13,6 +11,8 @@ import ru.bclib.client.models.BasePatterns;
 import ru.bclib.client.models.ItemModelProvider;
 import ru.bclib.client.models.ModelsHelper;
 import ru.bclib.client.models.PatternsHelper;
+
+import java.util.Optional;
 
 public class BaseSpawnEggItem extends SpawnEggItem implements ItemModelProvider {
 	public BaseSpawnEggItem(EntityType<? extends Mob> type, int primaryColor, int secondaryColor, Properties settings) {

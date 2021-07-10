@@ -1,9 +1,6 @@
 package ru.bclib.blocks;
 
-import java.util.List;
-
 import com.google.common.collect.Lists;
-
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.tool.attribute.v1.FabricToolTags;
 import net.minecraft.core.BlockPos;
@@ -15,16 +12,11 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.storage.loot.LootContext;
 
+import java.util.List;
+
 public abstract class WallMushroomBlock extends BaseWallPlantBlock {
 	public WallMushroomBlock(int light) {
-		super(FabricBlockSettings.of(Material.PLANT)
-				.breakByTool(FabricToolTags.AXES)
-				.breakByHand(true)
-				.luminance(light)
-				.hardness(0.2F)
-				.sound(SoundType.GRASS)
-				.sound(SoundType.WOOD)
-				.noCollission());
+		super(FabricBlockSettings.of(Material.PLANT).breakByTool(FabricToolTags.AXES).breakByHand(true).luminance(light).hardness(0.2F).sound(SoundType.GRASS).sound(SoundType.WOOD).noCollission());
 	}
 	
 	@Override

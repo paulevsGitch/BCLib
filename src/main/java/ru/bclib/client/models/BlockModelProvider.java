@@ -1,19 +1,18 @@
 package ru.bclib.client.models;
 
-import static net.minecraft.client.resources.model.ModelBakery.MISSING_MODEL_LOCATION;
-
-import java.util.Map;
-import java.util.Optional;
-
-import org.jetbrains.annotations.Nullable;
-
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.Nullable;
 import ru.bclib.BCLib;
+
+import java.util.Map;
+import java.util.Optional;
+
+import static net.minecraft.client.resources.model.ModelBakery.MISSING_MODEL_LOCATION;
 
 public interface BlockModelProvider extends ItemModelProvider {
 	@Environment(EnvType.CLIENT)
@@ -21,14 +20,14 @@ public interface BlockModelProvider extends ItemModelProvider {
 		Optional<String> pattern = PatternsHelper.createBlockSimple(resourceLocation);
 		return ModelsHelper.fromPattern(pattern);
 	}
-
+	
 	@Environment(EnvType.CLIENT)
 	default UnbakedModel getModelVariant(ResourceLocation stateId, BlockState blockState, Map<ResourceLocation, UnbakedModel> modelCache) {
 		ResourceLocation modelId = new ResourceLocation(stateId.getNamespace(), "block/" + stateId.getPath());
 		registerBlockModel(stateId, modelId, blockState, modelCache);
 		return ModelsHelper.createBlockSimple(modelId);
 	}
-
+	
 	@Environment(EnvType.CLIENT)
 	default void registerBlockModel(ResourceLocation stateId, ResourceLocation modelId, BlockState blockState, Map<ResourceLocation, UnbakedModel> modelCache) {
 		if (!modelCache.containsKey(modelId)) {
@@ -36,7 +35,8 @@ public interface BlockModelProvider extends ItemModelProvider {
 			if (model != null) {
 				model.name = modelId.toString();
 				modelCache.put(modelId, model);
-			} else {
+			}
+			else {
 				BCLib.LOGGER.warning("Error loading model: {}", modelId);
 				modelCache.put(modelId, modelCache.get(MISSING_MODEL_LOCATION));
 			}

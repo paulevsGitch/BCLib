@@ -12,6 +12,7 @@ public class WeightedList<T> {
 	
 	/**
 	 * Adds value with specified weight to the list
+	 *
 	 * @param value
 	 * @param weight
 	 */
@@ -23,6 +24,7 @@ public class WeightedList<T> {
 	
 	/**
 	 * Get  random value.
+	 *
 	 * @param random - {@link Random}.
 	 * @return {@link T} value.
 	 */
@@ -41,6 +43,7 @@ public class WeightedList<T> {
 	
 	/**
 	 * Get value by index.
+	 *
 	 * @param index - {@code int} index.
 	 * @return {@link T} value.
 	 */
@@ -50,33 +53,37 @@ public class WeightedList<T> {
 	
 	/**
 	 * Get value weight. Weight is summed with all previous values weights.
+	 *
 	 * @param index - {@code int} index.
 	 * @return {@code float} weight.
 	 */
 	public float getWeight(int index) {
 		return weights.get(index);
 	}
-
+	
 	/**
 	 * Chech if the list is empty.
+	 *
 	 * @return {@code true} if list is empty and {@code false} if not.
 	 */
 	public boolean isEmpty() {
 		return maxWeight == 0;
 	}
-
+	
 	/**
 	 * Get the list size.
+	 *
 	 * @return {@code int} list size.
 	 */
 	public int size() {
 		return values.size();
 	}
-
+	
 	/**
 	 * Makes a sublist of this list with same weights. Used only in {@link WeighTree}
+	 *
 	 * @param start - {@code int} start index (inclusive).
-	 * @param end - {@code int} end index (exclusive).
+	 * @param end   - {@code int} end index (exclusive).
 	 * @return {@link WeightedList}.
 	 */
 	protected WeightedList<T> subList(int start, int end) {
@@ -87,26 +94,29 @@ public class WeightedList<T> {
 		}
 		return list;
 	}
-
+	
 	/**
 	 * Check if list contains certain value.
+	 *
 	 * @param value - {@link T} value.
 	 * @return {@code true} if value is in list and {@code false} if not.
 	 */
 	public boolean contains(T value) {
 		return values.contains(value);
 	}
-
+	
 	/**
 	 * Applies {@link Consumer} to all values in list.
+	 *
 	 * @param function - {@link Consumer}.
 	 */
 	public void forEach(Consumer<T> function) {
 		values.forEach(function);
 	}
-
+	
 	/**
 	 * Get the maximum weight of the tree.
+	 *
 	 * @return {@code float} maximum weight.
 	 */
 	public float getMaxWeight() {

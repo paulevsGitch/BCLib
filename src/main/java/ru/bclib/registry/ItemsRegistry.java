@@ -30,44 +30,48 @@ import ru.bclib.items.tool.BasePickaxeItem;
 import ru.bclib.util.TagHelper;
 
 public abstract class ItemsRegistry extends BaseRegistry<Item> {
-
+	
 	protected ItemsRegistry(CreativeModeTab creativeTab) {
 		super(creativeTab);
 	}
-
+	
 	public Item registerDisc(String name, int power, SoundEvent sound) {
 		return register(name, new BaseDiscItem(power, sound, makeItemSettings().stacksTo(1)));
 	}
-
+	
 	public Item registerItem(String name) {
 		return register(name, new ModelProviderItem(makeItemSettings()));
 	}
-
+	
 	@Override
 	public Item register(ResourceLocation itemId, Item item) {
 		registerItem(itemId, item, BaseRegistry.getModItems(itemId.getNamespace()));
 		return item;
 	}
-
+	
 	public TieredItem registerTool(String name, TieredItem item) {
 		ResourceLocation id = createModId(name);
 		registerItem(id, item, BaseRegistry.getModItems(id.getNamespace()));
-
+		
 		if (item instanceof ShovelItem) {
 			TagHelper.addTag((Tag.Named<Item>) FabricToolTags.SHOVELS, item);
-		} else if (item instanceof SwordItem) {
+		}
+		else if (item instanceof SwordItem) {
 			TagHelper.addTag((Tag.Named<Item>) FabricToolTags.SWORDS, item);
-		} else if (item instanceof BasePickaxeItem) {
+		}
+		else if (item instanceof BasePickaxeItem) {
 			TagHelper.addTag((Tag.Named<Item>) FabricToolTags.PICKAXES, item);
-		} else if (item instanceof BaseAxeItem) {
+		}
+		else if (item instanceof BaseAxeItem) {
 			TagHelper.addTag((Tag.Named<Item>) FabricToolTags.AXES, item);
-		} else if (item instanceof BaseHoeItem) {
+		}
+		else if (item instanceof BaseHoeItem) {
 			TagHelper.addTag((Tag.Named<Item>) FabricToolTags.HOES, item);
 		}
-
+		
 		return item;
 	}
-
+	
 	public Item registerEgg(String name, EntityType<? extends Mob> type, int background, int dots) {
 		SpawnEggItem item = new BaseSpawnEggItem(type, background, dots, makeItemSettings());
 		DefaultDispenseItemBehavior behavior = new DefaultDispenseItemBehavior() {
@@ -82,27 +86,27 @@ public abstract class ItemsRegistry extends BaseRegistry<Item> {
 		DispenserBlock.registerBehavior(item, behavior);
 		return register(name, item);
 	}
-
+	
 	public Item registerFood(String name, int hunger, float saturation, MobEffectInstance... effects) {
 		FoodProperties.Builder builder = new FoodProperties.Builder().nutrition(hunger).saturationMod(saturation);
-		for (MobEffectInstance effect: effects) {
+		for (MobEffectInstance effect : effects) {
 			builder.effect(effect, 1F);
 		}
 		return registerFood(name, builder.build());
 	}
-
+	
 	public Item registerFood(String name, FoodProperties foodComponent) {
 		return register(name, new ModelProviderItem(makeItemSettings().food(foodComponent)));
 	}
-
+	
 	public Item registerDrink(String name) {
 		return register(name, new BaseDrinkItem(makeItemSettings().stacksTo(1)));
 	}
-
+	
 	public Item registerDrink(String name, FoodProperties foodComponent) {
 		return register(name, new BaseDrinkItem(makeItemSettings().stacksTo(1).food(foodComponent)));
 	}
-
+	
 	public Item registerDrink(String name, int hunger, float saturation) {
 		FoodProperties.Builder builder = new FoodProperties.Builder().nutrition(hunger).saturationMod(saturation);
 		return registerDrink(name, builder.build());

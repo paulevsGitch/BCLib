@@ -17,22 +17,22 @@ public class BaseDrinkItem extends ModelProviderItem {
 	public BaseDrinkItem(Properties settings) {
 		super(settings);
 	}
-
+	
 	@Override
 	public int getUseDuration(ItemStack stack) {
 		return 32;
 	}
-
+	
 	@Override
 	public UseAnim getUseAnimation(ItemStack stack) {
 		return UseAnim.DRINK;
 	}
-
+	
 	@Override
 	public InteractionResultHolder<ItemStack> use(Level world, Player user, InteractionHand hand) {
 		return ItemUtils.startUsingInstantly(world, user, hand);
 	}
-
+	
 	@Override
 	public ItemStack finishUsingItem(ItemStack stack, Level level, LivingEntity user) {
 		if (this.isEdible()) {
@@ -45,15 +45,15 @@ public class BaseDrinkItem extends ModelProviderItem {
 			CriteriaTriggers.CONSUME_ITEM.trigger(serverPlayerEntity, stack);
 			serverPlayerEntity.awardStat(Stats.ITEM_USED.get(this));
 		}
-
+		
 		if (user instanceof Player && !((Player) user).getAbilities().instabuild) {
 			stack.shrink(1);
 		}
-
+		
 		if (!level.isClientSide) {
 			user.removeAllEffects();
 		}
-
+		
 		return stack.isEmpty() ? new ItemStack(Items.GLASS_BOTTLE) : stack;
 	}
 }

@@ -1,11 +1,11 @@
 package ru.bclib.sdf;
 
-import java.util.Map;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+
+import java.util.Map;
 
 public class PosInfo implements Comparable<PosInfo> {
 	private static final BlockState AIR = Blocks.AIR.defaultBlockState();
@@ -86,12 +86,12 @@ public class PosInfo implements Comparable<PosInfo> {
 		}
 		return pos.equals(((PosInfo) obj).pos);
 	}
-
+	
 	@Override
 	public int compareTo(PosInfo info) {
 		return this.pos.getY() - info.pos.getY();
 	}
-
+	
 	public BlockPos getPos() {
 		return pos;
 	}

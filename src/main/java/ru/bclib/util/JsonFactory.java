@@ -1,5 +1,11 @@
 package ru.bclib.util;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import ru.bclib.BCLib;
+
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -8,16 +14,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-
-import ru.bclib.BCLib;
-
 public class JsonFactory {
 	public final static Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-
+	
 	public static JsonObject getJsonObject(InputStream stream) {
 		try {
 			Reader reader = new InputStreamReader(stream);
@@ -32,7 +31,7 @@ public class JsonFactory {
 		}
 		return new JsonObject();
 	}
-
+	
 	public static JsonObject getJsonObject(File jsonFile) {
 		if (jsonFile.exists()) {
 			JsonElement json = loadJson(jsonFile);
@@ -43,7 +42,7 @@ public class JsonFactory {
 		}
 		return new JsonObject();
 	}
-
+	
 	public static JsonElement loadJson(File jsonFile) {
 		if (jsonFile.exists()) {
 			try (Reader reader = new FileReader(jsonFile)) {
@@ -55,11 +54,11 @@ public class JsonFactory {
 		}
 		return null;
 	}
-
+	
 	public static JsonElement loadJson(Reader reader) {
 		return GSON.fromJson(reader, JsonElement.class);
 	}
-
+	
 	public static void storeJson(File jsonFile, JsonElement jsonObject) {
 		try (FileWriter writer = new FileWriter(jsonFile)) {
 			String json = GSON.toJson(jsonObject);
@@ -70,22 +69,22 @@ public class JsonFactory {
 			BCLib.LOGGER.catching(ex);
 		}
 	}
-
+	
 	public static int getInt(JsonObject object, String member, int def) {
 		JsonElement elem = object.get(member);
 		return elem == null ? def : elem.getAsInt();
 	}
-
+	
 	public static float getFloat(JsonObject object, String member, float def) {
 		JsonElement elem = object.get(member);
 		return elem == null ? def : elem.getAsFloat();
 	}
-
+	
 	public static boolean getBoolean(JsonObject object, String member, boolean def) {
 		JsonElement elem = object.get(member);
 		return elem == null ? def : elem.getAsBoolean();
 	}
-
+	
 	public static String getString(JsonObject object, String member, String def) {
 		JsonElement elem = object.get(member);
 		return elem == null ? def : elem.getAsString();

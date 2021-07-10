@@ -23,10 +23,8 @@ public class BCLibClient implements ClientModInitializer {
 		Registry.BLOCK.forEach(block -> {
 			if (block instanceof IRenderTyped) {
 				BCLRenderLayer layer = ((IRenderTyped) block).getRenderLayer();
-				if (layer == BCLRenderLayer.CUTOUT)
-					BlockRenderLayerMap.INSTANCE.putBlock(block, cutout);
-				else if (layer == BCLRenderLayer.TRANSLUCENT)
-					BlockRenderLayerMap.INSTANCE.putBlock(block, translucent);
+				if (layer == BCLRenderLayer.CUTOUT) BlockRenderLayerMap.INSTANCE.putBlock(block, cutout);
+				else if (layer == BCLRenderLayer.TRANSLUCENT) BlockRenderLayerMap.INSTANCE.putBlock(block, translucent);
 			}
 		});
 	}

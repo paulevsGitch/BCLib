@@ -1,13 +1,5 @@
 package ru.bclib.blocks;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
-import org.jetbrains.annotations.Nullable;
-
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
@@ -21,6 +13,7 @@ import net.minecraft.world.level.block.TrapDoorBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Half;
 import net.minecraft.world.level.storage.loot.LootContext;
+import org.jetbrains.annotations.Nullable;
 import ru.bclib.client.models.BasePatterns;
 import ru.bclib.client.models.BlockModelProvider;
 import ru.bclib.client.models.ModelsHelper;
@@ -28,11 +21,17 @@ import ru.bclib.client.models.PatternsHelper;
 import ru.bclib.client.render.BCLRenderLayer;
 import ru.bclib.interfaces.IRenderTyped;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 public class BaseTrapdoorBlock extends TrapDoorBlock implements IRenderTyped, BlockModelProvider {
 	public BaseTrapdoorBlock(Block source) {
 		super(FabricBlockSettings.copyOf(source).strength(3.0F, 3.0F).noOcclusion());
 	}
-
+	
 	@Override
 	@SuppressWarnings("deprecation")
 	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
@@ -43,19 +42,20 @@ public class BaseTrapdoorBlock extends TrapDoorBlock implements IRenderTyped, Bl
 	public BCLRenderLayer getRenderLayer() {
 		return BCLRenderLayer.CUTOUT;
 	}
-
+	
 	@Override
 	@Environment(EnvType.CLIENT)
 	public BlockModel getItemModel(ResourceLocation resourceLocation) {
 		return getBlockModel(resourceLocation, defaultBlockState());
 	}
-
+	
 	@Override
 	@Environment(EnvType.CLIENT)
 	public @Nullable BlockModel getBlockModel(ResourceLocation resourceLocation, BlockState blockState) {
 		String name = resourceLocation.getPath();
 		Optional<String> pattern = PatternsHelper.createJson(BasePatterns.BLOCK_TRAPDOOR, new HashMap<String, String>() {
 			private static final long serialVersionUID = 1L;
+			
 			{
 				put("%modid%", resourceLocation.getNamespace());
 				put("%texture%", name);
@@ -64,7 +64,7 @@ public class BaseTrapdoorBlock extends TrapDoorBlock implements IRenderTyped, Bl
 		});
 		return ModelsHelper.fromPattern(pattern);
 	}
-
+	
 	@Override
 	@Environment(EnvType.CLIENT)
 	public UnbakedModel getModelVariant(ResourceLocation stateId, BlockState blockState, Map<ResourceLocation, UnbakedModel> modelCache) {
@@ -87,7 +87,8 @@ public class BaseTrapdoorBlock extends TrapDoorBlock implements IRenderTyped, Bl
 			case WEST:
 				y = (isTop && isOpen) ? 90 : 270;
 				break;
-			default: break;
+			default:
+				break;
 		}
 		BlockModelRotation rotation = BlockModelRotation.by(x, y);
 		return ModelsHelper.createMultiVariant(modelId, rotation.getRotation(), false);

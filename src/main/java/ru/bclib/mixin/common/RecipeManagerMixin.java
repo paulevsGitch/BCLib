@@ -1,20 +1,6 @@
 package ru.bclib.mixin.common;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
 import com.google.gson.JsonElement;
-
 import net.minecraft.Util;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -24,23 +10,35 @@ import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Overwrite;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import ru.bclib.recipes.BCLRecipeManager;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @Mixin(RecipeManager.class)
 public abstract class RecipeManagerMixin {
 	@Shadow
 	private Map<RecipeType<?>, Map<ResourceLocation, Recipe<?>>> recipes;
-
+	
 	@Inject(method = "apply", at = @At(value = "RETURN"))
 	private void be_apply(Map<ResourceLocation, JsonElement> map, ResourceManager resourceManager, ProfilerFiller profiler, CallbackInfo info) {
 		recipes = BCLRecipeManager.getMap(recipes);
 	}
-
+	
 	@Shadow
 	private <C extends Container, T extends Recipe<C>> Map<ResourceLocation, Recipe<C>> byType(RecipeType<T> type) {
 		return null;
 	}
-
+	
 	/**
 	 * @author paulevs
 	 * @reason Remove conflicts with vanilla tags
@@ -56,7 +54,7 @@ public abstract class RecipeManagerMixin {
 			boolean b2 = v2.getId().getNamespace().equals("minecraft");
 			return b1 ^ b2 ? (b1 ? 1 : -1) : 0;
 		});
-
+		
 		return list.stream().flatMap((recipe) -> {
 			return Util.toStream(type.tryMatch(recipe, world, inventory));
 		}).findFirst();

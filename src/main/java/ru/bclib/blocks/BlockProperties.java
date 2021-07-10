@@ -24,9 +24,7 @@ public class BlockProperties {
 	public static final IntegerProperty AGE = IntegerProperty.create("age", 0, 3);
 	
 	public enum TripleShape implements StringRepresentable {
-		TOP("top", 0),
-		MIDDLE("middle", 1),
-		BOTTOM("bottom", 2);
+		TOP("top", 0), MIDDLE("middle", 1), BOTTOM("bottom", 2);
 		
 		private final String name;
 		private final int index;
@@ -35,7 +33,7 @@ public class BlockProperties {
 			this.name = name;
 			this.index = index;
 		}
-
+		
 		@Override
 		public String getSerializedName() {
 			return name;
@@ -56,18 +54,14 @@ public class BlockProperties {
 	}
 	
 	public enum PentaShape implements StringRepresentable {
-		BOTTOM("bottom"),
-		PRE_BOTTOM("pre_bottom"),
-		MIDDLE("middle"),
-		PRE_TOP("pre_top"),
-		TOP("top");
+		BOTTOM("bottom"), PRE_BOTTOM("pre_bottom"), MIDDLE("middle"), PRE_TOP("pre_top"), TOP("top");
 		
 		private final String name;
 		
 		PentaShape(String name) {
 			this.name = name;
 		}
-
+		
 		@Override
 		public String getSerializedName() {
 			return name;

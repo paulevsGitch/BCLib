@@ -1,26 +1,25 @@
 package ru.bclib.mixin.client;
 
-import java.util.Random;
-
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EnchantmentTableBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import ru.bclib.api.TagAPI;
+
+import java.util.Random;
 
 @Mixin(EnchantmentTableBlock.class)
 public abstract class EnchantingTableBlockMixin extends Block {
 	public EnchantingTableBlockMixin(Properties settings) {
 		super(settings);
 	}
-
+	
 	@Inject(method = "animateTick", at = @At(value = "TAIL"))
 	private void be_onRandomDisplayTick(BlockState state, Level world, BlockPos pos, Random random, CallbackInfo info) {
 		for (int px = -2; px <= 2; ++px) {
@@ -41,6 +40,6 @@ public abstract class EnchantingTableBlockMixin extends Block {
 				}
 			}
 		}
-
+		
 	}
 }
