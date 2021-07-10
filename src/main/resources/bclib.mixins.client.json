@@ -7,7 +7,6 @@
 		"EnchantingTableBlockMixin",
 		"BackgroundRendererMixin",
 	  	"ModelBakeryMixin",
-		"FaceBakeryMixin",
 		"MinecraftMixin"
 	],
 	"injectors": {
