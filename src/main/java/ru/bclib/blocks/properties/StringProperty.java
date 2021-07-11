@@ -6,7 +6,6 @@ import net.minecraft.world.level.block.state.properties.Property;
 import java.util.*;
 
 public class StringProperty extends Property<String> {
-
 	private final Set<String> values;
 
 	public static StringProperty create(String name, String... values) {
@@ -16,6 +15,10 @@ public class StringProperty extends Property<String> {
 	protected StringProperty(String string, String... values) {
 		super(string, String.class);
 		this.values = Sets.newHashSet(values);
+	}
+	
+	public void addValue(String name) {
+		values.add(name);
 	}
 
 	@Override
