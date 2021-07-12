@@ -5,6 +5,7 @@ import net.minecraft.world.level.block.state.properties.Property;
 
 import java.util.*;
 
+@Deprecated
 public class StringProperty extends Property<String> {
 	private final Set<String> values;
 

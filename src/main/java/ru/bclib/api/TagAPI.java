@@ -29,6 +29,11 @@ public class TagAPI {
 	
 	public static final Tag.Named<Block> DRAGON_IMMUNE = getMCBlockTag("dragon_immune");
 	
+	public static final Tag.Named<Block> MINEABLE_AXE = getMCBlockTag("mineable/axe");
+	public static final Tag.Named<Block> MINEABLE_PICKAXE = getMCBlockTag("mineable/pickaxe");
+	public static final Tag.Named<Block> MINEABLE_SHOVEL = getMCBlockTag("mineable/shovel");
+	public static final Tag.Named<Block> MINEABLE_HOE = getMCBlockTag("mineable/hoe");
+	
 	// Item Tags
 	public static final Tag.Named<Item> ITEM_CHEST = makeCommonItemTag("chest");
 	public static final Tag.Named<Item> IRON_INGOTS = makeCommonItemTag("iron_ingots");
