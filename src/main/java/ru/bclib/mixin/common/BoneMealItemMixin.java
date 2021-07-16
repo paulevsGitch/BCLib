@@ -11,6 +11,7 @@ import net.minecraft.world.level.biome.Biome.BiomeCategory;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.Property;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -20,6 +21,8 @@ import ru.bclib.api.BonemealAPI;
 import ru.bclib.api.TagAPI;
 import ru.bclib.util.BlocksHelper;
 import ru.bclib.util.MHelper;
+
+import java.util.Collection;
 
 @Mixin(BoneMealItem.class)
 public class BoneMealItemMixin {
@@ -31,24 +34,23 @@ public class BoneMealItemMixin {
 		BlockPos blockPos = context.getClickedPos();
 		if (!world.isClientSide) {
 			BlockPos offseted = blockPos.relative(context.getClickedFace());
-			boolean endBiome = world.getBiome(offseted).getBiomeCategory() == BiomeCategory.THEEND;
-			
-			if (world.getBlockState(blockPos).is(TagAPI.END_GROUND)) {
+			if (BonemealAPI.isTerrain(world.getBlockState(blockPos).getBlock())) {
 				boolean consume = false;
-				if (world.getBlockState(blockPos).is(Blocks.END_STONE)) {
-					BlockState nylium = bclib_getNylium(world, blockPos);
-					if (nylium != null) {
-						BlocksHelper.setWithoutUpdate(world, blockPos, nylium);
+				if (BonemealAPI.isSpreadableTerrain(world.getBlockState(blockPos).getBlock())) {
+					BlockState terrain = bclib_getSpreadable(world, blockPos);
+					if (terrain != null) {
+						BlocksHelper.setWithoutUpdate(world, blockPos, terrain);
 						consume = true;
 					}
 				}
 				else {
-					if (!world.getFluidState(offseted).isEmpty() && endBiome) {
-						if (world.getBlockState(offseted).getBlock().equals(Blocks.WATER)) {
+					BlockState state = world.getBlockState(offseted);
+					if (!state.getFluidState().isEmpty()) {
+						if (state.is(Blocks.WATER)) {
 							consume = bclib_growWaterGrass(world, blockPos);
 						}
 					}
-					else {
+					else if (state.isAir()) {
 						consume = bclib_growLandGrass(world, blockPos);
 					}
 				}
@@ -58,12 +60,6 @@ public class BoneMealItemMixin {
 					}
 					world.levelEvent(2005, blockPos, 0);
 					info.setReturnValue(InteractionResult.SUCCESS);
-					info.cancel();
-				}
-			}
-			else if (!world.getFluidState(offseted).isEmpty() && endBiome) {
-				if (world.getBlockState(offseted).getBlock().equals(Blocks.WATER)) {
-					info.setReturnValue(InteractionResult.FAIL);
 					info.cancel();
 				}
 			}
@@ -134,15 +130,38 @@ public class BoneMealItemMixin {
 		return block == null ? null : block.defaultBlockState();
 	}
 	
-	private BlockState bclib_getNylium(Level world, BlockPos pos) {
+	private BlockState bclib_getSpreadable(Level world, BlockPos pos) {
 		Vec3i[] offsets = MHelper.getOffsets(world.getRandom());
+		BlockState center = world.getBlockState(pos);
 		for (Vec3i dir : offsets) {
 			BlockPos p = pos.offset(dir);
 			BlockState state = world.getBlockState(p);
-			if (BonemealAPI.isSpreadable(state.getBlock())) {
+			Block terrain = BonemealAPI.getSpreadable(state.getBlock());
+			if (center.is(terrain)) {
+				if (haveSameProperties(state, center)) {
+					for (Property property: center.getProperties()) {
+						state = state.setValue(property, center.getValue(property));
+					}
+				}
 				return state;
 			}
 		}
 		return null;
+	}
+	
+	private boolean haveSameProperties(BlockState state1, BlockState state2) {
+		Property<?>[] properties1 = state1.getProperties().toArray(new Property[0]);
+		Property<?>[] properties2 = state2.getProperties().toArray(new Property[0]);
+		if (properties1.length != properties2.length) {
+			return false;
+		}
+		for (int i = 0; i < properties1.length; i++) {
+			String name1 = properties1[i].getName();
+			String name2 = properties2[i].getName();
+			if (!name1.equals(name2)) {
+				return false;
+			}
+		}
+		return true;
 	}
 }

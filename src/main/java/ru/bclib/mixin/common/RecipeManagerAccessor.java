@@ -12,8 +12,8 @@ import java.util.Map;
 @Mixin(RecipeManager.class)
 public interface RecipeManagerAccessor {
 	@Accessor("recipes")
-	Map<RecipeType<?>, Map<ResourceLocation, Recipe<?>>> bcl_getRecipes();
+	Map<RecipeType<?>, Map<ResourceLocation, Recipe<?>>> bclib_getRecipes();
 	
 	@Accessor("recipes")
-	void bcl_setRecipes(Map<RecipeType<?>, Map<ResourceLocation, Recipe<?>>> recipes);
+	void bclib_setRecipes(Map<RecipeType<?>, Map<ResourceLocation, Recipe<?>>> recipes);
 }

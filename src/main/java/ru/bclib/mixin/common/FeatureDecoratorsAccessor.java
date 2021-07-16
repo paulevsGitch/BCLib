@@ -7,5 +7,5 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 @Mixin(targets = "net.minecraft.data.worldgen.Features$Decorators")
 public interface FeatureDecoratorsAccessor {
 	@Accessor("HEIGHTMAP_SQUARE")
-	ConfiguredDecorator<?> bcl_getHeightmapSquare();
+	ConfiguredDecorator<?> bclib_getHeightmapSquare();
 }

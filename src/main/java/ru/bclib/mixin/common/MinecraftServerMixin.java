@@ -35,20 +35,20 @@ public class MinecraftServerMixin {
 	protected WorldData worldData;
 	
 	@Inject(method = "reloadResources", at = @At(value = "RETURN"), cancellable = true)
-	private void bcl_reloadResources(Collection<String> collection, CallbackInfoReturnable<CompletableFuture<Void>> info) {
-		bcl_injectRecipes();
+	private void bclib_reloadResources(Collection<String> collection, CallbackInfoReturnable<CompletableFuture<Void>> info) {
+		bclib_injectRecipes();
 	}
 	
 	@Inject(method = "loadLevel", at = @At(value = "RETURN"), cancellable = true)
-	private void bcl_loadLevel(CallbackInfo info) {
-		bcl_injectRecipes();
+	private void bclib_loadLevel(CallbackInfo info) {
+		bclib_injectRecipes();
 		BiomeAPI.initRegistry(MinecraftServer.class.cast(this));
 	}
 	
-	private void bcl_injectRecipes() {
+	private void bclib_injectRecipes() {
 		if (FabricLoader.getInstance().isModLoaded("kubejs")) {
 			RecipeManagerAccessor accessor = (RecipeManagerAccessor) resources.getRecipeManager();
-			accessor.bcl_setRecipes(BCLRecipeManager.getMap(accessor.bcl_getRecipes()));
+			accessor.bclib_setRecipes(BCLRecipeManager.getMap(accessor.bclib_getRecipes()));
 		}
 	}
 }

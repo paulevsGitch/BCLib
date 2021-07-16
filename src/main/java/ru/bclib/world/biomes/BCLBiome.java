@@ -47,6 +47,7 @@ public class BCLBiome {
 		this.genChance = definition.getGenChance();
 		this.fogDensity = definition.getFodDensity();
 		this.customData = definition.getCustomData();
+		subbiomes.add(this, 1);
 	}
 	
 	public BCLBiome(ResourceLocation id, Biome biome, float fogDensity, float genChance) {
@@ -56,6 +57,7 @@ public class BCLBiome {
 		this.fogDensity = fogDensity;
 		this.readStructureList();
 		this.customData = Maps.newHashMap();
+		subbiomes.add(this, 1);
 	}
 	
 	public BCLBiome getEdge() {
@@ -85,8 +87,7 @@ public class BCLBiome {
 	}
 	
 	public BCLBiome getSubBiome(Random random) {
-		BCLBiome biome = subbiomes.get(random);
-		return biome == null ? this : biome;
+		return subbiomes.get(random);
 	}
 	
 	public BCLBiome getParentBiome() {

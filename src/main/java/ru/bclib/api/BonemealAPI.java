@@ -15,38 +15,51 @@ public class BonemealAPI {
 	private static final Map<ResourceLocation, Map<Block, WeightedList<Block>>> LAND_GRASS_BIOMES = Maps.newHashMap();
 	private static final Map<Block, WeightedList<Block>> WATER_GRASS_TYPES = Maps.newHashMap();
 	private static final Map<Block, WeightedList<Block>> LAND_GRASS_TYPES = Maps.newHashMap();
-	private static final Set<Block> SPREADABLE_BLOCKS = Sets.newHashSet();
+	private static final Map<Block, Block> SPREADABLE_BLOCKS = Maps.newHashMap();
+	private static final Set<Block> TERRAIN_TO_SPREAD = Sets.newHashSet();
+	private static final Set<Block> TERRAIN = Sets.newHashSet();
 	
-	public static void addSpreadableBlock(Block block) {
-		SPREADABLE_BLOCKS.add(block);
+	public static void addSpreadableBlock(Block spreadableBlock, Block surfaceForSpread) {
+		SPREADABLE_BLOCKS.put(spreadableBlock, surfaceForSpread);
+		TERRAIN_TO_SPREAD.add(surfaceForSpread);
+		TERRAIN.add(surfaceForSpread);
 	}
 	
-	public static boolean isSpreadable(Block block) {
-		return SPREADABLE_BLOCKS.contains(block);
+	public static boolean isTerrain(Block block) {
+		return TERRAIN.contains(block);
+	}
+	
+	public static boolean isSpreadableTerrain(Block block) {
+		return TERRAIN_TO_SPREAD.contains(block);
+	}
+	
+	public static Block getSpreadable(Block block) {
+		return SPREADABLE_BLOCKS.get(block);
 	}
 	
 	public static void addLandGrass(Block plant, Block... terrain) {
 		for (Block block : terrain) {
-			addLandGrass(block, plant, 1F);
+			addLandGrass(plant, block, 1F);
 		}
 	}
 	
 	public static void addLandGrass(ResourceLocation biome, Block plant, Block... terrain) {
 		for (Block block : terrain) {
-			addLandGrass(biome, block, plant, 1F);
+			addLandGrass(biome, plant, block, 1F);
 		}
 	}
 	
-	public static void addLandGrass(Block terrain, Block plant, float chance) {
+	public static void addLandGrass(Block plant, Block terrain, float chance) {
 		WeightedList<Block> list = LAND_GRASS_TYPES.get(terrain);
 		if (list == null) {
 			list = new WeightedList<Block>();
 			LAND_GRASS_TYPES.put(terrain, list);
 		}
+		TERRAIN.add(terrain);
 		list.add(plant, chance);
 	}
 	
-	public static void addLandGrass(ResourceLocation biome, Block terrain, Block plant, float chance) {
+	public static void addLandGrass(ResourceLocation biome, Block plant, Block terrain, float chance) {
 		Map<Block, WeightedList<Block>> map = LAND_GRASS_BIOMES.get(biome);
 		if (map == null) {
 			map = Maps.newHashMap();
@@ -57,31 +70,33 @@ public class BonemealAPI {
 			list = new WeightedList<Block>();
 			map.put(terrain, list);
 		}
+		TERRAIN.add(terrain);
 		list.add(plant, chance);
 	}
 	
 	public static void addWaterGrass(Block plant, Block... terrain) {
 		for (Block block : terrain) {
-			addWaterGrass(block, plant, 1F);
+			addWaterGrass(plant, block, 1F);
 		}
 	}
 	
 	public static void addWaterGrass(ResourceLocation biome, Block plant, Block... terrain) {
 		for (Block block : terrain) {
-			addWaterGrass(biome, block, plant, 1F);
+			addWaterGrass(biome, plant, block, 1F);
 		}
 	}
 	
-	public static void addWaterGrass(Block terrain, Block plant, float chance) {
+	public static void addWaterGrass(Block plant, Block terrain, float chance) {
 		WeightedList<Block> list = WATER_GRASS_TYPES.get(terrain);
 		if (list == null) {
 			list = new WeightedList<Block>();
 			WATER_GRASS_TYPES.put(terrain, list);
 		}
+		TERRAIN.add(terrain);
 		list.add(plant, chance);
 	}
 	
-	public static void addWaterGrass(ResourceLocation biome, Block terrain, Block plant, float chance) {
+	public static void addWaterGrass(ResourceLocation biome, Block plant, Block terrain, float chance) {
 		Map<Block, WeightedList<Block>> map = WATER_GRASS_BIOMES.get(biome);
 		if (map == null) {
 			map = Maps.newHashMap();
@@ -92,6 +107,7 @@ public class BonemealAPI {
 			list = new WeightedList<Block>();
 			map.put(terrain, list);
 		}
+		TERRAIN.add(terrain);
 		list.add(plant, chance);
 	}
 	
