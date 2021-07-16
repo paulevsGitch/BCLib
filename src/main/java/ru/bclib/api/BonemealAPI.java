@@ -127,16 +127,16 @@ public class BonemealAPI {
 	}
 	
 	public static Block getWaterGrass(ResourceLocation biomeID, Block terrain, Random random) {
-		Map<Block, WeightedList<Block>> map = LAND_GRASS_BIOMES.get(biomeID);
+		Map<Block, WeightedList<Block>> map = WATER_GRASS_BIOMES.get(biomeID);
 		WeightedList<Block> list = null;
 		if (map != null) {
 			list = map.get(terrain);
 			if (list == null) {
-				list = LAND_GRASS_TYPES.get(terrain);
+				list = WATER_GRASS_TYPES.get(terrain);
 			}
 		}
 		else {
-			list = LAND_GRASS_TYPES.get(terrain);
+			list = WATER_GRASS_TYPES.get(terrain);
 		}
 		return list == null ? null : list.get(random);
 	}

@@ -44,13 +44,13 @@ public class BoneMealItemMixin {
 					}
 				}
 				else {
-					BlockState state = world.getBlockState(offseted);
-					if (!state.getFluidState().isEmpty()) {
-						if (state.is(Blocks.WATER)) {
+					BlockState stateAbove = world.getBlockState(blockPos.above());
+					if (!stateAbove.getFluidState().isEmpty()) {
+						if (stateAbove.is(Blocks.WATER)) {
 							consume = bclib_growWaterGrass(world, blockPos);
 						}
 					}
-					else if (state.isAir()) {
+					else if (stateAbove.isAir()) {
 						consume = bclib_growLandGrass(world, blockPos);
 					}
 				}
@@ -126,7 +126,7 @@ public class BoneMealItemMixin {
 	private BlockState bclib_getWaterGrassState(Level world, BlockPos pos) {
 		BlockState state = world.getBlockState(pos);
 		Block block = state.getBlock();
-		block = BonemealAPI.getLandGrass(BiomeAPI.getBiomeID(world.getBiome(pos)), block, world.getRandom());
+		block = BonemealAPI.getWaterGrass(BiomeAPI.getBiomeID(world.getBiome(pos)), block, world.getRandom());
 		return block == null ? null : block.defaultBlockState();
 	}
 	
