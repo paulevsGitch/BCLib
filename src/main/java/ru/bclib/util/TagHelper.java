@@ -25,12 +25,8 @@ public class TagHelper {
 	 * Adds one Tag to multiple Blocks.
 	 *
 	 * Example:
-	 * <pre>
-	 * {@code
-	 * Tag.Named<Block> DIMENSION_STONE = makeBlockTag("mymod", "dim_stone");
-	 * TagHelper.addTag(DIMENSION_STONE, Blocks.END_STONE, Blocks.NETHERRACK);
-	 * }
-	 * </pre>
+	 * <pre>{@code  Tag.Named<Block> DIMENSION_STONE = makeBlockTag("mymod", "dim_stone");
+	 * TagHelper.addTag(DIMENSION_STONE, Blocks.END_STONE, Blocks.NETHERRACK);}</pre>
 	 *
 	 * The call will reserve the Tag. The Tag is added to the blocks once
 	 * {@link #apply(String, Map)} was executed.
@@ -53,12 +49,8 @@ public class TagHelper {
 	 * Adds one Tag to multiple Items.
 	 *
 	 * Example:
-	 * <pre>
-	 * {@code
-	 * Tag.Named<Item> METALS = makeBlockTag("mymod", "metals");
-	 * TagHelper.addTag(METALS, Items.IRON_INGOT, Items.GOLD_INGOT, Items.COPPER_INGOT);
-	 * }
-	 * </pre>
+	 * <pre>{@code  Tag.Named<Item> METALS = makeBlockTag("mymod", "metals");
+	 * TagHelper.addTag(METALS, Items.IRON_INGOT, Items.GOLD_INGOT, Items.COPPER_INGOT);}</pre>
 	 *
 	 * The call will reserve the Tag. The Tag is added to the items once
 	 * {@link #apply(String, Map)} was executed.
