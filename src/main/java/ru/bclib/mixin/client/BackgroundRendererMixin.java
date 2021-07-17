@@ -25,9 +25,9 @@ import ru.bclib.world.biomes.BCLBiome;
 
 @Mixin(FogRenderer.class)
 public class BackgroundRendererMixin {
-	private static final MutableBlockPos BCL_LAST_POS = new MutableBlockPos(0, -100, 0);
-	private static final MutableBlockPos BCL_MUT_POS = new MutableBlockPos();
-	private static final float[] BCL_FOG_DENSITY = new float[8];
+	private static final MutableBlockPos BCLIB_LAST_POS = new MutableBlockPos(0, -100, 0);
+	private static final MutableBlockPos BCLIB_MUT_POS = new MutableBlockPos();
+	private static final float[] BCLIB_FOG_DENSITY = new float[8];
 	
 	@Shadow
 	private static float fogRed;
@@ -37,7 +37,7 @@ public class BackgroundRendererMixin {
 	private static float fogBlue;
 	
 	@Inject(method = "setupColor", at = @At("RETURN"))
-	private static void bcl_onRender(Camera camera, float tickDelta, ClientLevel world, int i, float f, CallbackInfo info) {
+	private static void bclib_onRender(Camera camera, float tickDelta, ClientLevel world, int i, float f, CallbackInfo info) {
 		FogType fogType = camera.getFluidInCamera();
 		if (fogType != FogType.WATER && world.dimension().equals(Level.END)) {
 			Entity entity = camera.getEntity();
@@ -59,14 +59,14 @@ public class BackgroundRendererMixin {
 	}
 	
 	@Inject(method = "setupFog", at = @At("HEAD"), cancellable = true)
-	private static void bcl_fogDensity(Camera camera, FogRenderer.FogMode fogMode, float viewDistance, boolean thickFog, CallbackInfo info) {
+	private static void bclib_fogDensity(Camera camera, FogRenderer.FogMode fogMode, float viewDistance, boolean thickFog, CallbackInfo info) {
 		Entity entity = camera.getEntity();
 		FogType fogType = camera.getFluidInCamera();
 		if (fogType != FogType.WATER) {
-			if (bcl_shouldIgnore(entity.level, (int) entity.getX(), (int) entity.getEyeY(), (int) entity.getZ())) {
+			if (bclib_shouldIgnore(entity.level, (int) entity.getX(), (int) entity.getEyeY(), (int) entity.getZ())) {
 				return;
 			}
-			float fog = bcl_getFogDensity(entity.level, entity.getX(), entity.getEyeY(), entity.getZ());
+			float fog = bclib_getFogDensity(entity.level, entity.getX(), entity.getEyeY(), entity.getZ());
 			BackgroundInfo.fogDensity = fog;
 			float start = viewDistance * 0.75F / fog;
 			float end = viewDistance / fog;
@@ -99,18 +99,18 @@ public class BackgroundRendererMixin {
 		}
 	}
 	
-	private static boolean bcl_shouldIgnore(Level level, int x, int y, int z) {
-		Biome biome = level.getBiome(BCL_MUT_POS.set(x, y, z));
+	private static boolean bclib_shouldIgnore(Level level, int x, int y, int z) {
+		Biome biome = level.getBiome(BCLIB_MUT_POS.set(x, y, z));
 		return BiomeAPI.getRenderBiome(biome) == BiomeAPI.EMPTY_BIOME;
 	}
 	
-	private static float bcl_getFogDensityI(Level level, int x, int y, int z) {
-		Biome biome = level.getBiome(BCL_MUT_POS.set(x, y, z));
+	private static float bclib_getFogDensityI(Level level, int x, int y, int z) {
+		Biome biome = level.getBiome(BCLIB_MUT_POS.set(x, y, z));
 		BCLBiome renderBiome = BiomeAPI.getRenderBiome(biome);
 		return renderBiome.getFogDensity();
 	}
 	
-	private static float bcl_getFogDensity(Level level, double x, double y, double z) {
+	private static float bclib_getFogDensity(Level level, double x, double y, double z) {
 		int x1 = (MHelper.floor(x) >> 3) << 3;
 		int y1 = (MHelper.floor(y) >> 3) << 3;
 		int z1 = (MHelper.floor(z) >> 3) << 3;
@@ -118,25 +118,25 @@ public class BackgroundRendererMixin {
 		float dy = (float) (y - y1) / 8F;
 		float dz = (float) (z - z1) / 8F;
 		
-		if (BCL_LAST_POS.getX() != x1 || BCL_LAST_POS.getY() != y1 || BCL_LAST_POS.getZ() != z1) {
+		if (BCLIB_LAST_POS.getX() != x1 || BCLIB_LAST_POS.getY() != y1 || BCLIB_LAST_POS.getZ() != z1) {
 			int x2 = x1 + 8;
 			int y2 = y1 + 8;
 			int z2 = z1 + 8;
-			BCL_LAST_POS.set(x1, y1, z1);
-			BCL_FOG_DENSITY[0] = bcl_getFogDensityI(level, x1, y1, z1);
-			BCL_FOG_DENSITY[1] = bcl_getFogDensityI(level, x2, y1, z1);
-			BCL_FOG_DENSITY[2] = bcl_getFogDensityI(level, x1, y2, z1);
-			BCL_FOG_DENSITY[3] = bcl_getFogDensityI(level, x2, y2, z1);
-			BCL_FOG_DENSITY[4] = bcl_getFogDensityI(level, x1, y1, z2);
-			BCL_FOG_DENSITY[5] = bcl_getFogDensityI(level, x2, y1, z2);
-			BCL_FOG_DENSITY[6] = bcl_getFogDensityI(level, x1, y2, z2);
-			BCL_FOG_DENSITY[7] = bcl_getFogDensityI(level, x2, y2, z2);
+			BCLIB_LAST_POS.set(x1, y1, z1);
+			BCLIB_FOG_DENSITY[0] = bclib_getFogDensityI(level, x1, y1, z1);
+			BCLIB_FOG_DENSITY[1] = bclib_getFogDensityI(level, x2, y1, z1);
+			BCLIB_FOG_DENSITY[2] = bclib_getFogDensityI(level, x1, y2, z1);
+			BCLIB_FOG_DENSITY[3] = bclib_getFogDensityI(level, x2, y2, z1);
+			BCLIB_FOG_DENSITY[4] = bclib_getFogDensityI(level, x1, y1, z2);
+			BCLIB_FOG_DENSITY[5] = bclib_getFogDensityI(level, x2, y1, z2);
+			BCLIB_FOG_DENSITY[6] = bclib_getFogDensityI(level, x1, y2, z2);
+			BCLIB_FOG_DENSITY[7] = bclib_getFogDensityI(level, x2, y2, z2);
 		}
 		
-		float a = Mth.lerp(dx, BCL_FOG_DENSITY[0], BCL_FOG_DENSITY[1]);
-		float b = Mth.lerp(dx, BCL_FOG_DENSITY[2], BCL_FOG_DENSITY[3]);
-		float c = Mth.lerp(dx, BCL_FOG_DENSITY[4], BCL_FOG_DENSITY[5]);
-		float d = Mth.lerp(dx, BCL_FOG_DENSITY[6], BCL_FOG_DENSITY[7]);
+		float a = Mth.lerp(dx, BCLIB_FOG_DENSITY[0], BCLIB_FOG_DENSITY[1]);
+		float b = Mth.lerp(dx, BCLIB_FOG_DENSITY[2], BCLIB_FOG_DENSITY[3]);
+		float c = Mth.lerp(dx, BCLIB_FOG_DENSITY[4], BCLIB_FOG_DENSITY[5]);
+		float d = Mth.lerp(dx, BCLIB_FOG_DENSITY[6], BCLIB_FOG_DENSITY[7]);
 		
 		a = Mth.lerp(dy, a, b);
 		b = Mth.lerp(dy, c, d);

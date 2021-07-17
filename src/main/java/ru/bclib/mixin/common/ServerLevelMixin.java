@@ -27,21 +27,21 @@ import java.util.function.Supplier;
 
 @Mixin(ServerLevel.class)
 public abstract class ServerLevelMixin extends Level {
-	private static String bcl_lastWorld = null;
+	private static String bclib_lastWorld = null;
 	
 	protected ServerLevelMixin(WritableLevelData writableLevelData, ResourceKey<Level> resourceKey, DimensionType dimensionType, Supplier<ProfilerFiller> supplier, boolean bl, boolean bl2, long l) {
 		super(writableLevelData, resourceKey, dimensionType, supplier, bl, bl2, l);
 	}
 	
 	@Inject(method = "<init>*", at = @At("TAIL"))
-	private void bcl_onServerWorldInit(MinecraftServer server, Executor workerExecutor, LevelStorageSource.LevelStorageAccess session, ServerLevelData properties, ResourceKey<Level> registryKey, DimensionType dimensionType, ChunkProgressListener worldGenerationProgressListener, ChunkGenerator chunkGenerator, boolean debugWorld, long l, List<CustomSpawner> list, boolean bl, CallbackInfo info) {
+	private void bclib_onServerWorldInit(MinecraftServer server, Executor workerExecutor, LevelStorageSource.LevelStorageAccess session, ServerLevelData properties, ResourceKey<Level> registryKey, DimensionType dimensionType, ChunkProgressListener worldGenerationProgressListener, ChunkGenerator chunkGenerator, boolean debugWorld, long l, List<CustomSpawner> list, boolean bl, CallbackInfo info) {
 		BiomeAPI.initRegistry(server);
 		
-		if (bcl_lastWorld != null && bcl_lastWorld.equals(session.getLevelId())) {
+		if (bclib_lastWorld != null && bclib_lastWorld.equals(session.getLevelId())) {
 			return;
 		}
 		
-		bcl_lastWorld = session.getLevelId();
+		bclib_lastWorld = session.getLevelId();
 		
 		ServerLevel world = ServerLevel.class.cast(this);
 		File dir = session.getDimensionPath(world.dimension());
