@@ -89,6 +89,7 @@ tasks.withType(JavaCompile) {
 
 javadoc {
 	options.tags = [ "reason" ]
+    options.stylesheetFile = new File(projectDir, "javadoc.css");
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
