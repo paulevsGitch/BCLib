@@ -31,6 +31,9 @@ vec3 hsvToRGB(vec3 color) {
 
 void main() {
 	vec4 tex = texture(Sampler0, texCoord0);
+	if (tex.a < 0.1) {
+        discard;
+    }
 	vec4 color = tex * ColorModulator;
 	vec4 vertex = vertexColor;
 	if (tex.a < 0.99) {
@@ -39,6 +42,5 @@ void main() {
 		vertex.rgb = hsvToRGB(hsv);
 	}
 	color = linear_fog(color * vertex, vertexDistance, FogStart, FogEnd, FogColor);
-	color.a = 1.0;
 	fragColor = color;
 }
