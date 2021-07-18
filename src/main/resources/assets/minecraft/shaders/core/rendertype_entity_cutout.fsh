@@ -9,6 +9,8 @@ uniform float FogEnd;
 uniform vec4 FogColor;
 
 in float vertexDistance;
+in vec4 lightMapColor;
+in vec4 overlayColor;
 in vec4 vertexColor;
 in vec2 texCoord0;
 
@@ -35,7 +37,8 @@ void main() {
         discard;
     }
 	vec4 color = tex * ColorModulator;
-	vec4 vertex = vertexColor;
+	color.rgb = mix(overlayColor.rgb, color.rgb, overlayColor.a);
+	vec4 vertex = vertexColor * lightMapColor;
 	if (tex.a < 0.99) {
 		vec3 hsv = rgbToHSV(vertex.rgb);
 		hsv.z = 1.0;
