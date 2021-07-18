@@ -62,7 +62,7 @@ public class TextureAtlasMixin {
 								int g = (argb >> 8) & 255;
 								int b = argb & 255;
 								if (r > 0 || g > 0 || b > 0) {
-									argb = (argb & 0x00FFFFFF) | (200 << 24);
+									argb = (argb & 0x00FFFFFF) | (250 << 24);
 									sprite.setPixelRGBA(x, y, argb);
 								}
 							}
