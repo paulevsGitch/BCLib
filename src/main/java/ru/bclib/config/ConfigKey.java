@@ -1,5 +1,7 @@
 package ru.bclib.config;
 
+import java.util.Arrays;
+
 import net.minecraft.resources.ResourceLocation;
 
 public class ConfigKey {
@@ -34,7 +36,7 @@ public class ConfigKey {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + path.hashCode();
+		result = prime * result + Arrays.hashCode(path);
 		result = prime * result + entry.hashCode();
 		return result;
 	}
