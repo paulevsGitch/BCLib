@@ -6,10 +6,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Item.Properties;
-import net.minecraft.world.item.WaterLilyBlockItem;
 import net.minecraft.world.level.block.Block;
-import ru.bclib.interfaces.ISpetialItem;
+import ru.bclib.interfaces.CustomItemProvider;
 
 public abstract class BlocksRegistry extends BaseRegistry<Block> {
 	
@@ -19,21 +17,17 @@ public abstract class BlocksRegistry extends BaseRegistry<Block> {
 	
 	@Override
 	public Block register(ResourceLocation id, Block block) {
-		int maxCount = 64;
-		boolean placeOnWater = false;
-		if (block instanceof ISpetialItem) {
-			ISpetialItem item = (ISpetialItem) block;
-			maxCount = item.getStackSize();
-			placeOnWater = item.canPlaceOnWater();
-		}
-		Properties item = makeItemSettings().stacksTo(maxCount);
-		if (placeOnWater) {
-			registerBlockItem(id, new WaterLilyBlockItem(block, item));
+		BlockItem item = null;
+		if (block instanceof CustomItemProvider) {
+			item = ((CustomItemProvider) block).getCustomItem(id, makeItemSettings());
 		}
 		else {
-			registerBlockItem(id, new BlockItem(block, item));
+			item = new BlockItem(block, makeItemSettings());
 		}
-		if (block.defaultBlockState().getMaterial().isFlammable() && FlammableBlockRegistry.getDefaultInstance().get(block).getBurnChance() == 0) {
+		registerBlockItem(id, item);
+		if (block.defaultBlockState().getMaterial().isFlammable() && FlammableBlockRegistry.getDefaultInstance()
+																						   .get(block)
+																						   .getBurnChance() == 0) {
 			FlammableBlockRegistry.getDefaultInstance().add(block, 5, 5);
 		}
 		return Registry.register(Registry.BLOCK, id, block);

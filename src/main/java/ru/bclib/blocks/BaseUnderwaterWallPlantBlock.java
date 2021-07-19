@@ -17,11 +17,20 @@ import net.minecraft.world.level.material.Material;
 public abstract class BaseUnderwaterWallPlantBlock extends BaseWallPlantBlock implements LiquidBlockContainer {
 	
 	public BaseUnderwaterWallPlantBlock() {
-		super(FabricBlockSettings.of(Material.WATER_PLANT).breakByTool(FabricToolTags.SHEARS).breakByHand(true).sound(SoundType.WET_GRASS).noCollission());
+		super(FabricBlockSettings.of(Material.WATER_PLANT)
+								 .breakByTool(FabricToolTags.SHEARS)
+								 .breakByHand(true)
+								 .sound(SoundType.WET_GRASS)
+								 .noCollission());
 	}
 	
 	public BaseUnderwaterWallPlantBlock(int light) {
-		super(FabricBlockSettings.of(Material.WATER_PLANT).breakByTool(FabricToolTags.SHEARS).breakByHand(true).luminance(light).sound(SoundType.WET_GRASS).noCollission());
+		super(FabricBlockSettings.of(Material.WATER_PLANT)
+								 .breakByTool(FabricToolTags.SHEARS)
+								 .breakByHand(true)
+								 .luminance(light)
+								 .sound(SoundType.WET_GRASS)
+								 .noCollission());
 	}
 	
 	public BaseUnderwaterWallPlantBlock(Properties settings) {

@@ -153,7 +153,17 @@ public class TripleTerrainBlock extends BaseTerrainBlock {
 			return new MultiVariant(variants);
 		}
 		else if (blockState.getValue(SHAPE) == TripleShape.TOP) {
-			return new MultiVariant(Lists.newArrayList(new Variant(modelId, BlockModelRotation.X180_Y0.getRotation(), false, 1), new Variant(modelId, BlockModelRotation.X180_Y90.getRotation(), false, 1), new Variant(modelId, BlockModelRotation.X180_Y180.getRotation(), false, 1), new Variant(modelId, BlockModelRotation.X180_Y270.getRotation(), false, 1)));
+			return new MultiVariant(Lists.newArrayList(
+				new Variant(
+					modelId,
+					BlockModelRotation.X180_Y0.getRotation(),
+					false,
+					1
+				),
+				new Variant(modelId, BlockModelRotation.X180_Y90.getRotation(), false, 1),
+				new Variant(modelId, BlockModelRotation.X180_Y180.getRotation(), false, 1),
+				new Variant(modelId, BlockModelRotation.X180_Y270.getRotation(), false, 1)
+			));
 		}
 		return ModelsHelper.createRandomTopModel(modelId);
 	}

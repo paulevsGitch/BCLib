@@ -4,10 +4,12 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.AnvilBlock;
@@ -20,16 +22,17 @@ import net.minecraft.world.level.material.MaterialColor;
 import net.minecraft.world.level.storage.loot.LootContext;
 import org.jetbrains.annotations.Nullable;
 import ru.bclib.client.models.BasePatterns;
-import ru.bclib.client.models.BlockModelProvider;
 import ru.bclib.client.models.ModelsHelper;
 import ru.bclib.client.models.PatternsHelper;
+import ru.bclib.interfaces.BlockModelProvider;
+import ru.bclib.interfaces.CustomItemProvider;
 import ru.bclib.items.BaseAnvilItem;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public abstract class BaseAnvilBlock extends AnvilBlock implements BlockModelProvider {
+public abstract class BaseAnvilBlock extends AnvilBlock implements BlockModelProvider, CustomItemProvider {
 	public static final IntegerProperty DESTRUCTION = BlockProperties.DESTRUCTION;
 	
 	public BaseAnvilBlock(MaterialColor color) {
@@ -60,9 +63,6 @@ public abstract class BaseAnvilBlock extends AnvilBlock implements BlockModelPro
 	}
 	
 	@Override
-	public abstract Item asItem();
-	
-	@Override
 	@Environment(EnvType.CLIENT)
 	public BlockModel getItemModel(ResourceLocation blockId) {
 		return getBlockModel(blockId, defaultBlockState());
@@ -90,5 +90,10 @@ public abstract class BaseAnvilBlock extends AnvilBlock implements BlockModelPro
 		ResourceLocation modelLocation = new ResourceLocation(modId, modelId);
 		registerBlockModel(stateId, modelLocation, blockState, modelCache);
 		return ModelsHelper.createFacingModel(modelLocation, blockState.getValue(FACING), false, false);
+	}
+	
+	@Override
+	public BlockItem getCustomItem(ResourceLocation blockID, FabricItemSettings settings) {
+		return new BaseAnvilItem(this, settings);
 	}
 }

@@ -19,7 +19,12 @@ public abstract class BasePlantWithAgeBlock extends BasePlantBlock {
 	public static final IntegerProperty AGE = BlockProperties.AGE;
 	
 	public BasePlantWithAgeBlock() {
-		this(FabricBlockSettings.of(Material.PLANT).breakByTool(FabricToolTags.SHEARS).breakByHand(true).sound(SoundType.GRASS).randomTicks().noCollission());
+		this(FabricBlockSettings.of(Material.PLANT)
+								.breakByTool(FabricToolTags.SHEARS)
+								.breakByHand(true)
+								.sound(SoundType.GRASS)
+								.randomTicks()
+								.noCollission());
 	}
 	
 	public BasePlantWithAgeBlock(Properties settings) {

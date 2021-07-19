@@ -1,5 +1,5 @@
 package ru.bclib.interfaces;
 
-public interface IPostInit {
+public interface PostInitable {
 	void postInit();
 }

@@ -15,8 +15,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ShovelItem;
 import net.minecraft.world.item.Tier;
 import net.minecraft.world.level.block.state.BlockState;
-import ru.bclib.client.models.ItemModelProvider;
 import ru.bclib.client.models.ModelsHelper;
+import ru.bclib.interfaces.ItemModelProvider;
 
 public class BaseShovelItem extends ShovelItem implements DynamicAttributeTool, ItemModelProvider {
 	public BaseShovelItem(Tier material, float attackDamage, float attackSpeed, Properties settings) {
@@ -34,7 +34,10 @@ public class BaseShovelItem extends ShovelItem implements DynamicAttributeTool, 
 	@Override
 	public float getDestroySpeed(ItemStack stack, BlockState state) {
 		Entry entry = ToolManagerImpl.entryNullable(state.getBlock());
-		return (entry != null && entry.getMiningLevel(FabricToolTags.SHOVELS) >= 0) ? speed : super.getDestroySpeed(stack, state);
+		return (entry != null && entry.getMiningLevel(FabricToolTags.SHOVELS) >= 0) ? speed : super.getDestroySpeed(
+			stack,
+			state
+		);
 	}
 	
 	@Override

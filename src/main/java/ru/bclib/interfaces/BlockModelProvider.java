@@ -1,4 +1,4 @@
-package ru.bclib.client.models;
+package ru.bclib.interfaces;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -8,6 +8,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 import ru.bclib.BCLib;
+import ru.bclib.client.models.ModelsHelper;
+import ru.bclib.client.models.PatternsHelper;
 
 import java.util.Map;
 import java.util.Optional;

@@ -7,8 +7,8 @@ import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.SwordItem;
 import net.minecraft.world.item.Tier;
-import ru.bclib.client.models.ItemModelProvider;
 import ru.bclib.client.models.ModelsHelper;
+import ru.bclib.interfaces.ItemModelProvider;
 
 public class BaseSwordItem extends SwordItem implements DynamicAttributeTool, ItemModelProvider {
 	public BaseSwordItem(Tier material, int attackDamage, float attackSpeed, Properties settings) {

@@ -13,8 +13,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Tier;
 import net.minecraft.world.level.block.state.BlockState;
-import ru.bclib.client.models.ItemModelProvider;
 import ru.bclib.client.models.ModelsHelper;
+import ru.bclib.interfaces.ItemModelProvider;
 
 public class BaseAxeItem extends AxeItem implements DynamicAttributeTool, ItemModelProvider {
 	public BaseAxeItem(Tier material, float attackDamage, float attackSpeed, Properties settings) {

@@ -20,8 +20,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import ru.bclib.BCLib;
-import ru.bclib.client.models.BlockModelProvider;
-import ru.bclib.client.models.ItemModelProvider;
+import ru.bclib.interfaces.BlockModelProvider;
+import ru.bclib.interfaces.ItemModelProvider;
 
 import java.util.List;
 import java.util.Map;
@@ -81,13 +81,26 @@ public abstract class ModelBakeryMixin {
 					Block block = Registry.BLOCK.get(clearLoc);
 					if (block instanceof BlockModelProvider) {
 						List<BlockState> possibleStates = block.getStateDefinition().getPossibleStates();
-						Optional<BlockState> possibleState = possibleStates.stream().filter(state -> modelId.equals(BlockModelShaper.stateToModelLocation(clearLoc, state))).findFirst();
+						Optional<BlockState> possibleState = possibleStates.stream()
+																		   .filter(state -> modelId.equals(
+																			   BlockModelShaper.stateToModelLocation(
+																				   clearLoc,
+																				   state
+																			   )))
+																		   .findFirst();
 						if (possibleState.isPresent()) {
-							UnbakedModel modelVariant = ((BlockModelProvider) block).getModelVariant(modelId, possibleState.get(), unbakedCache);
+							UnbakedModel modelVariant = ((BlockModelProvider) block).getModelVariant(
+								modelId,
+								possibleState.get(),
+								unbakedCache
+							);
 							if (modelVariant != null) {
 								if (modelVariant instanceof MultiPart) {
 									possibleStates.forEach(state -> {
-										ResourceLocation stateId = BlockModelShaper.stateToModelLocation(clearLoc, state);
+										ResourceLocation stateId = BlockModelShaper.stateToModelLocation(
+											clearLoc,
+											state
+										);
 										cacheAndQueueDependencies(stateId, modelVariant);
 									});
 								}

@@ -38,7 +38,12 @@ public class BaseCropBlock extends BasePlantBlock {
 	private final Item drop;
 	
 	public BaseCropBlock(Item drop, Block... terrain) {
-		super(FabricBlockSettings.of(Material.PLANT).breakByTool(FabricToolTags.HOES).breakByHand(true).sound(SoundType.GRASS).randomTicks().noCollission());
+		super(FabricBlockSettings.of(Material.PLANT)
+								 .breakByTool(FabricToolTags.HOES)
+								 .breakByHand(true)
+								 .sound(SoundType.GRASS)
+								 .randomTicks()
+								 .noCollission());
 		this.drop = drop;
 		this.terrain = terrain;
 		this.registerDefaultState(defaultBlockState().setValue(AGE, 0));

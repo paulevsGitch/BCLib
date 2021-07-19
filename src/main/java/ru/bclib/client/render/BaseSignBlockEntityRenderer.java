@@ -87,10 +87,14 @@ public class BaseSignBlockEntityRenderer implements BlockEntityRenderer<BaseSign
 		int p = (int) (NativeImage.getB(m) * 0.4D);
 		int q = NativeImage.combine(0, p, o, n);
 		
-		FormattedCharSequence[] formattedCharSequences = signBlockEntity.getRenderMessages(Minecraft.getInstance().isTextFilteringEnabled(), (component) -> {
-			List<FormattedCharSequence> list = this.font.split(component, 90);
-			return list.isEmpty() ? FormattedCharSequence.EMPTY : (FormattedCharSequence) list.get(0);
-		});
+		FormattedCharSequence[] formattedCharSequences = signBlockEntity.getRenderMessages(
+			Minecraft.getInstance()
+					 .isTextFilteringEnabled(),
+			(component) -> {
+				List<FormattedCharSequence> list = this.font.split(component, 90);
+				return list.isEmpty() ? FormattedCharSequence.EMPTY : (FormattedCharSequence) list.get(0);
+			}
+		);
 		int drawColor;
 		boolean drawOutlined;
 		int drawLight;
@@ -109,10 +113,30 @@ public class BaseSignBlockEntityRenderer implements BlockEntityRenderer<BaseSign
 			FormattedCharSequence formattedCharSequence = formattedCharSequences[s];
 			float t = (float) (-this.font.width(formattedCharSequence) / 2);
 			if (drawOutlined) {
-				this.font.drawInBatch8xOutline(formattedCharSequence, t, (float) (s * 10 - 20), drawColor, m, matrixStack.last().pose(), provider, drawLight);
+				this.font.drawInBatch8xOutline(
+					formattedCharSequence,
+					t,
+					(float) (s * 10 - 20),
+					drawColor,
+					m,
+					matrixStack.last().pose(),
+					provider,
+					drawLight
+				);
 			}
 			else {
-				this.font.drawInBatch((FormattedCharSequence) formattedCharSequence, t, (float) (s * 10 - 20), drawColor, false, matrixStack.last().pose(), provider, false, 0, drawLight);
+				this.font.drawInBatch(
+					(FormattedCharSequence) formattedCharSequence,
+					t,
+					(float) (s * 10 - 20),
+					drawColor,
+					false,
+					matrixStack.last().pose(),
+					provider,
+					false,
+					0,
+					drawLight
+				);
 			}
 		}
 		
@@ -160,7 +184,10 @@ public class BaseSignBlockEntityRenderer implements BlockEntityRenderer<BaseSign
 	
 	public static void registerRenderLayer(Block block) {
 		ResourceLocation blockId = Registry.BLOCK.getKey(block);
-		RenderType layer = RenderType.entitySolid(new ResourceLocation(blockId.getNamespace(), "textures/entity/sign/" + blockId.getPath() + ".png"));
+		RenderType layer = RenderType.entitySolid(new ResourceLocation(
+			blockId.getNamespace(),
+			"textures/entity/sign/" + blockId.getPath() + ".png"
+		));
 		LAYERS.put(block, layer);
 	}
 	

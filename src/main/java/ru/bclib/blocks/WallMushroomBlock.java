@@ -16,7 +16,14 @@ import java.util.List;
 
 public abstract class WallMushroomBlock extends BaseWallPlantBlock {
 	public WallMushroomBlock(int light) {
-		super(FabricBlockSettings.of(Material.PLANT).breakByTool(FabricToolTags.AXES).breakByHand(true).luminance(light).hardness(0.2F).sound(SoundType.GRASS).sound(SoundType.WOOD).noCollission());
+		super(FabricBlockSettings.of(Material.PLANT)
+								 .breakByTool(FabricToolTags.AXES)
+								 .breakByHand(true)
+								 .luminance(light)
+								 .hardness(0.2F)
+								 .sound(SoundType.GRASS)
+								 .sound(SoundType.WOOD)
+								 .noCollission());
 	}
 	
 	@Override

@@ -14,9 +14,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootContext;
 import org.jetbrains.annotations.Nullable;
 import ru.bclib.client.models.BasePatterns;
-import ru.bclib.client.models.BlockModelProvider;
 import ru.bclib.client.models.ModelsHelper;
 import ru.bclib.client.models.PatternsHelper;
+import ru.bclib.interfaces.BlockModelProvider;
 
 import java.util.Collections;
 import java.util.List;
@@ -51,10 +51,16 @@ public class BaseGateBlock extends FenceGateBlock implements BlockModelProvider 
 		ResourceLocation parentId = Registry.BLOCK.getKey(parent);
 		Optional<String> pattern;
 		if (inWall) {
-			pattern = isOpen ? PatternsHelper.createJson(BasePatterns.BLOCK_GATE_OPEN_WALL, parentId) : PatternsHelper.createJson(BasePatterns.BLOCK_GATE_CLOSED_WALL, parentId);
+			pattern = isOpen ? PatternsHelper.createJson(
+				BasePatterns.BLOCK_GATE_OPEN_WALL,
+				parentId
+			) : PatternsHelper.createJson(BasePatterns.BLOCK_GATE_CLOSED_WALL, parentId);
 		}
 		else {
-			pattern = isOpen ? PatternsHelper.createJson(BasePatterns.BLOCK_GATE_OPEN, parentId) : PatternsHelper.createJson(BasePatterns.BLOCK_GATE_CLOSED, parentId);
+			pattern = isOpen ? PatternsHelper.createJson(
+				BasePatterns.BLOCK_GATE_OPEN,
+				parentId
+			) : PatternsHelper.createJson(BasePatterns.BLOCK_GATE_CLOSED, parentId);
 		}
 		return ModelsHelper.fromPattern(pattern);
 	}

@@ -116,7 +116,14 @@ public class GridRecipe {
 			ItemStack result = new ItemStack(output, count);
 			NonNullList<Ingredient> materials = this.getMaterials(width, height);
 			
-			CraftingRecipe recipe = shaped ? new ShapedRecipe(id, group, width, height, materials, result) : new ShapelessRecipe(id, group, result, materials);
+			CraftingRecipe recipe = shaped ? new ShapedRecipe(
+				id,
+				group,
+				width,
+				height,
+				materials,
+				result
+			) : new ShapelessRecipe(id, group, result, materials);
 			BCLRecipeManager.addRecipe(type, recipe);
 		}
 		else {

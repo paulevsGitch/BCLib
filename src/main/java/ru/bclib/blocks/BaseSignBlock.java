@@ -2,6 +2,7 @@ package ru.bclib.blocks;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.core.BlockPos;
@@ -13,6 +14,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
@@ -39,25 +41,33 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 import ru.bclib.blockentities.BaseSignBlockEntity;
-import ru.bclib.client.models.BlockModelProvider;
 import ru.bclib.client.models.ModelsHelper;
-import ru.bclib.interfaces.ISpetialItem;
+import ru.bclib.interfaces.BlockModelProvider;
+import ru.bclib.interfaces.CustomItemProvider;
 import ru.bclib.util.BlocksHelper;
 
 import java.util.Collections;
 import java.util.List;
 
 @SuppressWarnings("deprecation")
-public class BaseSignBlock extends SignBlock implements BlockModelProvider, ISpetialItem {
+public class BaseSignBlock extends SignBlock implements BlockModelProvider, CustomItemProvider {
 	public static final IntegerProperty ROTATION = BlockStateProperties.ROTATION_16;
 	public static final BooleanProperty FLOOR = BooleanProperty.create("floor");
-	private static final VoxelShape[] WALL_SHAPES = new VoxelShape[] {Block.box(0.0D, 4.5D, 14.0D, 16.0D, 12.5D, 16.0D), Block.box(0.0D, 4.5D, 0.0D, 2.0D, 12.5D, 16.0D), Block.box(0.0D, 4.5D, 0.0D, 16.0D, 12.5D, 2.0D), Block.box(14.0D, 4.5D, 0.0D, 16.0D, 12.5D, 16.0D)};
+	private static final VoxelShape[] WALL_SHAPES = new VoxelShape[] {
+		Block.box(0.0D, 4.5D, 14.0D, 16.0D, 12.5D, 16.0D),
+		Block.box(0.0D, 4.5D, 0.0D, 2.0D, 12.5D, 16.0D),
+		Block.box(0.0D, 4.5D, 0.0D, 16.0D, 12.5D, 2.0D),
+		Block.box(14.0D, 4.5D, 0.0D, 16.0D, 12.5D, 16.0D)
+	};
 	
 	private final Block parent;
 	
 	public BaseSignBlock(Block source) {
 		super(FabricBlockSettings.copyOf(source).strength(1.0F, 1.0F).noCollission().noOcclusion(), WoodType.OAK);
-		this.registerDefaultState(this.stateDefinition.any().setValue(ROTATION, 0).setValue(FLOOR, false).setValue(WATERLOGGED, false));
+		this.registerDefaultState(this.stateDefinition.any()
+													  .setValue(ROTATION, 0)
+													  .setValue(FLOOR, false)
+													  .setValue(WATERLOGGED, false));
 		this.parent = source;
 	}
 	
@@ -98,7 +108,8 @@ public class BaseSignBlock extends SignBlock implements BlockModelProvider, ISpe
 			world.getLiquidTicks().scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(world));
 		}
 		if (!canSurvive(state, world, pos)) {
-			return state.getValue(WATERLOGGED) ? state.getFluidState().createLegacyBlock() : Blocks.AIR.defaultBlockState();
+			return state.getValue(WATERLOGGED) ? state.getFluidState()
+													  .createLegacyBlock() : Blocks.AIR.defaultBlockState();
 		}
 		return super.updateShape(state, facing, neighborState, world, pos, neighborPos);
 	}
@@ -118,7 +129,10 @@ public class BaseSignBlock extends SignBlock implements BlockModelProvider, ISpe
 	public BlockState getStateForPlacement(BlockPlaceContext ctx) {
 		if (ctx.getClickedFace() == Direction.UP) {
 			FluidState fluidState = ctx.getLevel().getFluidState(ctx.getClickedPos());
-			return this.defaultBlockState().setValue(FLOOR, true).setValue(ROTATION, Mth.floor((180.0 + ctx.getRotation() * 16.0 / 360.0) + 0.5 - 12) & 15).setValue(WATERLOGGED, fluidState.getType() == Fluids.WATER);
+			return this.defaultBlockState()
+					   .setValue(FLOOR, true)
+					   .setValue(ROTATION, Mth.floor((180.0 + ctx.getRotation() * 16.0 / 360.0) + 0.5 - 12) & 15)
+					   .setValue(WATERLOGGED, fluidState.getType() == Fluids.WATER);
 		}
 		else if (ctx.getClickedFace() != Direction.DOWN) {
 			BlockState blockState = this.defaultBlockState();
@@ -133,7 +147,8 @@ public class BaseSignBlock extends SignBlock implements BlockModelProvider, ISpe
 					int rot = Mth.floor((180.0 + dir.toYRot() * 16.0 / 360.0) + 0.5 + 4) & 15;
 					blockState = blockState.setValue(ROTATION, rot);
 					if (blockState.canSurvive(worldView, blockPos)) {
-						return blockState.setValue(FLOOR, false).setValue(WATERLOGGED, fluidState.getType() == Fluids.WATER);
+						return blockState.setValue(FLOOR, false)
+										 .setValue(WATERLOGGED, fluidState.getType() == Fluids.WATER);
 					}
 				}
 			}
@@ -177,12 +192,7 @@ public class BaseSignBlock extends SignBlock implements BlockModelProvider, ISpe
 	}
 	
 	@Override
-	public int getStackSize() {
-		return 16;
-	}
-	
-	@Override
-	public boolean canPlaceOnWater() {
-		return false;
+	public BlockItem getCustomItem(ResourceLocation blockID, FabricItemSettings settings) {
+		return new BlockItem(this, settings.maxCount(16));
 	}
 }

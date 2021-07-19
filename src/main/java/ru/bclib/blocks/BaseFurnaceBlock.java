@@ -26,18 +26,18 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import org.jetbrains.annotations.Nullable;
 import ru.bclib.blockentities.BaseFurnaceBlockEntity;
 import ru.bclib.client.models.BasePatterns;
-import ru.bclib.client.models.BlockModelProvider;
 import ru.bclib.client.models.ModelsHelper;
 import ru.bclib.client.models.PatternsHelper;
 import ru.bclib.client.render.BCLRenderLayer;
-import ru.bclib.interfaces.IRenderTyped;
+import ru.bclib.interfaces.BlockModelProvider;
+import ru.bclib.interfaces.RenderLayerProvider;
 import ru.bclib.registry.BaseBlockEntities;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class BaseFurnaceBlock extends FurnaceBlock implements BlockModelProvider, IRenderTyped {
+public class BaseFurnaceBlock extends FurnaceBlock implements BlockModelProvider, RenderLayerProvider {
 	public BaseFurnaceBlock(Block source) {
 		super(FabricBlockSettings.copyOf(source).luminance(state -> state.getValue(LIT) ? 13 : 0));
 	}
@@ -119,6 +119,10 @@ public class BaseFurnaceBlock extends FurnaceBlock implements BlockModelProvider
 	
 	@Nullable
 	protected static <T extends BlockEntity> BlockEntityTicker<T> createFurnaceTicker(Level level, BlockEntityType<T> blockEntityType, BlockEntityType<? extends AbstractFurnaceBlockEntity> blockEntityType2) {
-		return level.isClientSide ? null : createTickerHelper(blockEntityType, blockEntityType2, AbstractFurnaceBlockEntity::serverTick);
+		return level.isClientSide ? null : createTickerHelper(
+			blockEntityType,
+			blockEntityType2,
+			AbstractFurnaceBlockEntity::serverTick
+		);
 	}
 }

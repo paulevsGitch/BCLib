@@ -29,12 +29,18 @@ public class TextureAtlasMixin {
 	private void bclib_loadSprite(ResourceManager resourceManager, TextureAtlasSprite.Info spriteInfo, int atlasWidth, int atlasHeight, int maxLevel, int posX, int posY, CallbackInfoReturnable<TextureAtlasSprite> info) {
 		ResourceLocation location = spriteInfo.name();
 		if (bclib_modifyAtlas && location.getPath().startsWith("block")) {
-			ResourceLocation emissiveLocation = new ResourceLocation(location.getNamespace(), "textures/" + location.getPath() + "_e.png");
+			ResourceLocation emissiveLocation = new ResourceLocation(
+				location.getNamespace(),
+				"textures/" + location.getPath() + "_e.png"
+			);
 			if (resourceManager.hasResource(emissiveLocation)) {
 				NativeImage sprite = null;
 				NativeImage emission = null;
 				try {
-					ResourceLocation spriteLocation = new ResourceLocation(location.getNamespace(), "textures/" + location.getPath() + ".png");
+					ResourceLocation spriteLocation = new ResourceLocation(
+						location.getNamespace(),
+						"textures/" + location.getPath() + ".png"
+					);
 					Resource resource = resourceManager.getResource(spriteLocation);
 					sprite = NativeImage.read(resource.getInputStream());
 					resource.close();
@@ -65,7 +71,16 @@ public class TextureAtlasMixin {
 						}
 					}
 					TextureAtlas self = (TextureAtlas) (Object) this;
-					FabricSprite result = new FabricSprite(self, spriteInfo, maxLevel, atlasWidth, atlasHeight, posX, posY, sprite);
+					FabricSprite result = new FabricSprite(
+						self,
+						spriteInfo,
+						maxLevel,
+						atlasWidth,
+						atlasHeight,
+						posX,
+						posY,
+						sprite
+					);
 					info.setReturnValue(result);
 				}
 			}

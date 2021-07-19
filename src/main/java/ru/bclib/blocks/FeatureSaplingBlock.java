@@ -25,11 +25,11 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 import ru.bclib.client.models.BasePatterns;
-import ru.bclib.client.models.BlockModelProvider;
 import ru.bclib.client.models.ModelsHelper;
 import ru.bclib.client.models.PatternsHelper;
 import ru.bclib.client.render.BCLRenderLayer;
-import ru.bclib.interfaces.IRenderTyped;
+import ru.bclib.interfaces.BlockModelProvider;
+import ru.bclib.interfaces.RenderLayerProvider;
 
 import java.util.Collections;
 import java.util.List;
@@ -37,15 +37,32 @@ import java.util.Optional;
 import java.util.Random;
 
 @SuppressWarnings("deprecation")
-public abstract class FeatureSaplingBlock extends SaplingBlock implements IRenderTyped, BlockModelProvider {
+public abstract class FeatureSaplingBlock extends SaplingBlock implements RenderLayerProvider, BlockModelProvider {
 	private static final VoxelShape SHAPE = Block.box(4, 0, 4, 12, 14, 12);
 	
 	public FeatureSaplingBlock() {
-		super(null, FabricBlockSettings.of(Material.PLANT).breakByHand(true).collidable(false).instabreak().sound(SoundType.GRASS).randomTicks());
+		super(
+			null,
+			FabricBlockSettings.of(Material.PLANT)
+							   .breakByHand(true)
+							   .collidable(false)
+							   .instabreak()
+							   .sound(SoundType.GRASS)
+							   .randomTicks()
+		);
 	}
 	
 	public FeatureSaplingBlock(int light) {
-		super(null, FabricBlockSettings.of(Material.PLANT).breakByHand(true).collidable(false).luminance(light).instabreak().sound(SoundType.GRASS).randomTicks());
+		super(
+			null,
+			FabricBlockSettings.of(Material.PLANT)
+							   .breakByHand(true)
+							   .collidable(false)
+							   .luminance(light)
+							   .instabreak()
+							   .sound(SoundType.GRASS)
+							   .randomTicks()
+		);
 	}
 	
 	protected abstract Feature<?> getFeature();
@@ -73,7 +90,13 @@ public abstract class FeatureSaplingBlock extends SaplingBlock implements IRende
 	
 	@Override
 	public void advanceTree(ServerLevel world, BlockPos pos, BlockState blockState, Random random) {
-		FeaturePlaceContext context = new FeaturePlaceContext(world, world.getChunkSource().getGenerator(), random, pos, null);
+		FeaturePlaceContext context = new FeaturePlaceContext(
+			world,
+			world.getChunkSource().getGenerator(),
+			random,
+			pos,
+			null
+		);
 		getFeature().place(context);
 	}
 	

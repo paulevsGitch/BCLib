@@ -53,28 +53,48 @@ public class BlockSignEditScreen extends Screen {
 	
 	protected void init() {
 		//set up a default model
-		model = new SignRenderer.SignModel(this.minecraft.getEntityModels().bakeLayer(ModelLayers.createSignModelName(WoodType.OAK)));
+		model = new SignRenderer.SignModel(this.minecraft.getEntityModels()
+														 .bakeLayer(ModelLayers.createSignModelName(WoodType.OAK)));
 		
 		minecraft.keyboardHandler.setSendRepeatsToGui(true);
-		this.addRenderableWidget(new Button(this.width / 2 - 100, this.height / 4 + 120, 200, 20, CommonComponents.GUI_DONE, (buttonWidget) -> {
-			this.finishEditing();
-		}));
+		this.addRenderableWidget(new Button(
+			this.width / 2 - 100,
+			this.height / 4 + 120,
+			200,
+			20,
+			CommonComponents.GUI_DONE,
+			(buttonWidget) -> {
+				this.finishEditing();
+			}
+		));
 		this.sign.setEditable(false);
-		this.selectionManager = new TextFieldHelper(() -> {
-			return this.text[this.currentRow];
-		}, (string) -> {
-			this.text[this.currentRow] = string;
-			this.sign.setMessage(this.currentRow, new TextComponent(string));
-		}, TextFieldHelper.createClipboardGetter(this.minecraft), TextFieldHelper.createClipboardSetter(this.minecraft), (string) -> {
-			return this.minecraft.font.width(string) <= 90;
-		});
+		this.selectionManager = new TextFieldHelper(
+			() -> {
+				return this.text[this.currentRow];
+			},
+			(string) -> {
+				this.text[this.currentRow] = string;
+				this.sign.setMessage(this.currentRow, new TextComponent(string));
+			},
+			TextFieldHelper.createClipboardGetter(this.minecraft),
+			TextFieldHelper.createClipboardSetter(this.minecraft),
+			(string) -> {
+				return this.minecraft.font.width(string) <= 90;
+			}
+		);
 	}
 	
 	public void removed() {
 		minecraft.keyboardHandler.setSendRepeatsToGui(false);
 		ClientPacketListener clientPlayNetworkHandler = this.minecraft.getConnection();
 		if (clientPlayNetworkHandler != null) {
-			clientPlayNetworkHandler.send(new ServerboundSignUpdatePacket(this.sign.getBlockPos(), this.text[0], this.text[1], this.text[2], this.text[3]));
+			clientPlayNetworkHandler.send(new ServerboundSignUpdatePacket(
+				this.sign.getBlockPos(),
+				this.text[0],
+				this.text[1],
+				this.text[2],
+				this.text[3]
+			));
 		}
 		
 		this.sign.setEditable(true);
@@ -167,12 +187,36 @@ public class BlockSignEditScreen extends Screen {
 				}
 				
 				float n = (float) (-this.minecraft.font.width(string2) / 2);
-				this.minecraft.font.drawInBatch(string2, n, (float) (m * 10 - this.text.length * 5), i, false, matrix4f, immediate, false, 0, 15728880, false);
+				this.minecraft.font.drawInBatch(
+					string2,
+					n,
+					(float) (m * 10 - this.text.length * 5),
+					i,
+					false,
+					matrix4f,
+					immediate,
+					false,
+					0,
+					15728880,
+					false
+				);
 				if (m == this.currentRow && j >= 0 && bl2) {
 					s = this.minecraft.font.width(string2.substring(0, Math.max(Math.min(j, string2.length()), 0)));
 					t = s - this.minecraft.font.width(string2) / 2;
 					if (j >= string2.length()) {
-						this.minecraft.font.drawInBatch("_", (float) t, (float) l, i, false, matrix4f, immediate, false, 0, 15728880, false);
+						this.minecraft.font.drawInBatch(
+							"_",
+							(float) t,
+							(float) l,
+							i,
+							false,
+							matrix4f,
+							immediate,
+							false,
+							0,
+							15728880,
+							false
+						);
 					}
 				}
 			}

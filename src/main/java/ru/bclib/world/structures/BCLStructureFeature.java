@@ -19,7 +19,10 @@ public class BCLStructureFeature {
 	
 	public BCLStructureFeature(ResourceLocation id, StructureFeature<NoneFeatureConfiguration> structure, GenerationStep.Decoration step, int spacing, int separation) {
 		this.featureStep = step;
-		this.structure = FabricStructureBuilder.create(id, structure).step(step).defaultConfig(spacing, separation, RANDOM.nextInt(8192)).register();
+		this.structure = FabricStructureBuilder.create(id, structure)
+											   .step(step)
+											   .defaultConfig(spacing, separation, RANDOM.nextInt(8192))
+											   .register();
 		this.featureConfigured = this.structure.configured(NoneFeatureConfiguration.NONE);
 		BuiltinRegistries.register(BuiltinRegistries.CONFIGURED_STRUCTURE_FEATURE, id, this.featureConfigured);
 		FlatChunkGeneratorConfigAccessor.getStructureToFeatures().put(this.structure, this.featureConfigured);

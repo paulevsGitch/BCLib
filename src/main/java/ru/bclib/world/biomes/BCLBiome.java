@@ -142,7 +142,11 @@ public class BCLBiome {
 					list.add(new StructureInfo(structure, offsetY, terrainMerge));
 				});
 				if (!list.isEmpty()) {
-					structuresFeature = BCLFeature.makeChansedFeature(new ResourceLocation(ns, nm + "_structures"), new ListFeature(list), 10);
+					structuresFeature = BCLFeature.makeChansedFeature(
+						new ResourceLocation(ns, nm + "_structures"),
+						new ListFeature(list),
+						10
+					);
 				}
 			}
 		}

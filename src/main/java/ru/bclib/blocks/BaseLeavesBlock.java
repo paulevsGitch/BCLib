@@ -15,20 +15,27 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.MaterialColor;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
-import ru.bclib.client.models.BlockModelProvider;
 import ru.bclib.client.render.BCLRenderLayer;
-import ru.bclib.interfaces.IRenderTyped;
+import ru.bclib.interfaces.BlockModelProvider;
+import ru.bclib.interfaces.RenderLayerProvider;
 import ru.bclib.util.MHelper;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class BaseLeavesBlock extends LeavesBlock implements BlockModelProvider, IRenderTyped {
+public class BaseLeavesBlock extends LeavesBlock implements BlockModelProvider, RenderLayerProvider {
 	private final Block sapling;
 	
 	private static FabricBlockSettings makeLeaves(MaterialColor color) {
-		return FabricBlockSettings.copyOf(Blocks.OAK_LEAVES).mapColor(color).breakByTool(FabricToolTags.HOES).breakByTool(FabricToolTags.SHEARS).breakByHand(true).allowsSpawning((state, world, pos, type) -> false).suffocates((state, world, pos) -> false).blockVision((state, world, pos) -> false);
+		return FabricBlockSettings.copyOf(Blocks.OAK_LEAVES)
+								  .mapColor(color)
+								  .breakByTool(FabricToolTags.HOES)
+								  .breakByTool(FabricToolTags.SHEARS)
+								  .breakByHand(true)
+								  .allowsSpawning((state, world, pos, type) -> false)
+								  .suffocates((state, world, pos) -> false)
+								  .blockVision((state, world, pos) -> false);
 	}
 	
 	public BaseLeavesBlock(Block sapling, MaterialColor color, Consumer<FabricBlockSettings> customizeProperties) {
@@ -61,7 +68,10 @@ public class BaseLeavesBlock extends LeavesBlock implements BlockModelProvider, 
 	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
 		ItemStack tool = builder.getParameter(LootContextParams.TOOL);
 		if (tool != null) {
-			if (FabricToolTags.SHEARS.contains(tool.getItem()) || EnchantmentHelper.getItemEnchantmentLevel(Enchantments.SILK_TOUCH, tool) > 0) {
+			if (FabricToolTags.SHEARS.contains(tool.getItem()) || EnchantmentHelper.getItemEnchantmentLevel(
+				Enchantments.SILK_TOUCH,
+				tool
+			) > 0) {
 				return Collections.singletonList(new ItemStack(this));
 			}
 			int fortune = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.BLOCK_FORTUNE, tool);

@@ -30,14 +30,14 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import ru.bclib.blocks.BlockProperties.TripleShape;
 import ru.bclib.client.render.BCLRenderLayer;
-import ru.bclib.interfaces.IRenderTyped;
+import ru.bclib.interfaces.RenderLayerProvider;
 import ru.bclib.util.BlocksHelper;
 
 import java.util.List;
 import java.util.Random;
 
 @SuppressWarnings("deprecation")
-public class BaseVineBlock extends BaseBlockNotFull implements IRenderTyped, BonemealableBlock {
+public class BaseVineBlock extends BaseBlockNotFull implements RenderLayerProvider, BonemealableBlock {
 	public static final EnumProperty<TripleShape> SHAPE = BlockProperties.TRIPLE_SHAPE;
 	private static final VoxelShape VOXEL_SHAPE = Block.box(2, 0, 2, 14, 16, 14);
 	
@@ -50,7 +50,12 @@ public class BaseVineBlock extends BaseBlockNotFull implements IRenderTyped, Bon
 	}
 	
 	public BaseVineBlock(int light, boolean bottomOnly) {
-		super(FabricBlockSettings.of(Material.PLANT).breakByTool(FabricToolTags.SHEARS).breakByHand(true).sound(SoundType.GRASS).lightLevel((state) -> bottomOnly ? state.getValue(SHAPE) == TripleShape.BOTTOM ? light : 0 : light).noCollission());
+		super(FabricBlockSettings.of(Material.PLANT)
+								 .breakByTool(FabricToolTags.SHEARS)
+								 .breakByHand(true)
+								 .sound(SoundType.GRASS)
+								 .lightLevel((state) -> bottomOnly ? state.getValue(SHAPE) == TripleShape.BOTTOM ? light : 0 : light)
+								 .noCollission());
 		this.registerDefaultState(this.stateDefinition.any().setValue(SHAPE, TripleShape.BOTTOM));
 	}
 	
@@ -99,7 +104,10 @@ public class BaseVineBlock extends BaseBlockNotFull implements IRenderTyped, Bon
 	@Override
 	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
 		ItemStack tool = builder.getParameter(LootContextParams.TOOL);
-		if (tool != null && FabricToolTags.SHEARS.contains(tool.getItem()) || EnchantmentHelper.getItemEnchantmentLevel(Enchantments.SILK_TOUCH, tool) > 0) {
+		if (tool != null && FabricToolTags.SHEARS.contains(tool.getItem()) || EnchantmentHelper.getItemEnchantmentLevel(
+			Enchantments.SILK_TOUCH,
+			tool
+		) > 0) {
 			return Lists.newArrayList(new ItemStack(this));
 		}
 		else {

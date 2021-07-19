@@ -6,8 +6,8 @@ import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.HoeItem;
 import net.minecraft.world.item.Tier;
-import ru.bclib.client.models.ItemModelProvider;
 import ru.bclib.client.models.ModelsHelper;
+import ru.bclib.interfaces.ItemModelProvider;
 
 public class BaseHoeItem extends HoeItem implements ItemModelProvider {
 	public BaseHoeItem(Tier material, int attackDamage, float attackSpeed, Properties settings) {

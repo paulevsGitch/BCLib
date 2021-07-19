@@ -2,7 +2,6 @@
 	"schemaVersion": 1,
 	"id": "bclib",
 	"version": "${version}",
-
 	"name": "BCLib",
 	"description": "A library for BetterX team mods",
 	"authors": [
@@ -14,10 +13,8 @@
 		"issues": "https://github.com/paulevsGitch/bclib/issues",
 		"sources": "https://github.com/paulevsGitch/bclib"
 	},
-
 	"license": "MIT",
 	"icon": "assets/bclib/icon.png",
-
 	"environment": "*",
 	"entrypoints": {
 		"main": [
@@ -34,7 +31,6 @@
 		"bclib.mixins.common.json",
 		"bclib.mixins.client.json"
 	],
-
 	"depends": {
 		"fabricloader": ">=0.11.6",
 		"fabric": ">=0.36.0",

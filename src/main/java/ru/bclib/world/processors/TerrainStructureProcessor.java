@@ -14,7 +14,10 @@ public class TerrainStructureProcessor extends StructureProcessor {
 	public StructureBlockInfo processBlock(LevelReader worldView, BlockPos pos, BlockPos blockPos, StructureBlockInfo structureBlockInfo, StructureBlockInfo structureBlockInfo2, StructurePlaceSettings structurePlacementData) {
 		BlockPos bpos = structureBlockInfo2.pos;
 		if (structureBlockInfo2.state.is(Blocks.END_STONE) && worldView.isEmptyBlock(bpos.above())) {
-			BlockState top = worldView.getBiome(structureBlockInfo2.pos).getGenerationSettings().getSurfaceBuilderConfig().getTopMaterial();
+			BlockState top = worldView.getBiome(structureBlockInfo2.pos)
+									  .getGenerationSettings()
+									  .getSurfaceBuilderConfig()
+									  .getTopMaterial();
 			return new StructureBlockInfo(bpos, top, structureBlockInfo2.nbt);
 		}
 		return structureBlockInfo2;

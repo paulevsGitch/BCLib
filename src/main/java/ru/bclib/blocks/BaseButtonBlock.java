@@ -15,9 +15,9 @@ import net.minecraft.world.level.block.state.properties.AttachFace;
 import net.minecraft.world.level.storage.loot.LootContext;
 import org.jetbrains.annotations.Nullable;
 import ru.bclib.client.models.BasePatterns;
-import ru.bclib.client.models.BlockModelProvider;
 import ru.bclib.client.models.ModelsHelper;
 import ru.bclib.client.models.PatternsHelper;
+import ru.bclib.interfaces.BlockModelProvider;
 
 import java.util.Collections;
 import java.util.List;
@@ -51,7 +51,10 @@ public abstract class BaseButtonBlock extends ButtonBlock implements BlockModelP
 	@Environment(EnvType.CLIENT)
 	public @Nullable BlockModel getBlockModel(ResourceLocation resourceLocation, BlockState blockState) {
 		ResourceLocation parentId = Registry.BLOCK.getKey(parent);
-		Optional<String> pattern = blockState.getValue(POWERED) ? PatternsHelper.createJson(BasePatterns.BLOCK_BUTTON_PRESSED, parentId) : PatternsHelper.createJson(BasePatterns.BLOCK_BUTTON, parentId);
+		Optional<String> pattern = blockState.getValue(POWERED) ? PatternsHelper.createJson(
+			BasePatterns.BLOCK_BUTTON_PRESSED,
+			parentId
+		) : PatternsHelper.createJson(BasePatterns.BLOCK_BUTTON, parentId);
 		return ModelsHelper.fromPattern(pattern);
 	}
 	

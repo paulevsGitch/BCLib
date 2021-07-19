@@ -34,7 +34,15 @@ public abstract class EnchantingTableBlockMixin extends Block {
 							if (!world.isEmptyBlock(pos.offset(px / 2, 0, pz / 2))) {
 								break;
 							}
-							world.addParticle(ParticleTypes.ENCHANT, pos.getX() + 0.5, pos.getY() + 2.0, pos.getZ() + 0.5, px + random.nextFloat() - 0.5, py - random.nextFloat() - 1.0, pz + random.nextFloat() - 0.5);
+							world.addParticle(
+								ParticleTypes.ENCHANT,
+								pos.getX() + 0.5,
+								pos.getY() + 2.0,
+								pos.getZ() + 0.5,
+								px + random.nextFloat() - 0.5,
+								py - random.nextFloat() - 1.0,
+								pz + random.nextFloat() - 0.5
+							);
 						}
 					}
 				}

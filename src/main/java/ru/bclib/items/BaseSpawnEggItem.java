@@ -8,9 +8,9 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.SpawnEggItem;
 import ru.bclib.client.models.BasePatterns;
-import ru.bclib.client.models.ItemModelProvider;
 import ru.bclib.client.models.ModelsHelper;
 import ru.bclib.client.models.PatternsHelper;
+import ru.bclib.interfaces.ItemModelProvider;
 
 import java.util.Optional;
 

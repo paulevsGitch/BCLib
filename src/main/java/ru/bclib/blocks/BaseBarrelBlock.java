@@ -28,9 +28,9 @@ import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 import ru.bclib.blockentities.BaseBarrelBlockEntity;
 import ru.bclib.client.models.BasePatterns;
-import ru.bclib.client.models.BlockModelProvider;
 import ru.bclib.client.models.ModelsHelper;
 import ru.bclib.client.models.PatternsHelper;
+import ru.bclib.interfaces.BlockModelProvider;
 import ru.bclib.registry.BaseBlockEntities;
 
 import java.util.List;

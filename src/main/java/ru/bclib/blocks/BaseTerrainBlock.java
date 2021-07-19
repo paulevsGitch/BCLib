@@ -51,7 +51,10 @@ public class BaseTerrainBlock extends BaseBlock {
 	private Block pathBlock;
 	
 	public BaseTerrainBlock(Block baseBlock, MaterialColor color) {
-		super(FabricBlockSettings.copyOf(baseBlock).materialColor(color).sound(BlockSounds.TERRAIN_SOUND).randomTicks());
+		super(FabricBlockSettings.copyOf(baseBlock)
+								 .materialColor(color)
+								 .sound(BlockSounds.TERRAIN_SOUND)
+								 .randomTicks());
 		this.baseBlock = baseBlock;
 	}
 	
@@ -104,7 +107,15 @@ public class BaseTerrainBlock extends BaseBlock {
 			return false;
 		}
 		else {
-			int i = LayerLightEngine.getLightBlockInto(worldView, state, pos, blockState, blockPos, Direction.UP, blockState.getLightBlock(worldView, blockPos));
+			int i = LayerLightEngine.getLightBlockInto(
+				worldView,
+				state,
+				pos,
+				blockState,
+				blockPos,
+				Direction.UP,
+				blockState.getLightBlock(worldView, blockPos)
+			);
 			return i < 5;
 		}
 	}

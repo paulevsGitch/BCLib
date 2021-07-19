@@ -99,7 +99,8 @@ public class BoneMealItemMixin {
 			for (int y = y1; y >= y2; y--) {
 				bclib_BLOCK_POS.setY(y);
 				BlockPos down = bclib_BLOCK_POS.below();
-				if (BlocksHelper.isFluid(world.getBlockState(bclib_BLOCK_POS)) && !BlocksHelper.isFluid(world.getBlockState(down))) {
+				if (BlocksHelper.isFluid(world.getBlockState(bclib_BLOCK_POS)) && !BlocksHelper.isFluid(world.getBlockState(
+					down))) {
 					BlockState grass = bclib_getWaterGrassState(world, down);
 					if (grass != null) {
 						BlocksHelper.setWithoutUpdate(world, bclib_BLOCK_POS, grass);
