@@ -29,7 +29,8 @@ public class DataFixerAPI {
 			return;
 		}
 		
-		MigrationProfile data = Patch.createMigrationData(WorldDataAPI.getCompoundTag(BCLib.MOD_ID, Configs.MAIN_PATCH_CATEGORY));
+		final CompoundTag patchConfig = WorldDataAPI.getCompoundTag(BCLib.MOD_ID, Configs.MAIN_PATCH_CATEGORY);
+		MigrationProfile data = Patch.createMigrationData(patchConfig);
 		if (!data.hasAnyFixes()) {
 			LOGGER.info("Everything up to date");
 			return;
