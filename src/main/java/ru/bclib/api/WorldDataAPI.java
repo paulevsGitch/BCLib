@@ -38,7 +38,7 @@ public class WorldDataAPI {
 				if (optional.isPresent()) {
 					ModContainer modContainer = optional.get();
 					if (BCLib.isDevEnvironment()) {
-						root.putString("version", "63.63.63");
+						root.putString("version", "255.255.9999");
 					}
 					else {
 						root.putString("version", modContainer.getMetadata().getVersion().toString());
