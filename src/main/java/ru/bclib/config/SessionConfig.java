@@ -18,8 +18,8 @@ public class SessionConfig extends PathConfig {
 	public final File levelFolder;
 	
 	public SessionConfig(String modID, String group, LevelStorageSource.LevelStorageAccess session, ServerLevel world) {
-		super(modID, group, new File(getWorldFolder(session, world), BCLib.MOD_ID));
+		super(modID, group, new File(getWorldFolder(session, world), BCLib.MOD_ID+"-config"));
 		
-		this.levelFolder = new File(getWorldFolder(session, world), BCLib.MOD_ID);
+		this.levelFolder = new File(getWorldFolder(session, world), BCLib.MOD_ID+"-config");
 	}
 }
