@@ -1,5 +1,7 @@
 package ru.bclib.config;
 
+import java.io.File;
+
 import org.jetbrains.annotations.Nullable;
 import ru.bclib.config.ConfigKeeper.Entry;
 import ru.bclib.config.ConfigKeeper.FloatRange;
@@ -8,7 +10,11 @@ import ru.bclib.config.ConfigKeeper.IntegerRange;
 public class PathConfig extends Config {
 	
 	public PathConfig(String modID, String group) {
-		super(modID, group);
+		this(modID, group, null);
+	}
+
+	protected PathConfig(String modID, String group, File path) {
+		super(modID, group, path);
 	}
 	
 	@Override
