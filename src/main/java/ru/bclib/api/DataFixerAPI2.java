@@ -30,7 +30,7 @@ public class DataFixerAPI2 {
 	private static final Logger LOGGER = new Logger("DataFixerAPI");
 	
 	public static void fixData(SessionConfig config) {
-		if (true || !Configs.MAIN_CONFIG.getBoolean(Configs.MAIN_PATCH_CATEGORY, "applyPatches", true)) {
+		if (!Configs.MAIN_CONFIG.getBoolean(Configs.MAIN_PATCH_CATEGORY, "applyPatches", true)) {
 			LOGGER.info("World Patches are disabled");
 			return;
 		}
@@ -135,13 +135,13 @@ public class DataFixerAPI2 {
 		}
 		try {
 			int res = 0;
-			final String semanticVersionPattern = "\\D*(\\d+)\\D*\\.\\D*(\\d+)\\D*\\.\\D*(\\d+)\\D*";
+			final String semanticVersionPattern = "(\\d+)\\.(\\d+)\\.(\\d+)\\D*";
 			final Matcher matcher = Pattern.compile(semanticVersionPattern)
 										   .matcher(version);
 			if (matcher.find()) {
-				if (matcher.groupCount() > 0) res = Integer.parseInt(matcher.group(0)) << 20;
-				if (matcher.groupCount() > 1) res |= Integer.parseInt(matcher.group(1)) << 12;
-				if (matcher.groupCount() > 2) res |= Integer.parseInt(matcher.group(2));
+				if (matcher.groupCount() > 0) res = (Integer.parseInt(matcher.group(1)) & 0xFF) << 20;
+				if (matcher.groupCount() > 1) res |= (Integer.parseInt(matcher.group(2)) & 0xFF) << 12;
+				if (matcher.groupCount() > 2) res |= Integer.parseInt(matcher.group(3)) & 0xFFF;
 			}
 			
 			return res;
