@@ -31,15 +31,15 @@ import ru.bclib.client.models.BasePatterns;
 import ru.bclib.client.models.ModelsHelper;
 import ru.bclib.client.models.PatternsHelper;
 import ru.bclib.client.render.BCLRenderLayer;
-import ru.bclib.interfaces.BlockModelGetter;
-import ru.bclib.interfaces.RenderLayerGetter;
+import ru.bclib.interfaces.BlockModelProvider;
+import ru.bclib.interfaces.RenderLayerProvider;
 import ru.bclib.util.BlocksHelper;
 
 import java.util.Map;
 import java.util.Optional;
 
 @SuppressWarnings("deprecation")
-public class BaseLadderBlock extends BaseBlockNotFull implements RenderLayerGetter, BlockModelGetter {
+public class BaseLadderBlock extends BaseBlockNotFull implements RenderLayerProvider, BlockModelProvider {
 	public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
 	public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 	protected static final VoxelShape EAST_SHAPE = Block.box(0.0D, 0.0D, 0.0D, 3.0D, 16.0D, 16.0D);

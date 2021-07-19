@@ -29,15 +29,15 @@ import ru.bclib.client.models.BasePatterns;
 import ru.bclib.client.models.ModelsHelper;
 import ru.bclib.client.models.PatternsHelper;
 import ru.bclib.client.render.BCLRenderLayer;
-import ru.bclib.interfaces.BlockModelGetter;
-import ru.bclib.interfaces.RenderLayerGetter;
+import ru.bclib.interfaces.BlockModelProvider;
+import ru.bclib.interfaces.RenderLayerProvider;
 import ru.bclib.registry.BaseBlockEntities;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class BaseFurnaceBlock extends FurnaceBlock implements BlockModelGetter, RenderLayerGetter {
+public class BaseFurnaceBlock extends FurnaceBlock implements BlockModelProvider, RenderLayerProvider {
 	public BaseFurnaceBlock(Block source) {
 		super(FabricBlockSettings.copyOf(source).luminance(state -> state.getValue(LIT) ? 13 : 0));
 	}

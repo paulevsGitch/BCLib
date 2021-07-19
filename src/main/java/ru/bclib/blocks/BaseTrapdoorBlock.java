@@ -18,8 +18,8 @@ import ru.bclib.client.models.BasePatterns;
 import ru.bclib.client.models.ModelsHelper;
 import ru.bclib.client.models.PatternsHelper;
 import ru.bclib.client.render.BCLRenderLayer;
-import ru.bclib.interfaces.BlockModelGetter;
-import ru.bclib.interfaces.RenderLayerGetter;
+import ru.bclib.interfaces.BlockModelProvider;
+import ru.bclib.interfaces.RenderLayerProvider;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class BaseTrapdoorBlock extends TrapDoorBlock implements RenderLayerGetter, BlockModelGetter {
+public class BaseTrapdoorBlock extends TrapDoorBlock implements RenderLayerProvider, BlockModelProvider {
 	public BaseTrapdoorBlock(Block source) {
 		super(FabricBlockSettings.copyOf(source).strength(3.0F, 3.0F).noOcclusion());
 	}

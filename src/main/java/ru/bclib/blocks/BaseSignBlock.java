@@ -42,16 +42,15 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 import ru.bclib.blockentities.BaseSignBlockEntity;
 import ru.bclib.client.models.ModelsHelper;
-import ru.bclib.interfaces.BlockModelGetter;
-import ru.bclib.interfaces.CustomItemGetter;
-import ru.bclib.registry.BlocksRegistry;
+import ru.bclib.interfaces.BlockModelProvider;
+import ru.bclib.interfaces.CustomItemProvider;
 import ru.bclib.util.BlocksHelper;
 
 import java.util.Collections;
 import java.util.List;
 
 @SuppressWarnings("deprecation")
-public class BaseSignBlock extends SignBlock implements BlockModelGetter, CustomItemGetter {
+public class BaseSignBlock extends SignBlock implements BlockModelProvider, CustomItemProvider {
 	public static final IntegerProperty ROTATION = BlockStateProperties.ROTATION_16;
 	public static final BooleanProperty FLOOR = BooleanProperty.create("floor");
 	private static final VoxelShape[] WALL_SHAPES = new VoxelShape[] {

@@ -6,7 +6,7 @@ import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.resources.ResourceLocation;
 import ru.bclib.client.models.ModelsHelper;
 
-public interface ItemModelGetter {
+public interface ItemModelProvider {
 	@Environment(EnvType.CLIENT)
 	default BlockModel getItemModel(ResourceLocation resourceLocation) {
 		return ModelsHelper.createItemModel(resourceLocation);

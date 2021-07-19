@@ -17,13 +17,13 @@ import org.jetbrains.annotations.Nullable;
 import ru.bclib.client.models.BasePatterns;
 import ru.bclib.client.models.ModelsHelper;
 import ru.bclib.client.models.PatternsHelper;
-import ru.bclib.interfaces.BlockModelGetter;
+import ru.bclib.interfaces.BlockModelProvider;
 import ru.bclib.registry.BaseBlockEntities;
 
 import java.util.List;
 import java.util.Optional;
 
-public class BaseChestBlock extends ChestBlock implements BlockModelGetter {
+public class BaseChestBlock extends ChestBlock implements BlockModelProvider {
 	private final Block parent;
 	
 	public BaseChestBlock(Block source) {

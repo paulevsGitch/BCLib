@@ -17,14 +17,14 @@ import org.jetbrains.annotations.Nullable;
 import ru.bclib.client.models.BasePatterns;
 import ru.bclib.client.models.ModelsHelper;
 import ru.bclib.client.models.PatternsHelper;
-import ru.bclib.interfaces.BlockModelGetter;
+import ru.bclib.interfaces.BlockModelProvider;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public abstract class BaseButtonBlock extends ButtonBlock implements BlockModelGetter {
+public abstract class BaseButtonBlock extends ButtonBlock implements BlockModelProvider {
 	
 	private final Block parent;
 	

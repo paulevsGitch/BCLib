@@ -30,14 +30,14 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import ru.bclib.blocks.BlockProperties.TripleShape;
 import ru.bclib.client.render.BCLRenderLayer;
-import ru.bclib.interfaces.RenderLayerGetter;
+import ru.bclib.interfaces.RenderLayerProvider;
 import ru.bclib.util.BlocksHelper;
 
 import java.util.List;
 import java.util.Random;
 
 @SuppressWarnings("deprecation")
-public class BaseVineBlock extends BaseBlockNotFull implements RenderLayerGetter, BonemealableBlock {
+public class BaseVineBlock extends BaseBlockNotFull implements RenderLayerProvider, BonemealableBlock {
 	public static final EnumProperty<TripleShape> SHAPE = BlockProperties.TRIPLE_SHAPE;
 	private static final VoxelShape VOXEL_SHAPE = Block.box(2, 0, 2, 14, 16, 14);
 	

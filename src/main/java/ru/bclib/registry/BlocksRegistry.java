@@ -7,7 +7,7 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
-import ru.bclib.interfaces.CustomItemGetter;
+import ru.bclib.interfaces.CustomItemProvider;
 
 public abstract class BlocksRegistry extends BaseRegistry<Block> {
 	
@@ -18,8 +18,8 @@ public abstract class BlocksRegistry extends BaseRegistry<Block> {
 	@Override
 	public Block register(ResourceLocation id, Block block) {
 		BlockItem item = null;
-		if (block instanceof CustomItemGetter) {
-			item = ((CustomItemGetter) block).getCustomItem(id, makeItemSettings());
+		if (block instanceof CustomItemProvider) {
+			item = ((CustomItemProvider) block).getCustomItem(id, makeItemSettings());
 		}
 		else {
 			item = new BlockItem(block, makeItemSettings());

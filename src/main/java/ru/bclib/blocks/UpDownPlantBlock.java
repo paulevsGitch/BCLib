@@ -24,12 +24,12 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import ru.bclib.client.render.BCLRenderLayer;
-import ru.bclib.interfaces.RenderLayerGetter;
+import ru.bclib.interfaces.RenderLayerProvider;
 
 import java.util.List;
 
 @SuppressWarnings("deprecation")
-public abstract class UpDownPlantBlock extends BaseBlockNotFull implements RenderLayerGetter {
+public abstract class UpDownPlantBlock extends BaseBlockNotFull implements RenderLayerProvider {
 	private static final VoxelShape SHAPE = Block.box(4, 0, 4, 12, 16, 12);
 	
 	public UpDownPlantBlock() {

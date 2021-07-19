@@ -19,15 +19,15 @@ import ru.bclib.client.models.BasePatterns;
 import ru.bclib.client.models.ModelsHelper;
 import ru.bclib.client.models.PatternsHelper;
 import ru.bclib.client.render.BCLRenderLayer;
-import ru.bclib.interfaces.BlockModelGetter;
-import ru.bclib.interfaces.RenderLayerGetter;
+import ru.bclib.interfaces.BlockModelProvider;
+import ru.bclib.interfaces.RenderLayerProvider;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class BaseMetalBarsBlock extends IronBarsBlock implements BlockModelGetter, RenderLayerGetter {
+public class BaseMetalBarsBlock extends IronBarsBlock implements BlockModelProvider, RenderLayerProvider {
 	public BaseMetalBarsBlock(Block source) {
 		super(FabricBlockSettings.copyOf(source).strength(5.0F, 6.0F).noOcclusion());
 	}

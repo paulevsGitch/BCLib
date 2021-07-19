@@ -16,13 +16,13 @@ import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
-import ru.bclib.interfaces.BlockModelGetter;
+import ru.bclib.interfaces.BlockModelProvider;
 import ru.bclib.util.MHelper;
 
 import java.util.Collections;
 import java.util.List;
 
-public class BaseOreBlock extends OreBlock implements BlockModelGetter {
+public class BaseOreBlock extends OreBlock implements BlockModelProvider {
 	private final Item dropItem;
 	private final int minCount;
 	private final int maxCount;

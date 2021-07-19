@@ -5,7 +5,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
 import ru.bclib.registry.BlocksRegistry;
 
-public interface CustomItemGetter {
+public interface CustomItemProvider {
 	/**
 	 * Used to replace default Block Item when block is registered.
 	 *

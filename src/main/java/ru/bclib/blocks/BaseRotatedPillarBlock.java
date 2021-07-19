@@ -14,14 +14,14 @@ import net.minecraft.world.level.storage.loot.LootContext;
 import org.jetbrains.annotations.Nullable;
 import ru.bclib.client.models.ModelsHelper;
 import ru.bclib.client.models.PatternsHelper;
-import ru.bclib.interfaces.BlockModelGetter;
+import ru.bclib.interfaces.BlockModelProvider;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class BaseRotatedPillarBlock extends RotatedPillarBlock implements BlockModelGetter {
+public class BaseRotatedPillarBlock extends RotatedPillarBlock implements BlockModelProvider {
 	public BaseRotatedPillarBlock(Properties settings) {
 		super(settings);
 	}

@@ -8,11 +8,11 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterial;
-import ru.bclib.interfaces.ItemModelGetter;
+import ru.bclib.interfaces.ItemModelProvider;
 
 import java.util.UUID;
 
-public class BaseArmorItem extends ArmorItem implements ItemModelGetter {
+public class BaseArmorItem extends ArmorItem implements ItemModelProvider {
 	
 	protected static final UUID[] ARMOR_MODIFIER_UUID_PER_SLOT = new UUID[] {
 		UUID.fromString("845DB27C-C624-495F-8C9F-6020A9A58B6B"),

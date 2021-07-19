@@ -8,7 +8,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.MaterialColor;
 import net.minecraft.world.level.storage.loot.LootContext;
-import ru.bclib.interfaces.BlockModelGetter;
+import ru.bclib.interfaces.BlockModelProvider;
 
 import java.util.Collections;
 import java.util.List;
@@ -23,7 +23,7 @@ import java.util.function.Consumer;
  *     <li>Automatically create an Item-Model from the Block-Model</li>
  * </ul>
  */
-public class BaseBlock extends Block implements BlockModelGetter {
+public class BaseBlock extends Block implements BlockModelProvider {
 	/**
 	 * Creates a new Block with the passed properties
 	 *

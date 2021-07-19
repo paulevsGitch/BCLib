@@ -30,7 +30,7 @@ import ru.bclib.blockentities.BaseBarrelBlockEntity;
 import ru.bclib.client.models.BasePatterns;
 import ru.bclib.client.models.ModelsHelper;
 import ru.bclib.client.models.PatternsHelper;
-import ru.bclib.interfaces.BlockModelGetter;
+import ru.bclib.interfaces.BlockModelProvider;
 import ru.bclib.registry.BaseBlockEntities;
 
 import java.util.List;
@@ -38,7 +38,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 
-public class BaseBarrelBlock extends BarrelBlock implements BlockModelGetter {
+public class BaseBarrelBlock extends BarrelBlock implements BlockModelProvider {
 	public BaseBarrelBlock(Block source) {
 		super(FabricBlockSettings.copyOf(source).noOcclusion());
 	}

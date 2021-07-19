@@ -16,9 +16,9 @@ import net.minecraft.world.item.ShovelItem;
 import net.minecraft.world.item.Tier;
 import net.minecraft.world.level.block.state.BlockState;
 import ru.bclib.client.models.ModelsHelper;
-import ru.bclib.interfaces.ItemModelGetter;
+import ru.bclib.interfaces.ItemModelProvider;
 
-public class BaseShovelItem extends ShovelItem implements DynamicAttributeTool, ItemModelGetter {
+public class BaseShovelItem extends ShovelItem implements DynamicAttributeTool, ItemModelProvider {
 	public BaseShovelItem(Tier material, float attackDamage, float attackSpeed, Properties settings) {
 		super(material, attackDamage, attackSpeed, settings);
 	}

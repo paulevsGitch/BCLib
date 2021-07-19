@@ -6,9 +6,9 @@ import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import ru.bclib.client.models.ModelsHelper;
-import ru.bclib.interfaces.ItemModelGetter;
+import ru.bclib.interfaces.ItemModelProvider;
 
-public class ModelProviderItem extends Item implements ItemModelGetter {
+public class ModelProviderItem extends Item implements ItemModelProvider {
 	public ModelProviderItem(Properties settings) {
 		super(settings);
 	}

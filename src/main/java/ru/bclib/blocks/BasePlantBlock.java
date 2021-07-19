@@ -27,13 +27,13 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import ru.bclib.client.render.BCLRenderLayer;
-import ru.bclib.interfaces.RenderLayerGetter;
+import ru.bclib.interfaces.RenderLayerProvider;
 
 import java.util.List;
 import java.util.Random;
 
 @SuppressWarnings("deprecation")
-public abstract class BasePlantBlock extends BaseBlockNotFull implements RenderLayerGetter, BonemealableBlock {
+public abstract class BasePlantBlock extends BaseBlockNotFull implements RenderLayerProvider, BonemealableBlock {
 	private static final VoxelShape SHAPE = Block.box(4, 0, 4, 12, 14, 12);
 	
 	public BasePlantBlock() {

@@ -16,9 +16,9 @@ import net.minecraft.world.item.PickaxeItem;
 import net.minecraft.world.item.Tier;
 import net.minecraft.world.level.block.state.BlockState;
 import ru.bclib.client.models.ModelsHelper;
-import ru.bclib.interfaces.ItemModelGetter;
+import ru.bclib.interfaces.ItemModelProvider;
 
-public class BasePickaxeItem extends PickaxeItem implements DynamicAttributeTool, ItemModelGetter {
+public class BasePickaxeItem extends PickaxeItem implements DynamicAttributeTool, ItemModelProvider {
 	public BasePickaxeItem(Tier material, int attackDamage, float attackSpeed, Properties settings) {
 		super(material, attackDamage, attackSpeed, settings);
 	}

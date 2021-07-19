@@ -16,7 +16,7 @@ import java.util.Optional;
 
 import static net.minecraft.client.resources.model.ModelBakery.MISSING_MODEL_LOCATION;
 
-public interface BlockModelGetter extends ItemModelGetter {
+public interface BlockModelProvider extends ItemModelProvider {
 	@Environment(EnvType.CLIENT)
 	default @Nullable BlockModel getBlockModel(ResourceLocation resourceLocation, BlockState blockState) {
 		Optional<String> pattern = PatternsHelper.createBlockSimple(resourceLocation);

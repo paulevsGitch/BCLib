@@ -24,16 +24,15 @@ import org.jetbrains.annotations.Nullable;
 import ru.bclib.client.models.BasePatterns;
 import ru.bclib.client.models.ModelsHelper;
 import ru.bclib.client.models.PatternsHelper;
-import ru.bclib.interfaces.BlockModelGetter;
-import ru.bclib.interfaces.CustomItemGetter;
+import ru.bclib.interfaces.BlockModelProvider;
+import ru.bclib.interfaces.CustomItemProvider;
 import ru.bclib.items.BaseAnvilItem;
-import ru.bclib.registry.BlocksRegistry;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public abstract class BaseAnvilBlock extends AnvilBlock implements BlockModelGetter, CustomItemGetter {
+public abstract class BaseAnvilBlock extends AnvilBlock implements BlockModelProvider, CustomItemProvider {
 	public static final IntegerProperty DESTRUCTION = BlockProperties.DESTRUCTION;
 	
 	public BaseAnvilBlock(MaterialColor color) {

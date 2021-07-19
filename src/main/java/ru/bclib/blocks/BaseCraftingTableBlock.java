@@ -14,14 +14,14 @@ import org.jetbrains.annotations.Nullable;
 import ru.bclib.client.models.BasePatterns;
 import ru.bclib.client.models.ModelsHelper;
 import ru.bclib.client.models.PatternsHelper;
-import ru.bclib.interfaces.BlockModelGetter;
+import ru.bclib.interfaces.BlockModelProvider;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
-public class BaseCraftingTableBlock extends CraftingTableBlock implements BlockModelGetter {
+public class BaseCraftingTableBlock extends CraftingTableBlock implements BlockModelProvider {
 	public BaseCraftingTableBlock(Block source) {
 		super(FabricBlockSettings.copyOf(source));
 	}

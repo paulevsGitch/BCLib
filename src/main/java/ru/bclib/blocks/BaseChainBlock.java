@@ -18,15 +18,15 @@ import ru.bclib.client.models.BasePatterns;
 import ru.bclib.client.models.ModelsHelper;
 import ru.bclib.client.models.PatternsHelper;
 import ru.bclib.client.render.BCLRenderLayer;
-import ru.bclib.interfaces.BlockModelGetter;
-import ru.bclib.interfaces.RenderLayerGetter;
+import ru.bclib.interfaces.BlockModelProvider;
+import ru.bclib.interfaces.RenderLayerProvider;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class BaseChainBlock extends ChainBlock implements BlockModelGetter, RenderLayerGetter {
+public class BaseChainBlock extends ChainBlock implements BlockModelProvider, RenderLayerProvider {
 	public BaseChainBlock(MaterialColor color) {
 		super(FabricBlockSettings.copyOf(Blocks.CHAIN).mapColor(color));
 	}

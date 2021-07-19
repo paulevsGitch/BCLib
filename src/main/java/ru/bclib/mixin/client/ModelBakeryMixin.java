@@ -20,8 +20,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import ru.bclib.BCLib;
-import ru.bclib.interfaces.BlockModelGetter;
-import ru.bclib.interfaces.ItemModelGetter;
+import ru.bclib.interfaces.BlockModelProvider;
+import ru.bclib.interfaces.ItemModelProvider;
 
 import java.util.List;
 import java.util.Map;
@@ -51,14 +51,14 @@ public abstract class ModelBakeryMixin {
 				ResourceLocation itemModelLoc = new ResourceLocation(modId, "models/" + itemLoc.getPath() + ".json");
 				if (!resourceManager.hasResource(itemModelLoc)) {
 					Item item = Registry.ITEM.get(clearLoc);
-					ItemModelGetter modelProvider = null;
-					if (item instanceof ItemModelGetter) {
-						modelProvider = (ItemModelGetter) item;
+					ItemModelProvider modelProvider = null;
+					if (item instanceof ItemModelProvider) {
+						modelProvider = (ItemModelProvider) item;
 					}
 					else if (item instanceof BlockItem) {
 						Block block = Registry.BLOCK.get(clearLoc);
-						if (block instanceof ItemModelGetter) {
-							modelProvider = (ItemModelGetter) block;
+						if (block instanceof ItemModelProvider) {
+							modelProvider = (ItemModelProvider) block;
 						}
 					}
 					if (modelProvider != null) {
@@ -79,7 +79,7 @@ public abstract class ModelBakeryMixin {
 				ResourceLocation stateLoc = new ResourceLocation(modId, "blockstates/" + path + ".json");
 				if (!resourceManager.hasResource(stateLoc)) {
 					Block block = Registry.BLOCK.get(clearLoc);
-					if (block instanceof BlockModelGetter) {
+					if (block instanceof BlockModelProvider) {
 						List<BlockState> possibleStates = block.getStateDefinition().getPossibleStates();
 						Optional<BlockState> possibleState = possibleStates.stream()
 																		   .filter(state -> modelId.equals(
@@ -89,7 +89,7 @@ public abstract class ModelBakeryMixin {
 																			   )))
 																		   .findFirst();
 						if (possibleState.isPresent()) {
-							UnbakedModel modelVariant = ((BlockModelGetter) block).getModelVariant(
+							UnbakedModel modelVariant = ((BlockModelProvider) block).getModelVariant(
 								modelId,
 								possibleState.get(),
 								unbakedCache

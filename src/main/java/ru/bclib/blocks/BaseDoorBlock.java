@@ -21,15 +21,15 @@ import ru.bclib.client.models.BasePatterns;
 import ru.bclib.client.models.ModelsHelper;
 import ru.bclib.client.models.PatternsHelper;
 import ru.bclib.client.render.BCLRenderLayer;
-import ru.bclib.interfaces.BlockModelGetter;
-import ru.bclib.interfaces.RenderLayerGetter;
+import ru.bclib.interfaces.BlockModelProvider;
+import ru.bclib.interfaces.RenderLayerProvider;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class BaseDoorBlock extends DoorBlock implements RenderLayerGetter, BlockModelGetter {
+public class BaseDoorBlock extends DoorBlock implements RenderLayerProvider, BlockModelProvider {
 	public BaseDoorBlock(Block source) {
 		super(FabricBlockSettings.copyOf(source).strength(3F, 3F).noOcclusion());
 	}
