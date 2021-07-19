@@ -1,20 +1,18 @@
 package ru.bclib.config;
 
+import com.google.common.collect.Maps;
+import com.google.common.reflect.TypeToken;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import net.minecraft.util.GsonHelper;
+import org.jetbrains.annotations.Nullable;
+import ru.bclib.util.JsonFactory;
+
 import java.io.File;
 import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-
-import org.jetbrains.annotations.Nullable;
-
-import com.google.common.collect.Maps;
-import com.google.common.reflect.TypeToken;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-
-import net.minecraft.util.GsonHelper;
-import ru.bclib.util.JsonFactory;
 
 public final class ConfigKeeper {
 	private final Map<ConfigKey, Entry<?>> configEntries = Maps.newHashMap();
@@ -26,7 +24,7 @@ public final class ConfigKeeper {
 	public ConfigKeeper(String modID, String group) {
 		this(modID, group, null);
 	}
-
+	
 	protected ConfigKeeper(String modID, String group, File path) {
 		this.writer = new ConfigWriter(modID, group, path);
 		this.configObject = writer.load();

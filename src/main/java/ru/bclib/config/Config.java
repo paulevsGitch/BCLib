@@ -1,7 +1,5 @@
 package ru.bclib.config;
 
-import java.io.File;
-
 import org.jetbrains.annotations.Nullable;
 import ru.bclib.BCLib;
 import ru.bclib.config.ConfigKeeper.BooleanEntry;
@@ -11,12 +9,14 @@ import ru.bclib.config.ConfigKeeper.IntegerEntry;
 import ru.bclib.config.ConfigKeeper.RangeEntry;
 import ru.bclib.config.ConfigKeeper.StringEntry;
 
+import java.io.File;
+
 public abstract class Config {
 	protected final ConfigKeeper keeper;
 	
 	protected abstract void registerEntries();
-
-	public Config(String modID, String group){
+	
+	public Config(String modID, String group) {
 		this(modID, group, null);
 	}
 	

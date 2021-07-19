@@ -1,8 +1,8 @@
 package ru.bclib.config;
 
-import java.util.Arrays;
-
 import net.minecraft.resources.ResourceLocation;
+
+import java.util.Arrays;
 
 public class ConfigKey {
 	private final String path[];

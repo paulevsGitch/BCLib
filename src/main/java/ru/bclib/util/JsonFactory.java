@@ -52,6 +52,7 @@ public class JsonFactory {
 	
 	/**
 	 * Loads {@link JsonObject} from resource location using Minecraft resource manager. Can be used to load JSON from resourcepacks and resources.
+	 *
 	 * @param location {@link ResourceLocation} to JSON file
 	 * @return {@link JsonObject}
 	 */
@@ -70,7 +71,8 @@ public class JsonFactory {
 				stream.close();
 			}
 		}
-		catch (IOException ex) {}
+		catch (IOException ex) {
+		}
 		return obj;
 	}
 	

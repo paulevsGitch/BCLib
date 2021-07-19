@@ -25,11 +25,7 @@ public class TextureAtlasMixin {
 		bclib_modifyAtlas = resourceLocation.toString().equals("minecraft:textures/atlas/blocks.png");
 	}
 	
-	@Inject(
-		method = "load(Lnet/minecraft/server/packs/resources/ResourceManager;Lnet/minecraft/client/renderer/texture/TextureAtlasSprite$Info;IIIII)Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;",
-		at = @At("HEAD"),
-		cancellable = true
-	)
+	@Inject(method = "load(Lnet/minecraft/server/packs/resources/ResourceManager;Lnet/minecraft/client/renderer/texture/TextureAtlasSprite$Info;IIIII)Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;", at = @At("HEAD"), cancellable = true)
 	private void bclib_loadSprite(ResourceManager resourceManager, TextureAtlasSprite.Info spriteInfo, int atlasWidth, int atlasHeight, int maxLevel, int posX, int posY, CallbackInfoReturnable<TextureAtlasSprite> info) {
 		ResourceLocation location = spriteInfo.name();
 		if (bclib_modifyAtlas && location.getPath().startsWith("block")) {

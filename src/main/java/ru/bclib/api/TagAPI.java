@@ -1,7 +1,5 @@
 package ru.bclib.api;
 
-import java.util.function.Supplier;
-
 import net.fabricmc.fabric.api.tag.TagRegistry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
@@ -15,6 +13,8 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import ru.bclib.BCLib;
 import ru.bclib.util.TagHelper;
+
+import java.util.function.Supplier;
 
 public class TagAPI {
 	// Block Tags

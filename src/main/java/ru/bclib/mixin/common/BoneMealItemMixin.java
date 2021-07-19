@@ -7,7 +7,6 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.BoneMealItem;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.biome.Biome.BiomeCategory;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -18,11 +17,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import ru.bclib.api.BiomeAPI;
 import ru.bclib.api.BonemealAPI;
-import ru.bclib.api.TagAPI;
 import ru.bclib.util.BlocksHelper;
 import ru.bclib.util.MHelper;
-
-import java.util.Collection;
 
 @Mixin(BoneMealItem.class)
 public class BoneMealItemMixin {
@@ -139,7 +135,7 @@ public class BoneMealItemMixin {
 			Block terrain = BonemealAPI.getSpreadable(state.getBlock());
 			if (center.is(terrain)) {
 				if (haveSameProperties(state, center)) {
-					for (Property property: center.getProperties()) {
+					for (Property property : center.getProperties()) {
 						state = state.setValue(property, center.getValue(property));
 					}
 				}

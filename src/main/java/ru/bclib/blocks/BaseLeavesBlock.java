@@ -1,11 +1,6 @@
 package ru.bclib.blocks;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.function.Consumer;
-
 import com.google.common.collect.Lists;
-
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.tool.attribute.v1.FabricToolTags;
 import net.minecraft.client.renderer.block.model.BlockModel;
@@ -25,29 +20,25 @@ import ru.bclib.client.render.BCLRenderLayer;
 import ru.bclib.interfaces.IRenderTyped;
 import ru.bclib.util.MHelper;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.function.Consumer;
+
 public class BaseLeavesBlock extends LeavesBlock implements BlockModelProvider, IRenderTyped {
 	private final Block sapling;
-
-	private static FabricBlockSettings makeLeaves(MaterialColor color){
-		return FabricBlockSettings
-				.copyOf(Blocks.OAK_LEAVES)
-				.mapColor(color)
-				.breakByTool(FabricToolTags.HOES)
-				.breakByTool(FabricToolTags.SHEARS)
-				.breakByHand(true)
-				.allowsSpawning((state, world, pos, type) -> false)
-				.suffocates((state, world, pos) -> false)
-				.blockVision((state, world, pos) -> false);
+	
+	private static FabricBlockSettings makeLeaves(MaterialColor color) {
+		return FabricBlockSettings.copyOf(Blocks.OAK_LEAVES).mapColor(color).breakByTool(FabricToolTags.HOES).breakByTool(FabricToolTags.SHEARS).breakByHand(true).allowsSpawning((state, world, pos, type) -> false).suffocates((state, world, pos) -> false).blockVision((state, world, pos) -> false);
 	}
-
+	
 	public BaseLeavesBlock(Block sapling, MaterialColor color, Consumer<FabricBlockSettings> customizeProperties) {
-        super(BaseBlock.acceptAndReturn(customizeProperties, makeLeaves(color)));
-        this.sapling = sapling;
+		super(BaseBlock.acceptAndReturn(customizeProperties, makeLeaves(color)));
+		this.sapling = sapling;
 	}
-
-    public BaseLeavesBlock(Block sapling, MaterialColor color, int light, Consumer<FabricBlockSettings> customizeProperties) {
-        super(BaseBlock.acceptAndReturn(customizeProperties, makeLeaves(color).luminance(light)));
-        this.sapling = sapling;
+	
+	public BaseLeavesBlock(Block sapling, MaterialColor color, int light, Consumer<FabricBlockSettings> customizeProperties) {
+		super(BaseBlock.acceptAndReturn(customizeProperties, makeLeaves(color).luminance(light)));
+		this.sapling = sapling;
 	}
 	
 	public BaseLeavesBlock(Block sapling, MaterialColor color) {
