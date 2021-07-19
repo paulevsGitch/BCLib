@@ -3,7 +3,6 @@ package ru.bclib.interfaces;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
-import ru.bclib.registry.BlocksRegistry;
 
 public interface CustomItemProvider {
 	/**
