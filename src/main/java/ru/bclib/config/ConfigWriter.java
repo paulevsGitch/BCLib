@@ -1,12 +1,13 @@
 package ru.bclib.config;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import net.fabricmc.loader.api.FabricLoader;
-import ru.bclib.util.JsonFactory;
-
 import java.io.File;
 import java.nio.file.Path;
+
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
+import net.fabricmc.loader.api.FabricLoader;
+import ru.bclib.util.JsonFactory;
 
 public class ConfigWriter {
 	private final static Path GAME_CONFIG_DIR = FabricLoader.getInstance().getConfigDir();
@@ -15,7 +16,16 @@ public class ConfigWriter {
 	private JsonObject configObject;
 	
 	public ConfigWriter(String modID, String configFile) {
-		this.configFile = new File(new File(GAME_CONFIG_DIR.toFile(), modID), configFile + ".json");
+		this(modID, configFile, null);
+	}
+
+	public ConfigWriter(String modID, String configFile, File configFolder) {
+		this.configFile = new File(
+				(configFolder==null
+						? GAME_CONFIG_DIR.resolve(modID).toFile()
+						: new File(configFolder, modID)),
+				configFile + ".json"
+		);
 		File parent = this.configFile.getParentFile();
 		if (!parent.exists()) {
 			parent.mkdirs();
