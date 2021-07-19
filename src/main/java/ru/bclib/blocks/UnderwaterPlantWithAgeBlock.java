@@ -18,7 +18,12 @@ public abstract class UnderwaterPlantWithAgeBlock extends UnderwaterPlantBlock {
 	public static final IntegerProperty AGE = BlockProperties.AGE;
 	
 	public UnderwaterPlantWithAgeBlock() {
-		super(FabricBlockSettings.of(Material.WATER_PLANT).breakByTool(FabricToolTags.SHEARS).breakByHand(true).sound(SoundType.WET_GRASS).randomTicks().noCollission());
+		super(FabricBlockSettings.of(Material.WATER_PLANT)
+								 .breakByTool(FabricToolTags.SHEARS)
+								 .breakByHand(true)
+								 .sound(SoundType.WET_GRASS)
+								 .randomTicks()
+								 .noCollission());
 	}
 	
 	@Override

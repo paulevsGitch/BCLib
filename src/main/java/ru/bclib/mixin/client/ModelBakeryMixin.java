@@ -20,8 +20,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import ru.bclib.BCLib;
-import ru.bclib.client.models.BlockModelProvider;
-import ru.bclib.client.models.ItemModelProvider;
+import ru.bclib.interfaces.BlockModelGetter;
+import ru.bclib.interfaces.ItemModelGetter;
 
 import java.util.List;
 import java.util.Map;
@@ -51,14 +51,14 @@ public abstract class ModelBakeryMixin {
 				ResourceLocation itemModelLoc = new ResourceLocation(modId, "models/" + itemLoc.getPath() + ".json");
 				if (!resourceManager.hasResource(itemModelLoc)) {
 					Item item = Registry.ITEM.get(clearLoc);
-					ItemModelProvider modelProvider = null;
-					if (item instanceof ItemModelProvider) {
-						modelProvider = (ItemModelProvider) item;
+					ItemModelGetter modelProvider = null;
+					if (item instanceof ItemModelGetter) {
+						modelProvider = (ItemModelGetter) item;
 					}
 					else if (item instanceof BlockItem) {
 						Block block = Registry.BLOCK.get(clearLoc);
-						if (block instanceof ItemModelProvider) {
-							modelProvider = (ItemModelProvider) block;
+						if (block instanceof ItemModelGetter) {
+							modelProvider = (ItemModelGetter) block;
 						}
 					}
 					if (modelProvider != null) {
@@ -79,15 +79,28 @@ public abstract class ModelBakeryMixin {
 				ResourceLocation stateLoc = new ResourceLocation(modId, "blockstates/" + path + ".json");
 				if (!resourceManager.hasResource(stateLoc)) {
 					Block block = Registry.BLOCK.get(clearLoc);
-					if (block instanceof BlockModelProvider) {
+					if (block instanceof BlockModelGetter) {
 						List<BlockState> possibleStates = block.getStateDefinition().getPossibleStates();
-						Optional<BlockState> possibleState = possibleStates.stream().filter(state -> modelId.equals(BlockModelShaper.stateToModelLocation(clearLoc, state))).findFirst();
+						Optional<BlockState> possibleState = possibleStates.stream()
+																		   .filter(state -> modelId.equals(
+																			   BlockModelShaper.stateToModelLocation(
+																				   clearLoc,
+																				   state
+																			   )))
+																		   .findFirst();
 						if (possibleState.isPresent()) {
-							UnbakedModel modelVariant = ((BlockModelProvider) block).getModelVariant(modelId, possibleState.get(), unbakedCache);
+							UnbakedModel modelVariant = ((BlockModelGetter) block).getModelVariant(
+								modelId,
+								possibleState.get(),
+								unbakedCache
+							);
 							if (modelVariant != null) {
 								if (modelVariant instanceof MultiPart) {
 									possibleStates.forEach(state -> {
-										ResourceLocation stateId = BlockModelShaper.stateToModelLocation(clearLoc, state);
+										ResourceLocation stateId = BlockModelShaper.stateToModelLocation(
+											clearLoc,
+											state
+										);
 										cacheAndQueueDependencies(stateId, modelVariant);
 									});
 								}

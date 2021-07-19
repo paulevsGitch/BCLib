@@ -18,7 +18,11 @@ public class DestructionStructureProcessor extends StructureProcessor {
 	
 	@Override
 	public StructureBlockInfo processBlock(LevelReader worldView, BlockPos pos, BlockPos blockPos, StructureBlockInfo structureBlockInfo, StructureBlockInfo structureBlockInfo2, StructurePlaceSettings structurePlacementData) {
-		if (!BlocksHelper.isInvulnerable(structureBlockInfo2.state, worldView, structureBlockInfo2.pos) && MHelper.RANDOM.nextInt(chance) == 0) {
+		if (!BlocksHelper.isInvulnerable(
+			structureBlockInfo2.state,
+			worldView,
+			structureBlockInfo2.pos
+		) && MHelper.RANDOM.nextInt(chance) == 0) {
 			return null;
 		}
 		return structureBlockInfo2;

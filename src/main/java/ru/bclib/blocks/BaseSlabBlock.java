@@ -16,16 +16,16 @@ import net.minecraft.world.level.block.state.properties.SlabType;
 import net.minecraft.world.level.storage.loot.LootContext;
 import org.jetbrains.annotations.Nullable;
 import ru.bclib.client.models.BasePatterns;
-import ru.bclib.client.models.BlockModelProvider;
 import ru.bclib.client.models.ModelsHelper;
 import ru.bclib.client.models.PatternsHelper;
+import ru.bclib.interfaces.BlockModelGetter;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class BaseSlabBlock extends SlabBlock implements BlockModelProvider {
+public class BaseSlabBlock extends SlabBlock implements BlockModelGetter {
 	private final Block parent;
 	
 	public BaseSlabBlock(Block source) {
@@ -63,7 +63,10 @@ public class BaseSlabBlock extends SlabBlock implements BlockModelProvider {
 	@Environment(EnvType.CLIENT)
 	public UnbakedModel getModelVariant(ResourceLocation stateId, BlockState blockState, Map<ResourceLocation, UnbakedModel> modelCache) {
 		SlabType type = blockState.getValue(TYPE);
-		ResourceLocation modelId = new ResourceLocation(stateId.getNamespace(), "block/" + stateId.getPath() + "_" + type);
+		ResourceLocation modelId = new ResourceLocation(
+			stateId.getNamespace(),
+			"block/" + stateId.getPath() + "_" + type
+		);
 		registerBlockModel(stateId, modelId, blockState, modelCache);
 		if (type == SlabType.TOP) {
 			return ModelsHelper.createMultiVariant(modelId, BlockModelRotation.X180_Y0.getRotation(), true);

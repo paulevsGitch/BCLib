@@ -15,10 +15,10 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.PickaxeItem;
 import net.minecraft.world.item.Tier;
 import net.minecraft.world.level.block.state.BlockState;
-import ru.bclib.client.models.ItemModelProvider;
 import ru.bclib.client.models.ModelsHelper;
+import ru.bclib.interfaces.ItemModelGetter;
 
-public class BasePickaxeItem extends PickaxeItem implements DynamicAttributeTool, ItemModelProvider {
+public class BasePickaxeItem extends PickaxeItem implements DynamicAttributeTool, ItemModelGetter {
 	public BasePickaxeItem(Tier material, int attackDamage, float attackSpeed, Properties settings) {
 		super(material, attackDamage, attackSpeed, settings);
 	}
@@ -34,7 +34,10 @@ public class BasePickaxeItem extends PickaxeItem implements DynamicAttributeTool
 	@Override
 	public float getDestroySpeed(ItemStack stack, BlockState state) {
 		Entry entry = ToolManagerImpl.entryNullable(state.getBlock());
-		return (entry != null && entry.getMiningLevel(FabricToolTags.PICKAXES) >= 0) ? speed : super.getDestroySpeed(stack, state);
+		return (entry != null && entry.getMiningLevel(FabricToolTags.PICKAXES) >= 0) ? speed : super.getDestroySpeed(
+			stack,
+			state
+		);
 	}
 	
 	@Override

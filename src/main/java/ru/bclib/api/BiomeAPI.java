@@ -24,7 +24,12 @@ public class BiomeAPI {
 	 * Empty biome used as default value if requested biome doesn't exist or linked. Shouldn't be registered anywhere to prevent bugs.
 	 * Have {@code Biomes.THE_VOID} as the reference biome.
 	 */
-	public static final BCLBiome EMPTY_BIOME = new BCLBiome(Biomes.THE_VOID.location(), BuiltinRegistries.BIOME.get(Biomes.THE_VOID), 1, 0);
+	public static final BCLBiome EMPTY_BIOME = new BCLBiome(
+		Biomes.THE_VOID.location(),
+		BuiltinRegistries.BIOME.get(Biomes.THE_VOID),
+		1,
+		0
+	);
 	
 	private static final HashMap<ResourceLocation, BCLBiome> ID_MAP = Maps.newHashMap();
 	private static final HashMap<Biome, BCLBiome> CLIENT = Maps.newHashMap();
@@ -55,7 +60,13 @@ public class BiomeAPI {
 	public static void addNetherBiomeToFabricApi(BCLBiome biome) {
 		ResourceKey<Biome> key = BuiltinRegistries.BIOME.getResourceKey(biome.getBiome()).get();
 		Random random = new Random(biome.getID().toString().hashCode());
-		ClimateParameters parameters = new ClimateParameters(MHelper.randRange(-2F, 2F, random), MHelper.randRange(-2F, 2F, random), MHelper.randRange(-2F, 2F, random), MHelper.randRange(-2F, 2F, random), MHelper.randRange(-2F, 2F, random));
+		ClimateParameters parameters = new ClimateParameters(
+			MHelper.randRange(-2F, 2F, random),
+			MHelper.randRange(-2F, 2F, random),
+			MHelper.randRange(-2F, 2F, random),
+			MHelper.randRange(-2F, 2F, random),
+			MHelper.randRange(-2F, 2F, random)
+		);
 		InternalBiomeData.addNetherBiome(key, parameters);
 	}
 	
@@ -106,7 +117,9 @@ public class BiomeAPI {
 		BCLBiome endBiome = CLIENT.get(biome);
 		if (endBiome == null) {
 			Minecraft minecraft = Minecraft.getInstance();
-			ResourceLocation id = minecraft.level.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY).getKey(biome);
+			ResourceLocation id = minecraft.level.registryAccess()
+												 .registryOrThrow(Registry.BIOME_REGISTRY)
+												 .getKey(biome);
 			endBiome = id == null ? EMPTY_BIOME : ID_MAP.getOrDefault(id, EMPTY_BIOME);
 			CLIENT.put(biome, endBiome);
 		}

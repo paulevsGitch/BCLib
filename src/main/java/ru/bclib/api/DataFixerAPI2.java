@@ -166,12 +166,20 @@ public class DataFixerAPI2 {
 			if (modID == null || "".equals(modID)) {
 				throw new RuntimeException("[INTERNAL ERROR] Patches need a valid modID!");
 			}
-			if (!ALL.stream().filter(p -> p.getModID().equals(modID)).noneMatch(p -> p.getLevel() >= level) || level <= 0) {
-				throw new RuntimeException("[INTERNAL ERROR] Patch-levels need to be created in ascending order beginning with 1.");
+			if (!ALL.stream()
+					.filter(p -> p.getModID().equals(modID))
+					.noneMatch(p -> p.getLevel() >= level) || level <= 0) {
+				throw new RuntimeException(
+					"[INTERNAL ERROR] Patch-levels need to be created in ascending order beginning with 1.");
 			}
 			
 			
-			BCLib.LOGGER.info("Creating Patchlevel {} ({}, {})", level, ALL, ALL.stream().noneMatch(p -> p.getLevel() >= level));
+			BCLib.LOGGER.info(
+				"Creating Patchlevel {} ({}, {})",
+				level,
+				ALL,
+				ALL.stream().noneMatch(p -> p.getLevel() >= level)
+			);
 			this.level = level;
 			this.modID = modID;
 		}
@@ -229,7 +237,10 @@ public class DataFixerAPI2 {
 			private MigrationData(PathConfig config) {
 				this.config = config;
 				
-				this.mods = Collections.unmodifiableSet(Patch.getALL().stream().map(p -> p.modID).collect(Collectors.toSet()));
+				this.mods = Collections.unmodifiableSet(Patch.getALL()
+															 .stream()
+															 .map(p -> p.modID)
+															 .collect(Collectors.toSet()));
 				
 				HashMap<String, String> replacements = new HashMap<String, String>();
 				for (String modID : mods) {
@@ -249,7 +260,13 @@ public class DataFixerAPI2 {
 			
 			final public void markApplied() {
 				for (String modID : mods) {
-					LOGGER.info("Updating Patch-Level for '{}' from {} to {} -> {}", modID, currentPatchLevel(modID), Patch.maxPatchLevel(modID), config.setInt(Configs.MAIN_PATCH_CATEGORY, modID, Patch.maxPatchLevel(modID)));
+					LOGGER.info(
+						"Updating Patch-Level for '{}' from {} to {} -> {}",
+						modID,
+						currentPatchLevel(modID),
+						Patch.maxPatchLevel(modID),
+						config.setInt(Configs.MAIN_PATCH_CATEGORY, modID, Patch.maxPatchLevel(modID))
+					);
 				}
 				
 				config.saveChanges();

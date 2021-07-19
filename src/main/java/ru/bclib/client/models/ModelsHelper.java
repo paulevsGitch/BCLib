@@ -78,7 +78,12 @@ public class ModelsHelper {
 	}
 	
 	public static MultiVariant createRandomTopModel(ResourceLocation resourceLocation) {
-		return new MultiVariant(Lists.newArrayList(new Variant(resourceLocation, Transformation.identity(), false, 1), new Variant(resourceLocation, BlockModelRotation.X0_Y90.getRotation(), false, 1), new Variant(resourceLocation, BlockModelRotation.X0_Y180.getRotation(), false, 1), new Variant(resourceLocation, BlockModelRotation.X0_Y270.getRotation(), false, 1)));
+		return new MultiVariant(Lists.newArrayList(
+			new Variant(resourceLocation, Transformation.identity(), false, 1),
+			new Variant(resourceLocation, BlockModelRotation.X0_Y90.getRotation(), false, 1),
+			new Variant(resourceLocation, BlockModelRotation.X0_Y180.getRotation(), false, 1),
+			new Variant(resourceLocation, BlockModelRotation.X0_Y270.getRotation(), false, 1)
+		));
 	}
 	
 	public static class MultiPartBuilder {

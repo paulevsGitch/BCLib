@@ -31,21 +31,30 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import ru.bclib.client.render.BCLRenderLayer;
-import ru.bclib.interfaces.IRenderTyped;
+import ru.bclib.interfaces.RenderLayerGetter;
 
 import java.util.List;
 import java.util.Random;
 
 @SuppressWarnings("deprecation")
-public abstract class UnderwaterPlantBlock extends BaseBlockNotFull implements IRenderTyped, BonemealableBlock, LiquidBlockContainer {
+public abstract class UnderwaterPlantBlock extends BaseBlockNotFull implements RenderLayerGetter, BonemealableBlock, LiquidBlockContainer {
 	private static final VoxelShape SHAPE = Block.box(4, 0, 4, 12, 14, 12);
 	
 	public UnderwaterPlantBlock() {
-		super(FabricBlockSettings.of(Material.WATER_PLANT).breakByTool(FabricToolTags.SHEARS).breakByHand(true).sound(SoundType.WET_GRASS).noCollission());
+		super(FabricBlockSettings.of(Material.WATER_PLANT)
+								 .breakByTool(FabricToolTags.SHEARS)
+								 .breakByHand(true)
+								 .sound(SoundType.WET_GRASS)
+								 .noCollission());
 	}
 	
 	public UnderwaterPlantBlock(int light) {
-		super(FabricBlockSettings.of(Material.WATER_PLANT).breakByTool(FabricToolTags.SHEARS).breakByHand(true).luminance(light).sound(SoundType.WET_GRASS).noCollission());
+		super(FabricBlockSettings.of(Material.WATER_PLANT)
+								 .breakByTool(FabricToolTags.SHEARS)
+								 .breakByHand(true)
+								 .luminance(light)
+								 .sound(SoundType.WET_GRASS)
+								 .noCollission());
 	}
 	
 	public UnderwaterPlantBlock(Properties settings) {
@@ -86,7 +95,10 @@ public abstract class UnderwaterPlantBlock extends BaseBlockNotFull implements I
 	@Override
 	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
 		ItemStack tool = builder.getParameter(LootContextParams.TOOL);
-		if (tool != null && FabricToolTags.SHEARS.contains(tool.getItem()) || EnchantmentHelper.getItemEnchantmentLevel(Enchantments.SILK_TOUCH, tool) > 0) {
+		if (tool != null && FabricToolTags.SHEARS.contains(tool.getItem()) || EnchantmentHelper.getItemEnchantmentLevel(
+			Enchantments.SILK_TOUCH,
+			tool
+		) > 0) {
 			return Lists.newArrayList(new ItemStack(this));
 		}
 		else {
@@ -111,7 +123,13 @@ public abstract class UnderwaterPlantBlock extends BaseBlockNotFull implements I
 	
 	@Override
 	public void performBonemeal(ServerLevel world, Random random, BlockPos pos, BlockState state) {
-		ItemEntity item = new ItemEntity(world, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, new ItemStack(this));
+		ItemEntity item = new ItemEntity(
+			world,
+			pos.getX() + 0.5,
+			pos.getY() + 0.5,
+			pos.getZ() + 0.5,
+			new ItemStack(this)
+		);
 		world.addFreshEntity(item);
 	}
 	

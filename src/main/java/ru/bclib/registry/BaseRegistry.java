@@ -14,10 +14,11 @@ import java.util.List;
 import java.util.Map;
 
 public abstract class BaseRegistry<T> {
-	
 	private static final List<BaseRegistry<?>> REGISTRIES = Lists.newArrayList();
 	private static final Map<String, List<Item>> MOD_BLOCKS = Maps.newHashMap();
 	private static final Map<String, List<Item>> MOD_ITEMS = Maps.newHashMap();
+	
+	protected final CreativeModeTab creativeTab;
 	
 	public static Map<String, List<Item>> getRegisteredBlocks() {
 		return MOD_BLOCKS;
@@ -48,8 +49,6 @@ public abstract class BaseRegistry<T> {
 	public static void register() {
 		REGISTRIES.forEach(BaseRegistry::registerInternal);
 	}
-	
-	protected final CreativeModeTab creativeTab;
 	
 	protected BaseRegistry(CreativeModeTab creativeTab) {
 		this.creativeTab = creativeTab;

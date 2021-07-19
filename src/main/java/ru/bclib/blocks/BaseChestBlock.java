@@ -15,15 +15,15 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootContext;
 import org.jetbrains.annotations.Nullable;
 import ru.bclib.client.models.BasePatterns;
-import ru.bclib.client.models.BlockModelProvider;
 import ru.bclib.client.models.ModelsHelper;
 import ru.bclib.client.models.PatternsHelper;
+import ru.bclib.interfaces.BlockModelGetter;
 import ru.bclib.registry.BaseBlockEntities;
 
 import java.util.List;
 import java.util.Optional;
 
-public class BaseChestBlock extends ChestBlock implements BlockModelProvider {
+public class BaseChestBlock extends ChestBlock implements BlockModelGetter {
 	private final Block parent;
 	
 	public BaseChestBlock(Block source) {

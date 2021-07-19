@@ -24,16 +24,20 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import ru.bclib.client.render.BCLRenderLayer;
-import ru.bclib.interfaces.IRenderTyped;
+import ru.bclib.interfaces.RenderLayerGetter;
 
 import java.util.List;
 
 @SuppressWarnings("deprecation")
-public abstract class UpDownPlantBlock extends BaseBlockNotFull implements IRenderTyped {
+public abstract class UpDownPlantBlock extends BaseBlockNotFull implements RenderLayerGetter {
 	private static final VoxelShape SHAPE = Block.box(4, 0, 4, 12, 16, 12);
 	
 	public UpDownPlantBlock() {
-		super(FabricBlockSettings.of(Material.PLANT).breakByTool(FabricToolTags.SHEARS).breakByHand(true).sound(SoundType.GRASS).noCollission());
+		super(FabricBlockSettings.of(Material.PLANT)
+								 .breakByTool(FabricToolTags.SHEARS)
+								 .breakByHand(true)
+								 .sound(SoundType.GRASS)
+								 .noCollission());
 	}
 	
 	protected abstract boolean isTerrain(BlockState state);
@@ -67,7 +71,10 @@ public abstract class UpDownPlantBlock extends BaseBlockNotFull implements IRend
 	@Override
 	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
 		ItemStack tool = builder.getParameter(LootContextParams.TOOL);
-		if (tool != null && FabricToolTags.SHEARS.contains(tool.getItem()) || EnchantmentHelper.getItemEnchantmentLevel(Enchantments.SILK_TOUCH, tool) > 0) {
+		if (tool != null && FabricToolTags.SHEARS.contains(tool.getItem()) || EnchantmentHelper.getItemEnchantmentLevel(
+			Enchantments.SILK_TOUCH,
+			tool
+		) > 0) {
 			return Lists.newArrayList(new ItemStack(this));
 		}
 		else {

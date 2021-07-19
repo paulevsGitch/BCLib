@@ -28,15 +28,33 @@ import ru.bclib.util.BlocksHelper;
 import java.util.EnumMap;
 
 public abstract class BaseWallPlantBlock extends BasePlantBlock {
-	private static final EnumMap<Direction, VoxelShape> SHAPES = Maps.newEnumMap(ImmutableMap.of(Direction.NORTH, Block.box(1, 1, 8, 15, 15, 16), Direction.SOUTH, Block.box(1, 1, 0, 15, 15, 8), Direction.WEST, Block.box(8, 1, 1, 16, 15, 15), Direction.EAST, Block.box(0, 1, 1, 8, 15, 15)));
+	private static final EnumMap<Direction, VoxelShape> SHAPES = Maps.newEnumMap(ImmutableMap.of(
+		Direction.NORTH,
+		Block.box(1, 1, 8, 15, 15, 16),
+		Direction.SOUTH,
+		Block.box(1, 1, 0, 15, 15, 8),
+		Direction.WEST,
+		Block.box(8, 1, 1, 16, 15, 15),
+		Direction.EAST,
+		Block.box(0, 1, 1, 8, 15, 15)
+	));
 	public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
 	
 	public BaseWallPlantBlock() {
-		this(FabricBlockSettings.of(Material.PLANT).breakByTool(FabricToolTags.SHEARS).breakByHand(true).sound(SoundType.GRASS).noCollission());
+		this(FabricBlockSettings.of(Material.PLANT)
+								.breakByTool(FabricToolTags.SHEARS)
+								.breakByHand(true)
+								.sound(SoundType.GRASS)
+								.noCollission());
 	}
 	
 	public BaseWallPlantBlock(int light) {
-		this(FabricBlockSettings.of(Material.PLANT).breakByTool(FabricToolTags.SHEARS).breakByHand(true).luminance(light).sound(SoundType.GRASS).noCollission());
+		this(FabricBlockSettings.of(Material.PLANT)
+								.breakByTool(FabricToolTags.SHEARS)
+								.breakByHand(true)
+								.luminance(light)
+								.sound(SoundType.GRASS)
+								.noCollission());
 	}
 	
 	public BaseWallPlantBlock(Properties settings) {

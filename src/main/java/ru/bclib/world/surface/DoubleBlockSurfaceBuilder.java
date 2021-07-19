@@ -47,6 +47,20 @@ public class DoubleBlockSurfaceBuilder extends SurfaceBuilder<SurfaceBuilderBase
 	@Override
 	public void apply(Random random, ChunkAccess chunkAccess, Biome biome, int x, int z, int height, double noise, BlockState defaultBlock, BlockState defaultFluid, int l, int m, long seed, SurfaceBuilderBaseConfiguration surfaceBuilderConfiguration) {
 		noise = NOISE.eval(x * 0.1, z * 0.1) + MHelper.randRange(-0.4, 0.4, random);
-		SurfaceBuilder.DEFAULT.apply(random, chunkAccess, biome, x, z, height, noise, defaultBlock, defaultFluid, l, m, seed, noise > 0 ? config1 : config2);
+		SurfaceBuilder.DEFAULT.apply(
+			random,
+			chunkAccess,
+			biome,
+			x,
+			z,
+			height,
+			noise,
+			defaultBlock,
+			defaultFluid,
+			l,
+			m,
+			seed,
+			noise > 0 ? config1 : config2
+		);
 	}
 }

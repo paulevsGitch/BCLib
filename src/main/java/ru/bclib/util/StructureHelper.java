@@ -87,7 +87,12 @@ public class StructureHelper {
 	}
 	
 	public static BlockPos offsetPos(BlockPos pos, StructureTemplate structure, Rotation rotation, Mirror mirror) {
-		Vec3 offset = StructureTemplate.transform(Vec3.atCenterOf(structure.getSize()), mirror, rotation, BlockPos.ZERO);
+		Vec3 offset = StructureTemplate.transform(
+			Vec3.atCenterOf(structure.getSize()),
+			mirror,
+			rotation,
+			BlockPos.ZERO
+		);
 		return pos.offset(-offset.x * 0.5, 0, -offset.z * 0.5);
 	}
 	
@@ -97,7 +102,9 @@ public class StructureHelper {
 	
 	public static void placeCenteredBottom(WorldGenLevel world, BlockPos pos, StructureTemplate structure, Rotation rotation, Mirror mirror, BoundingBox bounds, Random random) {
 		BlockPos offset = offsetPos(pos, structure, rotation, mirror);
-		StructurePlaceSettings placementData = new StructurePlaceSettings().setRotation(rotation).setMirror(mirror).setBoundingBox(bounds);
+		StructurePlaceSettings placementData = new StructurePlaceSettings().setRotation(rotation)
+																		   .setMirror(mirror)
+																		   .setBoundingBox(bounds);
 		structure.placeInWorld(world, offset, offset, placementData, random, 4);
 	}
 	
@@ -140,7 +147,11 @@ public class StructureHelper {
 						mut.setY(y);
 						BlockState state = world.getBlockState(mut);
 						boolean ignore = ignore(state, world, mut);
-						if (canDestruct && BlocksHelper.isInvulnerable(state, world, mut) && random.nextInt(8) == 0 && world.isEmptyBlock(mut.below(2))) {
+						if (canDestruct && BlocksHelper.isInvulnerable(
+							state,
+							world,
+							mut
+						) && random.nextInt(8) == 0 && world.isEmptyBlock(mut.below(2))) {
 							int r = MHelper.randRange(1, 4, random);
 							int cx = mut.getX();
 							int cy = mut.getY();
@@ -163,7 +174,11 @@ public class StructureHelper {
 										int dz = pz - cz;
 										dz *= dz;
 										mut.setZ(pz);
-										if (dx + dy + dz <= r && BlocksHelper.isInvulnerable(world.getBlockState(mut), world, mut)) {
+										if (dx + dy + dz <= r && BlocksHelper.isInvulnerable(
+											world.getBlockState(mut),
+											world,
+											mut
+										)) {
 											BlocksHelper.setWithoutUpdate(world, mut, Blocks.AIR);
 										}
 									}
@@ -181,7 +196,8 @@ public class StructureHelper {
 						if (!state.isAir() && random.nextBoolean()) {
 							MHelper.shuffle(DIR, random);
 							for (Direction dir : DIR) {
-								if (world.isEmptyBlock(mut.relative(dir)) && world.isEmptyBlock(mut.below().relative(dir))) {
+								if (world.isEmptyBlock(mut.relative(dir)) && world.isEmptyBlock(mut.below()
+																								   .relative(dir))) {
 									BlocksHelper.setWithoutUpdate(world, mut, Blocks.AIR);
 									mut.move(dir).move(Direction.DOWN);
 									for (int py = mut.getY(); y >= bounds.minY() - 10; y--) {
@@ -196,7 +212,11 @@ public class StructureHelper {
 							}
 							break;
 						}
-						else if (random.nextInt(8) == 0 && !BlocksHelper.isInvulnerable(world.getBlockState(mut.above()), world, mut)) {
+						else if (random.nextInt(8) == 0 && !BlocksHelper.isInvulnerable(
+							world.getBlockState(mut.above()),
+							world,
+							mut
+						)) {
 							BlocksHelper.setWithoutUpdate(world, mut, Blocks.AIR);
 						}
 					}
@@ -344,7 +364,12 @@ public class StructureHelper {
 	}
 	
 	private static boolean ignore(BlockState state, WorldGenLevel world, BlockPos pos) {
-		return state.getMaterial().isReplaceable() || !state.getFluidState().isEmpty() || state.is(TagAPI.END_GROUND) || state.is(BlockTags.LOGS) || state.is(BlockTags.LEAVES) || state.getMaterial().equals(Material.PLANT) || state.getMaterial().equals(Material.LEAVES) || BlocksHelper.isInvulnerable(state, world, pos);
+		return state.getMaterial().isReplaceable() || !state.getFluidState()
+															.isEmpty() || state.is(TagAPI.END_GROUND) || state.is(
+			BlockTags.LOGS) || state.is(BlockTags.LEAVES) || state.getMaterial()
+																  .equals(Material.PLANT) || state.getMaterial()
+																								  .equals(Material.LEAVES) || BlocksHelper
+			.isInvulnerable(state, world, pos);
 	}
 	
 	public static void cover(WorldGenLevel world, BoundingBox bounds, Random random) {
@@ -357,7 +382,9 @@ public class StructureHelper {
 				for (int y = bounds.maxY(); y >= bounds.minY(); y--) {
 					mut.setY(y);
 					BlockState state = world.getBlockState(mut);
-					if (state.is(TagAPI.END_GROUND) && !world.getBlockState(mut.above()).getMaterial().isSolidBlocking()) {
+					if (state.is(TagAPI.END_GROUND) && !world.getBlockState(mut.above())
+															 .getMaterial()
+															 .isSolidBlocking()) {
 						BlocksHelper.setWithoutUpdate(world, mut, top);
 					}
 				}

@@ -78,7 +78,15 @@ public abstract class ItemsRegistry extends BaseRegistry<Item> {
 			public ItemStack execute(BlockSource pointer, ItemStack stack) {
 				Direction direction = pointer.getBlockState().getValue(DispenserBlock.FACING);
 				EntityType<?> entityType = ((SpawnEggItem) stack.getItem()).getType(stack.getTag());
-				entityType.spawn(pointer.getLevel(), stack, null, pointer.getPos().relative(direction), MobSpawnType.DISPENSER, direction != Direction.UP, false);
+				entityType.spawn(
+					pointer.getLevel(),
+					stack,
+					null,
+					pointer.getPos().relative(direction),
+					MobSpawnType.DISPENSER,
+					direction != Direction.UP,
+					false
+				);
 				stack.shrink(1);
 				return stack;
 			}

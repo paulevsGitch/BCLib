@@ -34,7 +34,10 @@ public class SDFRadialNoiseMap extends SDFDisplacement {
 	}
 	
 	private float getNoise(double x, double z) {
-		return (float) noise.eval(x, z) + (float) noise.eval(x * 3 + 1000, z * 3) * 0.5F + (float) noise.eval(x * 9 + 1000, z * 9) * 0.2F;
+		return (float) noise.eval(x, z) + (float) noise.eval(
+			x * 3 + 1000,
+			z * 3
+		) * 0.5F + (float) noise.eval(x * 9 + 1000, z * 9) * 0.2F;
 	}
 	
 	public SDFRadialNoiseMap setSeed(long seed) {

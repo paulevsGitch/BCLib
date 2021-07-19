@@ -85,7 +85,10 @@ public class SplineHelper {
 		for (int i = 1; i < count; i++) {
 			Vector3f pos = spline.get(i);
 			float delta = (float) (i - 1) / max;
-			SDF line = new SDFLine().setRadius(Mth.lerp(delta, radius1, radius2)).setStart(start.x(), start.y(), start.z()).setEnd(pos.x(), pos.y(), pos.z()).setBlock(placerFunction);
+			SDF line = new SDFLine().setRadius(Mth.lerp(delta, radius1, radius2))
+									.setStart(start.x(), start.y(), start.z())
+									.setEnd(pos.x(), pos.y(), pos.z())
+									.setBlock(placerFunction);
 			result = result == null ? line : new SDFUnion().setSourceA(result).setSourceB(line);
 			start = pos;
 		}
@@ -100,7 +103,10 @@ public class SplineHelper {
 		for (int i = 1; i < count; i++) {
 			Vector3f pos = spline.get(i);
 			float delta = (float) (i - 1) / max;
-			SDF line = new SDFLine().setRadius(radiusFunction.apply(delta)).setStart(start.x(), start.y(), start.z()).setEnd(pos.x(), pos.y(), pos.z()).setBlock(placerFunction);
+			SDF line = new SDFLine().setRadius(radiusFunction.apply(delta))
+									.setStart(start.x(), start.y(), start.z())
+									.setEnd(pos.x(), pos.y(), pos.z())
+									.setBlock(placerFunction);
 			result = result == null ? line : new SDFUnion().setSourceA(result).setSourceB(line);
 			start = pos;
 		}

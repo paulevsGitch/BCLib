@@ -140,12 +140,19 @@ public class BCLBiomeDef {
 	}
 	
 	public BCLBiomeDef setSurface(Block block) {
-		setSurface(SurfaceBuilder.DEFAULT.configured(new SurfaceBuilderBaseConfiguration(block.defaultBlockState(), Blocks.END_STONE.defaultBlockState(), Blocks.END_STONE.defaultBlockState())));
+		setSurface(SurfaceBuilder.DEFAULT.configured(new SurfaceBuilderBaseConfiguration(
+			block.defaultBlockState(),
+			Blocks.END_STONE.defaultBlockState(),
+			Blocks.END_STONE.defaultBlockState()
+		)));
 		return this;
 	}
 	
 	public BCLBiomeDef setSurface(Block block1, Block block2) {
-		setSurface(DoubleBlockSurfaceBuilder.register("bclib_" + id.getPath() + "_surface").setBlock1(block1).setBlock2(block2).configured());
+		setSurface(DoubleBlockSurfaceBuilder.register("bclib_" + id.getPath() + "_surface")
+											.setBlock1(block1)
+											.setBlock2(block2)
+											.configured());
 		return this;
 	}
 	
@@ -299,7 +306,10 @@ public class BCLBiomeDef {
 		Builder effects = new Builder();
 		
 		mobs.forEach((spawn) -> {
-			spawnSettings.addSpawn(spawn.type.getCategory(), new MobSpawnSettings.SpawnerData(spawn.type, spawn.weight, spawn.minGroupSize, spawn.maxGroupSize));
+			spawnSettings.addSpawn(
+				spawn.type.getCategory(),
+				new MobSpawnSettings.SpawnerData(spawn.type, spawn.weight, spawn.minGroupSize, spawn.maxGroupSize)
+			);
 		});
 		
 		spawns.forEach((entry) -> {
@@ -311,14 +321,28 @@ public class BCLBiomeDef {
 		features.forEach((info) -> generationSettings.addFeature(info.featureStep, info.feature));
 		carvers.forEach((info) -> generationSettings.addCarver(info.carverStep, info.carver));
 		
-		effects.skyColor(0).waterColor(waterColor).waterFogColor(waterFogColor).fogColor(fogColor).foliageColorOverride(foliageColor).grassColorOverride(grassColor);
+		effects.skyColor(0)
+			   .waterColor(waterColor)
+			   .waterFogColor(waterFogColor)
+			   .fogColor(fogColor)
+			   .foliageColorOverride(foliageColor)
+			   .grassColorOverride(grassColor);
 		if (loop != null) effects.ambientLoopSound(loop);
 		if (mood != null) effects.ambientMoodSound(mood);
 		if (additions != null) effects.ambientAdditionsSound(additions);
 		if (particleConfig != null) effects.ambientParticle(particleConfig);
 		effects.backgroundMusic(music != null ? new Music(music, 600, 2400, true) : Musics.END);
 		
-		return new Biome.BiomeBuilder().precipitation(precipitation).biomeCategory(category).depth(depth).scale(0.2F).temperature(temperature).downfall(downfall).specialEffects(effects.build()).mobSpawnSettings(spawnSettings.build()).generationSettings(generationSettings.build()).build();
+		return new Biome.BiomeBuilder().precipitation(precipitation)
+									   .biomeCategory(category)
+									   .depth(depth)
+									   .scale(0.2F)
+									   .temperature(temperature)
+									   .downfall(downfall)
+									   .specialEffects(effects.build())
+									   .mobSpawnSettings(spawnSettings.build())
+									   .generationSettings(generationSettings.build())
+									   .build();
 	}
 	
 	private static final class SpawnInfo {

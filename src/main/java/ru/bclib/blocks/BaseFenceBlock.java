@@ -15,17 +15,17 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootContext;
 import org.jetbrains.annotations.Nullable;
 import ru.bclib.client.models.BasePatterns;
-import ru.bclib.client.models.BlockModelProvider;
 import ru.bclib.client.models.ModelsHelper;
 import ru.bclib.client.models.ModelsHelper.MultiPartBuilder;
 import ru.bclib.client.models.PatternsHelper;
+import ru.bclib.interfaces.BlockModelGetter;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class BaseFenceBlock extends FenceBlock implements BlockModelProvider {
+public class BaseFenceBlock extends FenceBlock implements BlockModelGetter {
 	private final Block parent;
 	
 	public BaseFenceBlock(Block source) {
@@ -72,9 +72,21 @@ public class BaseFenceBlock extends FenceBlock implements BlockModelProvider {
 		
 		MultiPartBuilder builder = MultiPartBuilder.create(stateDefinition);
 		builder.part(sideId).setCondition(state -> state.getValue(NORTH)).setUVLock(true).add();
-		builder.part(sideId).setCondition(state -> state.getValue(EAST)).setTransformation(BlockModelRotation.X0_Y90.getRotation()).setUVLock(true).add();
-		builder.part(sideId).setCondition(state -> state.getValue(SOUTH)).setTransformation(BlockModelRotation.X0_Y180.getRotation()).setUVLock(true).add();
-		builder.part(sideId).setCondition(state -> state.getValue(WEST)).setTransformation(BlockModelRotation.X0_Y270.getRotation()).setUVLock(true).add();
+		builder.part(sideId)
+			   .setCondition(state -> state.getValue(EAST))
+			   .setTransformation(BlockModelRotation.X0_Y90.getRotation())
+			   .setUVLock(true)
+			   .add();
+		builder.part(sideId)
+			   .setCondition(state -> state.getValue(SOUTH))
+			   .setTransformation(BlockModelRotation.X0_Y180.getRotation())
+			   .setUVLock(true)
+			   .add();
+		builder.part(sideId)
+			   .setCondition(state -> state.getValue(WEST))
+			   .setTransformation(BlockModelRotation.X0_Y270.getRotation())
+			   .setUVLock(true)
+			   .add();
 		builder.part(postId).add();
 		
 		return builder.build();

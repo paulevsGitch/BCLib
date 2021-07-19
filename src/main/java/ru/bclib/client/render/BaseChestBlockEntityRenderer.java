@@ -51,7 +51,11 @@ public class BaseChestBlockEntityRenderer implements BlockEntityRenderer<BaseChe
 	public void render(BaseChestBlockEntity entity, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
 		Level world = entity.getLevel();
 		boolean worldExists = world != null;
-		BlockState blockState = worldExists ? entity.getBlockState() : Blocks.CHEST.defaultBlockState().setValue(ChestBlock.FACING, Direction.SOUTH);
+		BlockState blockState = worldExists ? entity.getBlockState() : Blocks.CHEST.defaultBlockState()
+																				   .setValue(
+																					   ChestBlock.FACING,
+																					   Direction.SOUTH
+																				   );
 		ChestType chestType = blockState.hasProperty(ChestBlock.TYPE) ? blockState.getValue(ChestBlock.TYPE) : ChestType.SINGLE;
 		Block block = blockState.getBlock();
 		if (block instanceof AbstractChestBlock) {
@@ -72,23 +76,54 @@ public class BaseChestBlockEntityRenderer implements BlockEntityRenderer<BaseChe
 				propertySource = DoubleBlockCombiner.Combiner::acceptNone;
 			}
 			
-			float pitch = ((Float2FloatFunction) propertySource.apply(ChestBlock.opennessCombiner(entity))).get(tickDelta);
+			float pitch = ((Float2FloatFunction) propertySource.apply(ChestBlock.opennessCombiner(entity))).get(
+				tickDelta);
 			pitch = 1.0F - pitch;
 			pitch = 1.0F - pitch * pitch * pitch;
-			@SuppressWarnings({"unchecked", "rawtypes"}) int blockLight = ((Int2IntFunction) propertySource.apply(new BrightnessCombiner())).applyAsInt(light);
+			@SuppressWarnings({
+				"unchecked",
+				"rawtypes"
+			}) int blockLight = ((Int2IntFunction) propertySource.apply(new BrightnessCombiner())).applyAsInt(light);
 			
 			VertexConsumer vertexConsumer = getConsumer(vertexConsumers, block, chestType);
 			
 			if (isDouble) {
 				if (chestType == ChestType.LEFT) {
-					renderParts(matrices, vertexConsumer, chestModel.partLeftA, chestModel.partLeftB, chestModel.partLeftC, pitch, blockLight, overlay);
+					renderParts(
+						matrices,
+						vertexConsumer,
+						chestModel.partLeftA,
+						chestModel.partLeftB,
+						chestModel.partLeftC,
+						pitch,
+						blockLight,
+						overlay
+					);
 				}
 				else {
-					renderParts(matrices, vertexConsumer, chestModel.partRightA, chestModel.partRightB, chestModel.partRightC, pitch, blockLight, overlay);
+					renderParts(
+						matrices,
+						vertexConsumer,
+						chestModel.partRightA,
+						chestModel.partRightB,
+						chestModel.partRightC,
+						pitch,
+						blockLight,
+						overlay
+					);
 				}
 			}
 			else {
-				renderParts(matrices, vertexConsumer, chestModel.partA, chestModel.partB, chestModel.partC, pitch, blockLight, overlay);
+				renderParts(
+					matrices,
+					vertexConsumer,
+					chestModel.partA,
+					chestModel.partB,
+					chestModel.partC,
+					pitch,
+					blockLight,
+					overlay
+				);
 			}
 			
 			matrices.popPose();
@@ -120,10 +155,24 @@ public class BaseChestBlockEntityRenderer implements BlockEntityRenderer<BaseChe
 		ResourceLocation blockId = Registry.BLOCK.getKey(block);
 		String modId = blockId.getNamespace();
 		String path = blockId.getPath();
-		LAYERS.put(block, new RenderType[] {RenderType.entityCutout(new ResourceLocation(modId, "textures/entity/chest/" + path + ".png")), RenderType.entityCutout(new ResourceLocation(modId, "textures/entity/chest/" + path + "_left.png")), RenderType.entityCutout(new ResourceLocation(modId, "textures/entity/chest/" + path + "_right.png"))});
+		LAYERS.put(
+			block,
+			new RenderType[] {
+				RenderType.entityCutout(new ResourceLocation(
+					modId,
+					"textures/entity/chest/" + path + ".png"
+				)),
+				RenderType.entityCutout(new ResourceLocation(modId, "textures/entity/chest/" + path + "_left.png")),
+				RenderType.entityCutout(new ResourceLocation(modId, "textures/entity/chest/" + path + "_right.png"))
+			}
+		);
 	}
 	
 	static {
-		defaultLayer = new RenderType[] {RenderType.entityCutout(new ResourceLocation("textures/entity/chest/normal.png")), RenderType.entityCutout(new ResourceLocation("textures/entity/chest/normal_left.png")), RenderType.entityCutout(new ResourceLocation("textures/entity/chest/normal_right.png"))};
+		defaultLayer = new RenderType[] {
+			RenderType.entityCutout(new ResourceLocation("textures/entity/chest/normal.png")),
+			RenderType.entityCutout(new ResourceLocation("textures/entity/chest/normal_left.png")),
+			RenderType.entityCutout(new ResourceLocation("textures/entity/chest/normal_right.png"))
+		};
 	}
 }

@@ -93,11 +93,18 @@ public abstract class NBTStructureFeature extends DefaultFeature {
 		StructureTemplate structure = getStructure(world, center, random);
 		Rotation rotation = getRotation(world, center, random);
 		Mirror mirror = getMirror(world, center, random);
-		BlockPos offset = StructureTemplate.transform(new BlockPos(structure.getSize()), mirror, rotation, BlockPos.ZERO);
+		BlockPos offset = StructureTemplate.transform(
+			new BlockPos(structure.getSize()),
+			mirror,
+			rotation,
+			BlockPos.ZERO
+		);
 		center = center.offset(0, getYOffset(structure, world, center, random) + 0.5, 0);
 		
 		BoundingBox bounds = makeBox(center);
-		StructurePlaceSettings placementData = new StructurePlaceSettings().setRotation(rotation).setMirror(mirror).setBoundingBox(bounds);
+		StructurePlaceSettings placementData = new StructurePlaceSettings().setRotation(rotation)
+																		   .setMirror(mirror)
+																		   .setBoundingBox(bounds);
 		addStructureData(placementData);
 		center = center.offset(-offset.getX() * 0.5, 0, -offset.getZ() * 0.5);
 		structure.placeInWorld(world, center, center, placementData, random, 4);
@@ -135,7 +142,9 @@ public abstract class NBTStructureFeature extends DefaultFeature {
 							BlockState stateSt = world.getBlockState(mut);
 							if (!stateSt.is(TagAPI.GEN_TERRAIN)) {
 								if (merge == TerrainMerge.SURFACE) {
-									SurfaceBuilderConfiguration config = world.getBiome(mut).getGenerationSettings().getSurfaceBuilderConfig();
+									SurfaceBuilderConfiguration config = world.getBiome(mut)
+																			  .getGenerationSettings()
+																			  .getSurfaceBuilderConfig();
 									boolean isTop = mut.getY() == surfMax && state.getMaterial().isSolidBlocking();
 									BlockState top = isTop ? config.getTopMaterial() : config.getUnderMaterial();
 									BlocksHelper.setWithoutUpdate(world, mut, top);
@@ -147,7 +156,9 @@ public abstract class NBTStructureFeature extends DefaultFeature {
 							else {
 								if (stateSt.is(TagAPI.END_GROUND) && state.getMaterial().isSolidBlocking()) {
 									if (merge == TerrainMerge.SURFACE) {
-										SurfaceBuilderConfiguration config = world.getBiome(mut).getGenerationSettings().getSurfaceBuilderConfig();
+										SurfaceBuilderConfiguration config = world.getBiome(mut)
+																				  .getGenerationSettings()
+																				  .getSurfaceBuilderConfig();
 										BlocksHelper.setWithoutUpdate(world, mut, config.getUnderMaterial());
 									}
 									else {

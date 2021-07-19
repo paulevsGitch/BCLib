@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import ru.bclib.interfaces.IColorProvider;
+import ru.bclib.interfaces.ColorProviderGetter;
 
 @Mixin(Minecraft.class)
 public class MinecraftMixin {
@@ -26,8 +26,8 @@ public class MinecraftMixin {
 	@Inject(method = "<init>*", at = @At("TAIL"))
 	private void bclib_onMCInit(GameConfig args, CallbackInfo info) {
 		Registry.BLOCK.forEach(block -> {
-			if (block instanceof IColorProvider) {
-				IColorProvider provider = (IColorProvider) block;
+			if (block instanceof ColorProviderGetter) {
+				ColorProviderGetter provider = (ColorProviderGetter) block;
 				blockColors.register(provider.getProvider(), block);
 				itemColors.register(provider.getItemProvider(), block.asItem());
 			}

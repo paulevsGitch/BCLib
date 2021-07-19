@@ -14,20 +14,23 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootContext;
 import org.jetbrains.annotations.Nullable;
 import ru.bclib.client.models.BasePatterns;
-import ru.bclib.client.models.BlockModelProvider;
 import ru.bclib.client.models.ModelsHelper;
 import ru.bclib.client.models.PatternsHelper;
+import ru.bclib.interfaces.BlockModelGetter;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class BaseWeightedPlateBlock extends WeightedPressurePlateBlock implements BlockModelProvider {
+public class BaseWeightedPlateBlock extends WeightedPressurePlateBlock implements BlockModelGetter {
 	private final Block parent;
 	
 	public BaseWeightedPlateBlock(Block source) {
-		super(15, FabricBlockSettings.copyOf(source).noCollission().noOcclusion().requiresCorrectToolForDrops().strength(0.5F));
+		super(
+			15,
+			FabricBlockSettings.copyOf(source).noCollission().noOcclusion().requiresCorrectToolForDrops().strength(0.5F)
+		);
 		this.parent = source;
 	}
 	

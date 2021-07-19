@@ -13,17 +13,17 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootContext;
 import org.jetbrains.annotations.Nullable;
 import ru.bclib.client.models.BasePatterns;
-import ru.bclib.client.models.BlockModelProvider;
 import ru.bclib.client.models.ModelsHelper;
 import ru.bclib.client.models.ModelsHelper.MultiPartBuilder;
 import ru.bclib.client.models.PatternsHelper;
+import ru.bclib.interfaces.BlockModelGetter;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class BaseComposterBlock extends ComposterBlock implements BlockModelProvider {
+public class BaseComposterBlock extends ComposterBlock implements BlockModelGetter {
 	public BaseComposterBlock(Block source) {
 		super(FabricBlockSettings.copyOf(source));
 	}

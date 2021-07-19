@@ -16,19 +16,23 @@ import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
-import ru.bclib.client.models.BlockModelProvider;
+import ru.bclib.interfaces.BlockModelGetter;
 import ru.bclib.util.MHelper;
 
 import java.util.Collections;
 import java.util.List;
 
-public class BaseOreBlock extends OreBlock implements BlockModelProvider {
+public class BaseOreBlock extends OreBlock implements BlockModelGetter {
 	private final Item dropItem;
 	private final int minCount;
 	private final int maxCount;
 	
 	public BaseOreBlock(Item drop, int minCount, int maxCount, int experience) {
-		super(FabricBlockSettings.of(Material.STONE, MaterialColor.SAND).hardness(3F).resistance(9F).requiresCorrectToolForDrops().sound(SoundType.STONE), UniformInt.of(1, experience));
+		super(FabricBlockSettings.of(Material.STONE, MaterialColor.SAND)
+								 .hardness(3F)
+								 .resistance(9F)
+								 .requiresCorrectToolForDrops()
+								 .sound(SoundType.STONE), UniformInt.of(1, experience));
 		this.dropItem = drop;
 		this.minCount = minCount;
 		this.maxCount = maxCount;

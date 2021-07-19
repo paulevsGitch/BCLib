@@ -31,25 +31,34 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import ru.bclib.client.render.BCLRenderLayer;
-import ru.bclib.interfaces.IRenderTyped;
+import ru.bclib.interfaces.RenderLayerGetter;
 import ru.bclib.util.BlocksHelper;
 
 import java.util.List;
 import java.util.Random;
 
 @SuppressWarnings("deprecation")
-public abstract class BaseDoublePlantBlock extends BaseBlockNotFull implements IRenderTyped, BonemealableBlock {
+public abstract class BaseDoublePlantBlock extends BaseBlockNotFull implements RenderLayerGetter, BonemealableBlock {
 	private static final VoxelShape SHAPE = Block.box(4, 2, 4, 12, 16, 12);
 	public static final IntegerProperty ROTATION = BlockProperties.ROTATION;
 	public static final BooleanProperty TOP = BooleanProperty.create("top");
 	
 	public BaseDoublePlantBlock() {
-		super(FabricBlockSettings.of(Material.PLANT).breakByTool(FabricToolTags.SHEARS).breakByHand(true).sound(SoundType.WET_GRASS).noCollission());
+		super(FabricBlockSettings.of(Material.PLANT)
+								 .breakByTool(FabricToolTags.SHEARS)
+								 .breakByHand(true)
+								 .sound(SoundType.WET_GRASS)
+								 .noCollission());
 		this.registerDefaultState(this.stateDefinition.any().setValue(TOP, false));
 	}
 	
 	public BaseDoublePlantBlock(int light) {
-		super(FabricBlockSettings.of(Material.PLANT).breakByTool(FabricToolTags.SHEARS).breakByHand(true).sound(SoundType.WET_GRASS).lightLevel((state) -> state.getValue(TOP) ? light : 0).noCollission());
+		super(FabricBlockSettings.of(Material.PLANT)
+								 .breakByTool(FabricToolTags.SHEARS)
+								 .breakByHand(true)
+								 .sound(SoundType.WET_GRASS)
+								 .lightLevel((state) -> state.getValue(TOP) ? light : 0)
+								 .noCollission());
 		this.registerDefaultState(this.stateDefinition.any().setValue(TOP, false));
 	}
 	
@@ -101,7 +110,10 @@ public abstract class BaseDoublePlantBlock extends BaseBlockNotFull implements I
 		}
 		
 		ItemStack tool = builder.getParameter(LootContextParams.TOOL);
-		if (tool != null && FabricToolTags.SHEARS.contains(tool.getItem()) || EnchantmentHelper.getItemEnchantmentLevel(Enchantments.SILK_TOUCH, tool) > 0) {
+		if (tool != null && FabricToolTags.SHEARS.contains(tool.getItem()) || EnchantmentHelper.getItemEnchantmentLevel(
+			Enchantments.SILK_TOUCH,
+			tool
+		) > 0) {
 			return Lists.newArrayList(new ItemStack(this));
 		}
 		else {
@@ -126,7 +138,13 @@ public abstract class BaseDoublePlantBlock extends BaseBlockNotFull implements I
 	
 	@Override
 	public void performBonemeal(ServerLevel world, Random random, BlockPos pos, BlockState state) {
-		ItemEntity item = new ItemEntity(world, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, new ItemStack(this));
+		ItemEntity item = new ItemEntity(
+			world,
+			pos.getX() + 0.5,
+			pos.getY() + 0.5,
+			pos.getZ() + 0.5,
+			new ItemStack(this)
+		);
 		world.addFreshEntity(item);
 	}
 	

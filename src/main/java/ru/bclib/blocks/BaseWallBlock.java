@@ -16,16 +16,16 @@ import net.minecraft.world.level.block.state.properties.WallSide;
 import net.minecraft.world.level.storage.loot.LootContext;
 import org.jetbrains.annotations.Nullable;
 import ru.bclib.client.models.BasePatterns;
-import ru.bclib.client.models.BlockModelProvider;
 import ru.bclib.client.models.ModelsHelper;
 import ru.bclib.client.models.PatternsHelper;
+import ru.bclib.interfaces.BlockModelGetter;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class BaseWallBlock extends WallBlock implements BlockModelProvider {
+public class BaseWallBlock extends WallBlock implements BlockModelGetter {
 	
 	private final Block parent;
 	
@@ -71,20 +71,50 @@ public class BaseWallBlock extends WallBlock implements BlockModelProvider {
 	public UnbakedModel getModelVariant(ResourceLocation stateId, BlockState blockState, Map<ResourceLocation, UnbakedModel> modelCache) {
 		ResourceLocation postId = new ResourceLocation(stateId.getNamespace(), "block/" + stateId.getPath() + "_post");
 		ResourceLocation sideId = new ResourceLocation(stateId.getNamespace(), "block/" + stateId.getPath() + "_side");
-		ResourceLocation sideTallId = new ResourceLocation(stateId.getNamespace(), "block/" + stateId.getPath() + "_side_tall");
+		ResourceLocation sideTallId = new ResourceLocation(
+			stateId.getNamespace(),
+			"block/" + stateId.getPath() + "_side_tall"
+		);
 		registerBlockModel(postId, postId, blockState, modelCache);
 		registerBlockModel(sideId, sideId, blockState, modelCache);
 		registerBlockModel(sideTallId, sideTallId, blockState, modelCache);
 		
 		ModelsHelper.MultiPartBuilder builder = ModelsHelper.MultiPartBuilder.create(stateDefinition);
 		builder.part(sideId).setCondition(state -> state.getValue(NORTH_WALL) == WallSide.LOW).setUVLock(true).add();
-		builder.part(sideId).setCondition(state -> state.getValue(EAST_WALL) == WallSide.LOW).setTransformation(BlockModelRotation.X0_Y90.getRotation()).setUVLock(true).add();
-		builder.part(sideId).setCondition(state -> state.getValue(SOUTH_WALL) == WallSide.LOW).setTransformation(BlockModelRotation.X0_Y180.getRotation()).setUVLock(true).add();
-		builder.part(sideId).setCondition(state -> state.getValue(WEST_WALL) == WallSide.LOW).setTransformation(BlockModelRotation.X0_Y270.getRotation()).setUVLock(true).add();
-		builder.part(sideTallId).setCondition(state -> state.getValue(NORTH_WALL) == WallSide.TALL).setUVLock(true).add();
-		builder.part(sideTallId).setCondition(state -> state.getValue(EAST_WALL) == WallSide.TALL).setTransformation(BlockModelRotation.X0_Y90.getRotation()).setUVLock(true).add();
-		builder.part(sideTallId).setCondition(state -> state.getValue(SOUTH_WALL) == WallSide.TALL).setTransformation(BlockModelRotation.X0_Y180.getRotation()).setUVLock(true).add();
-		builder.part(sideTallId).setCondition(state -> state.getValue(WEST_WALL) == WallSide.TALL).setTransformation(BlockModelRotation.X0_Y270.getRotation()).setUVLock(true).add();
+		builder.part(sideId)
+			   .setCondition(state -> state.getValue(EAST_WALL) == WallSide.LOW)
+			   .setTransformation(BlockModelRotation.X0_Y90.getRotation())
+			   .setUVLock(true)
+			   .add();
+		builder.part(sideId)
+			   .setCondition(state -> state.getValue(SOUTH_WALL) == WallSide.LOW)
+			   .setTransformation(BlockModelRotation.X0_Y180.getRotation())
+			   .setUVLock(true)
+			   .add();
+		builder.part(sideId)
+			   .setCondition(state -> state.getValue(WEST_WALL) == WallSide.LOW)
+			   .setTransformation(BlockModelRotation.X0_Y270.getRotation())
+			   .setUVLock(true)
+			   .add();
+		builder.part(sideTallId)
+			   .setCondition(state -> state.getValue(NORTH_WALL) == WallSide.TALL)
+			   .setUVLock(true)
+			   .add();
+		builder.part(sideTallId)
+			   .setCondition(state -> state.getValue(EAST_WALL) == WallSide.TALL)
+			   .setTransformation(BlockModelRotation.X0_Y90.getRotation())
+			   .setUVLock(true)
+			   .add();
+		builder.part(sideTallId)
+			   .setCondition(state -> state.getValue(SOUTH_WALL) == WallSide.TALL)
+			   .setTransformation(BlockModelRotation.X0_Y180.getRotation())
+			   .setUVLock(true)
+			   .add();
+		builder.part(sideTallId)
+			   .setCondition(state -> state.getValue(WEST_WALL) == WallSide.TALL)
+			   .setTransformation(BlockModelRotation.X0_Y270.getRotation())
+			   .setUVLock(true)
+			   .add();
 		builder.part(postId).setCondition(state -> state.getValue(UP)).add();
 		
 		return builder.build();

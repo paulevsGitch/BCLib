@@ -37,13 +37,13 @@ import ru.bclib.client.models.BasePatterns;
 import ru.bclib.client.models.ModelsHelper;
 import ru.bclib.client.models.PatternsHelper;
 import ru.bclib.client.render.BCLRenderLayer;
-import ru.bclib.interfaces.IRenderTyped;
+import ru.bclib.interfaces.RenderLayerGetter;
 
 import java.util.Map;
 import java.util.Optional;
 
 @SuppressWarnings("deprecation")
-public class StalactiteBlock extends BaseBlockNotFull implements SimpleWaterloggedBlock, LiquidBlockContainer, IRenderTyped {
+public class StalactiteBlock extends BaseBlockNotFull implements SimpleWaterloggedBlock, LiquidBlockContainer, RenderLayerGetter {
 	public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 	public static final BooleanProperty IS_FLOOR = BlockProperties.IS_FLOOR;
 	public static final IntegerProperty SIZE = BlockProperties.SIZE;
@@ -51,7 +51,10 @@ public class StalactiteBlock extends BaseBlockNotFull implements SimpleWaterlogg
 	
 	public StalactiteBlock(Block source) {
 		super(FabricBlockSettings.copy(source).noOcclusion());
-		this.registerDefaultState(getStateDefinition().any().setValue(SIZE, 0).setValue(IS_FLOOR, true).setValue(WATERLOGGED, false));
+		this.registerDefaultState(getStateDefinition().any()
+													  .setValue(SIZE, 0)
+													  .setValue(IS_FLOOR, true)
+													  .setValue(WATERLOGGED, false));
 	}
 	
 	@Override
@@ -212,7 +215,10 @@ public class StalactiteBlock extends BaseBlockNotFull implements SimpleWaterlogg
 	@Environment(EnvType.CLIENT)
 	public UnbakedModel getModelVariant(ResourceLocation stateId, BlockState blockState, Map<ResourceLocation, UnbakedModel> modelCache) {
 		BlockModelRotation rotation = blockState.getValue(IS_FLOOR) ? BlockModelRotation.X0_Y0 : BlockModelRotation.X180_Y0;
-		ResourceLocation modelId = new ResourceLocation(stateId.getNamespace(), stateId.getPath() + "_" + blockState.getValue(SIZE));
+		ResourceLocation modelId = new ResourceLocation(
+			stateId.getNamespace(),
+			stateId.getPath() + "_" + blockState.getValue(SIZE)
+		);
 		registerBlockModel(modelId, modelId, blockState, modelCache);
 		return ModelsHelper.createMultiVariant(modelId, rotation.getRotation(), false);
 	}

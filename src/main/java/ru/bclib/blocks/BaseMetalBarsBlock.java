@@ -16,18 +16,18 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootContext;
 import org.jetbrains.annotations.Nullable;
 import ru.bclib.client.models.BasePatterns;
-import ru.bclib.client.models.BlockModelProvider;
 import ru.bclib.client.models.ModelsHelper;
 import ru.bclib.client.models.PatternsHelper;
 import ru.bclib.client.render.BCLRenderLayer;
-import ru.bclib.interfaces.IRenderTyped;
+import ru.bclib.interfaces.BlockModelGetter;
+import ru.bclib.interfaces.RenderLayerGetter;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class BaseMetalBarsBlock extends IronBarsBlock implements BlockModelProvider, IRenderTyped {
+public class BaseMetalBarsBlock extends IronBarsBlock implements BlockModelGetter, RenderLayerGetter {
 	public BaseMetalBarsBlock(Block source) {
 		super(FabricBlockSettings.copyOf(source).strength(5.0F, 6.0F).noOcclusion());
 	}
@@ -81,11 +81,26 @@ public class BaseMetalBarsBlock extends IronBarsBlock implements BlockModelProvi
 		registerBlockModel(sideId, sideId, blockState, modelCache);
 		
 		ModelsHelper.MultiPartBuilder builder = ModelsHelper.MultiPartBuilder.create(stateDefinition);
-		builder.part(postId).setCondition(state -> !state.getValue(NORTH) && !state.getValue(EAST) && !state.getValue(SOUTH) && !state.getValue(WEST)).add();
+		builder.part(postId)
+			   .setCondition(state -> !state.getValue(NORTH) && !state.getValue(EAST) && !state.getValue(SOUTH) && !state
+				   .getValue(WEST))
+			   .add();
 		builder.part(sideId).setCondition(state -> state.getValue(NORTH)).setUVLock(true).add();
-		builder.part(sideId).setCondition(state -> state.getValue(EAST)).setTransformation(BlockModelRotation.X0_Y90.getRotation()).setUVLock(true).add();
-		builder.part(sideId).setCondition(state -> state.getValue(SOUTH)).setTransformation(BlockModelRotation.X0_Y180.getRotation()).setUVLock(true).add();
-		builder.part(sideId).setCondition(state -> state.getValue(WEST)).setTransformation(BlockModelRotation.X0_Y270.getRotation()).setUVLock(true).add();
+		builder.part(sideId)
+			   .setCondition(state -> state.getValue(EAST))
+			   .setTransformation(BlockModelRotation.X0_Y90.getRotation())
+			   .setUVLock(true)
+			   .add();
+		builder.part(sideId)
+			   .setCondition(state -> state.getValue(SOUTH))
+			   .setTransformation(BlockModelRotation.X0_Y180.getRotation())
+			   .setUVLock(true)
+			   .add();
+		builder.part(sideId)
+			   .setCondition(state -> state.getValue(WEST))
+			   .setTransformation(BlockModelRotation.X0_Y270.getRotation())
+			   .setUVLock(true)
+			   .add();
 		
 		return builder.build();
 	}

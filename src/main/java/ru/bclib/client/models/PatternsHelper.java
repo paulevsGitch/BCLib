@@ -52,7 +52,8 @@ public class PatternsHelper {
 	public static Optional<String> createJson(ResourceLocation patternId, Map<String, String> textures) {
 		ResourceManager resourceManager = Minecraft.getInstance().getResourceManager();
 		try (InputStream input = resourceManager.getResource(patternId).getInputStream()) {
-			String json = new BufferedReader(new InputStreamReader(input, StandardCharsets.UTF_8)).lines().collect(Collectors.joining());
+			String json = new BufferedReader(new InputStreamReader(input, StandardCharsets.UTF_8)).lines()
+																								  .collect(Collectors.joining());
 			for (Map.Entry<String, String> texture : textures.entrySet()) {
 				json = json.replace(texture.getKey(), texture.getValue());
 			}
