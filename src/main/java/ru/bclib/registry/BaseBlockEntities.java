@@ -44,4 +44,25 @@ public class BaseBlockEntities {
 	public static Block[] getFurnaces() {
 		return BaseRegistry.getRegisteredBlocks().values().stream().filter(item -> item instanceof BlockItem && ((BlockItem) item).getBlock() instanceof BaseFurnaceBlock).map(item -> ((BlockItem) item).getBlock()).toArray(Block[]::new);
 	}
+
+	public static boolean registerSpecialBlock(Block block) {
+		if (block instanceof BaseChestBlock) {
+			BaseBlockEntities.CHEST.registerBlock(block);
+			return true;
+		}
+		if (block instanceof BaseSignBlock) {
+			BaseBlockEntities.SIGN.registerBlock(block);
+			return true;
+		}
+		if (block instanceof BaseBarrelBlock) {
+			BaseBlockEntities.BARREL.registerBlock(block);
+			return true;
+		}
+		if (block instanceof BaseFurnaceBlock) {
+			BaseBlockEntities.FURNACE.registerBlock(block);
+			return true;
+		}
+
+		return false;
+	}
 }
