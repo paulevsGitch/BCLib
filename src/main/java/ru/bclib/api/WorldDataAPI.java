@@ -7,6 +7,7 @@ import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
 import ru.bclib.BCLib;
+import ru.bclib.api.datafixer.DataFixerAPI;
 
 import java.io.File;
 import java.io.IOException;
