@@ -14,12 +14,14 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import org.jetbrains.annotations.Nullable;
 import ru.bclib.blocks.BaseAnvilBlock;
 import ru.bclib.interfaces.BlockModelProvider;
 import ru.bclib.interfaces.ItemModelProvider;
 
 import java.util.List;
+import java.util.Locale;
 
 public class BaseAnvilItem extends BlockItem implements ItemModelProvider {
 	public final static String DESTRUCTION = "destruction";
@@ -34,7 +36,16 @@ public class BaseAnvilItem extends BlockItem implements ItemModelProvider {
 		ItemStack stack = blockPlaceContext.getItemInHand();
 		int destruction = stack.getOrCreateTag().getInt(DESTRUCTION);
 		if (blockState != null) {
-			blockState = blockState.setValue(BaseAnvilBlock.DESTRUCTION, destruction);
+			BaseAnvilBlock block = (BaseAnvilBlock) blockState.getBlock();
+			IntegerProperty durabilityProp = block.getDurabilityProp();
+			if (destruction == 0) {
+				blockState = blockState.setValue(durabilityProp, 0).setValue(BaseAnvilBlock.DESTRUCTION, 0);
+			}
+			else {
+				int destructionValue = destruction / block.getMaxDurability();
+				int durabilityValue = destruction - destructionValue * block.getMaxDurability();
+				blockState = blockState.setValue(durabilityProp, durabilityValue).setValue(BaseAnvilBlock.DESTRUCTION, destructionValue);
+			}
 		}
 		return blockState;
 	}
@@ -42,10 +53,13 @@ public class BaseAnvilItem extends BlockItem implements ItemModelProvider {
 	@Override
 	@Environment(EnvType.CLIENT)
 	public void appendHoverText(ItemStack itemStack, @Nullable Level level, List<Component> list, TooltipFlag tooltipFlag) {
-		super.appendHoverText(itemStack, level, list, tooltipFlag);
-		int l = itemStack.getOrCreateTag().getInt(DESTRUCTION);
-		if (l > 0) {
-			list.add(new TranslatableComponent("message.bclib.anvil_damage").append(": " + l));
+		int destruction = itemStack.getOrCreateTag().getInt(DESTRUCTION);
+		if (destruction > 0) {
+			BaseAnvilBlock block = (BaseAnvilBlock) ((BaseAnvilItem) itemStack.getItem()).getBlock();
+			int maxValue = block.getMaxDurability() * 3;
+			float damage = maxValue - destruction;
+			String percents = String.format(Locale.ROOT, "%.0F%%", damage);
+			list.add(new TranslatableComponent("message.bclib.anvil_damage").append(": " + percents));
 		}
 	}
 	

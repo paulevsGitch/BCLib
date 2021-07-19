@@ -12,6 +12,8 @@
 		"RecipeManagerMixin",
 		"BoneMealItemMixin",
 		"ServerLevelMixin",
+		"AnvilBlockMixin",
+		"AnvilMenuMixin",
 		"TagLoaderMixin"
 	],
 	"injectors": {

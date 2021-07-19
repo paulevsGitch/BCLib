@@ -8,6 +8,7 @@ import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.resources.model.UnbakedModel;
+import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
@@ -27,13 +28,16 @@ import ru.bclib.client.models.PatternsHelper;
 import ru.bclib.interfaces.BlockModelProvider;
 import ru.bclib.interfaces.CustomItemProvider;
 import ru.bclib.items.BaseAnvilItem;
+import ru.bclib.util.MHelper;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Random;
 
 public abstract class BaseAnvilBlock extends AnvilBlock implements BlockModelProvider, CustomItemProvider {
 	public static final IntegerProperty DESTRUCTION = BlockProperties.DESTRUCTION;
+	public IntegerProperty durability;
 	
 	public BaseAnvilBlock(MaterialColor color) {
 		super(FabricBlockSettings.copyOf(Blocks.ANVIL).mapColor(color));
@@ -42,24 +46,13 @@ public abstract class BaseAnvilBlock extends AnvilBlock implements BlockModelPro
 	@Override
 	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
 		super.createBlockStateDefinition(builder);
-		builder.add(DESTRUCTION);
-	}
-	
-	@Override
-	@SuppressWarnings("deprecation")
-	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
-		ItemStack dropStack = new ItemStack(this);
-		int destruction = state.getValue(DESTRUCTION);
-		dropStack.getOrCreateTag().putInt(BaseAnvilItem.DESTRUCTION, destruction);
-		return Lists.newArrayList(dropStack);
-	}
-	
-	protected String getTop(ResourceLocation blockId, String block) {
-		if (block.contains("item")) {
-			return blockId.getPath() + "_top_0";
+		if (getMaxDurability() != 3) {
+			durability = IntegerProperty.create("durability", 0, getMaxDurability());
 		}
-		char last = block.charAt(block.length() - 1);
-		return blockId.getPath() + "_top_" + last;
+		else {
+			durability = BlockProperties.DEFAULT_ANVIL_DURABILITY;
+		}
+		builder.add(DESTRUCTION, durability);
 	}
 	
 	@Override
@@ -95,5 +88,40 @@ public abstract class BaseAnvilBlock extends AnvilBlock implements BlockModelPro
 	@Override
 	public BlockItem getCustomItem(ResourceLocation blockID, FabricItemSettings settings) {
 		return new BaseAnvilItem(this, settings);
+	}
+	
+	@Override
+	@SuppressWarnings("deprecation")
+	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
+		int destruction = state.getValue(DESTRUCTION);
+		int durability = state.getValue(getDurabilityProp());
+		int value = destruction * getMaxDurability() + durability;
+		List<ItemStack> drops = super.getDrops(state, builder);
+		ItemStack itemStack = drops.get(0);
+		itemStack.getOrCreateTag().putInt(BaseAnvilItem.DESTRUCTION, value);
+		return drops;
+	}
+	
+	public IntegerProperty getDurabilityProp() {
+		return durability;
+	}
+	
+	public int getMaxDurability() {
+		return 3;
+	}
+	
+	public BlockState damageAnvilUse(BlockState state, Random random) {
+		IntegerProperty durability = getDurabilityProp();
+		int value = state.getValue(durability);
+		if (value < getMaxDurability() && random.nextInt(8) == 0) {
+			return state.setValue(durability, value + 1);
+		}
+		value = state.getValue(DESTRUCTION);
+		return value < 2 ? state.setValue(DESTRUCTION, value + 1).setValue(durability, 0) : null;
+	}
+	
+	public BlockState damageAnvilFall(BlockState state) {
+		int destruction = state.getValue(DESTRUCTION);
+		return destruction < 2 ? state.setValue(DESTRUCTION, destruction + 1) : null;
 	}
 }
