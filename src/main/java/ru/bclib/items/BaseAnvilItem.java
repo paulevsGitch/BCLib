@@ -16,12 +16,12 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 import ru.bclib.blocks.BaseAnvilBlock;
+import ru.bclib.interfaces.BlockModelProvider;
 import ru.bclib.interfaces.ItemModelProvider;
 
 import java.util.List;
 
 public class BaseAnvilItem extends BlockItem implements ItemModelProvider {
-	
 	public final static String DESTRUCTION = "destruction";
 	
 	public BaseAnvilItem(Block block, Properties properties) {
@@ -54,6 +54,6 @@ public class BaseAnvilItem extends BlockItem implements ItemModelProvider {
 	public BlockModel getItemModel(ResourceLocation resourceLocation) {
 		Block anvilBlock = getBlock();
 		ResourceLocation blockId = Registry.BLOCK.getKey(anvilBlock);
-		return ((ItemModelProvider) anvilBlock).getItemModel(blockId);
+		return ((BlockModelProvider) anvilBlock).getBlockModel(blockId, anvilBlock.defaultBlockState());
 	}
 }

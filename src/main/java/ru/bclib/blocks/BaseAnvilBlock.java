@@ -63,9 +63,6 @@ public abstract class BaseAnvilBlock extends AnvilBlock implements BlockModelPro
 	}
 	
 	@Override
-	public abstract Item asItem();
-	
-	@Override
 	@Environment(EnvType.CLIENT)
 	public BlockModel getItemModel(ResourceLocation blockId) {
 		return getBlockModel(blockId, defaultBlockState());
