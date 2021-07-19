@@ -5,8 +5,9 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.chunk.storage.RegionFile;
+import ru.bclib.BCLib;
+import ru.bclib.api.WorldDataAPI;
 import ru.bclib.config.Configs;
-import ru.bclib.config.SessionConfig;
 import ru.bclib.util.Logger;
 
 import java.io.DataInputStream;
@@ -15,26 +16,27 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class DataFixerAPI {
 	static final Logger LOGGER = new Logger("DataFixerAPI");
 	
-	public static void fixData(SessionConfig config) {
+	public static void fixData(File dir) {
 		if (!Configs.MAIN_CONFIG.getBoolean(Configs.MAIN_PATCH_CATEGORY, "applyPatches", true)) {
 			LOGGER.info("World Patches are disabled");
 			return;
 		}
 		
-		final File dir = config.levelFolder;
-		MigrationProfile data = Patch.createMigrationData(config);
+		MigrationProfile data = Patch.createMigrationData(WorldDataAPI.getCompoundTag(BCLib.MOD_ID, Configs.MAIN_PATCH_CATEGORY));
 		if (!data.hasAnyFixes()) {
 			LOGGER.info("Everything up to date");
 			return;
 		}
 		
 		List<File> regions = getAllRegions(dir, null);
+		boolean[] allOk = {true};
 		regions.parallelStream()
 			   .forEach((file) -> {
 				   try {
@@ -78,11 +80,23 @@ public class DataFixerAPI {
 					   region.close();
 				   }
 				   catch (Exception e) {
+					   allOk[0] = false;
 					   e.printStackTrace();
 				   }
 			   });
 		
-		data.markApplied();
+		if (allOk[0]) {
+			data.markApplied();
+			WorldDataAPI.saveFile(BCLib.MOD_ID);
+		}
+	}
+	
+	static CompoundTag patchConfTag = null;
+	static CompoundTag getPatchData(){
+		if (patchConfTag==null) {
+			patchConfTag = WorldDataAPI.getCompoundTag(BCLib.MOD_ID, Configs.MAIN_PATCH_CATEGORY);
+		}
+		return patchConfTag;
 	}
 	
 	private static boolean fixItemArrayWithID(ListTag items, boolean[] changed, MigrationProfile data, boolean recursive) {
@@ -116,6 +130,15 @@ public class DataFixerAPI {
 	}
 	
 	/**
+	 * register a new Patch
+	 *
+	 * @param patch A #Supplier that will instantiate the new Patch Object
+	 */
+	public static void registerPatch(Supplier<Patch> patch) {
+		Patch.getALL().add(patch.get());
+	}
+	
+	/**
 	 * Get mod version from string. String should be in format: %d.%d.%d
 	 *
 	 * @param version - {@link String} mod version.
@@ -131,9 +154,9 @@ public class DataFixerAPI {
 			final Matcher matcher = Pattern.compile(semanticVersionPattern)
 										   .matcher(version);
 			if (matcher.find()) {
-				if (matcher.groupCount() > 0) res = (Integer.parseInt(matcher.group(1)) & 0xFF) << 20;
-				if (matcher.groupCount() > 1) res |= (Integer.parseInt(matcher.group(2)) & 0xFF) << 12;
-				if (matcher.groupCount() > 2) res |= Integer.parseInt(matcher.group(3)) & 0xFFF;
+				if (matcher.groupCount() > 0) res = (Integer.parseInt(matcher.group(1)) & 0xFF) << 22;
+				if (matcher.groupCount() > 1) res |= (Integer.parseInt(matcher.group(2)) & 0xFF) << 14;
+				if (matcher.groupCount() > 2) res |= Integer.parseInt(matcher.group(3)) & 0x3FFF;
 			}
 			
 			return res;
@@ -150,9 +173,9 @@ public class DataFixerAPI {
 	 * @return {@link String} mod version.
 	 */
 	public static String getModVersion(int version) {
-		int a = (version >> 20) & 0xFF;
-		int b = (version >> 12) & 0xFF;
-		int c = version & 0xFFF;
+		int a = (version >> 22) & 0xFF;
+		int b = (version >> 14) & 0xFF;
+		int c = version & 0x3FFF;
 		return String.format(Locale.ROOT, "%d.%d.%d", a, b, c);
 	}
 	

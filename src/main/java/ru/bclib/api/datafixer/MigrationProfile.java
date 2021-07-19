@@ -2,8 +2,6 @@ package ru.bclib.api.datafixer;
 
 import net.minecraft.nbt.CompoundTag;
 import org.jetbrains.annotations.NotNull;
-import ru.bclib.config.Configs;
-import ru.bclib.config.PathConfig;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -14,9 +12,9 @@ import java.util.stream.Collectors;
 class MigrationProfile {
 	final Set<String> mods;
 	final Map<String, String> idReplacements;
-	private final PathConfig config;
+	private final CompoundTag config;
 	
-	MigrationProfile(PathConfig config) {
+	MigrationProfile(CompoundTag config) {
 		this.config = config;
 		
 		this.mods = Collections.unmodifiableSet(Patch.getALL()
@@ -46,14 +44,13 @@ class MigrationProfile {
 	final public void markApplied() {
 		for (String modID : mods) {
 			DataFixerAPI.LOGGER.info("Updating Patch-Level for '{}' from {} to {}", modID, currentPatchLevel(modID), Patch.maxPatchLevel(modID));
-			config.setString(Configs.MAIN_PATCH_CATEGORY, modID, Patch.maxPatchVersion(modID));
+			config.putString(modID, Patch.maxPatchVersion(modID));
 		}
-		
-		config.saveChanges();
 	}
 	
 	public String currentPatchVersion(@NotNull String modID) {
-		return config.getString(Configs.MAIN_PATCH_CATEGORY, modID, "0.0.0");
+		if (!config.contains(modID)) return "0.0.0";
+		return config.getString(modID);
 	}
 	
 	public int currentPatchLevel(@NotNull String modID) {

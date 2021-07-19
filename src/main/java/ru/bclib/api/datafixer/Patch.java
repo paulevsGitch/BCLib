@@ -1,13 +1,12 @@
 package ru.bclib.api.datafixer;
 
+import net.minecraft.nbt.CompoundTag;
 import org.jetbrains.annotations.NotNull;
-import ru.bclib.config.PathConfig;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Supplier;
 
 public abstract class Patch {
 	private static List<Patch> ALL = new ArrayList<>(10);
@@ -24,8 +23,6 @@ public abstract class Patch {
 	
 	/**
 	 * The Mod-ID that registered this Patch
-	 *
-	 * @return The ID
 	 */
 	
 	@NotNull
@@ -33,15 +30,6 @@ public abstract class Patch {
 	
 	static List<Patch> getALL() {
 		return ALL;
-	}
-	
-	/**
-	 * register a new Patch
-	 *
-	 * @param patch A #Supplier that will instantiate the new Patch Object
-	 */
-	public static void registerPatch(Supplier<Patch> patch) {
-		ALL.add(patch.get());
 	}
 	
 	/**
@@ -137,10 +125,10 @@ public abstract class Patch {
 	 * <p>
 	 * A {@link #Patch} with a given {@link #level} is only included if the patch-level of the
 	 * world is less
-	 *
+	 * @param config The current patch-level configuration
 	 * @return a new {@link MigrationProfile} Object.
 	 */
-	static MigrationProfile createMigrationData(PathConfig config) {
+	static MigrationProfile createMigrationData(CompoundTag config) {
 		return new MigrationProfile(config);
 	}
 	
