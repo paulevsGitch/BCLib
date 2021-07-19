@@ -1,5 +1,10 @@
 package ru.bclib.mixin.common;
 
+import java.io.File;
+import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.function.Supplier;
+
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -16,14 +21,11 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import ru.bclib.BCLib;
 import ru.bclib.api.BiomeAPI;
-import ru.bclib.api.DataFixerAPI;
+import ru.bclib.api.DataFixerAPI2;
 import ru.bclib.api.WorldDataAPI;
-
-import java.io.File;
-import java.util.List;
-import java.util.concurrent.Executor;
-import java.util.function.Supplier;
+import ru.bclib.config.SessionConfig;
 
 @Mixin(ServerLevel.class)
 public abstract class ServerLevelMixin extends Level {
@@ -49,7 +51,8 @@ public abstract class ServerLevelMixin extends Level {
 			dir = dir.getParentFile();
 		}
 		
-		DataFixerAPI.fixData(dir);
+		//DataFixerAPI.fixData(dir);
+		DataFixerAPI2.fixData(new SessionConfig(BCLib.MOD_ID, "patches", session, world));
 		WorldDataAPI.load(new File(dir, "data"));
 	}
 }
