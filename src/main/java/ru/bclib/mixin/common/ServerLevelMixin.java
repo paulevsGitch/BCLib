@@ -16,11 +16,9 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import ru.bclib.BCLib;
 import ru.bclib.api.BiomeAPI;
-import ru.bclib.api.datafixer.DataFixerAPI;
 import ru.bclib.api.WorldDataAPI;
-import ru.bclib.config.SessionConfig;
+import ru.bclib.api.datafixer.DataFixerAPI;
 
 import java.io.File;
 import java.util.List;
@@ -51,8 +49,7 @@ public abstract class ServerLevelMixin extends Level {
 			dir = dir.getParentFile();
 		}
 		
-		//DataFixerAPI.fixData(dir);
-		DataFixerAPI.fixData(new SessionConfig(BCLib.MOD_ID, "patches", session, world));
 		WorldDataAPI.load(new File(dir, "data"));
+		DataFixerAPI.fixData(dir);
 	}
 }

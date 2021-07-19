@@ -24,7 +24,6 @@ public class WorldDataAPI {
 		MODS.stream().parallel().forEach(modID -> {
 			File file = new File(dataDir, modID + ".nbt");
 			CompoundTag root = new CompoundTag();
-			TAGS.put(modID, root);
 			if (file.exists()) {
 				try {
 					root = NbtIo.readCompressed(file);
@@ -46,6 +45,8 @@ public class WorldDataAPI {
 					saveFile(modID);
 				}
 			}
+			
+			TAGS.put(modID, root);
 		});
 	}
 	
