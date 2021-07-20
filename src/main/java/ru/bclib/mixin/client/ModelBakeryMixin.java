@@ -1,14 +1,19 @@
 package ru.bclib.mixin.client;
 
+import net.fabricmc.fabric.api.client.model.ModelLoadingRegistry;
+import net.minecraft.client.color.block.BlockColors;
 import net.minecraft.client.renderer.block.BlockModelShaper;
+import net.minecraft.client.renderer.block.model.BlockElementFace;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.renderer.block.model.multipart.MultiPart;
 import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.client.resources.model.UnbakedModel;
+import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -19,7 +24,11 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import ru.bclib.BCLib;
+import ru.bclib.client.BCLibClient;
+import ru.bclib.client.models.EmissiveModel;
+import ru.bclib.client.render.EmissiveTexturesInfo;
 import ru.bclib.interfaces.BlockModelProvider;
 import ru.bclib.interfaces.ItemModelProvider;
 
@@ -27,7 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-@Mixin(ModelBakery.class)
+@Mixin(value = ModelBakery.class, priority = 100)
 public abstract class ModelBakeryMixin {
 	@Final
 	@Shadow
@@ -81,13 +90,10 @@ public abstract class ModelBakeryMixin {
 					Block block = Registry.BLOCK.get(clearLoc);
 					if (block instanceof BlockModelProvider) {
 						List<BlockState> possibleStates = block.getStateDefinition().getPossibleStates();
-						Optional<BlockState> possibleState = possibleStates.stream()
-																		   .filter(state -> modelId.equals(
-																			   BlockModelShaper.stateToModelLocation(
-																				   clearLoc,
-																				   state
-																			   )))
-																		   .findFirst();
+						Optional<BlockState> possibleState = possibleStates
+							.stream()
+							.filter(state -> modelId.equals(BlockModelShaper.stateToModelLocation(clearLoc, state)))
+							.findFirst();
 						if (possibleState.isPresent()) {
 							UnbakedModel modelVariant = ((BlockModelProvider) block).getModelVariant(
 								modelId,

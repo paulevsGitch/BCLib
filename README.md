@@ -1,6 +1,6 @@
 [![](https://jitpack.io/v/paulevsGitch/BCLib.svg)](https://jitpack.io/#paulevsGitch/BCLib)
 # BCLib
-BCLib is a library mod for BetterX team mods, developed for Fabric, MC 1.16.5
+BCLib is a library mod for BetterX team mods, developed for Fabric, MC 1.17.1
 
 ## Features:
 ### API:
@@ -32,7 +32,7 @@ BCLib is a library mod for BetterX team mods, developed for Fabric, MC 1.16.5
 ## Importing:
 * Clone repo
 * Edit gradle.properties if necessary
-* Run command line in folder: gradlew genSources eclipse (or Another-IDE-Name)
+* Run command line in folder: gradlew genSources idea (or eclipse)
 * Import project to IDE
 
 ## Building:

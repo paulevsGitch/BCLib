@@ -4,8 +4,10 @@
 	"package": "ru.bclib.mixin.client",
 	"compatibilityLevel": "JAVA_16",
 	"client": [
+		"AmbientOcclusionFaceMixin",
 		"EnchantingTableBlockMixin",
 		"BackgroundRendererMixin",
+		"AoCalculatorMixin",
 		"TextureAtlasMixin",
 		"ModelBakeryMixin",
 		"MinecraftMixin"

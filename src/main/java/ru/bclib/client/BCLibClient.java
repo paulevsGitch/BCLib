@@ -10,7 +10,7 @@ import ru.bclib.interfaces.PostInitable;
 import ru.bclib.interfaces.RenderLayerProvider;
 import ru.bclib.registry.BaseBlockEntityRenders;
 
-public class BCLibClient implements ClientModInitializer {
+public class BCLibClient implements ClientModInitializer/*, ModelResourceProvider*/ {
 	@Override
 	public void onInitializeClient() {
 		ModIntegrationAPI.registerAll();
@@ -21,6 +21,7 @@ public class BCLibClient implements ClientModInitializer {
 				((PostInitable) block).postInit();
 			}
 		});
+		//ModelLoadingRegistry.INSTANCE.registerResourceProvider(rm -> this);
 	}
 	
 	private void registerRenderLayers() {
@@ -34,4 +35,17 @@ public class BCLibClient implements ClientModInitializer {
 			}
 		});
 	}
+	
+	/*@Override
+	public @Nullable UnbakedModel loadModelResource(ResourceLocation resourceId, ModelProviderContext context) throws ModelProviderException {
+		if (!resourceId.getPath().startsWith("block")) {
+			return null;
+		}
+		UnbakedModel model = context.loadModel(resourceId);
+		if (model instanceof BlockModel) {
+			System.out.println(resourceId);
+			return new EmissiveModel((BlockModel) model);
+		}
+		return null;
+	}*/
 }
