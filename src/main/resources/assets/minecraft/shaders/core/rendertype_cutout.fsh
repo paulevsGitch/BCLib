@@ -24,19 +24,24 @@ vec3 rgbToHSV(vec3 color) {
 }
 
 vec3 hsvToRGB(vec3 color) {
-    vec4 k = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
-    vec3 p = abs(fract(color.xxx + k.xyz) * 6.0 - k.www);
-    return color.z * mix(k.xxx, clamp(p - k.xxx, 0.0, 1.0), color.y);
+	vec4 k = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+	vec3 p = abs(fract(color.xxx + k.xyz) * 6.0 - k.www);
+	return color.z * mix(k.xxx, clamp(p - k.xxx, 0.0, 1.0), color.y);
+}
+
+// Value between 252 and 254
+bool isEmissive(float alpha) {
+    return 0.9883 < alpha && alpha < 0.9961;
 }
 
 void main() {
 	vec4 tex = texture(Sampler0, texCoord0);
 	if (tex.a < 0.1) {
-        discard;
-    }
+		discard;
+	}
 	vec4 color = tex * ColorModulator;
 	vec4 vertex = vertexColor;
-	if (tex.a < 0.99) {
+	if (isEmissive(tex.a)) {
 		vec3 hsv = rgbToHSV(vertex.rgb);
 		hsv.z = 1.0;
 		vertex.rgb = hsvToRGB(hsv);
