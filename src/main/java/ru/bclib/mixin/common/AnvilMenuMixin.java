@@ -38,6 +38,7 @@ public abstract class AnvilMenuMixin extends ItemCombinerMenu {
 		this.access.execute((level, blockPos) -> {
 			BlockState blockState = level.getBlockState(blockPos);
 			if (blockState.getBlock() instanceof BaseAnvilBlock) {
+				info.cancel();
 				if (!player.getAbilities().instabuild) {
 					player.giveExperienceLevels(-this.cost.get());
 				}
@@ -59,15 +60,15 @@ public abstract class AnvilMenuMixin extends ItemCombinerMenu {
 				
 				this.cost.set(0);
 				
-				if (!player.getAbilities().instabuild && blockState.is(BlockTags.ANVIL) && player.getRandom()
-																								 .nextFloat() < 0.12F) {
-					BlockState blockState2 = AnvilBlock.damage(blockState);
-					if (blockState2 == null) {
+				if (!player.getAbilities().instabuild && blockState.is(BlockTags.ANVIL) && player.getRandom().nextFloat() < 0.12F) {
+					BaseAnvilBlock anvil = (BaseAnvilBlock) blockState.getBlock();
+					BlockState damaged = anvil.damageAnvilUse(blockState, player.getRandom());
+					if (damaged == null) {
 						level.removeBlock(blockPos, false);
 						level.levelEvent(1029, blockPos, 0);
 					}
 					else {
-						level.setBlock(blockPos, blockState2, 2);
+						level.setBlock(blockPos, damaged, 2);
 						level.levelEvent(1030, blockPos, 0);
 					}
 				}
@@ -75,7 +76,6 @@ public abstract class AnvilMenuMixin extends ItemCombinerMenu {
 					level.levelEvent(1030, blockPos, 0);
 				}
 			}
-			info.cancel();
 		});
 	}
 }
