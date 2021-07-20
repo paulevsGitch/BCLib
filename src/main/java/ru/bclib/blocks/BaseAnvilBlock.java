@@ -8,11 +8,10 @@ import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.resources.model.UnbakedModel;
-import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.PickaxeItem;
 import net.minecraft.world.level.block.AnvilBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -21,6 +20,7 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.material.MaterialColor;
 import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import org.jetbrains.annotations.Nullable;
 import ru.bclib.client.models.BasePatterns;
 import ru.bclib.client.models.ModelsHelper;
@@ -28,8 +28,8 @@ import ru.bclib.client.models.PatternsHelper;
 import ru.bclib.interfaces.BlockModelProvider;
 import ru.bclib.interfaces.CustomItemProvider;
 import ru.bclib.items.BaseAnvilItem;
-import ru.bclib.util.MHelper;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -96,10 +96,13 @@ public abstract class BaseAnvilBlock extends AnvilBlock implements BlockModelPro
 		int destruction = state.getValue(DESTRUCTION);
 		int durability = state.getValue(getDurabilityProp());
 		int value = destruction * getMaxDurability() + durability;
-		List<ItemStack> drops = super.getDrops(state, builder);
-		ItemStack itemStack = drops.get(0);
-		itemStack.getOrCreateTag().putInt(BaseAnvilItem.DESTRUCTION, value);
-		return drops;
+		ItemStack tool = builder.getParameter(LootContextParams.TOOL);
+		if (tool != null && tool.getItem() instanceof PickaxeItem) {
+			ItemStack itemStack = new ItemStack(this);
+			itemStack.getOrCreateTag().putInt(BaseAnvilItem.DESTRUCTION, value);
+			return Lists.newArrayList(itemStack);
+		}
+		return Collections.emptyList();
 	}
 	
 	public IntegerProperty getDurabilityProp() {
