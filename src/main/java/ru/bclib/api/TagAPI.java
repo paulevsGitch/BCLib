@@ -1,7 +1,11 @@
 package ru.bclib.api;
 
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import net.fabricmc.fabric.api.tag.TagRegistry;
+import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.Tag;
@@ -9,14 +13,19 @@ import net.minecraft.tags.Tag.Named;
 import net.minecraft.tags.TagCollection;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import ru.bclib.BCLib;
-import ru.bclib.util.TagHelper;
 
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Supplier;
 
 public class TagAPI {
+	private static final Map<ResourceLocation, Set<ResourceLocation>> TAGS_BLOCK = Maps.newConcurrentMap();
+	private static final Map<ResourceLocation, Set<ResourceLocation>> TAGS_ITEM = Maps.newConcurrentMap();
+	
 	// Block Tags
 	public static final Tag.Named<Block> BOOKSHELVES = makeCommonBlockTag("bookshelves");
 	public static final Tag.Named<Block> GEN_TERRAIN = makeBlockTag(BCLib.MOD_ID, "gen_terrain");
@@ -114,8 +123,8 @@ public class TagAPI {
 	 * @param block - {@link Block}.
 	 */
 	public static void addNetherGround(Block block) {
-		TagHelper.addTag(NETHER_GROUND, block);
-		TagHelper.addTag(GEN_TERRAIN, block);
+		addTag(NETHER_GROUND, block);
+		addTag(GEN_TERRAIN, block);
 	}
 	
 	/**
@@ -124,21 +133,137 @@ public class TagAPI {
 	 * @param block - {@link Block}.
 	 */
 	public static void addEndGround(Block block) {
-		TagHelper.addTag(GEN_TERRAIN, block);
-		TagHelper.addTag(END_GROUND, block);
+		addTag(GEN_TERRAIN, block);
+		addTag(END_GROUND, block);
 	}
 	
 	/**
 	 * Initializes basic tags. Should be called only in BCLib main class.
 	 */
 	public static void init() {
-		TagHelper.addTag(BOOKSHELVES, Blocks.BOOKSHELF);
-		TagHelper.addTag(GEN_TERRAIN, Blocks.END_STONE, Blocks.NETHERRACK, Blocks.SOUL_SAND, Blocks.SOUL_SOIL);
-		TagHelper.addTag(NETHER_GROUND, Blocks.NETHERRACK, Blocks.SOUL_SAND, Blocks.SOUL_SOIL);
-		TagHelper.addTag(END_GROUND, Blocks.END_STONE);
-		TagHelper.addTag(BLOCK_CHEST, Blocks.CHEST);
-		TagHelper.addTag(ITEM_CHEST, Items.CHEST);
-		TagHelper.addTag(IRON_INGOTS, Items.IRON_INGOT);
-		TagHelper.addTag(FURNACES, Blocks.FURNACE);
+		addTag(BOOKSHELVES, Blocks.BOOKSHELF);
+		addTag(GEN_TERRAIN, Blocks.END_STONE, Blocks.NETHERRACK, Blocks.SOUL_SAND, Blocks.SOUL_SOIL);
+		addTag(NETHER_GROUND, Blocks.NETHERRACK, Blocks.SOUL_SAND, Blocks.SOUL_SOIL);
+		addTag(END_GROUND, Blocks.END_STONE);
+		addTag(BLOCK_CHEST, Blocks.CHEST);
+		addTag(ITEM_CHEST, Items.CHEST);
+		addTag(IRON_INGOTS, Items.IRON_INGOT);
+		addTag(FURNACES, Blocks.FURNACE);
+	}
+	
+	/**
+	 * Adds one Tag to multiple Blocks.
+	 * <p>
+	 * Example:
+	 * <pre>{@code  Tag.Named<Block> DIMENSION_STONE = makeBlockTag("mymod", "dim_stone");
+	 * addTag(DIMENSION_STONE, Blocks.END_STONE, Blocks.NETHERRACK);}</pre>
+	 * <p>
+	 * The call will reserve the Tag. The Tag is added to the blocks once
+	 * {@link #apply(String, Map)} was executed.
+	 *
+	 * @param tag    The new Tag
+	 * @param blocks One or more blocks that should receive the Tag.
+	 */
+	public static void addTag(Tag.Named<Block> tag, Block... blocks) {
+		ResourceLocation tagID = tag.getName();
+		Set<ResourceLocation> set = TAGS_BLOCK.computeIfAbsent(tagID, k -> Sets.newHashSet());
+		for (Block block : blocks) {
+			ResourceLocation id = Registry.BLOCK.getKey(block);
+			if (id != Registry.BLOCK.getDefaultKey()) {
+				set.add(id);
+			}
+		}
+	}
+	
+	/**
+	 * Adds one Tag to multiple Items.
+	 * <p>
+	 * Example:
+	 * <pre>{@code  Tag.Named<Item> METALS = makeBlockTag("mymod", "metals");
+	 * addTag(METALS, Items.IRON_INGOT, Items.GOLD_INGOT, Items.COPPER_INGOT);}</pre>
+	 * <p>
+	 * The call will reserve the Tag. The Tag is added to the items once
+	 * {@link #apply(String, Map)} was executed.
+	 *
+	 * @param tag   The new Tag
+	 * @param items One or more item that should receive the Tag.
+	 */
+	public static void addTag(Tag.Named<Item> tag, ItemLike... items) {
+		ResourceLocation tagID = tag.getName();
+		Set<ResourceLocation> set = TAGS_ITEM.computeIfAbsent(tagID, k -> Sets.newHashSet());
+		for (ItemLike item : items) {
+			ResourceLocation id = Registry.ITEM.getKey(item.asItem());
+			if (id != Registry.ITEM.getDefaultKey()) {
+				set.add(id);
+			}
+		}
+	}
+	
+	/**
+	 * Adds multiple Tags to one Item.
+	 * <p>
+	 * The call will reserve the Tags. The Tags are added to the Item once
+	 * * {@link #apply(String, Map)} was executed.
+	 *
+	 * @param item The Item that will receive all Tags
+	 * @param tags One or more Tags
+	 */
+	@SafeVarargs
+	public static void addTags(ItemLike item, Tag.Named<Item>... tags) {
+		for (Tag.Named<Item> tag : tags) {
+			addTag(tag, item);
+		}
+	}
+	
+	/**
+	 * Adds multiple Tags to one Block.
+	 * <p>
+	 * The call will reserve the Tags. The Tags are added to the Block once
+	 * * {@link #apply(String, Map)} was executed.
+	 *
+	 * @param block The Block that will receive all Tags
+	 * @param tags  One or more Tags
+	 */
+	@SafeVarargs
+	public static void addTags(Block block, Tag.Named<Block>... tags) {
+		for (Tag.Named<Block> tag : tags) {
+			addTag(tag, block);
+		}
+	}
+	
+	/**
+	 * Adds all {@code ids} to the {@code builder}.
+	 *
+	 * @param builder
+	 * @param ids
+	 * @return The Builder passed as {@code builder}.
+	 */
+	public static Tag.Builder apply(Tag.Builder builder, Set<ResourceLocation> ids) {
+		ids.forEach(value -> builder.addElement(value, "Better End Code"));
+		return builder;
+	}
+	
+	/**
+	 * Automatically called in {@link net.minecraft.tags.TagLoader#loadAndBuild(ResourceManager)}.
+	 * <p>
+	 * In most cases there is no need to call this Method manually.
+	 *
+	 * @param directory The name of the Tag-directory. Should be either <i>"tags/blocks"</i> or
+	 *                  <i>"tags/items"</i>.
+	 * @param tagsMap   The map that will hold the registered Tags
+	 * @return The {@code tagsMap} Parameter.
+	 */
+	public static Map<ResourceLocation, Tag.Builder> apply(String directory, Map<ResourceLocation, Tag.Builder> tagsMap) {
+		Map<ResourceLocation, Set<ResourceLocation>> endTags = null;
+		if ("tags/blocks".equals(directory)) {
+			endTags = TAGS_BLOCK;
+		}
+		else if ("tags/items".equals(directory)) {
+			endTags = TAGS_ITEM;
+		}
+		if (endTags != null) {
+			endTags.forEach((id, ids) -> apply(tagsMap.computeIfAbsent(id, key -> Tag.Builder.tag()), ids));
+		}
+		return tagsMap;
 	}
 }

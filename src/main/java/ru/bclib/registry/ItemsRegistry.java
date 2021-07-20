@@ -27,7 +27,7 @@ import ru.bclib.items.ModelProviderItem;
 import ru.bclib.items.tool.BaseAxeItem;
 import ru.bclib.items.tool.BaseHoeItem;
 import ru.bclib.items.tool.BasePickaxeItem;
-import ru.bclib.util.TagHelper;
+import ru.bclib.api.TagAPI;
 
 public abstract class ItemsRegistry extends BaseRegistry<Item> {
 	
@@ -54,19 +54,19 @@ public abstract class ItemsRegistry extends BaseRegistry<Item> {
 		registerItem(id, item, BaseRegistry.getModItems(id.getNamespace()));
 		
 		if (item instanceof ShovelItem) {
-			TagHelper.addTag((Tag.Named<Item>) FabricToolTags.SHOVELS, item);
+			TagAPI.addTag((Tag.Named<Item>) FabricToolTags.SHOVELS, item);
 		}
 		else if (item instanceof SwordItem) {
-			TagHelper.addTag((Tag.Named<Item>) FabricToolTags.SWORDS, item);
+			TagAPI.addTag((Tag.Named<Item>) FabricToolTags.SWORDS, item);
 		}
 		else if (item instanceof BasePickaxeItem) {
-			TagHelper.addTag((Tag.Named<Item>) FabricToolTags.PICKAXES, item);
+			TagAPI.addTag((Tag.Named<Item>) FabricToolTags.PICKAXES, item);
 		}
 		else if (item instanceof BaseAxeItem) {
-			TagHelper.addTag((Tag.Named<Item>) FabricToolTags.AXES, item);
+			TagAPI.addTag((Tag.Named<Item>) FabricToolTags.AXES, item);
 		}
 		else if (item instanceof BaseHoeItem) {
-			TagHelper.addTag((Tag.Named<Item>) FabricToolTags.HOES, item);
+			TagAPI.addTag((Tag.Named<Item>) FabricToolTags.HOES, item);
 		}
 		
 		return item;
