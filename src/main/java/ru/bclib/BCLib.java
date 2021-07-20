@@ -5,6 +5,7 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.resources.ResourceLocation;
 import ru.bclib.api.TagAPI;
+import ru.bclib.api.WorldDataAPI;
 import ru.bclib.config.Configs;
 import ru.bclib.recipes.CraftingRecipes;
 import ru.bclib.registry.BaseBlockEntities;
@@ -23,6 +24,7 @@ public class BCLib implements ModInitializer {
 		BCLSurfaceBuilders.register();
 		TagAPI.init();
 		CraftingRecipes.init();
+		WorldDataAPI.registerModCache(MOD_ID);
 		Configs.save();
 	}
 	

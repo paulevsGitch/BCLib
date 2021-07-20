@@ -7,6 +7,7 @@ import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
 import ru.bclib.BCLib;
+import ru.bclib.api.datafixer.DataFixerAPI;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,7 +25,6 @@ public class WorldDataAPI {
 		MODS.stream().parallel().forEach(modID -> {
 			File file = new File(dataDir, modID + ".nbt");
 			CompoundTag root = new CompoundTag();
-			TAGS.put(modID, root);
 			if (file.exists()) {
 				try {
 					root = NbtIo.readCompressed(file);
@@ -38,7 +38,7 @@ public class WorldDataAPI {
 				if (optional.isPresent()) {
 					ModContainer modContainer = optional.get();
 					if (BCLib.isDevEnvironment()) {
-						root.putString("version", "63.63.63");
+						root.putString("version", "255.255.9999");
 					}
 					else {
 						root.putString("version", modContainer.getMetadata().getVersion().toString());
@@ -46,6 +46,8 @@ public class WorldDataAPI {
 					saveFile(modID);
 				}
 			}
+			
+			TAGS.put(modID, root);
 		});
 	}
 	
