@@ -58,7 +58,7 @@ public class BaseAnvilItem extends BlockItem implements ItemModelProvider {
 			BaseAnvilBlock block = (BaseAnvilBlock) ((BaseAnvilItem) itemStack.getItem()).getBlock();
 			int maxValue = block.getMaxDurability() * 3;
 			float damage = maxValue - destruction;
-			String percents = String.format(Locale.ROOT, "%.0F%%", damage);
+			String percents = String.format(Locale.ROOT, "%.0f%%", damage);
 			list.add(new TranslatableComponent("message.bclib.anvil_damage").append(": " + percents));
 		}
 	}
