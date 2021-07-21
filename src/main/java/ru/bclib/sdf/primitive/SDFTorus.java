@@ -7,12 +7,12 @@ public class SDFTorus extends SDFPrimitive {
 	private float radiusBig;
 	
 	public SDFTorus setBigRadius(float radius) {
-		this.radiusBig = radiusBig;
+		this.radiusBig = radius;
 		return this;
 	}
 
 	public SDFTorus setSmallRadius(float radius) {
-		this.radiusSmall = radiusSmall;
+		this.radiusSmall = radius;
 		return this;
 	}
 
