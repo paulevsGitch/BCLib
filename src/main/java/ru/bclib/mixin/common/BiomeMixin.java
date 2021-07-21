@@ -18,7 +18,7 @@ public class BiomeMixin {
 	
 	@ModifyArg(method = "generate", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/levelgen/WorldgenRandom;setFeatureSeed(JII)J"))
 	private long bclib_updateFeatureSeed(long seed) {
-		return Long.rotateRight(seed, bclib_featureIteratorSeed);
+		return Long.rotateRight(seed, bclib_featureIteratorSeed++);
 	}
 	
 	@Inject(method = "generate", at = @At("HEAD"))
