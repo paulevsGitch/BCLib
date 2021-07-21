@@ -14,7 +14,8 @@
 		"ServerLevelMixin",
 		"AnvilBlockMixin",
 		"AnvilMenuMixin",
-		"TagLoaderMixin"
+		"TagLoaderMixin",
+		"BiomeMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
