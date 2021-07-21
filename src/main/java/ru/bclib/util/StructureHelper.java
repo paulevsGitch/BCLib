@@ -286,7 +286,7 @@ public class StructureHelper {
 	
 	private static boolean isTerrainNear(WorldGenLevel world, BlockPos pos) {
 		for (Direction dir : BlocksHelper.DIRECTIONS) {
-			if (world.getBlockState(pos.relative(dir)).is(TagAPI.GEN_TERRAIN)) {
+			if (world.getBlockState(pos.relative(dir)).is(TagAPI.BLOCK_GEN_TERRAIN)) {
 				return true;
 			}
 		}
@@ -365,7 +365,7 @@ public class StructureHelper {
 	
 	private static boolean ignore(BlockState state, WorldGenLevel world, BlockPos pos) {
 		return state.getMaterial().isReplaceable() || !state.getFluidState()
-															.isEmpty() || state.is(TagAPI.END_GROUND) || state.is(
+															.isEmpty() || state.is(TagAPI.BLOCK_END_GROUND) || state.is(
 			BlockTags.LOGS) || state.is(BlockTags.LEAVES) || state.getMaterial()
 																  .equals(Material.PLANT) || state.getMaterial()
 																								  .equals(Material.LEAVES) || BlocksHelper
@@ -382,7 +382,7 @@ public class StructureHelper {
 				for (int y = bounds.maxY(); y >= bounds.minY(); y--) {
 					mut.setY(y);
 					BlockState state = world.getBlockState(mut);
-					if (state.is(TagAPI.END_GROUND) && !world.getBlockState(mut.above())
+					if (state.is(TagAPI.BLOCK_END_GROUND) && !world.getBlockState(mut.above())
 															 .getMaterial()
 															 .isSolidBlocking()) {
 						BlocksHelper.setWithoutUpdate(world, mut, top);

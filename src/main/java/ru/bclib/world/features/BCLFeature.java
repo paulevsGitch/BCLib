@@ -21,7 +21,7 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.TagMatchTest;
 import ru.bclib.api.TagAPI;
 
 public class BCLFeature {
-	private static final RuleTest ANY_TERRAIN = new TagMatchTest(TagAPI.GEN_TERRAIN);
+	private static final RuleTest ANY_TERRAIN = new TagMatchTest(TagAPI.BLOCK_GEN_TERRAIN);
 	private ConfiguredFeature<?, ?> featureConfigured;
 	private GenerationStep.Decoration featureStep;
 	private Feature<?> feature;

@@ -136,11 +136,11 @@ public abstract class NBTStructureFeature extends DefaultFeature {
 					mut.setZ(z);
 					mut.setY(surfMax);
 					BlockState state = world.getBlockState(mut);
-					if (!state.is(TagAPI.GEN_TERRAIN) && state.isFaceSturdy(world, mut, Direction.DOWN)) {
+					if (!state.is(TagAPI.BLOCK_GEN_TERRAIN) && state.isFaceSturdy(world, mut, Direction.DOWN)) {
 						for (int i = 0; i < 10; i++) {
 							mut.setY(mut.getY() - 1);
 							BlockState stateSt = world.getBlockState(mut);
-							if (!stateSt.is(TagAPI.GEN_TERRAIN)) {
+							if (!stateSt.is(TagAPI.BLOCK_GEN_TERRAIN)) {
 								if (merge == TerrainMerge.SURFACE) {
 									SurfaceBuilderConfiguration config = world.getBiome(mut)
 																			  .getGenerationSettings()
@@ -154,7 +154,7 @@ public abstract class NBTStructureFeature extends DefaultFeature {
 								}
 							}
 							else {
-								if (stateSt.is(TagAPI.END_GROUND) && state.getMaterial().isSolidBlocking()) {
+								if (stateSt.is(TagAPI.BLOCK_END_GROUND) && state.getMaterial().isSolidBlocking()) {
 									if (merge == TerrainMerge.SURFACE) {
 										SurfaceBuilderConfiguration config = world.getBiome(mut)
 																				  .getGenerationSettings()

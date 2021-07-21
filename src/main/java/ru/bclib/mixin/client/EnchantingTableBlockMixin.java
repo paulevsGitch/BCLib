@@ -30,7 +30,7 @@ public abstract class EnchantingTableBlockMixin extends Block {
 				if (random.nextInt(16) == 0) {
 					for (int py = 0; py <= 1; ++py) {
 						BlockPos blockPos = pos.offset(px, py, pz);
-						if (world.getBlockState(blockPos).is(TagAPI.BOOKSHELVES)) {
+						if (world.getBlockState(blockPos).is(TagAPI.BLOCK_BOOKSHELVES)) {
 							if (!world.isEmptyBlock(pos.offset(px / 2, 0, pz / 2))) {
 								break;
 							}

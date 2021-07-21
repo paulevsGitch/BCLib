@@ -27,16 +27,17 @@ public class TagAPI {
 	private static final Map<ResourceLocation, Set<ResourceLocation>> TAGS_ITEM = Maps.newConcurrentMap();
 	
 	// Block Tags
-	public static final Tag.Named<Block> BOOKSHELVES = makeCommonBlockTag("bookshelves");
-	public static final Tag.Named<Block> GEN_TERRAIN = makeBlockTag(BCLib.MOD_ID, "gen_terrain");
-	public static final Tag.Named<Block> NETHER_GROUND = makeBlockTag(BCLib.MOD_ID, "nether_ground");
-	public static final Tag.Named<Block> END_GROUND = makeBlockTag(BCLib.MOD_ID, "end_ground");
+	public static final Tag.Named<Block> BLOCK_BOOKSHELVES = makeCommonBlockTag("bookshelves");
+	public static final Tag.Named<Block> BLOCK_GEN_TERRAIN = makeBlockTag(BCLib.MOD_ID, "gen_terrain");
+	public static final Tag.Named<Block> BLOCK_NETHER_GROUND = makeBlockTag(BCLib.MOD_ID, "nether_ground");
+	public static final Tag.Named<Block> BLOCK_END_GROUND = makeBlockTag(BCLib.MOD_ID, "end_ground");
 	
 	public static final Tag.Named<Block> BLOCK_CHEST = makeCommonBlockTag("chest");
-	public static final Tag.Named<Block> END_STONES = makeCommonBlockTag("end_stones");
-	public static final Tag.Named<Block> NETHER_STONES = makeCommonBlockTag("nether_stones");
+	public static final Tag.Named<Block> BLOCK_END_STONES = makeCommonBlockTag("end_stones");
+	public static final Tag.Named<Block> BLOCK_NETHER_STONES = makeCommonBlockTag("nether_stones");
+	public static final Tag.Named<Block> BLOCK_WORKBENCHES = makeCommonBlockTag("workbenches");
 	
-	public static final Tag.Named<Block> DRAGON_IMMUNE = getMCBlockTag("dragon_immune");
+	public static final Tag.Named<Block> BLOCK_DRAGON_IMMUNE = getMCBlockTag("dragon_immune");
 	
 	public static final Tag.Named<Block> MINEABLE_AXE = getMCBlockTag("mineable/axe");
 	public static final Tag.Named<Block> MINEABLE_PICKAXE = getMCBlockTag("mineable/pickaxe");
@@ -45,9 +46,10 @@ public class TagAPI {
 	
 	// Item Tags
 	public static final Tag.Named<Item> ITEM_CHEST = makeCommonItemTag("chest");
-	public static final Tag.Named<Item> IRON_INGOTS = makeCommonItemTag("iron_ingots");
-	public static final Tag.Named<Item> FURNACES = makeCommonItemTag("furnaces");
-	public final static Tag.Named<Item> HAMMERS = makeItemTag("fabric", "hammers");
+	public static final Tag.Named<Item> ITEM_IRON_INGOTS = makeCommonItemTag("iron_ingots");
+	public static final Tag.Named<Item> ITEM_FURNACES = makeCommonItemTag("furnaces");
+	public static final Tag.Named<Item> ITEM_WORKBENCHES = makeCommonItemTag("workbenches");
+	public final static Tag.Named<Item> ITEM_HAMMERS = makeCommonItemTag("hammers");
 	
 	/**
 	 * Get or create {@link Tag.Named}.
@@ -123,8 +125,8 @@ public class TagAPI {
 	 * @param block - {@link Block}.
 	 */
 	public static void addNetherGround(Block block) {
-		addTag(NETHER_GROUND, block);
-		addTag(GEN_TERRAIN, block);
+		addTag(BLOCK_NETHER_GROUND, block);
+		addTag(BLOCK_GEN_TERRAIN, block);
 	}
 	
 	/**
@@ -133,22 +135,22 @@ public class TagAPI {
 	 * @param block - {@link Block}.
 	 */
 	public static void addEndGround(Block block) {
-		addTag(GEN_TERRAIN, block);
-		addTag(END_GROUND, block);
+		addTag(BLOCK_GEN_TERRAIN, block);
+		addTag(BLOCK_END_GROUND, block);
 	}
 	
 	/**
 	 * Initializes basic tags. Should be called only in BCLib main class.
 	 */
 	public static void init() {
-		addTag(BOOKSHELVES, Blocks.BOOKSHELF);
-		addTag(GEN_TERRAIN, Blocks.END_STONE, Blocks.NETHERRACK, Blocks.SOUL_SAND, Blocks.SOUL_SOIL);
-		addTag(NETHER_GROUND, Blocks.NETHERRACK, Blocks.SOUL_SAND, Blocks.SOUL_SOIL);
-		addTag(END_GROUND, Blocks.END_STONE);
+		addTag(BLOCK_BOOKSHELVES, Blocks.BOOKSHELF);
+		addTag(BLOCK_GEN_TERRAIN, Blocks.END_STONE, Blocks.NETHERRACK, Blocks.SOUL_SAND, Blocks.SOUL_SOIL);
+		addTag(BLOCK_NETHER_GROUND, Blocks.NETHERRACK, Blocks.SOUL_SAND, Blocks.SOUL_SOIL);
+		addTag(BLOCK_END_GROUND, Blocks.END_STONE);
 		addTag(BLOCK_CHEST, Blocks.CHEST);
 		addTag(ITEM_CHEST, Items.CHEST);
-		addTag(IRON_INGOTS, Items.IRON_INGOT);
-		addTag(FURNACES, Blocks.FURNACE);
+		addTag(ITEM_IRON_INGOTS, Items.IRON_INGOT);
+		addTag(ITEM_FURNACES, Blocks.FURNACE);
 	}
 	
 	/**
