@@ -1,10 +1,14 @@
 package ru.bclib.blocks;
 
 import com.google.common.collect.Lists;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.tool.attribute.v1.FabricToolTags;
+import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
@@ -26,10 +30,15 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jetbrains.annotations.Nullable;
+import ru.bclib.client.models.BasePatterns;
+import ru.bclib.client.models.ModelsHelper;
+import ru.bclib.client.models.PatternsHelper;
 import ru.bclib.client.render.BCLRenderLayer;
 import ru.bclib.interfaces.RenderLayerProvider;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
 @SuppressWarnings("deprecation")
@@ -133,5 +142,19 @@ public abstract class BasePlantBlock extends BaseBlockNotFull implements RenderL
 			new ItemStack(this)
 		);
 		world.addFreshEntity(item);
+	}
+	
+	@Override
+	@Environment(EnvType.CLIENT)
+	public BlockModel getItemModel(ResourceLocation resourceLocation) {
+		return ModelsHelper.createBlockItem(resourceLocation);
+	}
+	
+	@Override
+	@Nullable
+	@Environment(EnvType.CLIENT)
+	public BlockModel getBlockModel(ResourceLocation resourceLocation, BlockState blockState) {
+		Optional<String> pattern = PatternsHelper.createJson(BasePatterns.BLOCK_CROSS, resourceLocation);
+		return ModelsHelper.fromPattern(pattern);
 	}
 }
