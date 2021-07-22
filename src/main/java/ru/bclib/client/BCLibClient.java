@@ -5,6 +5,7 @@ import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.Registry;
 import ru.bclib.api.ModIntegrationAPI;
+import ru.bclib.api.PostInitAPI;
 import ru.bclib.client.render.BCLRenderLayer;
 import ru.bclib.interfaces.PostInitable;
 import ru.bclib.interfaces.RenderLayerProvider;
@@ -16,11 +17,7 @@ public class BCLibClient implements ClientModInitializer {
 		ModIntegrationAPI.registerAll();
 		BaseBlockEntityRenders.register();
 		registerRenderLayers();
-		Registry.BLOCK.forEach(block -> {
-			if (block instanceof PostInitable) {
-				((PostInitable) block).postInit();
-			}
-		});
+		PostInitAPI.postInit();
 	}
 	
 	private void registerRenderLayers() {
