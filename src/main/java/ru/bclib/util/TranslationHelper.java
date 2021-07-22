@@ -1,6 +1,6 @@
 package ru.bclib.util;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import net.minecraft.core.Registry;
@@ -9,28 +9,34 @@ import net.minecraft.resources.ResourceLocation;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Collections;
-import java.util.List;
+import java.util.Set;
 
 public class TranslationHelper {
-	public static void printMissingNames(String modID) {
-		List<String> missingNamesEn = Lists.newArrayList();
-		List<String> missingNamesRu = Lists.newArrayList();
+	/**
+	 * Print English translation file lines. Translation is "auto-beautified" text (example "strange_thing" -> "Strange Thing").
+	 * @param modID {@link String} mod ID string.
+	 */
+	public static void printMissingEnNames(String modID) {
+		printMissingNames(modID, "en_us");
+	}
+	
+	/**
+	 * Prints translation file lines for specified language.
+	 * @param modID {@link String} mod ID string;
+	 * @param languageCode {@link String} language code (example "en_us", "ru_ru").
+	 */
+	public static void printMissingNames(String modID, String languageCode) {
+		Set<String> missingNames = Sets.newHashSet();
 		
 		Gson gson = new Gson();
-		InputStream streamEn = TranslationHelper.class.getResourceAsStream("/assets/" + modID + "/lang/en_us.json");
-		InputStream streamRu = TranslationHelper.class.getResourceAsStream("/assets/" + modID + "/lang/ru_ru.json");
-		JsonObject translationEn = gson.fromJson(new InputStreamReader(streamEn), JsonObject.class);
-		JsonObject translationRu = gson.fromJson(new InputStreamReader(streamRu), JsonObject.class);
+		InputStream inputStream = TranslationHelper.class.getResourceAsStream("/assets/" + modID + "/lang/" + languageCode + ".json");
+		JsonObject translation = gson.fromJson(new InputStreamReader(inputStream), JsonObject.class);
 		
 		Registry.BLOCK.forEach(block -> {
 			if (Registry.BLOCK.getKey(block).getNamespace().equals(modID)) {
 				String name = block.getName().getString();
-				if (!translationEn.has(name)) {
-					missingNamesEn.add(name);
-				}
-				if (!translationRu.has(name)) {
-					missingNamesRu.add(name);
+				if (!translation.has(name)) {
+					missingNames.add(name);
 				}
 			}
 		});
@@ -38,11 +44,8 @@ public class TranslationHelper {
 		Registry.ITEM.forEach(item -> {
 			if (Registry.ITEM.getKey(item).getNamespace().equals(modID)) {
 				String name = item.getDescription().getString();
-				if (!translationEn.has(name)) {
-					missingNamesEn.add(name);
-				}
-				if (!translationRu.has(name)) {
-					missingNamesRu.add(name);
+				if (!translation.has(name)) {
+					missingNames.add(name);
 				}
 			}
 		});
@@ -51,11 +54,8 @@ public class TranslationHelper {
 			ResourceLocation id = BuiltinRegistries.BIOME.getKey(biome);
 			if (id.getNamespace().equals(modID)) {
 				String name = "biome." + modID + "." + id.getPath();
-				if (!translationEn.has(name)) {
-					missingNamesEn.add(name);
-				}
-				if (!translationRu.has(name)) {
-					missingNamesRu.add(name);
+				if (!translation.has(name)) {
+					missingNames.add(name);
 				}
 			}
 		});
@@ -64,44 +64,45 @@ public class TranslationHelper {
 			ResourceLocation id = Registry.ENTITY_TYPE.getKey(entity);
 			if (id.getNamespace().equals(modID)) {
 				String name = "entity." + modID + "." + id.getPath();
-				if (!translationEn.has(name)) {
-					missingNamesEn.add(name);
-				}
-				if (!translationRu.has(name)) {
-					missingNamesRu.add(name);
+				if (!translation.has(name)) {
+					missingNames.add(name);
 				}
 			}
 		});
 		
-		if (!missingNamesEn.isEmpty() || !missingNamesRu.isEmpty()) {
+		if (!missingNames.isEmpty()) {
 			
 			System.out.println("========================================");
 			System.out.println("           MISSING NAMES LIST");
 			
-			if (!missingNamesEn.isEmpty()) {
-				Collections.sort(missingNamesEn);
-				System.out.println("========================================");
-				System.out.println("                 ENGLISH");
-				System.out.println("========================================");
-				missingNamesEn.forEach((name) -> {
-					System.out.println("	\"" + name + "\": \"" + fastTranslateEn(name) + "\",");
-				});
-			}
-			
-			if (!missingNamesRu.isEmpty()) {
-				Collections.sort(missingNamesRu);
-				System.out.println("========================================");
-				System.out.println("                 RUSSIAN");
-				System.out.println("========================================");
-				missingNamesRu.forEach((name) -> {
-					System.out.println("	\"" + name + "\": \"\",");
-				});
+			if (!missingNames.isEmpty()) {
+				if (languageCode.equals("en_us")) {
+					System.out.println("========================================");
+					System.out.println("      AUTO ENGLISH BEAUTIFICATION");
+					System.out.println("========================================");
+					missingNames.stream().sorted().forEach(name -> {
+						System.out.println("	\"" + name + "\": \"" + fastTranslateEn(name) + "\",");
+					});
+				}
+				else {
+					System.out.println("========================================");
+					System.out.println("           TEMPLATE: [" + languageCode + "]");
+					System.out.println("========================================");
+					missingNames.stream().sorted().forEach(name -> {
+						System.out.println("	\"" + name + "\": \"\",");
+					});
+				}
 			}
 			
 			System.out.println("========================================");
 		}
 	}
 	
+	/**
+	 * Simple fast text beautification (example "strange_thing" -> "Strange Thing").
+	 * @param text {@link String} to process;
+	 * @return {@link String} result.
+	 */
 	public static String fastTranslateEn(String text) {
 		String[] words = text.substring(text.lastIndexOf('.') + 1).split("_");
 		StringBuilder builder = new StringBuilder();
