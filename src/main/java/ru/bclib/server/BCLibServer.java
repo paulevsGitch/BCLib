@@ -10,6 +10,6 @@ public class BCLibServer implements DedicatedServerModInitializer {
 	@Override
 	public void onInitializeServer() {
 		ModIntegrationAPI.registerAll();
-		PostInitAPI.postInit();
+		PostInitAPI.postInit(false);
 	}
 }

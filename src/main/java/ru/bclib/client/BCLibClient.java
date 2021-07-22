@@ -16,19 +16,6 @@ public class BCLibClient implements ClientModInitializer {
 	public void onInitializeClient() {
 		ModIntegrationAPI.registerAll();
 		BaseBlockEntityRenders.register();
-		registerRenderLayers();
-		PostInitAPI.postInit();
-	}
-	
-	private void registerRenderLayers() {
-		RenderType cutout = RenderType.cutout();
-		RenderType translucent = RenderType.translucent();
-		Registry.BLOCK.forEach(block -> {
-			if (block instanceof RenderLayerProvider) {
-				BCLRenderLayer layer = ((RenderLayerProvider) block).getRenderLayer();
-				if (layer == BCLRenderLayer.CUTOUT) BlockRenderLayerMap.INSTANCE.putBlock(block, cutout);
-				else if (layer == BCLRenderLayer.TRANSLUCENT) BlockRenderLayerMap.INSTANCE.putBlock(block, translucent);
-			}
-		});
+		PostInitAPI.postInit(true);
 	}
 }
