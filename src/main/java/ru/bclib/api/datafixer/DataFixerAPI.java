@@ -35,63 +35,75 @@ public class DataFixerAPI {
 			LOGGER.info("Everything up to date");
 			return;
 		}
+
+		boolean[] allOk = {true};
 		
 		List<File> regions = getAllRegions(dir, null);
-		boolean[] allOk = {true};
-		regions.parallelStream()
-			   .forEach((file) -> {
-				   try {
-					   LOGGER.info("Inspecting " + file);
-					   boolean[] changed = new boolean[1];
-					   RegionFile region = new RegionFile(file, file.getParentFile(), true);
-					   for (int x = 0; x < 32; x++) {
-						   for (int z = 0; z < 32; z++) {
-							   ChunkPos pos = new ChunkPos(x, z);
-							   changed[0] = false;
-							   if (region.hasChunk(pos)) {
-								   DataInputStream input = region.getChunkDataInputStream(pos);
-								   CompoundTag root = NbtIo.read(input);
-								   // if ((root.toString().contains("betternether") || root.toString().contains("bclib")) && root.toString().contains("chest")) {
-								   //    NbtIo.write(root, new File(file.toString() + "-" + x + "-" + z + ".nbt"));
-								   // }
-								   input.close();
-							
-								   ListTag tileEntities = root.getCompound("Level")
-															  .getList("TileEntities", 10);
-								   fixItemArrayWithID(tileEntities, changed, data, true);
-							
-								   ListTag sections = root.getCompound("Level")
-														  .getList("Sections", 10);
-								   sections.forEach((tag) -> {
-									   ListTag palette = ((CompoundTag) tag).getList("Palette", 10);
-									   palette.forEach((blockTag) -> {
-										   CompoundTag blockTagCompound = ((CompoundTag) blockTag);
-										   changed[0] = data.replaceStringFromIDs(blockTagCompound, "Name");
-									   });
-								   });
-								   if (changed[0]) {
-									   LOGGER.warning("Writing '{}': {}/{}", file, x, z);
-									   DataOutputStream output = region.getChunkDataOutputStream(pos);
-									   NbtIo.write(root, output);
-									   output.close();
-								   }
-							   }
-						   }
-					   }
-					   region.close();
-				   }
-				   catch (Exception e) {
-					   allOk[0] = false;
-					   e.printStackTrace();
-				   }
-			   });
+		regions.parallelStream().forEach((file) -> fixRegion(data, allOk, file));
 		
 		if (allOk[0]) {
 			data.markApplied();
 			WorldDataAPI.saveFile(BCLib.MOD_ID);
 		}
 	}
-	
+
+	private static void fixRegion(MigrationProfile data, boolean[] allOk, File file) {
+		try {
+			LOGGER.info("Inspecting " + file);
+			boolean[] changed = new boolean[1];
+			RegionFile region = new RegionFile(file, file.getParentFile(), true);
+			for (int x = 0; x < 32; x++) {
+				for (int z = 0; z < 32; z++) {
+					ChunkPos pos = new ChunkPos(x, z);
+					changed[0] = false;
+					if (region.hasChunk(pos)) {
+						DataInputStream input = region.getChunkDataInputStream(pos);
+						CompoundTag root = NbtIo.read(input);
+						if ((root.toString().contains("betternether:chest") || root.toString().contains("bclib:chest"))) {
+						   NbtIo.write(root, new File(file.toString() + "-" + x + "-" + z + ".nbt"));
+						}
+						input.close();
+
+						//Checking TileEntities
+						ListTag tileEntities = root.getCompound("Level")
+												   .getList("TileEntities", 10);
+						fixItemArrayWithID(tileEntities, changed, data, true);
+
+						//Checking Entities
+						ListTag entities = root.getList("Entities", 10);
+						fixItemArrayWithID(entities, changed, data, true);
+
+
+						//Checking Block Palette
+						ListTag sections = root.getCompound("Level")
+											   .getList("Sections", 10);
+						sections.forEach((tag) -> {
+							ListTag palette = ((CompoundTag) tag).getList("Palette", 10);
+							palette.forEach((blockTag) -> {
+								CompoundTag blockTagCompound = ((CompoundTag) blockTag);
+								changed[0] |= data.replaceStringFromIDs(blockTagCompound, "Name");
+							});
+						});
+
+						if (changed[0]) {
+							LOGGER.warning("Writing '{}': {}/{}", file, x, z);
+							NbtIo.write(root, new File(file.toString() + "-" + x + "-" + z + "-changed.nbt"));
+							DataOutputStream output = region.getChunkDataOutputStream(pos);
+							NbtIo.write(root, output);
+							output.close();
+
+						}
+					}
+				}
+			}
+			region.close();
+		}
+		catch (Exception e) {
+			allOk[0] = false;
+			e.printStackTrace();
+		}
+	}
+
 	static CompoundTag patchConfTag = null;
 	static CompoundTag getPatchData(){
 		if (patchConfTag==null) {
@@ -109,6 +121,9 @@ public class DataFixerAPI {
 			if (recursive && tag.contains("Items")) {
 				changed[0] |= fixItemArrayWithID(tag.getList("Items", 10), changed, data, true);
 			}
+			if (recursive && tag.contains("Inventory")) {
+				changed[0] |= fixItemArrayWithID(tag.getList("Inventory", 10), changed, data, true);
+			}
 		});
 		
 		return changed[0];
@@ -121,9 +136,7 @@ public class DataFixerAPI {
 		for (File file : dir.listFiles()) {
 			if (file.isDirectory()) {
 				getAllRegions(file, list);
-			}
-			else if (file.isFile() && file.getName()
-										  .endsWith(".mca")) {
+			} else if (file.isFile() && file.getName().endsWith(".mca")) {
 				list.add(file);
 			}
 		}
