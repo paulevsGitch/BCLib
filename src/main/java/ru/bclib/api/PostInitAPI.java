@@ -19,17 +19,25 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class PostInitAPI {
-	private static List<Consumer<Void>> postInitFunctions = Lists.newArrayList();
+	private static List<Consumer<Boolean>> postInitFunctions = Lists.newArrayList();
 	
-	public static void register(Consumer<Void> function) {
+	/**
+	 * Register a new function which will be called after all mods are initiated. Will be called on both client and server.
+	 * @param function {@link Consumer} with {@code boolean} parameter ({@code true} for client, {@code false} for server).
+	 */
+	public static void register(Consumer<Boolean> function) {
 		postInitFunctions.add(function);
 	}
 	
+	/**
+	 * Called in proper BCLib entry points, for internal usage only.
+	 * @param isClient {@code boolean}, {@code true} for client, {@code false} for server.
+	 */
 	public static void postInit(boolean isClient) {
 		if (postInitFunctions == null) {
 			return;
 		}
-		postInitFunctions.forEach(function -> function.accept(null));
+		postInitFunctions.forEach(function -> function.accept(isClient));
 		Registry.BLOCK.forEach(block -> {
 			processBlockCommon(block);
 			if (isClient) {

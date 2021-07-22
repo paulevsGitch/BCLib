@@ -35,19 +35,16 @@ import java.util.HashMap;
 import java.util.List;
 
 public class BaseSignBlockEntityRenderer implements BlockEntityRenderer<BaseSignBlockEntity> {
-	private static final HashMap<Block, RenderType> LAYERS = Maps.newHashMap();
-	private static final RenderType defaultLayer;
-	private final Font font;
-	private final SignRenderer.SignModel model;
-	
-	
+	private static final HashMap<Block, RenderType> RENDER_TYPES = Maps.newHashMap();
 	private static final int OUTLINE_RENDER_DISTANCE = Mth.square(16);
+	private static final RenderType RENDER_TYPE;
+	private final SignRenderer.SignModel model;
+	private final Font font;
+	
 	
 	public BaseSignBlockEntityRenderer(BlockEntityRendererProvider.Context ctx) {
 		super();
 		this.font = ctx.getFont();
-		
-		//set up a default model
 		model = new SignRenderer.SignModel(ctx.bakeLayer(ModelLayers.createSignModelName(WoodType.OAK)));
 	}
 	
@@ -76,9 +73,7 @@ public class BaseSignBlockEntityRenderer implements BlockEntityRenderer<BaseSign
 		VertexConsumer vertexConsumer = getConsumer(provider, state.getBlock());
 		
 		model.root.render(matrixStack, vertexConsumer, light, overlay);
-		//model.stick.render(matrixStack, vertexConsumer, light, overlay);
 		matrixStack.popPose();
-		//Font textRenderer = renderer.getFont();
 		matrixStack.translate(0.0D, 0.3333333432674408D, 0.046666666865348816D);
 		matrixStack.scale(0.010416667F, -0.010416667F, 0.010416667F);
 		int m = signBlockEntity.getColor().getTextColor();
@@ -179,19 +174,16 @@ public class BaseSignBlockEntityRenderer implements BlockEntityRenderer<BaseSign
 	}
 	
 	public static VertexConsumer getConsumer(MultiBufferSource provider, Block block) {
-		return provider.getBuffer(LAYERS.getOrDefault(block, defaultLayer));
+		return provider.getBuffer(RENDER_TYPES.getOrDefault(block, RENDER_TYPE));
 	}
 	
 	public static void registerRenderLayer(Block block) {
 		ResourceLocation blockId = Registry.BLOCK.getKey(block);
-		RenderType layer = RenderType.entitySolid(new ResourceLocation(
-			blockId.getNamespace(),
-			"textures/entity/sign/" + blockId.getPath() + ".png"
-		));
-		LAYERS.put(block, layer);
+		RenderType layer = RenderType.entitySolid(new ResourceLocation(blockId.getNamespace(), "textures/entity/sign/" + blockId.getPath() + ".png"));
+		RENDER_TYPES.put(block, layer);
 	}
 	
 	static {
-		defaultLayer = RenderType.entitySolid(new ResourceLocation("textures/entity/signs/oak.png"));
+		RENDER_TYPE = RenderType.entitySolid(new ResourceLocation("textures/entity/signs/oak.png"));
 	}
 }

@@ -35,7 +35,7 @@ import java.util.HashMap;
 @Environment(EnvType.CLIENT)
 public class BaseChestBlockEntityRenderer implements BlockEntityRenderer<BaseChestBlockEntity> {
 	private static final HashMap<Block, RenderType[]> LAYERS = Maps.newHashMap();
-	private static final RenderType[] defaultLayer;
+	private static final RenderType[] RENDER_TYPES;
 	
 	private static final int ID_NORMAL = 0;
 	private static final int ID_LEFT = 1;
@@ -147,7 +147,7 @@ public class BaseChestBlockEntityRenderer implements BlockEntityRenderer<BaseChe
 	}
 	
 	public static VertexConsumer getConsumer(MultiBufferSource provider, Block block, ChestType chestType) {
-		RenderType[] layers = LAYERS.getOrDefault(block, defaultLayer);
+		RenderType[] layers = LAYERS.getOrDefault(block, RENDER_TYPES);
 		return provider.getBuffer(getChestTexture(chestType, layers));
 	}
 	
@@ -158,10 +158,7 @@ public class BaseChestBlockEntityRenderer implements BlockEntityRenderer<BaseChe
 		LAYERS.put(
 			block,
 			new RenderType[] {
-				RenderType.entityCutout(new ResourceLocation(
-					modId,
-					"textures/entity/chest/" + path + ".png"
-				)),
+				RenderType.entityCutout(new ResourceLocation(modId, "textures/entity/chest/" + path + ".png")),
 				RenderType.entityCutout(new ResourceLocation(modId, "textures/entity/chest/" + path + "_left.png")),
 				RenderType.entityCutout(new ResourceLocation(modId, "textures/entity/chest/" + path + "_right.png"))
 			}
@@ -169,7 +166,7 @@ public class BaseChestBlockEntityRenderer implements BlockEntityRenderer<BaseChe
 	}
 	
 	static {
-		defaultLayer = new RenderType[] {
+		RENDER_TYPES = new RenderType[] {
 			RenderType.entityCutout(new ResourceLocation("textures/entity/chest/normal.png")),
 			RenderType.entityCutout(new ResourceLocation("textures/entity/chest/normal_left.png")),
 			RenderType.entityCutout(new ResourceLocation("textures/entity/chest/normal_right.png"))
