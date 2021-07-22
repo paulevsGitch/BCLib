@@ -32,8 +32,19 @@ public abstract class ServerLevelMixin extends Level {
 	protected ServerLevelMixin(WritableLevelData writableLevelData, ResourceKey<Level> resourceKey, DimensionType dimensionType, Supplier<ProfilerFiller> supplier, boolean bl, boolean bl2, long l) {
 		super(writableLevelData, resourceKey, dimensionType, supplier, bl, bl2, l);
 	}
-	
-	@Inject(method = "<init>*", at = @At("TAIL"))
+	@Inject(method = "<init>*", at = @At("HEAD"))
+	private void bclib_onServerWorldInitStart(MinecraftServer server, Executor workerExecutor, LevelStorageSource.LevelStorageAccess session, ServerLevelData properties, ResourceKey<Level> registryKey, DimensionType dimensionType, ChunkProgressListener worldGenerationProgressListener, ChunkGenerator chunkGenerator, boolean debugWorld, long l, List<CustomSpawner> list, boolean bl, CallbackInfo info) {
+		ServerLevel world = ServerLevel.class.cast(this);
+		File dir = session.getDimensionPath(world.dimension());
+		if (!new File(dir, "level.dat").exists()) {
+			dir = dir.getParentFile();
+		}
+
+		WorldDataAPI.load(new File(dir, "data"));
+		DataFixerAPI.fixData(dir);
+	}
+
+		@Inject(method = "<init>*", at = @At("TAIL"))
 	private void bclib_onServerWorldInit(MinecraftServer server, Executor workerExecutor, LevelStorageSource.LevelStorageAccess session, ServerLevelData properties, ResourceKey<Level> registryKey, DimensionType dimensionType, ChunkProgressListener worldGenerationProgressListener, ChunkGenerator chunkGenerator, boolean debugWorld, long l, List<CustomSpawner> list, boolean bl, CallbackInfo info) {
 		BiomeAPI.initRegistry(server);
 		
@@ -42,14 +53,5 @@ public abstract class ServerLevelMixin extends Level {
 		}
 		
 		bclib_lastWorld = session.getLevelId();
-		
-		ServerLevel world = ServerLevel.class.cast(this);
-		File dir = session.getDimensionPath(world.dimension());
-		if (!new File(dir, "level.dat").exists()) {
-			dir = dir.getParentFile();
-		}
-		
-		WorldDataAPI.load(new File(dir, "data"));
-		DataFixerAPI.fixData(dir);
 	}
 }
