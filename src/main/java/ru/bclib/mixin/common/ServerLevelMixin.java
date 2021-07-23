@@ -15,6 +15,7 @@ import net.minecraft.world.level.storage.WritableLevelData;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import ru.bclib.api.BiomeAPI;
 import ru.bclib.api.WorldDataAPI;
@@ -32,7 +33,7 @@ public abstract class ServerLevelMixin extends Level {
 	protected ServerLevelMixin(WritableLevelData writableLevelData, ResourceKey<Level> resourceKey, DimensionType dimensionType, Supplier<ProfilerFiller> supplier, boolean bl, boolean bl2, long l) {
 		super(writableLevelData, resourceKey, dimensionType, supplier, bl, bl2, l);
 	}
-	
+
 	@Inject(method = "<init>*", at = @At("TAIL"))
 	private void bclib_onServerWorldInit(MinecraftServer server, Executor workerExecutor, LevelStorageSource.LevelStorageAccess session, ServerLevelData properties, ResourceKey<Level> registryKey, DimensionType dimensionType, ChunkProgressListener worldGenerationProgressListener, ChunkGenerator chunkGenerator, boolean debugWorld, long l, List<CustomSpawner> list, boolean bl, CallbackInfo info) {
 		BiomeAPI.initRegistry(server);
@@ -42,14 +43,5 @@ public abstract class ServerLevelMixin extends Level {
 		}
 		
 		bclib_lastWorld = session.getLevelId();
-		
-		ServerLevel world = ServerLevel.class.cast(this);
-		File dir = session.getDimensionPath(world.dimension());
-		if (!new File(dir, "level.dat").exists()) {
-			dir = dir.getParentFile();
-		}
-		
-		WorldDataAPI.load(new File(dir, "data"));
-		DataFixerAPI.fixData(dir);
 	}
 }

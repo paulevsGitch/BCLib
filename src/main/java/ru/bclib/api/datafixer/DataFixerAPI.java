@@ -35,63 +35,131 @@ public class DataFixerAPI {
 			LOGGER.info("Everything up to date");
 			return;
 		}
+
+		boolean[] allOk = {true};
 		
 		List<File> regions = getAllRegions(dir, null);
-		boolean[] allOk = {true};
-		regions.parallelStream()
-			   .forEach((file) -> {
-				   try {
-					   LOGGER.info("Inspecting " + file);
-					   boolean[] changed = new boolean[1];
-					   RegionFile region = new RegionFile(file, file.getParentFile(), true);
-					   for (int x = 0; x < 32; x++) {
-						   for (int z = 0; z < 32; z++) {
-							   ChunkPos pos = new ChunkPos(x, z);
-							   changed[0] = false;
-							   if (region.hasChunk(pos)) {
-								   DataInputStream input = region.getChunkDataInputStream(pos);
-								   CompoundTag root = NbtIo.read(input);
-								   // if ((root.toString().contains("betternether") || root.toString().contains("bclib")) && root.toString().contains("chest")) {
-								   //    NbtIo.write(root, new File(file.toString() + "-" + x + "-" + z + ".nbt"));
-								   // }
-								   input.close();
-							
-								   ListTag tileEntities = root.getCompound("Level")
-															  .getList("TileEntities", 10);
-								   fixItemArrayWithID(tileEntities, changed, data, true);
-							
-								   ListTag sections = root.getCompound("Level")
-														  .getList("Sections", 10);
-								   sections.forEach((tag) -> {
-									   ListTag palette = ((CompoundTag) tag).getList("Palette", 10);
-									   palette.forEach((blockTag) -> {
-										   CompoundTag blockTagCompound = ((CompoundTag) blockTag);
-										   changed[0] = data.replaceStringFromIDs(blockTagCompound, "Name");
-									   });
-								   });
-								   if (changed[0]) {
-									   LOGGER.warning("Writing '{}': {}/{}", file, x, z);
-									   DataOutputStream output = region.getChunkDataOutputStream(pos);
-									   NbtIo.write(root, output);
-									   output.close();
-								   }
-							   }
-						   }
-					   }
-					   region.close();
-				   }
-				   catch (Exception e) {
-					   allOk[0] = false;
-					   e.printStackTrace();
-				   }
-			   });
+		regions.parallelStream().forEach((file) -> fixRegion(data, allOk, file));
+
+		List<File> players = getAllPlayers(dir);
+		players.parallelStream().forEach((file) -> fixPlayer(data, allOk, file));
+
+		fixLevel(data, allOk, new File(dir, "level.dat"));
 		
 		if (allOk[0]) {
 			data.markApplied();
 			WorldDataAPI.saveFile(BCLib.MOD_ID);
 		}
 	}
-	
+	private static void fixLevel(MigrationProfile data, boolean[] allOk, File file) {
+		try {
+			LOGGER.info("Inspecting " + file);
+			CompoundTag level = NbtIo.readCompressed(file);
+			boolean[] changed = { false };
+
+			if (level.contains("Data")) {
+				CompoundTag dataTag = (CompoundTag)level.get("Data");
+				if (dataTag.contains("Player")) {
+					CompoundTag player = (CompoundTag)dataTag.get("Player");
+					fixPlayerNbt(player, changed, data);
+				}
+			}
+
+			if (changed[0]) {
+				LOGGER.warning("Writing '{}'", file);
+				NbtIo.writeCompressed(level, file);
+			}
+		}
+		catch (Exception e) {
+			allOk[0] = false;
+			e.printStackTrace();
+		}
+	}
+
+	private static void fixPlayer(MigrationProfile data, boolean[] allOk, File file) {
+		try {
+			LOGGER.info("Inspecting " + file);
+			CompoundTag player = NbtIo.readCompressed(file);
+			boolean[] changed = { false };
+			fixPlayerNbt(player, changed, data);
+
+			if (changed[0]) {
+				LOGGER.warning("Writing '{}'", file);
+				NbtIo.writeCompressed(player, file);
+			}
+		}
+		catch (Exception e) {
+			allOk[0] = false;
+			e.printStackTrace();
+		}
+	}
+
+	private static void fixPlayerNbt(CompoundTag player, boolean[] changed, MigrationProfile data) {
+		//Checking Inventory
+		ListTag inventory = player.getList("Inventory", 10);
+		fixInventory(inventory, changed, data, true);
+
+		//Checking EnderChest
+		ListTag enderitems = player.getList("EnderItems", 10);
+		fixInventory(enderitems, changed, data, true);
+	}
+
+	private static void fixRegion(MigrationProfile data, boolean[] allOk, File file) {
+		try {
+			LOGGER.info("Inspecting " + file);
+			boolean[] changed = new boolean[1];
+			RegionFile region = new RegionFile(file, file.getParentFile(), true);
+			for (int x = 0; x < 32; x++) {
+				for (int z = 0; z < 32; z++) {
+					ChunkPos pos = new ChunkPos(x, z);
+					changed[0] = false;
+					if (region.hasChunk(pos)) {
+						DataInputStream input = region.getChunkDataInputStream(pos);
+						CompoundTag root = NbtIo.read(input);
+						// if ((root.toString().contains("betternether:chest") || root.toString().contains("bclib:chest"))) {
+						//   NbtIo.write(root, new File(file.toString() + "-" + x + "-" + z + ".nbt"));
+						// }
+						input.close();
+
+						//Checking TileEntities
+						ListTag tileEntities = root.getCompound("Level")
+												   .getList("TileEntities", 10);
+						fixItemArrayWithID(tileEntities, changed, data, true);
+
+						//Checking Entities
+						ListTag entities = root.getList("Entities", 10);
+						fixItemArrayWithID(entities, changed, data, true);
+
+						//Checking Block Palette
+						ListTag sections = root.getCompound("Level")
+											   .getList("Sections", 10);
+						sections.forEach((tag) -> {
+							ListTag palette = ((CompoundTag) tag).getList("Palette", 10);
+							palette.forEach((blockTag) -> {
+								CompoundTag blockTagCompound = ((CompoundTag) blockTag);
+								changed[0] |= data.replaceStringFromIDs(blockTagCompound, "Name");
+							});
+						});
+
+						if (changed[0]) {
+							LOGGER.warning("Writing '{}': {}/{}", file, x, z);
+							// NbtIo.write(root, new File(file.toString() + "-" + x + "-" + z + "-changed.nbt"));
+							DataOutputStream output = region.getChunkDataOutputStream(pos);
+							NbtIo.write(root, output);
+							output.close();
+
+						}
+					}
+				}
+			}
+			region.close();
+		}
+		catch (Exception e) {
+			allOk[0] = false;
+			e.printStackTrace();
+		}
+	}
+
 	static CompoundTag patchConfTag = null;
 	static CompoundTag getPatchData(){
 		if (patchConfTag==null) {
@@ -99,19 +167,56 @@ public class DataFixerAPI {
 		}
 		return patchConfTag;
 	}
-	
-	private static boolean fixItemArrayWithID(ListTag items, boolean[] changed, MigrationProfile data, boolean recursive) {
-		items.forEach(inTag -> {
-			final CompoundTag tag = (CompoundTag) inTag;
-			
-			changed[0] |= data.replaceStringFromIDs(tag, "id");
-			
-			if (recursive && tag.contains("Items")) {
-				changed[0] |= fixItemArrayWithID(tag.getList("Items", 10), changed, data, true);
+
+	private static void fixInventory(ListTag inventory, boolean[] changed, MigrationProfile data, boolean recursive) {
+		inventory.forEach(item -> {
+			changed[0] |= data.replaceStringFromIDs((CompoundTag)item, "id");
+
+			if (((CompoundTag) item).contains("tag")) {
+				CompoundTag tag = (CompoundTag)((CompoundTag) item).get("tag");
+				if (tag.contains("BlockEntityTag")){
+					CompoundTag blockEntityTag = (CompoundTag)((CompoundTag) tag).get("BlockEntityTag");
+					ListTag items = blockEntityTag.getList("Items", 10);
+					fixItemArrayWithID(items, changed, data, recursive);
+				}
 			}
 		});
-		
-		return changed[0];
+	}
+
+	private static void fixItemArrayWithID(ListTag items, boolean[] changed, MigrationProfile data, boolean recursive) {
+		items.forEach(inTag -> {
+			fixID((CompoundTag) inTag, changed, data, recursive);
+		});
+	}
+
+
+	private static void fixID(CompoundTag inTag, boolean[] changed, MigrationProfile data, boolean recursive) {
+		final CompoundTag tag = inTag;
+
+		changed[0] |= data.replaceStringFromIDs(tag, "id");
+		if (tag.contains("Item")) {
+			CompoundTag item = (CompoundTag)tag.get("Item");
+			fixID(item, changed, data, recursive);
+		}
+
+		if (recursive && tag.contains("Items")) {
+			fixItemArrayWithID(tag.getList("Items", 10), changed, data, true);
+		}
+		if (recursive && tag.contains("Inventory")) {
+			ListTag inventory = tag.getList("Inventory", 10);
+			fixInventory(inventory, changed, data, recursive);
+		}
+	}
+
+	private static List<File> getAllPlayers(File dir) {
+		List<File> list = new ArrayList<>();
+		dir = new File(dir, "playerdata");
+		for (File file : dir.listFiles()) {
+			if (file.isFile() && file.getName().endsWith(".dat")) {
+				list.add(file);
+			}
+		}
+		return list;
 	}
 	
 	private static List<File> getAllRegions(File dir, List<File> list) {
@@ -121,9 +226,7 @@ public class DataFixerAPI {
 		for (File file : dir.listFiles()) {
 			if (file.isDirectory()) {
 				getAllRegions(file, list);
-			}
-			else if (file.isFile() && file.getName()
-										  .endsWith(".mca")) {
+			} else if (file.isFile() && file.getName().endsWith(".mca")) {
 				list.add(file);
 			}
 		}
