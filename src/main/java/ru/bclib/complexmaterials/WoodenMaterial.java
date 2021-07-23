@@ -34,10 +34,8 @@ import ru.bclib.blocks.WoodenPressurePlateBlock;
 import ru.bclib.complexmaterials.entry.BlockEntry;
 import ru.bclib.config.PathConfig;
 import ru.bclib.recipes.GridRecipe;
-import ru.bclib.registry.BlockRegistry;
-import ru.bclib.registry.ItemRegistry;
 
-public abstract class WoodenMaterial extends ComplexMaterial {
+public class WoodenMaterial extends ComplexMaterial {
 	public final MaterialColor planksColor;
 	public final MaterialColor woodColor;
 	

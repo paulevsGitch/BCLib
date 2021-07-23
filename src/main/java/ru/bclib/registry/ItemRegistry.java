@@ -20,6 +20,7 @@ import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.item.SwordItem;
 import net.minecraft.world.item.TieredItem;
 import net.minecraft.world.level.block.DispenserBlock;
+import ru.bclib.api.TagAPI;
 import ru.bclib.items.BaseDiscItem;
 import ru.bclib.items.BaseDrinkItem;
 import ru.bclib.items.BaseSpawnEggItem;
@@ -27,7 +28,6 @@ import ru.bclib.items.ModelProviderItem;
 import ru.bclib.items.tool.BaseAxeItem;
 import ru.bclib.items.tool.BaseHoeItem;
 import ru.bclib.items.tool.BasePickaxeItem;
-import ru.bclib.api.TagAPI;
 
 public abstract class ItemRegistry extends BaseRegistry<Item> {
 	

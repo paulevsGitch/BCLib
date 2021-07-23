@@ -39,12 +39,9 @@ public abstract class ComplexMaterial {
 		MATERIALS.add(this);
 	}
 	
-	public void init() {
+	public ComplexMaterial init(BlockRegistry blocksRegistry, ItemRegistry itemsRegistry, PathConfig recipeConfig) {
 		initTags();
 		
-		final BlockRegistry blocksRegistry = getBlockRegistry();
-		final ItemRegistry itemsRegistry = getItemRegistry();
-		final PathConfig recipeConfig = getRecipeConfig();
 		final FabricBlockSettings blockSettings = getBlockSettings();
 		final FabricItemSettings itemSettings = getItemSettings(itemsRegistry);
 		initDefault(blockSettings, itemSettings);
@@ -61,13 +58,8 @@ public abstract class ComplexMaterial {
 		
 		initRecipes(recipeConfig);
 		initFlammable();
+		return this;
 	}
-	
-	protected abstract BlockRegistry getBlockRegistry();
-	
-	protected abstract ItemRegistry getItemRegistry();
-	
-	protected abstract PathConfig getRecipeConfig();
 	
 	protected abstract void initDefault(FabricBlockSettings blockSettings, FabricItemSettings itemSettings);
 	
