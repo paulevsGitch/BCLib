@@ -1,8 +1,10 @@
 package ru.bclib.complexmaterials;
 
+import com.google.common.collect.Lists;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.registry.FlammableBlockRegistry;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.Tag;
@@ -11,6 +13,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.MaterialColor;
+import ru.bclib.BCLib;
 import ru.bclib.api.TagAPI;
 import ru.bclib.blocks.BaseBarkBlock;
 import ru.bclib.blocks.BaseBarrelBlock;
@@ -33,10 +36,14 @@ import ru.bclib.blocks.BaseWoodenButtonBlock;
 import ru.bclib.blocks.StripableBarkBlock;
 import ru.bclib.blocks.WoodenPressurePlateBlock;
 import ru.bclib.complexmaterials.entry.BlockEntry;
+import ru.bclib.complexmaterials.entry.ItemEntry;
 import ru.bclib.config.PathConfig;
 import ru.bclib.recipes.GridRecipe;
 
+import java.util.List;
+
 public class WoodenMaterial extends ComplexMaterial {
+	public static final ResourceLocation MATERIAL_ID = BCLib.makeID("wooden_material");
 	public final MaterialColor planksColor;
 	public final MaterialColor woodColor;
 	
@@ -49,6 +56,11 @@ public class WoodenMaterial extends ComplexMaterial {
 	@Override
 	protected FabricBlockSettings getBlockSettings() {
 		return FabricBlockSettings.copyOf(Blocks.OAK_PLANKS).materialColor(planksColor);
+	}
+	
+	@Override
+	public ResourceLocation getMaterialID() {
+		return MATERIAL_ID;
 	}
 	
 	@Override

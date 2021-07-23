@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.Tag;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -19,8 +20,8 @@ import java.util.List;
 import java.util.Map;
 
 public abstract class ComplexMaterial {
-	private static final Map<Class<? extends ComplexMaterial>, List<BlockEntry>> BLOCK_ENTRIES = Maps.newHashMap();
-	private static final Map<Class<? extends ComplexMaterial>, List<ItemEntry>> ITEM_ENTRIES = Maps.newHashMap();
+	private static final Map<ResourceLocation, List<BlockEntry>> BLOCK_ENTRIES = Maps.newHashMap();
+	private static final Map<ResourceLocation, List<ItemEntry>> ITEM_ENTRIES = Maps.newHashMap();
 	private static final List<ComplexMaterial> MATERIALS = Lists.newArrayList();
 	
 	private final List<BlockEntry> defaultBlockEntries = Lists.newArrayList();
@@ -105,7 +106,7 @@ public abstract class ComplexMaterial {
 	
 	private Collection<BlockEntry> getBlockEntries() {
 		List<BlockEntry> result = Lists.newArrayList(defaultBlockEntries);
-		List<BlockEntry> entries = BLOCK_ENTRIES.get(this.getClass());
+		List<BlockEntry> entries = BLOCK_ENTRIES.get(this.getMaterialID());
 		if (entries != null) {
 			result.addAll(entries);
 		}
@@ -114,7 +115,7 @@ public abstract class ComplexMaterial {
 	
 	private Collection<ItemEntry> getItemEntries() {
 		List<ItemEntry> result = Lists.newArrayList(defaultItemEntries);
-		List<ItemEntry> entries = ITEM_ENTRIES.get(this.getClass());
+		List<ItemEntry> entries = ITEM_ENTRIES.get(this.getMaterialID());
 		if (entries != null) {
 			result.addAll(entries);
 		}
@@ -129,6 +130,8 @@ public abstract class ComplexMaterial {
 		return modID;
 	}
 	
+	public abstract ResourceLocation getMaterialID();
+	
 	protected void addBlockEntry(BlockEntry entry) {
 		defaultBlockEntries.add(entry);
 	}
@@ -137,20 +140,20 @@ public abstract class ComplexMaterial {
 		defaultItemEntries.add(entry);
 	}
 	
-	public static void addBlockEntry(Class<? extends ComplexMaterial> key, BlockEntry entry) {
-		List<BlockEntry> entries = BLOCK_ENTRIES.get(key);
+	public static void addBlockEntry(ResourceLocation materialName, BlockEntry entry) {
+		List<BlockEntry> entries = BLOCK_ENTRIES.get(materialName);
 		if (entries == null) {
 			entries = Lists.newArrayList();
-			BLOCK_ENTRIES.put(key, entries);
+			BLOCK_ENTRIES.put(materialName, entries);
 		}
 		entries.add(entry);
 	}
 	
-	public static void addItemEntry(Class<? extends ComplexMaterial> key, ItemEntry entry) {
-		List<ItemEntry> entries = ITEM_ENTRIES.get(key);
+	public static void addItemEntry(ResourceLocation materialName, ItemEntry entry) {
+		List<ItemEntry> entries = ITEM_ENTRIES.get(materialName);
 		if (entries == null) {
 			entries = Lists.newArrayList();
-			ITEM_ENTRIES.put(key, entries);
+			ITEM_ENTRIES.put(materialName, entries);
 		}
 		entries.add(entry);
 	}
