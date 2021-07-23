@@ -94,53 +94,52 @@ public class WoodenMaterial extends ComplexMaterial {
 			return new BaseBlock(settings);
 		}).setBlockTags(BlockTags.PLANKS).setItemTags(ItemTags.PLANKS));
 		
-		final Block planks = getBlock("planks");
 		addBlockEntry(new BlockEntry("stairs", (complexMaterial, settings) -> {
-			return new BaseStairsBlock(planks);
+			return new BaseStairsBlock(getBlock("planks"));
 		}).setBlockTags(BlockTags.WOODEN_STAIRS, BlockTags.STAIRS).setItemTags(ItemTags.WOODEN_STAIRS, ItemTags.STAIRS));
 		addBlockEntry(new BlockEntry("slab", (complexMaterial, settings) -> {
-			return new BaseSlabBlock(planks);
+			return new BaseSlabBlock(getBlock("planks"));
 		}).setBlockTags(BlockTags.WOODEN_SLABS, BlockTags.SLABS).setItemTags(ItemTags.WOODEN_SLABS, ItemTags.SLABS));
 		addBlockEntry(new BlockEntry("fence", (complexMaterial, settings) -> {
-			return new BaseFenceBlock(planks);
+			return new BaseFenceBlock(getBlock("planks"));
 		}).setBlockTags(BlockTags.FENCES, BlockTags.WOODEN_FENCES).setItemTags(ItemTags.FENCES, ItemTags.WOODEN_FENCES));
 		addBlockEntry(new BlockEntry("gate", (complexMaterial, settings) -> {
-			return new BaseGateBlock(planks);
+			return new BaseGateBlock(getBlock("planks"));
 		}).setBlockTags(BlockTags.FENCE_GATES));
 		addBlockEntry(new BlockEntry("button", (complexMaterial, settings) -> {
-			return new BaseWoodenButtonBlock(planks);
+			return new BaseWoodenButtonBlock(getBlock("planks"));
 		}).setBlockTags(BlockTags.BUTTONS, BlockTags.WOODEN_BUTTONS).setItemTags(ItemTags.BUTTONS, ItemTags.WOODEN_BUTTONS));
 		addBlockEntry(new BlockEntry("plate", (complexMaterial, settings) -> {
-			return new WoodenPressurePlateBlock(planks);
+			return new WoodenPressurePlateBlock(getBlock("planks"));
 		}).setBlockTags(BlockTags.PRESSURE_PLATES, BlockTags.WOODEN_PRESSURE_PLATES).setItemTags(ItemTags.WOODEN_PRESSURE_PLATES));
 		addBlockEntry(new BlockEntry("trapdoor", (complexMaterial, settings) -> {
-			return new BaseTrapdoorBlock(planks);
+			return new BaseTrapdoorBlock(getBlock("planks"));
 		}).setBlockTags(BlockTags.TRAPDOORS, BlockTags.WOODEN_TRAPDOORS).setItemTags(ItemTags.TRAPDOORS, ItemTags.WOODEN_TRAPDOORS));
 		addBlockEntry(new BlockEntry("door", (complexMaterial, settings) -> {
-			return new BaseDoorBlock(planks);
+			return new BaseDoorBlock(getBlock("planks"));
 		}).setBlockTags(BlockTags.DOORS, BlockTags.WOODEN_DOORS).setItemTags(ItemTags.DOORS, ItemTags.WOODEN_DOORS));
 		
 		addBlockEntry(new BlockEntry("crafting_table", (complexMaterial, settings) -> {
-			return new BaseCraftingTableBlock(planks);
+			return new BaseCraftingTableBlock(getBlock("planks"));
 		}).setBlockTags(TagAPI.BLOCK_WORKBENCHES).setItemTags(TagAPI.ITEM_WORKBENCHES));
 		addBlockEntry(new BlockEntry("ladder", (complexMaterial, settings) -> {
-			return new BaseLadderBlock(planks);
+			return new BaseLadderBlock(getBlock("planks"));
 		}).setBlockTags(BlockTags.CLIMBABLE));
 		addBlockEntry(new BlockEntry("sign", (complexMaterial, settings) -> {
-			return new BaseSignBlock(planks);
+			return new BaseSignBlock(getBlock("planks"));
 		}).setBlockTags(BlockTags.SIGNS).setItemTags(ItemTags.SIGNS));
 		
 		addBlockEntry(new BlockEntry("chest", (complexMaterial, settings) -> {
-			return new BaseChestBlock(planks);
+			return new BaseChestBlock(getBlock("planks"));
 		}).setBlockTags(TagAPI.BLOCK_CHEST).setItemTags(TagAPI.ITEM_CHEST));
 		addBlockEntry(new BlockEntry("barrel", (complexMaterial, settings) -> {
-			return new BaseBarrelBlock(planks);
+			return new BaseBarrelBlock(getBlock("planks"));
 		}));
 		addBlockEntry(new BlockEntry("bookshelf", (complexMaterial, settings) -> {
-			return new BaseBookshelfBlock(planks);
+			return new BaseBookshelfBlock(getBlock("planks"));
 		}).setBlockTags(TagAPI.BLOCK_BOOKSHELVES));
 		addBlockEntry(new BlockEntry("composter", (complexMaterial, settings) -> {
-			return new BaseComposterBlock(planks);
+			return new BaseComposterBlock(getBlock("planks"));
 		}));
 	}
 	
