@@ -33,9 +33,13 @@ public class GridRecipe {
 	private boolean exist = true;
 	
 	private GridRecipe() {}
-	
+
 	public static GridRecipe make(String modID, String name, ItemLike output) {
-		INSTANCE.id = new ResourceLocation(modID, name);
+		return make(new ResourceLocation(modID, name), output);
+	}
+
+	public static GridRecipe make(ResourceLocation id, ItemLike output) {
+		INSTANCE.id = id;
 		INSTANCE.output = output;
 		
 		INSTANCE.group = "";

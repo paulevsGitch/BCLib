@@ -37,12 +37,13 @@ import ru.bclib.blocks.StripableBarkBlock;
 import ru.bclib.blocks.WoodenPressurePlateBlock;
 import ru.bclib.complexmaterials.entry.BlockEntry;
 import ru.bclib.complexmaterials.entry.ItemEntry;
+import ru.bclib.complexmaterials.entry.RecipeEntry;
 import ru.bclib.config.PathConfig;
 import ru.bclib.recipes.GridRecipe;
 
 import java.util.List;
 
-public class WoodenMaterial extends ComplexMaterial {
+public class WoodenComplexMaterial extends ComplexMaterial {
 	public static final ResourceLocation MATERIAL_ID = BCLib.makeID("wooden_material");
 	
 	public static final String BLOCK_CRAFTING_TABLE = "crafting_table";
@@ -71,7 +72,7 @@ public class WoodenMaterial extends ComplexMaterial {
 	public final MaterialColor planksColor;
 	public final MaterialColor woodColor;
 	
-	public WoodenMaterial(String modID, String baseName, MaterialColor woodColor, MaterialColor planksColor) {
+	public WoodenComplexMaterial(String modID, String baseName, MaterialColor woodColor, MaterialColor planksColor) {
 		super(modID, baseName);
 		this.planksColor = planksColor;
 		this.woodColor = woodColor;
@@ -193,154 +194,192 @@ public class WoodenMaterial extends ComplexMaterial {
 	}
 	
 	@Override
-	public void initRecipes(PathConfig recipeConfig) {
-		Block log_stripped = getBlock(BLOCK_STRIPPED_LOG);
-		Block bark_stripped = getBlock(BLOCK_STRIPPED_BARK);
-		Block log = getBlock(BLOCK_LOG);
-		Block bark = getBlock(BLOCK_BARK);
+	public void initDefaultRecipes() {
 		Block planks = getBlock(BLOCK_PLANKS);
-		Block stairs = getBlock(BLOCK_STAIRS);
-		Block slab = getBlock(BLOCK_SLAB);
-		Block fence = getBlock(BLOCK_FENCE);
-		Block gate = getBlock("gate");
-		Block button = getBlock("button");
-		Block pressurePlate = getBlock("plate");
-		Block trapdoor = getBlock("trapdoor");
-		Block door = getBlock("door");
-		Block craftingTable = getBlock("crafting_table");
-		Block ladder = getBlock("ladder");
-		Block sign = getBlock("sign");
-		Block chest = getBlock("chest");
-		Block barrel = getBlock("barrel");
-		Block shelf = getBlock("bookshelf");
-		Block composter = getBlock("composter");
-		
-		GridRecipe.make(getModID(), getBaseName() + "_planks", planks)
-				  .checkConfig(recipeConfig)
-				  .setOutputCount(4)
-				  .setList("#")
-				  .addMaterial('#', log, bark, log_stripped, bark_stripped)
-				  .setGroup("end_planks")
-				  .build();
-		GridRecipe.make(getModID(), getBaseName() + "_stairs", stairs)
-				  .checkConfig(recipeConfig)
-				  .setOutputCount(4)
-				  .setShape("#  ", "## ", "###")
-				  .addMaterial('#', planks)
-				  .setGroup("end_planks_stairs")
-				  .build();
-		GridRecipe.make(getModID(), getBaseName() + "_slab", slab)
-				  .checkConfig(recipeConfig)
-				  .setOutputCount(6)
-				  .setShape("###")
-				  .addMaterial('#', planks)
-				  .setGroup("end_planks_slabs")
-				  .build();
-		GridRecipe.make(getModID(), getBaseName() + "_fence", fence)
-				  .checkConfig(recipeConfig)
-				  .setOutputCount(3)
-				  .setShape("#I#", "#I#")
-				  .addMaterial('#', planks)
-				  .addMaterial('I', Items.STICK)
-				  .setGroup("end_planks_fences")
-				  .build();
-		GridRecipe.make(getModID(), getBaseName() + "_gate", gate)
-				  .checkConfig(recipeConfig)
-				  .setShape("I#I", "I#I")
-				  .addMaterial('#', planks)
-				  .addMaterial('I', Items.STICK)
-				  .setGroup("end_planks_gates")
-				  .build();
-		GridRecipe.make(getModID(), getBaseName() + "_button", button)
-				  .checkConfig(recipeConfig)
-				  .setList("#")
-				  .addMaterial('#', planks)
-				  .setGroup("end_planks_buttons")
-				  .build();
-		GridRecipe.make(getModID(), getBaseName() + "_pressure_plate", pressurePlate)
-				  .checkConfig(recipeConfig)
-				  .setShape("##")
-				  .addMaterial('#', planks)
-				  .setGroup("end_planks_plates")
-				  .build();
-		GridRecipe.make(getModID(), getBaseName() + "_trapdoor", trapdoor)
-				  .checkConfig(recipeConfig)
-				  .setOutputCount(2)
-				  .setShape("###", "###")
-				  .addMaterial('#', planks)
-				  .setGroup("end_trapdoors")
-				  .build();
-		GridRecipe.make(getModID(), getBaseName() + "_door", door)
-				  .checkConfig(recipeConfig)
-				  .setOutputCount(3)
-				  .setShape("##", "##", "##")
-				  .addMaterial('#', planks)
-				  .setGroup("end_doors")
-				  .build();
-		GridRecipe.make(getModID(), getBaseName() + "_crafting_table", craftingTable)
-				  .checkConfig(recipeConfig)
-				  .setShape("##", "##")
-				  .addMaterial('#', planks)
-				  .setGroup("end_tables")
-				  .build();
-		GridRecipe.make(getModID(), getBaseName() + "_ladder", ladder)
-				  .checkConfig(recipeConfig)
-				  .setOutputCount(3)
-				  .setShape("I I", "I#I", "I I")
-				  .addMaterial('#', planks)
-				  .addMaterial('I', Items.STICK)
-				  .setGroup("end_ladders")
-				  .build();
-		GridRecipe.make(getModID(), getBaseName() + "_sign", sign)
-				  .checkConfig(recipeConfig)
-				  .setOutputCount(3)
-				  .setShape("###", "###", " I ")
-				  .addMaterial('#', planks)
-				  .addMaterial('I', Items.STICK)
-				  .setGroup("end_signs")
-				  .build();
-		GridRecipe.make(getModID(), getBaseName() + "_chest", chest)
-				  .checkConfig(recipeConfig)
-				  .setShape("###", "# #", "###")
-				  .addMaterial('#', planks)
-				  .setGroup("end_chests")
-				  .build();
-		GridRecipe.make(getModID(), getBaseName() + "_barrel", barrel)
-				  .checkConfig(recipeConfig)
-				  .setShape("#S#", "# #", "#S#")
-				  .addMaterial('#', planks)
-				  .addMaterial('S', slab)
-				  .setGroup("end_barrels")
-				  .build();
-		GridRecipe.make(getModID(), getBaseName() + "_bookshelf", shelf)
-				  .checkConfig(recipeConfig)
-				  .setShape("###", "PPP", "###")
-				  .addMaterial('#', planks)
-				  .addMaterial('P', Items.BOOK)
-				  .setGroup("end_BLOCK_BOOKSHELVES")
-				  .build();
-		GridRecipe.make(getModID(), getBaseName() + "_bark", bark)
-				  .checkConfig(recipeConfig)
-				  .setShape("##", "##")
-				  .addMaterial('#', log)
-				  .setOutputCount(3)
-				  .build();
-		GridRecipe.make(getModID(), getBaseName() + "_log", log)
-				  .checkConfig(recipeConfig)
-				  .setShape("##", "##")
-				  .addMaterial('#', bark)
-				  .setOutputCount(3)
-				  .build();
-		GridRecipe.make(getModID(), getBaseName() + "_composter", composter)
-				  .checkConfig(recipeConfig)
-				  .setShape("# #", "# #", "###")
-				  .addMaterial('#', slab)
-				  .build();
-		GridRecipe.make(getModID(), getBaseName() + "_shulker", Items.SHULKER_BOX)
-				  .checkConfig(recipeConfig)
-				  .setShape("S", "#", "S")
-				  .addMaterial('S', Items.SHULKER_SHELL)
-				  .addMaterial('#', chest)
-				  .build();
+		addRecipeEntry(new RecipeEntry("planks", (material, config, id) -> {
+			Block log_stripped = getBlock(BLOCK_STRIPPED_LOG);
+			Block bark_stripped = getBlock(BLOCK_STRIPPED_BARK);
+			Block log = getBlock(BLOCK_LOG);
+			Block bark = getBlock(BLOCK_BARK);
+			GridRecipe.make(id, planks)
+				.checkConfig(config)
+				.setOutputCount(4)
+				.setList("#")
+				.addMaterial('#', log, bark, log_stripped, bark_stripped)
+				.setGroup("end_planks")
+				.build();
+		}));
+		addRecipeEntry(new RecipeEntry("stairs", (material, config, id) -> {
+			GridRecipe.make(id, getBlock(BLOCK_STAIRS))
+				.checkConfig(config)
+				.setOutputCount(4)
+				.setShape("#  ", "## ", "###")
+				.addMaterial('#', planks)
+				.setGroup("end_planks_stairs")
+				.build();
+		}));
+		addRecipeEntry(new RecipeEntry("slab", (material, config, id) -> {
+			GridRecipe.make(id, getBlock(BLOCK_SLAB))
+				.checkConfig(config)
+				.setOutputCount(6)
+				.setShape("###")
+				.addMaterial('#', planks)
+				.setGroup("end_planks_slabs")
+				.build();
+		}));
+		addRecipeEntry(new RecipeEntry("fence", (material, config, id) -> {
+			GridRecipe.make(id, getBlock(BLOCK_FENCE))
+				.checkConfig(config)
+				.setOutputCount(3)
+				.setShape("#I#", "#I#")
+				.addMaterial('#', planks)
+				.addMaterial('I', Items.STICK)
+				.setGroup("end_planks_fences")
+				.build();
+		}));
+		addRecipeEntry(new RecipeEntry("gate", (material, config, id) -> {
+			GridRecipe.make(id, getBlock(BLOCK_GATE))
+				.checkConfig(config)
+				.setShape("I#I", "I#I")
+				.addMaterial('#', planks)
+				.addMaterial('I', Items.STICK)
+				.setGroup("end_planks_gates")
+				.build();
+		}));
+		addRecipeEntry(new RecipeEntry("button", (material, config, id) -> {
+			GridRecipe.make(id, getBlock(BLOCK_BUTTON))
+				.checkConfig(config)
+				.setList("#")
+				.addMaterial('#', planks)
+				.setGroup("end_planks_buttons")
+				.build();
+		}));
+		addRecipeEntry(new RecipeEntry("pressure_plate", (material, config, id) -> {
+			GridRecipe.make(id, getBlock(BLOCK_PRESSURE_PLATE))
+				.checkConfig(config)
+				.setShape("##")
+				.addMaterial('#', planks)
+				.setGroup("end_planks_plates")
+				.build();
+		}));
+		addRecipeEntry(new RecipeEntry("trapdoor", (material, config, id) -> {
+			GridRecipe.make(id, getBlock(BLOCK_TRAPDOOR))
+				.checkConfig(config)
+				.setOutputCount(2)
+				.setShape("###", "###")
+				.addMaterial('#', planks)
+				.setGroup("end_trapdoors")
+				.build();
+		}));
+		addRecipeEntry(new RecipeEntry("door", (material, config, id) -> {
+			GridRecipe.make(id, getBlock(BLOCK_DOOR))
+				.checkConfig(config)
+				.setOutputCount(3)
+				.setShape("##", "##", "##")
+				.addMaterial('#', planks)
+				.setGroup("end_doors")
+				.build();
+		}));
+		addRecipeEntry(new RecipeEntry("crafting_table", (material, config, id) -> {
+			GridRecipe.make(id, getBlock(BLOCK_CRAFTING_TABLE))
+				.checkConfig(config)
+				.setShape("##", "##")
+				.addMaterial('#', planks)
+				.setGroup("end_tables")
+				.build();
+		}));
+		addRecipeEntry(new RecipeEntry("ladder", (material, config, id) -> {
+			GridRecipe.make(id, getBlock(BLOCK_LADDER))
+				.checkConfig(config)
+				.setOutputCount(3)
+				.setShape("I I", "I#I", "I I")
+				.addMaterial('#', planks)
+				.addMaterial('I', Items.STICK)
+				.setGroup("end_ladders")
+				.build();
+		}));
+		addRecipeEntry(new RecipeEntry("sign", (material, config, id) -> {
+			GridRecipe.make(id, getBlock(BLOCK_SIGN))
+				.checkConfig(config)
+				.setOutputCount(3)
+				.setShape("###", "###", " I ")
+				.addMaterial('#', planks)
+				.addMaterial('I', Items.STICK)
+				.setGroup("end_signs")
+				.build();
+		}));
+		addRecipeEntry(new RecipeEntry("chest", (material, config, id) -> {
+			GridRecipe.make(id, getBlock(BLOCK_CHEST))
+				.checkConfig(config)
+				.setShape("###", "# #", "###")
+				.addMaterial('#', planks)
+				.setGroup("end_chests")
+				.build();
+		}));
+		addRecipeEntry(new RecipeEntry("barrel", (material, config, id) -> {
+			GridRecipe.make(id, getBlock(BLOCK_BARREL))
+				.checkConfig(config)
+				.setShape("#S#", "# #", "#S#")
+				.addMaterial('#', planks)
+				.addMaterial('S', getBlock(BLOCK_SLAB))
+				.setGroup("end_barrels")
+				.build();
+		}));
+		addRecipeEntry(new RecipeEntry("bookshelf", (material, config, id) -> {
+			GridRecipe.make(id, getBlock(BLOCK_BOOKSHELF))
+				.checkConfig(config)
+				.setShape("###", "PPP", "###")
+				.addMaterial('#', planks)
+				.addMaterial('P', Items.BOOK)
+				.setGroup("end_bookshelves")
+				.build();
+		}));
+		addRecipeEntry(new RecipeEntry("bark", (material, config, id) -> {
+			GridRecipe.make(id, getBlock(BLOCK_BARK))
+				.checkConfig(config)
+				.setShape("##", "##")
+				.addMaterial('#', getBlock(BLOCK_LOG))
+				.setOutputCount(3)
+				.build();
+		}));
+		addRecipeEntry(new RecipeEntry("log", (material, config, id) -> {
+			GridRecipe.make(id, getBlock(BLOCK_LOG))
+				.checkConfig(config)
+				.setShape("##", "##")
+				.addMaterial('#', getBlock(BLOCK_BARK))
+				.setOutputCount(3)
+				.build();
+		}));
+		addRecipeEntry(new RecipeEntry("stripped_bark", (material, config, id) -> {
+			GridRecipe.make(id, getBlock(BLOCK_STRIPPED_BARK))
+				.checkConfig(config)
+				.setShape("##", "##")
+				.addMaterial('#', getBlock(BLOCK_STRIPPED_LOG))
+				.setOutputCount(3)
+				.build();
+		}));
+		addRecipeEntry(new RecipeEntry("stripped_log", (material, config, id) -> {
+			GridRecipe.make(id, getBlock(BLOCK_STRIPPED_LOG))
+				.checkConfig(config)
+				.setShape("##", "##")
+				.addMaterial('#', getBlock(BLOCK_STRIPPED_BARK))
+				.setOutputCount(3)
+				.build();
+		}));
+		addRecipeEntry(new RecipeEntry("composter", (material, config, id) -> {
+			GridRecipe.make(id, getBlock(BLOCK_COMPOSTER))
+				.checkConfig(config)
+				.setShape("# #", "# #", "###")
+				.addMaterial('#', getBlock(BLOCK_SLAB))
+				.build();
+		}));
+		addRecipeEntry(new RecipeEntry("shulker", (material, config, id) -> {
+			GridRecipe.make(id, getBlock(BLOCK_COMPOSTER))
+				.checkConfig(config)
+				.setShape("S", "#", "S")
+				.addMaterial('S', Items.SHULKER_SHELL)
+				.addMaterial('#', getBlock(BLOCK_CHEST))
+				.build();
+		}));
 	}
 }

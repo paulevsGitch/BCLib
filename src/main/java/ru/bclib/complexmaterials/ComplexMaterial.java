@@ -12,6 +12,7 @@ import net.minecraft.world.level.block.Block;
 import org.jetbrains.annotations.Nullable;
 import ru.bclib.complexmaterials.entry.BlockEntry;
 import ru.bclib.complexmaterials.entry.ItemEntry;
+import ru.bclib.complexmaterials.entry.RecipeEntry;
 import ru.bclib.config.PathConfig;
 import ru.bclib.registry.BlockRegistry;
 import ru.bclib.registry.ItemRegistry;
@@ -21,12 +22,15 @@ import java.util.List;
 import java.util.Map;
 
 public abstract class ComplexMaterial {
+	private static final Map<ResourceLocation, List<RecipeEntry>> RECIPE_ENTRIES = Maps.newHashMap();
 	private static final Map<ResourceLocation, List<BlockEntry>> BLOCK_ENTRIES = Maps.newHashMap();
 	private static final Map<ResourceLocation, List<ItemEntry>> ITEM_ENTRIES = Maps.newHashMap();
 	private static final List<ComplexMaterial> MATERIALS = Lists.newArrayList();
-	
+
+	private final List<RecipeEntry> defaultRecipeEntries = Lists.newArrayList();
 	private final List<BlockEntry> defaultBlockEntries = Lists.newArrayList();
 	private final List<ItemEntry> defaultItemEntries = Lists.newArrayList();
+
 	private final Map<String, Tag.Named<Block>> blockTags = Maps.newHashMap();
 	private final Map<String, Tag.Named<Item>> itemTags = Maps.newHashMap();
 	private final Map<String, Block> blocks = Maps.newHashMap();
@@ -64,8 +68,12 @@ public abstract class ComplexMaterial {
 			Item item = entry.init(this, itemSettings, itemsRegistry);
 			items.put(entry.getSuffix(), item);
 		});
-		
-		initRecipes(recipeConfig);
+
+		initDefaultRecipes();
+		getRecipeEntries().forEach(entry -> {
+			entry.init(this, recipeConfig);
+		});
+
 		initFlammable(FlammableBlockRegistry.getDefaultInstance());
 		return this;
 	}
@@ -83,9 +91,9 @@ public abstract class ComplexMaterial {
 	protected void initTags() {}
 	
 	/**
-	 * Init custom recipes for this {@link ComplexMaterial}, not required.
+	 * Init default recipes for this {@link ComplexMaterial}, not required.
 	 */
-	protected void initRecipes(PathConfig recipeConfig) {}
+	protected void initDefaultRecipes() {}
 	
 	/**
 	 * Allows to add blocks into Fabric {@link FlammableBlockRegistry} for this {@link ComplexMaterial}, not required.
@@ -181,6 +189,15 @@ public abstract class ComplexMaterial {
 		}
 		return result;
 	}
+
+	private Collection<RecipeEntry> getRecipeEntries() {
+		List<RecipeEntry> result = Lists.newArrayList(defaultRecipeEntries);
+		List<RecipeEntry> entries = RECIPE_ENTRIES.get(this.getMaterialID());
+		if (entries != null) {
+			result.addAll(entries);
+		}
+		return result;
+	}
 	
 	/**
 	 * Get base name of this {@link ComplexMaterial}.
@@ -202,8 +219,8 @@ public abstract class ComplexMaterial {
 	 * Get a unique {@link ResourceLocation} for each material class.
 	 * For example WoodenComplexMaterial will have a "bclib:Wooden_Complex_Material" {@link ResourceLocation}.
 	 * This is used to add custom entries before mods init using Fabric "preLaunch" entry point.
-	 * @see <a href="https://fabricmc.net/wiki/documentation:entrypoint>Fabric Documentation: Entrypoint</a>
 	 * @return {@link ResourceLocation} for this material
+	 * @see <a href="https://fabricmc.net/wiki/documentation:entrypoint">Fabric Documentation: Entrypoint</a>
 	 */
 	public abstract ResourceLocation getMaterialID();
 	
@@ -238,14 +255,22 @@ public abstract class ComplexMaterial {
 	protected void addItemEntry(ItemEntry entry) {
 		defaultItemEntries.add(entry);
 	}
+
+	/**
+	 * Adds a default {@link RecipeEntry} to this {@link ComplexMaterial}. Used to initiate items later.
+	 * @param entry {@link RecipeEntry}
+	 */
+	protected void addRecipeEntry(RecipeEntry entry) {
+		defaultRecipeEntries.add(entry);
+	}
 	
 	/**
 	 * Adds a custom {@link BlockEntry} for specified {@link ComplexMaterial} using its {@link ResourceLocation}.
 	 * Used to add custom entry for all instances of {@link ComplexMaterial}.
 	 * Should be called only using Fabric "preLaunch" entry point.
-	 * @see <a href="https://fabricmc.net/wiki/documentation:entrypoint>Fabric Documentation: Entrypoint</a>
 	 * @param materialName {@link ResourceLocation} id of {@link ComplexMaterial};
 	 * @param entry {@link BlockEntry}.
+	 * @see <a href="https://fabricmc.net/wiki/documentation:entrypoint">Fabric Documentation: Entrypoint</a>
 	 */
 	public static void addBlockEntry(ResourceLocation materialName, BlockEntry entry) {
 		List<BlockEntry> entries = BLOCK_ENTRIES.get(materialName);
@@ -260,15 +285,32 @@ public abstract class ComplexMaterial {
 	 * Adds a custom {@link ItemEntry} for specified {@link ComplexMaterial} using its {@link ResourceLocation}.
 	 * Used to add custom entry for all instances of {@link ComplexMaterial}.
 	 * Should be called only using Fabric "preLaunch" entry point.
-	 * @see <a href="https://fabricmc.net/wiki/documentation:entrypoint>Fabric Documentation: Entrypoint</a>
 	 * @param materialName {@link ResourceLocation} id of {@link ComplexMaterial};
 	 * @param entry {@link ItemEntry}.
+	 * @see <a href="https://fabricmc.net/wiki/documentation:entrypoint">Fabric Documentation: Entrypoint</a>
 	 */
 	public static void addItemEntry(ResourceLocation materialName, ItemEntry entry) {
 		List<ItemEntry> entries = ITEM_ENTRIES.get(materialName);
 		if (entries == null) {
 			entries = Lists.newArrayList();
 			ITEM_ENTRIES.put(materialName, entries);
+		}
+		entries.add(entry);
+	}
+
+	/**
+	 * Adds a custom {@link RecipeEntry} for specified {@link ComplexMaterial} using its {@link ResourceLocation}.
+	 * Used to add custom entry for all instances of {@link ComplexMaterial}.
+	 * Should be called only using Fabric "preLaunch" entry point.
+	 * @param materialName {@link ResourceLocation} id of {@link ComplexMaterial};
+	 * @param entry {@link RecipeEntry}.
+	 * @see <a href="https://fabricmc.net/wiki/documentation:entrypoint">Fabric Documentation: Entrypoint</a>
+	 */
+	public static void addRecipeEntry(ResourceLocation materialName, RecipeEntry entry) {
+		List<RecipeEntry> entries = RECIPE_ENTRIES.get(materialName);
+		if (entries == null) {
+			entries = Lists.newArrayList();
+			RECIPE_ENTRIES.put(materialName, entries);
 		}
 		entries.add(entry);
 	}
