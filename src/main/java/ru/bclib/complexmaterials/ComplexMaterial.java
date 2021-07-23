@@ -52,22 +52,25 @@ public abstract class ComplexMaterial {
 		
 		getBlockEntries().forEach(entry -> {
 			Block block = entry.init(this, blockSettings, blocksRegistry);
-			blocks.put(entry.getName(baseName), block);
+			blocks.put(entry.getSuffix(), block);
 		});
 		
 		getItemEntries().forEach(entry -> {
 			Item item = entry.init(this, itemSettings, itemsRegistry);
-			items.put(entry.getName(baseName), item);
+			items.put(entry.getSuffix(), item);
 		});
 		
 		initRecipes();
+		initFlammable();
 	}
 	
-	public abstract void initDefault(FabricBlockSettings blockSettings, FabricItemSettings itemSettings);
+	protected abstract void initDefault(FabricBlockSettings blockSettings, FabricItemSettings itemSettings);
 	
-	public void initTags() {}
+	protected void initTags() {}
 	
-	public void initRecipes() {}
+	protected void initRecipes() {}
+	
+	protected void initFlammable() {}
 	
 	protected void addBlockTag(Tag.Named<Block> tag) {
 		blockTags.put(tag.getName().getPath(), tag);
