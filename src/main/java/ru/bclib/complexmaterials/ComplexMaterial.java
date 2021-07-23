@@ -11,8 +11,8 @@ import org.jetbrains.annotations.Nullable;
 import ru.bclib.complexmaterials.entry.BlockEntry;
 import ru.bclib.complexmaterials.entry.ItemEntry;
 import ru.bclib.config.PathConfig;
-import ru.bclib.registry.BlocksRegistry;
-import ru.bclib.registry.ItemsRegistry;
+import ru.bclib.registry.BlockRegistry;
+import ru.bclib.registry.ItemRegistry;
 
 import java.util.Collection;
 import java.util.List;
@@ -30,17 +30,10 @@ public abstract class ComplexMaterial {
 	private final Map<String, Block> blocks = Maps.newHashMap();
 	private final Map<String, Item> items = Maps.newHashMap();
 	
-	private final BlocksRegistry blocksRegistry;
-	private final ItemsRegistry itemsRegistry;
-	private final PathConfig recipeConfig;
-	
 	private final String baseName;
 	private final String modID;
 	
-	public ComplexMaterial(String modID, String baseName, BlocksRegistry blocksRegistry, ItemsRegistry itemsRegistry, PathConfig recipeConfig) {
-		this.blocksRegistry = blocksRegistry;
-		this.itemsRegistry = itemsRegistry;
-		this.recipeConfig = recipeConfig;
+	public ComplexMaterial(String modID, String baseName) {
 		this.baseName = baseName;
 		this.modID = modID;
 		MATERIALS.add(this);
@@ -49,6 +42,9 @@ public abstract class ComplexMaterial {
 	public void init() {
 		initTags();
 		
+		final BlockRegistry blocksRegistry = getBlockRegistry();
+		final ItemRegistry itemsRegistry = getItemRegistry();
+		final PathConfig recipeConfig = getRecipeConfig();
 		final FabricBlockSettings blockSettings = getBlockSettings();
 		final FabricItemSettings itemSettings = getItemSettings(itemsRegistry);
 		initDefault(blockSettings, itemSettings);
@@ -66,6 +62,12 @@ public abstract class ComplexMaterial {
 		initRecipes(recipeConfig);
 		initFlammable();
 	}
+	
+	protected abstract BlockRegistry getBlockRegistry();
+	
+	protected abstract ItemRegistry getItemRegistry();
+	
+	protected abstract PathConfig getRecipeConfig();
 	
 	protected abstract void initDefault(FabricBlockSettings blockSettings, FabricItemSettings itemSettings);
 	
@@ -105,7 +107,7 @@ public abstract class ComplexMaterial {
 	
 	protected abstract FabricBlockSettings getBlockSettings();
 	
-	protected FabricItemSettings getItemSettings(ItemsRegistry registry) {
+	protected FabricItemSettings getItemSettings(ItemRegistry registry) {
 		return registry.makeItemSettings();
 	}
 	
@@ -125,14 +127,6 @@ public abstract class ComplexMaterial {
 			result.addAll(entries);
 		}
 		return result;
-	}
-	
-	public BlocksRegistry getBlocksRegistry() {
-		return blocksRegistry;
-	}
-	
-	public ItemsRegistry getItemsRegistry() {
-		return itemsRegistry;
 	}
 	
 	public String getBaseName() {

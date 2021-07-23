@@ -7,7 +7,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import ru.bclib.api.TagAPI;
 import ru.bclib.complexmaterials.ComplexMaterial;
-import ru.bclib.registry.BlocksRegistry;
+import ru.bclib.registry.BlockRegistry;
 
 import java.util.function.BiFunction;
 
@@ -38,7 +38,7 @@ public class BlockEntry extends ComplexMaterialEntry {
 		return this;
 	}
 	
-	public Block init(ComplexMaterial material, FabricBlockSettings blockSettings, BlocksRegistry registry) {
+	public Block init(ComplexMaterial material, FabricBlockSettings blockSettings, BlockRegistry registry) {
 		ResourceLocation location = getLocation(material.getModID(), material.getBaseName());
 		Block block = initFunction.apply(material, blockSettings);
 		if (hasItem) {

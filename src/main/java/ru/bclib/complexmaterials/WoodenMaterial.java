@@ -27,7 +27,6 @@ import ru.bclib.blocks.BaseRotatedPillarBlock;
 import ru.bclib.blocks.BaseSignBlock;
 import ru.bclib.blocks.BaseSlabBlock;
 import ru.bclib.blocks.BaseStairsBlock;
-import ru.bclib.blocks.BaseStripableLogBlock;
 import ru.bclib.blocks.BaseTrapdoorBlock;
 import ru.bclib.blocks.BaseWoodenButtonBlock;
 import ru.bclib.blocks.StripableBarkBlock;
@@ -35,15 +34,15 @@ import ru.bclib.blocks.WoodenPressurePlateBlock;
 import ru.bclib.complexmaterials.entry.BlockEntry;
 import ru.bclib.config.PathConfig;
 import ru.bclib.recipes.GridRecipe;
-import ru.bclib.registry.BlocksRegistry;
-import ru.bclib.registry.ItemsRegistry;
+import ru.bclib.registry.BlockRegistry;
+import ru.bclib.registry.ItemRegistry;
 
-public class WoodenMaterial extends ComplexMaterial {
+public abstract class WoodenMaterial extends ComplexMaterial {
 	public final MaterialColor planksColor;
 	public final MaterialColor woodColor;
 	
-	public WoodenMaterial(String modID, String baseName, MaterialColor woodColor, MaterialColor planksColor, BlocksRegistry blocksRegistry, ItemsRegistry itemsRegistry, PathConfig recipeConfig) {
-		super(modID, baseName, blocksRegistry, itemsRegistry, recipeConfig);
+	public WoodenMaterial(String modID, String baseName, MaterialColor woodColor, MaterialColor planksColor) {
+		super(modID, baseName);
 		this.planksColor = planksColor;
 		this.woodColor = woodColor;
 	}

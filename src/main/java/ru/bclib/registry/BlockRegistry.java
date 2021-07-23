@@ -9,8 +9,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import ru.bclib.interfaces.CustomItemProvider;
 
-public abstract class BlocksRegistry extends BaseRegistry<Block> {
-	protected BlocksRegistry(CreativeModeTab creativeTab) {
+public abstract class BlockRegistry extends BaseRegistry<Block> {
+	protected BlockRegistry(CreativeModeTab creativeTab) {
 		super(creativeTab);
 	}
 	

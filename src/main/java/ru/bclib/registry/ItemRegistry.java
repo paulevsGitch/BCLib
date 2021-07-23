@@ -29,9 +29,9 @@ import ru.bclib.items.tool.BaseHoeItem;
 import ru.bclib.items.tool.BasePickaxeItem;
 import ru.bclib.api.TagAPI;
 
-public abstract class ItemsRegistry extends BaseRegistry<Item> {
+public abstract class ItemRegistry extends BaseRegistry<Item> {
 	
-	protected ItemsRegistry(CreativeModeTab creativeTab) {
+	protected ItemRegistry(CreativeModeTab creativeTab) {
 		super(creativeTab);
 	}
 	
