@@ -7,13 +7,16 @@ import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.Registry;
 import net.minecraft.world.level.block.Block;
+import ru.bclib.blocks.BaseBarrelBlock;
 import ru.bclib.blocks.BaseChestBlock;
+import ru.bclib.blocks.BaseFurnaceBlock;
 import ru.bclib.blocks.BaseSignBlock;
 import ru.bclib.client.render.BCLRenderLayer;
 import ru.bclib.client.render.BaseChestBlockEntityRenderer;
 import ru.bclib.client.render.BaseSignBlockEntityRenderer;
 import ru.bclib.interfaces.PostInitable;
 import ru.bclib.interfaces.RenderLayerProvider;
+import ru.bclib.registry.BaseBlockEntities;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -65,6 +68,18 @@ public class PostInitAPI {
 	private static void processBlockCommon(Block block) {
 		if (block instanceof PostInitable) {
 			((PostInitable) block).postInit();
+		}
+		if (block instanceof BaseChestBlock) {
+			BaseBlockEntities.CHEST.registerBlock(block);
+		}
+		else if (block instanceof BaseSignBlock) {
+			BaseBlockEntities.SIGN.registerBlock(block);
+		}
+		else if (block instanceof BaseBarrelBlock) {
+			BaseBlockEntities.BARREL.registerBlock(block);
+		}
+		else if (block instanceof BaseFurnaceBlock) {
+			BaseBlockEntities.FURNACE.registerBlock(block);
 		}
 	}
 }
