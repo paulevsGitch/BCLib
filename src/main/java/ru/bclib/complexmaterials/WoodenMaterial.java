@@ -27,6 +27,7 @@ import ru.bclib.blocks.BaseRotatedPillarBlock;
 import ru.bclib.blocks.BaseSignBlock;
 import ru.bclib.blocks.BaseSlabBlock;
 import ru.bclib.blocks.BaseStairsBlock;
+import ru.bclib.blocks.BaseStripableLogBlock;
 import ru.bclib.blocks.BaseTrapdoorBlock;
 import ru.bclib.blocks.BaseWoodenButtonBlock;
 import ru.bclib.blocks.StripableBarkBlock;
@@ -78,14 +79,14 @@ public class WoodenMaterial extends ComplexMaterial {
 		
 		addBlockEntry(
 			new BlockEntry("log", (complexMaterial, settings) -> {
-				return new StripableBarkBlock(woodColor, getBlock("log_stripped"));
+				return new BaseStripableLogBlock(woodColor, getBlock("stripped_log"));
 			})
 			.setBlockTags(BlockTags.LOGS, BlockTags.LOGS_THAT_BURN, tagBlockLog)
 			.setItemTags(ItemTags.LOGS, ItemTags.LOGS_THAT_BURN, tagItemLog)
 		);
 		addBlockEntry(
 			new BlockEntry("bark", (complexMaterial, settings) -> {
-				return new StripableBarkBlock(woodColor, getBlock("bark_stripped"));
+				return new StripableBarkBlock(woodColor, getBlock("stripped_bark"));
 			})
 			.setBlockTags(BlockTags.LOGS, BlockTags.LOGS_THAT_BURN, tagBlockLog)
 			.setItemTags(ItemTags.LOGS, ItemTags.LOGS_THAT_BURN, tagItemLog)
@@ -146,8 +147,8 @@ public class WoodenMaterial extends ComplexMaterial {
 	protected void initFlammable() {
 		FlammableBlockRegistry.getDefaultInstance().add(getBlock("log"), 5, 5);
 		FlammableBlockRegistry.getDefaultInstance().add(getBlock("bark"), 5, 5);
-		FlammableBlockRegistry.getDefaultInstance().add(getBlock("log_stripped"), 5, 5);
-		FlammableBlockRegistry.getDefaultInstance().add(getBlock("bark_stripped"), 5, 5);
+		FlammableBlockRegistry.getDefaultInstance().add(getBlock("stripped_log"), 5, 5);
+		FlammableBlockRegistry.getDefaultInstance().add(getBlock("stripped_bark"), 5, 5);
 		
 		FlammableBlockRegistry.getDefaultInstance().add(getBlock("planks"), 5, 20);
 		FlammableBlockRegistry.getDefaultInstance().add(getBlock("stairs"), 5, 20);
