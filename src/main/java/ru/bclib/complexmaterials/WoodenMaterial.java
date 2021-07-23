@@ -7,6 +7,7 @@ import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.Tag;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.MaterialColor;
@@ -26,11 +27,14 @@ import ru.bclib.blocks.BaseRotatedPillarBlock;
 import ru.bclib.blocks.BaseSignBlock;
 import ru.bclib.blocks.BaseSlabBlock;
 import ru.bclib.blocks.BaseStairsBlock;
+import ru.bclib.blocks.BaseStripableLogBlock;
 import ru.bclib.blocks.BaseTrapdoorBlock;
 import ru.bclib.blocks.BaseWoodenButtonBlock;
 import ru.bclib.blocks.StripableBarkBlock;
 import ru.bclib.blocks.WoodenPressurePlateBlock;
 import ru.bclib.complexmaterials.entry.BlockEntry;
+import ru.bclib.config.PathConfig;
+import ru.bclib.recipes.GridRecipe;
 import ru.bclib.registry.BlocksRegistry;
 import ru.bclib.registry.ItemsRegistry;
 
@@ -38,8 +42,8 @@ public class WoodenMaterial extends ComplexMaterial {
 	public final MaterialColor planksColor;
 	public final MaterialColor woodColor;
 	
-	public WoodenMaterial(String modID, String baseName, MaterialColor woodColor, MaterialColor planksColor, BlocksRegistry blocksRegistry, ItemsRegistry itemsRegistry) {
-		super(modID, baseName, blocksRegistry, itemsRegistry);
+	public WoodenMaterial(String modID, String baseName, MaterialColor woodColor, MaterialColor planksColor, BlocksRegistry blocksRegistry, ItemsRegistry itemsRegistry, PathConfig recipeConfig) {
+		super(modID, baseName, blocksRegistry, itemsRegistry, recipeConfig);
 		this.planksColor = planksColor;
 		this.woodColor = woodColor;
 	}
@@ -156,22 +160,169 @@ public class WoodenMaterial extends ComplexMaterial {
 		FlammableBlockRegistry.getDefaultInstance().add(getBlock("fence"), 5, 20);
 		FlammableBlockRegistry.getDefaultInstance().add(getBlock("gate"), 5, 20);
 		FlammableBlockRegistry.getDefaultInstance().add(getBlock("button"), 5, 20);
-		FlammableBlockRegistry.getDefaultInstance().add(getBlock("pressurePlate"), 5, 20);
+		FlammableBlockRegistry.getDefaultInstance().add(getBlock("plate"), 5, 20);
 		FlammableBlockRegistry.getDefaultInstance().add(getBlock("trapdoor"), 5, 20);
 		FlammableBlockRegistry.getDefaultInstance().add(getBlock("door"), 5, 20);
 		
-		FlammableBlockRegistry.getDefaultInstance().add(getBlock("craftingTable"), 5, 20);
+		FlammableBlockRegistry.getDefaultInstance().add(getBlock("crafting_table"), 5, 20);
 		FlammableBlockRegistry.getDefaultInstance().add(getBlock("ladder"), 5, 20);
 		FlammableBlockRegistry.getDefaultInstance().add(getBlock("sign"), 5, 20);
 		
 		FlammableBlockRegistry.getDefaultInstance().add(getBlock("chest"), 5, 20);
 		FlammableBlockRegistry.getDefaultInstance().add(getBlock("barrel"), 5, 20);
-		FlammableBlockRegistry.getDefaultInstance().add(getBlock("shelf"), 5, 20);
+		FlammableBlockRegistry.getDefaultInstance().add(getBlock("bookshelf"), 5, 20);
 		FlammableBlockRegistry.getDefaultInstance().add(getBlock("composter"), 5, 20);
 	}
 	
 	@Override
-	public void initRecipes() {
-	
+	public void initRecipes(PathConfig recipeConfig) {
+		Block log_stripped = getBlock("stripped_log");
+		Block bark_stripped = getBlock("stripped_bark");
+		Block log = getBlock("log");
+		Block bark = getBlock("bark");
+		Block planks = getBlock("planks");
+		Block stairs = getBlock("stairs");
+		Block slab = getBlock("slab");
+		Block fence = getBlock("fence");
+		Block gate = getBlock("gate");
+		Block button = getBlock("button");
+		Block pressurePlate = getBlock("plate");
+		Block trapdoor = getBlock("trapdoor");
+		Block door = getBlock("door");
+		Block craftingTable = getBlock("crafting_table");
+		Block ladder = getBlock("ladder");
+		Block sign = getBlock("sign");
+		Block chest = getBlock("chest");
+		Block barrel = getBlock("barrel");
+		Block shelf = getBlock("bookshelf");
+		Block composter = getBlock("composter");
+		
+		GridRecipe.make(getModID(), getBaseName() + "_planks", planks)
+				  .checkConfig(recipeConfig)
+				  .setOutputCount(4)
+				  .setList("#")
+				  .addMaterial('#', log, bark, log_stripped, bark_stripped)
+				  .setGroup("end_planks")
+				  .build();
+		GridRecipe.make(getModID(), getBaseName() + "_stairs", stairs)
+				  .checkConfig(recipeConfig)
+				  .setOutputCount(4)
+				  .setShape("#  ", "## ", "###")
+				  .addMaterial('#', planks)
+				  .setGroup("end_planks_stairs")
+				  .build();
+		GridRecipe.make(getModID(), getBaseName() + "_slab", slab)
+				  .checkConfig(recipeConfig)
+				  .setOutputCount(6)
+				  .setShape("###")
+				  .addMaterial('#', planks)
+				  .setGroup("end_planks_slabs")
+				  .build();
+		GridRecipe.make(getModID(), getBaseName() + "_fence", fence)
+				  .checkConfig(recipeConfig)
+				  .setOutputCount(3)
+				  .setShape("#I#", "#I#")
+				  .addMaterial('#', planks)
+				  .addMaterial('I', Items.STICK)
+				  .setGroup("end_planks_fences")
+				  .build();
+		GridRecipe.make(getModID(), getBaseName() + "_gate", gate)
+				  .checkConfig(recipeConfig)
+				  .setShape("I#I", "I#I")
+				  .addMaterial('#', planks)
+				  .addMaterial('I', Items.STICK)
+				  .setGroup("end_planks_gates")
+				  .build();
+		GridRecipe.make(getModID(), getBaseName() + "_button", button)
+				  .checkConfig(recipeConfig)
+				  .setList("#")
+				  .addMaterial('#', planks)
+				  .setGroup("end_planks_buttons")
+				  .build();
+		GridRecipe.make(getModID(), getBaseName() + "_pressure_plate", pressurePlate)
+				  .checkConfig(recipeConfig)
+				  .setShape("##")
+				  .addMaterial('#', planks)
+				  .setGroup("end_planks_plates")
+				  .build();
+		GridRecipe.make(getModID(), getBaseName() + "_trapdoor", trapdoor)
+				  .checkConfig(recipeConfig)
+				  .setOutputCount(2)
+				  .setShape("###", "###")
+				  .addMaterial('#', planks)
+				  .setGroup("end_trapdoors")
+				  .build();
+		GridRecipe.make(getModID(), getBaseName() + "_door", door)
+				  .checkConfig(recipeConfig)
+				  .setOutputCount(3)
+				  .setShape("##", "##", "##")
+				  .addMaterial('#', planks)
+				  .setGroup("end_doors")
+				  .build();
+		GridRecipe.make(getModID(), getBaseName() + "_crafting_table", craftingTable)
+				  .checkConfig(recipeConfig)
+				  .setShape("##", "##")
+				  .addMaterial('#', planks)
+				  .setGroup("end_tables")
+				  .build();
+		GridRecipe.make(getModID(), getBaseName() + "_ladder", ladder)
+				  .checkConfig(recipeConfig)
+				  .setOutputCount(3)
+				  .setShape("I I", "I#I", "I I")
+				  .addMaterial('#', planks)
+				  .addMaterial('I', Items.STICK)
+				  .setGroup("end_ladders")
+				  .build();
+		GridRecipe.make(getModID(), getBaseName() + "_sign", sign)
+				  .checkConfig(recipeConfig)
+				  .setOutputCount(3)
+				  .setShape("###", "###", " I ")
+				  .addMaterial('#', planks)
+				  .addMaterial('I', Items.STICK)
+				  .setGroup("end_signs")
+				  .build();
+		GridRecipe.make(getModID(), getBaseName() + "_chest", chest)
+				  .checkConfig(recipeConfig)
+				  .setShape("###", "# #", "###")
+				  .addMaterial('#', planks)
+				  .setGroup("end_chests")
+				  .build();
+		GridRecipe.make(getModID(), getBaseName() + "_barrel", barrel)
+				  .checkConfig(recipeConfig)
+				  .setShape("#S#", "# #", "#S#")
+				  .addMaterial('#', planks)
+				  .addMaterial('S', slab)
+				  .setGroup("end_barrels")
+				  .build();
+		GridRecipe.make(getModID(), getBaseName() + "_bookshelf", shelf)
+				  .checkConfig(recipeConfig)
+				  .setShape("###", "PPP", "###")
+				  .addMaterial('#', planks)
+				  .addMaterial('P', Items.BOOK)
+				  .setGroup("end_BLOCK_BOOKSHELVES")
+				  .build();
+		GridRecipe.make(getModID(), getBaseName() + "_bark", bark)
+				  .checkConfig(recipeConfig)
+				  .setShape("##", "##")
+				  .addMaterial('#', log)
+				  .setOutputCount(3)
+				  .build();
+		GridRecipe.make(getModID(), getBaseName() + "_log", log)
+				  .checkConfig(recipeConfig)
+				  .setShape("##", "##")
+				  .addMaterial('#', bark)
+				  .setOutputCount(3)
+				  .build();
+		GridRecipe.make(getModID(), getBaseName() + "_composter", composter)
+				  .checkConfig(recipeConfig)
+				  .setShape("# #", "# #", "###")
+				  .addMaterial('#', slab)
+				  .build();
+		GridRecipe.make(getModID(), getBaseName() + "_shulker", Items.SHULKER_BOX)
+				  .checkConfig(recipeConfig)
+				  .setShape("S", "#", "S")
+				  .addMaterial('S', Items.SHULKER_SHELL)
+				  .addMaterial('#', chest)
+				  .build();
 	}
 }

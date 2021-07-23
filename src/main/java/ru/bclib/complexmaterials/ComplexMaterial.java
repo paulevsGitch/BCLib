@@ -10,6 +10,7 @@ import net.minecraft.world.level.block.Block;
 import org.jetbrains.annotations.Nullable;
 import ru.bclib.complexmaterials.entry.BlockEntry;
 import ru.bclib.complexmaterials.entry.ItemEntry;
+import ru.bclib.config.PathConfig;
 import ru.bclib.registry.BlocksRegistry;
 import ru.bclib.registry.ItemsRegistry;
 
@@ -31,13 +32,15 @@ public abstract class ComplexMaterial {
 	
 	private final BlocksRegistry blocksRegistry;
 	private final ItemsRegistry itemsRegistry;
+	private final PathConfig recipeConfig;
 	
 	private final String baseName;
 	private final String modID;
 	
-	public ComplexMaterial(String modID, String baseName, BlocksRegistry blocksRegistry, ItemsRegistry itemsRegistry) {
+	public ComplexMaterial(String modID, String baseName, BlocksRegistry blocksRegistry, ItemsRegistry itemsRegistry, PathConfig recipeConfig) {
 		this.blocksRegistry = blocksRegistry;
 		this.itemsRegistry = itemsRegistry;
+		this.recipeConfig = recipeConfig;
 		this.baseName = baseName;
 		this.modID = modID;
 		MATERIALS.add(this);
@@ -60,7 +63,7 @@ public abstract class ComplexMaterial {
 			items.put(entry.getSuffix(), item);
 		});
 		
-		initRecipes();
+		initRecipes(recipeConfig);
 		initFlammable();
 	}
 	
@@ -68,7 +71,7 @@ public abstract class ComplexMaterial {
 	
 	protected void initTags() {}
 	
-	protected void initRecipes() {}
+	protected void initRecipes(PathConfig recipeConfig) {}
 	
 	protected void initFlammable() {}
 	
