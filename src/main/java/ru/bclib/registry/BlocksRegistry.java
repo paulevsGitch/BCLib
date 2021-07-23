@@ -10,7 +10,6 @@ import net.minecraft.world.level.block.Block;
 import ru.bclib.interfaces.CustomItemProvider;
 
 public abstract class BlocksRegistry extends BaseRegistry<Block> {
-	
 	protected BlocksRegistry(CreativeModeTab creativeTab) {
 		super(creativeTab);
 	}
@@ -33,11 +32,11 @@ public abstract class BlocksRegistry extends BaseRegistry<Block> {
 		return Registry.register(Registry.BLOCK, id, block);
 	}
 	
-	public Block registerBlockOnly(String name, Block block) {
-		return Registry.register(Registry.BLOCK, createModId(name), block);
+	public Block registerBlockOnly(ResourceLocation id, Block block) {
+		return Registry.register(Registry.BLOCK, id, block);
 	}
 	
-	public Item registerBlockItem(ResourceLocation id, Item item) {
+	private Item registerBlockItem(ResourceLocation id, Item item) {
 		registerItem(id, item, BaseRegistry.getModBlocks(id.getNamespace()));
 		return item;
 	}
