@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
+import net.fabricmc.fabric.api.registry.FlammableBlockRegistry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.Tag;
 import net.minecraft.world.item.Item;
@@ -40,6 +41,13 @@ public abstract class ComplexMaterial {
 		MATERIALS.add(this);
 	}
 	
+	/**
+	 * Initialize and registers all content inside material, return material itself.
+	 * @param blocksRegistry {@link BlockRegistry} instance to add blocks in;
+	 * @param itemsRegistry {@link ItemRegistry} instance to add items in;
+	 * @param recipeConfig {@link PathConfig} for recipes check.
+	 * @return {@link ComplexMaterial}.
+	 */
 	public ComplexMaterial init(BlockRegistry blocksRegistry, ItemRegistry itemsRegistry, PathConfig recipeConfig) {
 		initTags();
 		
@@ -58,48 +66,100 @@ public abstract class ComplexMaterial {
 		});
 		
 		initRecipes(recipeConfig);
-		initFlammable();
+		initFlammable(FlammableBlockRegistry.getDefaultInstance());
 		return this;
 	}
 	
+	/**
+	 * Init default content for {@link ComplexMaterial} - blocks and items.
+	 * @param blockSettings {@link FabricBlockSettings} default block settings for this material;
+	 * @param itemSettings {@link FabricItemSettings} default item settings for this material.
+	 */
 	protected abstract void initDefault(FabricBlockSettings blockSettings, FabricItemSettings itemSettings);
 	
+	/**
+	 * Init custom tags for this {@link ComplexMaterial}, not required.
+	 */
 	protected void initTags() {}
 	
+	/**
+	 * Init custom recipes for this {@link ComplexMaterial}, not required.
+	 */
 	protected void initRecipes(PathConfig recipeConfig) {}
 	
-	protected void initFlammable() {}
+	/**
+	 * Allows to add blocks into Fabric {@link FlammableBlockRegistry} for this {@link ComplexMaterial}, not required.
+	 */
+	protected void initFlammable(FlammableBlockRegistry registry) {}
 	
+	/**
+	 * Adds custom block tag for this {@link ComplexMaterial}, tag can be created with {@link ru.bclib.api.TagAPI} or you can use one of already created tags.
+	 * @param tag {@link Tag.Named} for {@link Block}
+	 */
 	protected void addBlockTag(Tag.Named<Block> tag) {
-		blockTags.put(tag.getName().getPath(), tag);
+		String key = tag.getName().getPath().replace(getBaseName() + "_", "");
+		blockTags.put(key, tag);
 	}
 	
+	/**
+	 * Adds custom iten tag for this {@link ComplexMaterial}, tag can be created with {@link ru.bclib.api.TagAPI} or you can use one of already created tags.
+	 * @param tag {@link Tag.Named} for {@link Item}
+	 */
 	protected void addItemTag(Tag.Named<Item> tag) {
-		itemTags.put(tag.getName().getPath(), tag);
+		String key = tag.getName().getPath().replace(getBaseName() + "_", "");
+		itemTags.put(key, tag);
 	}
 	
+	/**
+	 * Get custom {@link Block} {@link Tag.Named} from this {@link ComplexMaterial}.
+	 * @param key {@link String} tag name (path of its {@link ResourceLocation}), for inner tags created inside material its tag suffix.
+	 * @return {@link Tag.Named} for {@link Block} or {@code null} if nothing is stored.
+	 */
 	@Nullable
 	public Tag.Named<Block> getBlockTag(String key) {
 		return blockTags.get(key);
 	}
 	
+	/**
+	 * Get custom {@link Item} {@link Tag.Named} from this {@link ComplexMaterial}.
+	 * @param key {@link String} tag name (path of its {@link ResourceLocation}), for inner tags created inside material its tag suffix.
+	 * @return {@link Tag.Named} for {@link Item} or {@code null} if nothing is stored.
+	 */
 	@Nullable
 	public Tag.Named<Item> getItemTag(String key) {
 		return itemTags.get(key);
 	}
 	
+	/**
+	 * Get initiated {@link Block} from this {@link ComplexMaterial}.
+	 * @param key {@link String} block name suffix (example: "mod:custom_log" will have a "log" suffix if "custom" is a base name of this material)
+	 * @return {@link Block} or {@code null} if nothing is stored.
+	 */
 	@Nullable
 	public Block getBlock(String key) {
 		return blocks.get(key);
 	}
 	
+	/**
+	 * Get initiated {@link Item} from this {@link ComplexMaterial}.
+	 * @param key {@link String} block name suffix (example: "mod:custom_apple" will have a "apple" suffix if "custom" is a base name of this material)
+	 * @return {@link Item} or {@code null} if nothing is stored.
+	 */
 	@Nullable
 	public Item getItem(String key) {
 		return items.get(key);
 	}
 	
+	/**
+	 * Get default block settings for this material.
+	 * @return {@link FabricBlockSettings}
+	 */
 	protected abstract FabricBlockSettings getBlockSettings();
 	
+	/**
+	 * Get default item settings for this material.
+	 * @return {@link FabricItemSettings}
+	 */
 	protected FabricItemSettings getItemSettings(ItemRegistry registry) {
 		return registry.makeItemSettings();
 	}
@@ -122,24 +182,71 @@ public abstract class ComplexMaterial {
 		return result;
 	}
 	
+	/**
+	 * Get base name of this {@link ComplexMaterial}.
+	 * @return {@link String} name
+	 */
 	public String getBaseName() {
 		return baseName;
 	}
 	
+	/**
+	 * Get mod ID for this {@link ComplexMaterial}.
+	 * @return {@link String} mod ID.
+	 */
 	public String getModID() {
 		return modID;
 	}
 	
+	/**
+	 * Get a unique {@link ResourceLocation} for each material class.
+	 * For example WoodenComplexMaterial will have a "bclib:Wooden_Complex_Material" {@link ResourceLocation}.
+	 * This is used to add custom entries before mods init using Fabric "preLaunch" entry point.
+	 * @see <a href="https://fabricmc.net/wiki/documentation:entrypoint>Fabric Documentation: Entrypoint</a>
+	 * @return {@link ResourceLocation} for this material
+	 */
 	public abstract ResourceLocation getMaterialID();
 	
+	/**
+	 * Get all initiated block from this {@link ComplexMaterial}.
+	 * @return {@link Collection} of {@link Block}.
+	 */
+	public Collection<Block> getBlocks() {
+		return blocks.values();
+	}
+	
+	/**
+	 * Get all initiated items from this {@link ComplexMaterial}.
+	 * @return {@link Collection} of {@link Item}.
+	 */
+	public Collection<Item> getItems() {
+		return items.values();
+	}
+	
+	/**
+	 * Adds a default {@link BlockEntry} to this {@link ComplexMaterial}. Used to initiate blocks later.
+	 * @param entry {@link BlockEntry}
+	 */
 	protected void addBlockEntry(BlockEntry entry) {
 		defaultBlockEntries.add(entry);
 	}
 	
+	/**
+	 * Adds a default {@link ItemEntry} to this {@link ComplexMaterial}. Used to initiate items later.
+	 * @param entry {@link ItemEntry}
+	 */
 	protected void addItemEntry(ItemEntry entry) {
 		defaultItemEntries.add(entry);
 	}
 	
+	/**
+	 * Adds a custom {@link BlockEntry} for specified {@link ComplexMaterial} using its {@link ResourceLocation}.
+	 * Used to add custom entry for all instances of {@link ComplexMaterial}.
+	 * Should be called only using Fabric "preLaunch" entry point.
+	 * @see <a href="https://fabricmc.net/wiki/documentation:entrypoint>Fabric Documentation: Entrypoint</a>
+	 * @param materialName {@link ResourceLocation} id of {@link ComplexMaterial};
+	 * @param entry {@link BlockEntry}.
+	 */
 	public static void addBlockEntry(ResourceLocation materialName, BlockEntry entry) {
 		List<BlockEntry> entries = BLOCK_ENTRIES.get(materialName);
 		if (entries == null) {
@@ -149,6 +256,14 @@ public abstract class ComplexMaterial {
 		entries.add(entry);
 	}
 	
+	/**
+	 * Adds a custom {@link ItemEntry} for specified {@link ComplexMaterial} using its {@link ResourceLocation}.
+	 * Used to add custom entry for all instances of {@link ComplexMaterial}.
+	 * Should be called only using Fabric "preLaunch" entry point.
+	 * @see <a href="https://fabricmc.net/wiki/documentation:entrypoint>Fabric Documentation: Entrypoint</a>
+	 * @param materialName {@link ResourceLocation} id of {@link ComplexMaterial};
+	 * @param entry {@link ItemEntry}.
+	 */
 	public static void addItemEntry(ResourceLocation materialName, ItemEntry entry) {
 		List<ItemEntry> entries = ITEM_ENTRIES.get(materialName);
 		if (entries == null) {
@@ -158,6 +273,10 @@ public abstract class ComplexMaterial {
 		entries.add(entry);
 	}
 	
+	/**
+	 * Get all instances of all materials.
+	 * @return {@link Collection} of {@link ComplexMaterial}.
+	 */
 	public static Collection<ComplexMaterial> getAllMaterials() {
 		return MATERIALS;
 	}

@@ -44,6 +44,30 @@ import java.util.List;
 
 public class WoodenMaterial extends ComplexMaterial {
 	public static final ResourceLocation MATERIAL_ID = BCLib.makeID("wooden_material");
+	
+	public static final String BLOCK_CRAFTING_TABLE = "crafting_table";
+	public static final String BLOCK_STRIPPED_BARK = "stripped_bark";
+	public static final String BLOCK_STRIPPED_LOG = "stripped_log";
+	public static final String BLOCK_PRESSURE_PLATE = "plate";
+	public static final String BLOCK_BOOKSHELF = "bookshelf";
+	public static final String BLOCK_COMPOSTER = "composter";
+	public static final String BLOCK_TRAPDOOR = "trapdoor";
+	public static final String BLOCK_BARREL = "barrel";
+	public static final String BLOCK_BUTTON = "button";
+	public static final String BLOCK_LADDER = "ladder";
+	public static final String BLOCK_PLANKS = "planks";
+	public static final String BLOCK_STAIRS = "stairs";
+	public static final String BLOCK_CHEST = "chest";
+	public static final String BLOCK_FENCE = "fence";
+	public static final String BLOCK_BARK = "bark";
+	public static final String BLOCK_DOOR = "door";
+	public static final String BLOCK_GATE = "gate";
+	public static final String BLOCK_SIGN = "sign";
+	public static final String BLOCK_SLAB = "slab";
+	public static final String BLOCK_LOG = "log";
+	
+	public static final String TAG_LOGS = "logs";
+	
 	public final MaterialColor planksColor;
 	public final MaterialColor woodColor;
 	
@@ -71,18 +95,18 @@ public class WoodenMaterial extends ComplexMaterial {
 	
 	@Override
 	protected void initDefault(FabricBlockSettings blockSettings, FabricItemSettings itemSettings) {
-		Tag.Named<Block> tagBlockLog = getBlockTag(getBaseName() + "_logs");
-		Tag.Named<Item> tagItemLog = getItemTag(getBaseName() + "_logs");
+		Tag.Named<Block> tagBlockLog = getBlockTag(TAG_LOGS);
+		Tag.Named<Item> tagItemLog = getItemTag(TAG_LOGS);
 		
 		addBlockEntry(
-			new BlockEntry("stripped_log", (complexMaterial, settings) -> {
+			new BlockEntry(BLOCK_STRIPPED_LOG, (complexMaterial, settings) -> {
 				return new BaseRotatedPillarBlock(settings);
 			})
 			.setBlockTags(BlockTags.LOGS, BlockTags.LOGS_THAT_BURN, tagBlockLog)
 			.setItemTags(ItemTags.LOGS, ItemTags.LOGS_THAT_BURN, tagItemLog)
 		);
 		addBlockEntry(
-			new BlockEntry("stripped_bark", (complexMaterial, settings) -> {
+			new BlockEntry(BLOCK_STRIPPED_BARK, (complexMaterial, settings) -> {
 				return new BaseBarkBlock(settings);
 			})
 		  .setBlockTags(BlockTags.LOGS, BlockTags.LOGS_THAT_BURN, tagBlockLog)
@@ -90,109 +114,94 @@ public class WoodenMaterial extends ComplexMaterial {
 		);
 		
 		addBlockEntry(
-			new BlockEntry("log", (complexMaterial, settings) -> {
+			new BlockEntry(BLOCK_LOG, (complexMaterial, settings) -> {
 				return new BaseStripableLogBlock(woodColor, getBlock("stripped_log"));
 			})
 			.setBlockTags(BlockTags.LOGS, BlockTags.LOGS_THAT_BURN, tagBlockLog)
 			.setItemTags(ItemTags.LOGS, ItemTags.LOGS_THAT_BURN, tagItemLog)
 		);
 		addBlockEntry(
-			new BlockEntry("bark", (complexMaterial, settings) -> {
+			new BlockEntry(BLOCK_BARK, (complexMaterial, settings) -> {
 				return new StripableBarkBlock(woodColor, getBlock("stripped_bark"));
 			})
 			.setBlockTags(BlockTags.LOGS, BlockTags.LOGS_THAT_BURN, tagBlockLog)
 			.setItemTags(ItemTags.LOGS, ItemTags.LOGS_THAT_BURN, tagItemLog)
 		);
-		addBlockEntry(new BlockEntry("planks", (complexMaterial, settings) -> {
+		addBlockEntry(new BlockEntry(BLOCK_PLANKS, (complexMaterial, settings) -> {
 			return new BaseBlock(settings);
 		}).setBlockTags(BlockTags.PLANKS).setItemTags(ItemTags.PLANKS));
 		
-		addBlockEntry(new BlockEntry("stairs", (complexMaterial, settings) -> {
-			return new BaseStairsBlock(getBlock("planks"));
+		addBlockEntry(new BlockEntry(BLOCK_STAIRS, (complexMaterial, settings) -> {
+			return new BaseStairsBlock(getBlock(BLOCK_PLANKS));
 		}).setBlockTags(BlockTags.WOODEN_STAIRS, BlockTags.STAIRS).setItemTags(ItemTags.WOODEN_STAIRS, ItemTags.STAIRS));
-		addBlockEntry(new BlockEntry("slab", (complexMaterial, settings) -> {
-			return new BaseSlabBlock(getBlock("planks"));
+		addBlockEntry(new BlockEntry(BLOCK_SLAB, (complexMaterial, settings) -> {
+			return new BaseSlabBlock(getBlock(BLOCK_PLANKS));
 		}).setBlockTags(BlockTags.WOODEN_SLABS, BlockTags.SLABS).setItemTags(ItemTags.WOODEN_SLABS, ItemTags.SLABS));
-		addBlockEntry(new BlockEntry("fence", (complexMaterial, settings) -> {
-			return new BaseFenceBlock(getBlock("planks"));
+		addBlockEntry(new BlockEntry(BLOCK_FENCE, (complexMaterial, settings) -> {
+			return new BaseFenceBlock(getBlock(BLOCK_PLANKS));
 		}).setBlockTags(BlockTags.FENCES, BlockTags.WOODEN_FENCES).setItemTags(ItemTags.FENCES, ItemTags.WOODEN_FENCES));
-		addBlockEntry(new BlockEntry("gate", (complexMaterial, settings) -> {
-			return new BaseGateBlock(getBlock("planks"));
+		addBlockEntry(new BlockEntry(BLOCK_GATE, (complexMaterial, settings) -> {
+			return new BaseGateBlock(getBlock(BLOCK_PLANKS));
 		}).setBlockTags(BlockTags.FENCE_GATES));
-		addBlockEntry(new BlockEntry("button", (complexMaterial, settings) -> {
-			return new BaseWoodenButtonBlock(getBlock("planks"));
+		addBlockEntry(new BlockEntry(BLOCK_BUTTON, (complexMaterial, settings) -> {
+			return new BaseWoodenButtonBlock(getBlock(BLOCK_PLANKS));
 		}).setBlockTags(BlockTags.BUTTONS, BlockTags.WOODEN_BUTTONS).setItemTags(ItemTags.BUTTONS, ItemTags.WOODEN_BUTTONS));
-		addBlockEntry(new BlockEntry("plate", (complexMaterial, settings) -> {
-			return new WoodenPressurePlateBlock(getBlock("planks"));
+		addBlockEntry(new BlockEntry(BLOCK_PRESSURE_PLATE, (complexMaterial, settings) -> {
+			return new WoodenPressurePlateBlock(getBlock(BLOCK_PLANKS));
 		}).setBlockTags(BlockTags.PRESSURE_PLATES, BlockTags.WOODEN_PRESSURE_PLATES).setItemTags(ItemTags.WOODEN_PRESSURE_PLATES));
-		addBlockEntry(new BlockEntry("trapdoor", (complexMaterial, settings) -> {
-			return new BaseTrapdoorBlock(getBlock("planks"));
+		addBlockEntry(new BlockEntry(BLOCK_TRAPDOOR, (complexMaterial, settings) -> {
+			return new BaseTrapdoorBlock(getBlock(BLOCK_PLANKS));
 		}).setBlockTags(BlockTags.TRAPDOORS, BlockTags.WOODEN_TRAPDOORS).setItemTags(ItemTags.TRAPDOORS, ItemTags.WOODEN_TRAPDOORS));
-		addBlockEntry(new BlockEntry("door", (complexMaterial, settings) -> {
-			return new BaseDoorBlock(getBlock("planks"));
+		addBlockEntry(new BlockEntry(BLOCK_DOOR, (complexMaterial, settings) -> {
+			return new BaseDoorBlock(getBlock(BLOCK_PLANKS));
 		}).setBlockTags(BlockTags.DOORS, BlockTags.WOODEN_DOORS).setItemTags(ItemTags.DOORS, ItemTags.WOODEN_DOORS));
 		
-		addBlockEntry(new BlockEntry("crafting_table", (complexMaterial, settings) -> {
-			return new BaseCraftingTableBlock(getBlock("planks"));
+		addBlockEntry(new BlockEntry(BLOCK_CRAFTING_TABLE, (complexMaterial, settings) -> {
+			return new BaseCraftingTableBlock(getBlock(BLOCK_PLANKS));
 		}).setBlockTags(TagAPI.BLOCK_WORKBENCHES).setItemTags(TagAPI.ITEM_WORKBENCHES));
-		addBlockEntry(new BlockEntry("ladder", (complexMaterial, settings) -> {
-			return new BaseLadderBlock(getBlock("planks"));
+		addBlockEntry(new BlockEntry(BLOCK_LADDER, (complexMaterial, settings) -> {
+			return new BaseLadderBlock(getBlock(BLOCK_PLANKS));
 		}).setBlockTags(BlockTags.CLIMBABLE));
-		addBlockEntry(new BlockEntry("sign", (complexMaterial, settings) -> {
-			return new BaseSignBlock(getBlock("planks"));
+		addBlockEntry(new BlockEntry(BLOCK_SIGN, (complexMaterial, settings) -> {
+			return new BaseSignBlock(getBlock(BLOCK_PLANKS));
 		}).setBlockTags(BlockTags.SIGNS).setItemTags(ItemTags.SIGNS));
 		
-		addBlockEntry(new BlockEntry("chest", (complexMaterial, settings) -> {
-			return new BaseChestBlock(getBlock("planks"));
+		addBlockEntry(new BlockEntry(BLOCK_CHEST, (complexMaterial, settings) -> {
+			return new BaseChestBlock(getBlock(BLOCK_PLANKS));
 		}).setBlockTags(TagAPI.BLOCK_CHEST).setItemTags(TagAPI.ITEM_CHEST));
-		addBlockEntry(new BlockEntry("barrel", (complexMaterial, settings) -> {
-			return new BaseBarrelBlock(getBlock("planks"));
+		addBlockEntry(new BlockEntry(BLOCK_BARREL, (complexMaterial, settings) -> {
+			return new BaseBarrelBlock(getBlock(BLOCK_PLANKS));
 		}));
-		addBlockEntry(new BlockEntry("bookshelf", (complexMaterial, settings) -> {
-			return new BaseBookshelfBlock(getBlock("planks"));
+		addBlockEntry(new BlockEntry(BLOCK_BOOKSHELF, (complexMaterial, settings) -> {
+			return new BaseBookshelfBlock(getBlock(BLOCK_PLANKS));
 		}).setBlockTags(TagAPI.BLOCK_BOOKSHELVES));
-		addBlockEntry(new BlockEntry("composter", (complexMaterial, settings) -> {
-			return new BaseComposterBlock(getBlock("planks"));
+		addBlockEntry(new BlockEntry(BLOCK_COMPOSTER, (complexMaterial, settings) -> {
+			return new BaseComposterBlock(getBlock(BLOCK_PLANKS));
 		}));
 	}
 	
-	protected void initFlammable() {
-		FlammableBlockRegistry.getDefaultInstance().add(getBlock("log"), 5, 5);
-		FlammableBlockRegistry.getDefaultInstance().add(getBlock("bark"), 5, 5);
-		FlammableBlockRegistry.getDefaultInstance().add(getBlock("stripped_log"), 5, 5);
-		FlammableBlockRegistry.getDefaultInstance().add(getBlock("stripped_bark"), 5, 5);
+	@Override
+	protected void initFlammable(FlammableBlockRegistry registry) {
+		getBlocks().forEach(block -> {
+			registry.add(block, 5, 20);
+		});
 		
-		FlammableBlockRegistry.getDefaultInstance().add(getBlock("planks"), 5, 20);
-		FlammableBlockRegistry.getDefaultInstance().add(getBlock("stairs"), 5, 20);
-		FlammableBlockRegistry.getDefaultInstance().add(getBlock("slab"), 5, 20);
-		
-		FlammableBlockRegistry.getDefaultInstance().add(getBlock("fence"), 5, 20);
-		FlammableBlockRegistry.getDefaultInstance().add(getBlock("gate"), 5, 20);
-		FlammableBlockRegistry.getDefaultInstance().add(getBlock("button"), 5, 20);
-		FlammableBlockRegistry.getDefaultInstance().add(getBlock("plate"), 5, 20);
-		FlammableBlockRegistry.getDefaultInstance().add(getBlock("trapdoor"), 5, 20);
-		FlammableBlockRegistry.getDefaultInstance().add(getBlock("door"), 5, 20);
-		
-		FlammableBlockRegistry.getDefaultInstance().add(getBlock("crafting_table"), 5, 20);
-		FlammableBlockRegistry.getDefaultInstance().add(getBlock("ladder"), 5, 20);
-		FlammableBlockRegistry.getDefaultInstance().add(getBlock("sign"), 5, 20);
-		
-		FlammableBlockRegistry.getDefaultInstance().add(getBlock("chest"), 5, 20);
-		FlammableBlockRegistry.getDefaultInstance().add(getBlock("barrel"), 5, 20);
-		FlammableBlockRegistry.getDefaultInstance().add(getBlock("bookshelf"), 5, 20);
-		FlammableBlockRegistry.getDefaultInstance().add(getBlock("composter"), 5, 20);
+		registry.add(getBlock(BLOCK_LOG), 5, 5);
+		registry.add(getBlock(BLOCK_BARK), 5, 5);
+		registry.add(getBlock(BLOCK_STRIPPED_LOG), 5, 5);
+		registry.add(getBlock(BLOCK_STRIPPED_BARK), 5, 5);
 	}
 	
 	@Override
 	public void initRecipes(PathConfig recipeConfig) {
-		Block log_stripped = getBlock("stripped_log");
-		Block bark_stripped = getBlock("stripped_bark");
-		Block log = getBlock("log");
-		Block bark = getBlock("bark");
-		Block planks = getBlock("planks");
-		Block stairs = getBlock("stairs");
-		Block slab = getBlock("slab");
-		Block fence = getBlock("fence");
+		Block log_stripped = getBlock(BLOCK_STRIPPED_LOG);
+		Block bark_stripped = getBlock(BLOCK_STRIPPED_BARK);
+		Block log = getBlock(BLOCK_LOG);
+		Block bark = getBlock(BLOCK_BARK);
+		Block planks = getBlock(BLOCK_PLANKS);
+		Block stairs = getBlock(BLOCK_STAIRS);
+		Block slab = getBlock(BLOCK_SLAB);
+		Block fence = getBlock(BLOCK_FENCE);
 		Block gate = getBlock("gate");
 		Block button = getBlock("button");
 		Block pressurePlate = getBlock("plate");

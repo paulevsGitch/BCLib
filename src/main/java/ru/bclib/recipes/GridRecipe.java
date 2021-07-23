@@ -45,7 +45,7 @@ public class GridRecipe {
 		INSTANCE.materialKeys.clear();
 		INSTANCE.count = 1;
 		
-		INSTANCE.exist = BCLRecipeManager.exists(output);
+		INSTANCE.exist = output != null && BCLRecipeManager.exists(output);
 		
 		return INSTANCE;
 	}
