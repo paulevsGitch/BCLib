@@ -64,6 +64,12 @@ BCLib is a library mod for BetterX team mods, developed for Fabric, MC 1.17.1
 * Block helper:
   * Some useful functions to operate with blocks;
 
+### Complex Materials
+* Utility classes used for mass content generation (wooden blocks, stone blocks, etc.);
+* Contains a set of defined blocks, items, recipes and tags;
+* Can be modified before mods startup (will add new block type for all instances in all mods);
+* All inner blocks and items are Patterned (will have auto-generated models with ability to override them with resource packs or mod resources).
+
 ### Pre-Defined Blocks and Items:
 * Most basic blocks from MC;
 * Automatic item & block model generation;
