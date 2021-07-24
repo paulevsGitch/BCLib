@@ -1,7 +1,11 @@
 package ru.bclib.client.models;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.mojang.datafixers.util.Pair;
+import com.mojang.math.Vector3f;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
@@ -19,6 +23,8 @@ import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
+import ru.bclib.util.BlocksHelper;
+import ru.bclib.util.MHelper;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -28,35 +34,42 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.function.Function;
 
+@Environment(EnvType.CLIENT)
 public class OBJBlockModel implements UnbakedModel, BakedModel {
-	private static final byte[] QUAD_INDEXES = new byte[] {0, 1, 2, 0, 2, 3};
+	private static final Vector3f[] POSITIONS = new Vector3f[] { new Vector3f(), new Vector3f(), new Vector3f() };
+	
+	protected final Map<Direction, List<UnbakedQuad>> quadsUnbakedMap = Maps.newHashMap();
+	protected final Map<Direction, List<BakedQuad>> quadsBakedMap = Maps.newHashMap();
+	protected final List<UnbakedQuad> quadsUnbaked = Lists.newArrayList();
+	protected final List<BakedQuad> quadsBaked = Lists.newArrayList();
 	
 	protected TextureAtlasSprite[] sprites;
-	protected TextureAtlasSprite particles;
 	protected ItemTransforms transforms;
 	protected ItemOverrides overrides;
 	
-	protected List<UnbakedQuad> quadsUnbaked;
-	protected Material particleMaterial;
 	protected List<Material> materials;
-	protected List<BakedQuad> quads;
+	protected boolean useCulling;
+	protected boolean useShading;
+	protected byte particleIndex;
 	
-	public OBJBlockModel(ResourceLocation location, ResourceLocation particleTextureID, ResourceLocation... textureIDs) {
+	public OBJBlockModel(ResourceLocation location, boolean useCulling, boolean useShading, byte particleIndex, ResourceLocation... textureIDs) {
+		for (Direction dir: BlocksHelper.DIRECTIONS) {
+			quadsUnbakedMap.put(dir, Lists.newArrayList());
+			quadsBakedMap.put(dir, Lists.newArrayList());
+		}
 		transforms = ItemTransforms.NO_TRANSFORMS;
 		overrides = ItemOverrides.EMPTY;
-		
-		quadsUnbaked = Lists.newArrayList();
-		materials = Lists.newArrayList();
-		
-		loadModel(location, textureIDs);
-		
-		quads = new ArrayList<>(quadsUnbaked.size());
-		particleMaterial = new Material(TextureAtlas.LOCATION_BLOCKS, particleTextureID);
+		materials = new ArrayList<>(textureIDs.length + 1);
 		sprites = new TextureAtlasSprite[materials.size()];
+		this.particleIndex = particleIndex;
+		this.useCulling = useCulling;
+		this.useShading = useShading;
+		loadModel(location, textureIDs);
 	}
 	
 	// UnbakedModel //
@@ -77,9 +90,14 @@ public class OBJBlockModel implements UnbakedModel, BakedModel {
 		for (int i = 0; i < sprites.length; i++) {
 			sprites[i] = textureGetter.apply(materials.get(i));
 		}
-		particles = textureGetter.apply(particleMaterial);
-		quads.clear();
-		quadsUnbaked.forEach(quad -> quads.add(quad.bake(sprites)));
+		quadsBaked.clear();
+		quadsUnbaked.forEach(quad -> quadsBaked.add(quad.bake(sprites)));
+		for (Direction dir: BlocksHelper.DIRECTIONS) {
+			List<UnbakedQuad> unbaked = quadsUnbakedMap.get(dir);
+			List<BakedQuad> baked = quadsBakedMap.get(dir);
+			baked.clear();
+			unbaked.forEach(quad -> baked.add(quad.bake(sprites)));
+		}
 		return this;
 	}
 	
@@ -87,7 +105,7 @@ public class OBJBlockModel implements UnbakedModel, BakedModel {
 	
 	@Override
 	public List<BakedQuad> getQuads(@Nullable BlockState blockState, @Nullable Direction direction, Random random) {
-		return direction == null ? quads : Collections.emptyList();
+		return direction == null ? quadsBaked : quadsBakedMap.get(direction);
 	}
 	
 	@Override
@@ -112,7 +130,7 @@ public class OBJBlockModel implements UnbakedModel, BakedModel {
 	
 	@Override
 	public TextureAtlasSprite getParticleIcon() {
-		return particles;
+		return sprites[particleIndex];
 	}
 	
 	@Override
@@ -219,7 +237,18 @@ public class OBJBlockModel implements UnbakedModel, BakedModel {
 						}
 					}
 					quad.setSpriteIndex(materialIndex);
-					quadsUnbaked.add(quad);
+					if (useShading) {
+						Direction dir = getNormalDirection(quad);
+						quad.setDirection(dir);
+						quad.setShading(true);
+					}
+					if (useCulling) {
+						Direction dir = getCullingDirection(quad);
+						quadsUnbakedMap.get(dir).add(quad);
+					}
+					else {
+						quadsUnbaked.add(quad);
+					}
 				}
 			}
 			
@@ -237,5 +266,34 @@ public class OBJBlockModel implements UnbakedModel, BakedModel {
 			int index = Math.min(materialIndex, maxID);
 			materials.add(new Material(TextureAtlas.LOCATION_BLOCKS, textureIDs[index]));
 		}
+	}
+	
+	private Direction getNormalDirection(UnbakedQuad quad) {
+		Vector3f pos = quad.getPos(0, POSITIONS[0]);
+		Vector3f dirA = quad.getPos(1, POSITIONS[1]);
+		Vector3f dirB = quad.getPos(2, POSITIONS[2]);
+		dirA.sub(pos);
+		dirB.sub(pos);
+		pos = MHelper.cross(dirA, dirB);
+		return Direction.getNearest(pos.x(), pos.y(), pos.z());
+	}
+	
+	@Nullable
+	private Direction getCullingDirection(UnbakedQuad quad) {
+		Direction dir = null;
+		for (int i = 0; i < 4; i++) {
+			Vector3f pos = quad.getPos(i, POSITIONS[0]);
+			if (pos.x() < 1 || pos.x() > 0 || pos.y() < 1 || pos.y() > 0 || pos.z() < 1 || pos.z() > 0) {
+				return null;
+			}
+			Direction newDir = Direction.getNearest(pos.x(), pos.y(), pos.z());
+			if (dir == null) {
+				dir = newDir;
+			}
+			else if (newDir != dir) {
+				return null;
+			}
+		}
+		return dir;
 	}
 }
