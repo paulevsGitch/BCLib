@@ -43,8 +43,8 @@ import java.util.function.Function;
 public class OBJBlockModel implements UnbakedModel, BakedModel {
 	private static final Vector3f[] POSITIONS = new Vector3f[] { new Vector3f(), new Vector3f(), new Vector3f() };
 	
-	protected final Map<Direction, List<UnbakedQuad>> quadsUnbakedMap = Maps.newHashMap();
-	protected final Map<Direction, List<BakedQuad>> quadsBakedMap = Maps.newHashMap();
+	protected final Map<Direction, List<UnbakedQuad>> quadsUnbakedMap = Maps.newEnumMap(Direction.class);
+	protected final Map<Direction, List<BakedQuad>> quadsBakedMap = Maps.newEnumMap(Direction.class);
 	protected final List<UnbakedQuad> quadsUnbaked = Lists.newArrayList();
 	protected final List<BakedQuad> quadsBaked = Lists.newArrayList();
 	
@@ -65,7 +65,7 @@ public class OBJBlockModel implements UnbakedModel, BakedModel {
 		transforms = ItemTransforms.NO_TRANSFORMS;
 		overrides = ItemOverrides.EMPTY;
 		materials = new ArrayList<>(textureIDs.length + 1);
-		sprites = new TextureAtlasSprite[materials.size()];
+		sprites = new TextureAtlasSprite[textureIDs.length + 1];
 		this.particleIndex = particleIndex;
 		this.useCulling = useCulling;
 		this.useShading = useShading;
@@ -244,7 +244,12 @@ public class OBJBlockModel implements UnbakedModel, BakedModel {
 					}
 					if (useCulling) {
 						Direction dir = getCullingDirection(quad);
-						quadsUnbakedMap.get(dir).add(quad);
+						if (dir == null) {
+							quadsUnbaked.add(quad);
+						}
+						else {
+							quadsUnbakedMap.get(dir).add(quad);
+						}
 					}
 					else {
 						quadsUnbaked.add(quad);
@@ -283,10 +288,10 @@ public class OBJBlockModel implements UnbakedModel, BakedModel {
 		Direction dir = null;
 		for (int i = 0; i < 4; i++) {
 			Vector3f pos = quad.getPos(i, POSITIONS[0]);
-			if (pos.x() < 1 || pos.x() > 0 || pos.y() < 1 || pos.y() > 0 || pos.z() < 1 || pos.z() > 0) {
+			if (pos.x() < 1 && pos.x() > 0 && pos.y() < 1 && pos.y() > 0 && pos.z() < 1 && pos.z() > 0) {
 				return null;
 			}
-			Direction newDir = Direction.getNearest(pos.x(), pos.y(), pos.z());
+			Direction newDir = Direction.getNearest(pos.x() - 0.5F, pos.y() - 0.5F, pos.z() - 0.5F);
 			if (dir == null) {
 				dir = newDir;
 			}
