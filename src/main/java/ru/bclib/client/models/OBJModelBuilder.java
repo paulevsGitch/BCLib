@@ -1,6 +1,7 @@
 package ru.bclib.client.models;
 
 import com.google.common.collect.Lists;
+import com.mojang.math.Vector3f;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.resources.ResourceLocation;
@@ -15,6 +16,7 @@ public class OBJModelBuilder {
 	private ResourceLocation particles;
 	private boolean useCulling;
 	private boolean useShading;
+	private Vector3f offset;
 	
 	private OBJModelBuilder() {}
 	
@@ -24,6 +26,7 @@ public class OBJModelBuilder {
 	 */
 	public static OBJModelBuilder start(ResourceLocation modelLocation) {
 		INSTANCE.modelLocation = modelLocation;
+		INSTANCE.offset.set(0, 0, 0);
 		INSTANCE.useCulling = true;
 		INSTANCE.useShading = true;
 		INSTANCE.particles = null;
@@ -76,6 +79,11 @@ public class OBJModelBuilder {
 		return this;
 	}
 	
+	public OBJModelBuilder setOffset(float x, float y, float z) {
+		this.offset.set(x, y, z);
+		return this;
+	}
+	
 	/**
 	 * Builds model from all required data.
 	 * @return {@link OBJBlockModel}.
@@ -90,6 +98,6 @@ public class OBJModelBuilder {
 			}
 		}
 		ResourceLocation[] sprites = textures.toArray(new ResourceLocation[textures.size()]);
-		return new OBJBlockModel(modelLocation, useCulling, useShading, particleIndex, sprites);
+		return new OBJBlockModel(modelLocation, offset, useCulling, useShading, particleIndex, sprites);
 	}
 }

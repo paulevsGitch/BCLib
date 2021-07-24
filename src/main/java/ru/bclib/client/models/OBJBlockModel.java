@@ -57,7 +57,7 @@ public class OBJBlockModel implements UnbakedModel, BakedModel {
 	protected boolean useShading;
 	protected byte particleIndex;
 	
-	public OBJBlockModel(ResourceLocation location, boolean useCulling, boolean useShading, byte particleIndex, ResourceLocation... textureIDs) {
+	public OBJBlockModel(ResourceLocation location, Vector3f offset, boolean useCulling, boolean useShading, byte particleIndex, ResourceLocation... textureIDs) {
 		for (Direction dir: BlocksHelper.DIRECTIONS) {
 			quadsUnbakedMap.put(dir, Lists.newArrayList());
 			quadsBakedMap.put(dir, Lists.newArrayList());
@@ -69,7 +69,7 @@ public class OBJBlockModel implements UnbakedModel, BakedModel {
 		this.particleIndex = particleIndex;
 		this.useCulling = useCulling;
 		this.useShading = useShading;
-		loadModel(location, textureIDs);
+		loadModel(location, textureIDs, offset);
 	}
 	
 	// UnbakedModel //
@@ -163,7 +163,7 @@ public class OBJBlockModel implements UnbakedModel, BakedModel {
 		return resource;
 	}
 	
-	private void loadModel(ResourceLocation location, ResourceLocation[] textureIDs) {
+	private void loadModel(ResourceLocation location, ResourceLocation[] textureIDs, Vector3f offset) {
 		Resource resource = getResource(location);
 		if (resource == null) {
 			return;
@@ -227,9 +227,9 @@ public class OBJBlockModel implements UnbakedModel, BakedModel {
 					for (int i = 0; i < 4; i++) {
 						int index = vertexIndex.get(i) * 3;
 						int quadIndex = i * 5;
-						quad.addData(quadIndex++, vertecies.get(index++)); // X
-						quad.addData(quadIndex++, vertecies.get(index++)); // Y
-						quad.addData(quadIndex++, vertecies.get(index));   // Z
+						quad.addData(quadIndex++, vertecies.get(index++) + offset.x()); // X
+						quad.addData(quadIndex++, vertecies.get(index++) + offset.y()); // Y
+						quad.addData(quadIndex++, vertecies.get(index) + offset.z());   // Z
 						if (hasUV) {
 							index = uvIndex.get(i) * 2;
 							quad.addData(quadIndex++, uvs.get(index++) * 16F);   // U
