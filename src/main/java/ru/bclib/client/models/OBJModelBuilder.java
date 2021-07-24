@@ -12,11 +12,11 @@ import java.util.List;
 public class OBJModelBuilder {
 	private static final OBJModelBuilder INSTANCE = new OBJModelBuilder();
 	private final List<ResourceLocation> textures = Lists.newArrayList();
+	private Vector3f offset = new Vector3f();
 	private ResourceLocation modelLocation;
 	private ResourceLocation particles;
 	private boolean useCulling;
 	private boolean useShading;
-	private Vector3f offset;
 	
 	private OBJModelBuilder() {}
 	
