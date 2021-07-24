@@ -103,7 +103,6 @@ public class ModelsHelper {
 		
 		public ModelPart part(ResourceLocation modelId) {
 			ModelPart part = new ModelPart(modelId);
-			modelParts.add(part);
 			return part;
 		}
 		
