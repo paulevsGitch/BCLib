@@ -95,12 +95,12 @@ public class OBJBlockModel implements UnbakedModel, BakedModel {
 			sprites[i] = textureGetter.apply(materials.get(i));
 		}
 		quadsBaked.clear();
-		quadsUnbaked.forEach(quad -> quadsBaked.add(quad.bake(sprites)));
+		quadsUnbaked.forEach(quad -> quadsBaked.add(quad.bake(sprites, modelState)));
 		for (Direction dir: BlocksHelper.DIRECTIONS) {
 			List<UnbakedQuad> unbaked = quadsUnbakedMap.get(dir);
 			List<BakedQuad> baked = quadsBakedMap.get(dir);
 			baked.clear();
-			unbaked.forEach(quad -> baked.add(quad.bake(sprites)));
+			unbaked.forEach(quad -> baked.add(quad.bake(sprites, modelState)));
 		}
 		return this;
 	}
