@@ -102,7 +102,9 @@ public class ModelsHelper {
 		private MultiPartBuilder() {}
 		
 		public ModelPart part(ResourceLocation modelId) {
-			return new ModelPart(modelId);
+			ModelPart part = new ModelPart(modelId);
+			modelParts.add(part);
+			return part;
 		}
 		
 		public MultiPart build() {

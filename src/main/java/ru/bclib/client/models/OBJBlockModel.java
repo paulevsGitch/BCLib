@@ -20,7 +20,6 @@ import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
-import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 import ru.bclib.util.BlocksHelper;
@@ -62,14 +61,19 @@ public class OBJBlockModel implements UnbakedModel, BakedModel {
 			quadsUnbakedMap.put(dir, Lists.newArrayList());
 			quadsBakedMap.put(dir, Lists.newArrayList());
 		}
+		
 		transforms = ItemTransforms.NO_TRANSFORMS;
 		overrides = ItemOverrides.EMPTY;
-		materials = new ArrayList<>(textureIDs.length + 1);
-		sprites = new TextureAtlasSprite[textureIDs.length + 1];
+		materials = new ArrayList<>(textureIDs.length);
+		sprites = new TextureAtlasSprite[textureIDs.length];
 		this.particleIndex = particleIndex;
 		this.useCulling = useCulling;
 		this.useShading = useShading;
-		loadModel(location, textureIDs, offset);
+		loadModel(location, offset, (byte) (textureIDs.length - 1));
+		
+		for (int i = 0; i < textureIDs.length; i++) {
+			materials.add(new Material(TextureAtlas.LOCATION_BLOCKS, textureIDs[i]));
+		}
 	}
 	
 	// UnbakedModel //
@@ -163,7 +167,7 @@ public class OBJBlockModel implements UnbakedModel, BakedModel {
 		return resource;
 	}
 	
-	private void loadModel(ResourceLocation location, ResourceLocation[] textureIDs, Vector3f offset) {
+	private void loadModel(ResourceLocation location, Vector3f offset, byte maxIndex) {
 		Resource resource = getResource(location);
 		if (resource == null) {
 			return;
@@ -176,8 +180,7 @@ public class OBJBlockModel implements UnbakedModel, BakedModel {
 		List<Integer> vertexIndex = new ArrayList<>(4);
 		List<Integer> uvIndex = new ArrayList<>(4);
 		
-		byte materialIndex = 0;
-		int vertCount = 0;
+		byte materialIndex = -1;
 		
 		try {
 			InputStreamReader streamReader = new InputStreamReader(input);
@@ -185,9 +188,11 @@ public class OBJBlockModel implements UnbakedModel, BakedModel {
 			String string;
 			
 			while ((string = reader.readLine()) != null) {
-				if ((string.startsWith("usemtl") || string.startsWith("g")) && vertCount != vertecies.size()) {
-					vertCount = vertecies.size();
+				if (string.startsWith("usemtl")) {
 					materialIndex++;
+					if (materialIndex > maxIndex) {
+						materialIndex = maxIndex;
+					}
 				}
 				else if (string.startsWith("vt")) {
 					String[] uv = string.split(" ");
@@ -266,10 +271,9 @@ public class OBJBlockModel implements UnbakedModel, BakedModel {
 			e.printStackTrace();
 		}
 		
-		int maxID = textureIDs.length - 1;
-		for (int i = 0; i <= materialIndex; i++) {
-			int index = Math.min(materialIndex, maxID);
-			materials.add(new Material(TextureAtlas.LOCATION_BLOCKS, textureIDs[index]));
+		if (materialIndex < 0) {
+			quadsUnbaked.forEach(quad -> quad.setSpriteIndex(0));
+			quadsUnbakedMap.values().forEach(list -> list.forEach(quad -> quad.setSpriteIndex(0)));
 		}
 	}
 	
