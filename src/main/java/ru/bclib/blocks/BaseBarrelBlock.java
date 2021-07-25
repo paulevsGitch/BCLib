@@ -96,52 +96,33 @@ public class BaseBarrelBlock extends BarrelBlock implements BlockModelProvider {
 		}
 	}
 	
-	@Override
 	@Environment(EnvType.CLIENT)
-	public BlockModel getItemModel(ResourceLocation blockId) {
-		return getBlockModel(blockId, defaultBlockState());
-	}
-	
-	@Override
-	@Environment(EnvType.CLIENT)
-	public @Nullable BlockModel getBlockModel(ResourceLocation blockId, BlockState blockState) {
-		Optional<String> pattern;
-		if (blockState.getValue(OPEN)) {
-			pattern = PatternsHelper.createJson(BasePatterns.BLOCK_BARREL_OPEN, blockId);
-		}
-		else {
-			pattern = PatternsHelper.createJson(BasePatterns.BLOCK_BOTTOM_TOP, blockId);
-		}
-		return ModelsHelper.fromPattern(pattern);
-	}
-	
-	@Override
-	@Environment(EnvType.CLIENT)
-	public UnbakedModel getModelVariant(ResourceLocation stateId, BlockState blockState, Map<ResourceLocation, UnbakedModel> modelCache) {
-		String open = blockState.getValue(OPEN) ? "_open" : "";
-		ResourceLocation modelId = new ResourceLocation(stateId.getNamespace(), "block/" + stateId.getPath() + open);
-		registerBlockModel(stateId, modelId, blockState, modelCache);
-		Direction facing = blockState.getValue(FACING);
-		BlockModelRotation rotation = BlockModelRotation.X0_Y0;
-		switch (facing) {
-			case NORTH:
-				rotation = BlockModelRotation.X90_Y0;
-				break;
-			case EAST:
-				rotation = BlockModelRotation.X90_Y90;
-				break;
-			case SOUTH:
-				rotation = BlockModelRotation.X90_Y180;
-				break;
-			case WEST:
-				rotation = BlockModelRotation.X90_Y270;
-				break;
-			case DOWN:
-				rotation = BlockModelRotation.X180_Y0;
-				break;
-			default:
-				break;
-		}
-		return ModelsHelper.createMultiVariant(modelId, rotation.getRotation(), false);
+	public void registerModels(ResourceLocation blockID, Map<ResourceLocation, UnbakedModel> modelRegistry, Map<ResourceLocation, UnbakedModel> unbakedCache) {
+		this.stateDefinition.getPossibleStates().forEach(blockState -> {
+			String open = blockState.getValue(OPEN) ? "_open" : "";
+			ResourceLocation modelId = new ResourceLocation(blockID.getNamespace(), "block/" + blockID.getPath() + open);
+			Direction facing = blockState.getValue(FACING);
+			BlockModelRotation rotation = BlockModelRotation.X0_Y0;
+			switch (facing) {
+				case NORTH:
+					rotation = BlockModelRotation.X90_Y0;
+					break;
+				case EAST:
+					rotation = BlockModelRotation.X90_Y90;
+					break;
+				case SOUTH:
+					rotation = BlockModelRotation.X90_Y180;
+					break;
+				case WEST:
+					rotation = BlockModelRotation.X90_Y270;
+					break;
+				case DOWN:
+					rotation = BlockModelRotation.X180_Y0;
+					break;
+				default:
+					break;
+			}
+			modelRegistry.put(modelId, ModelsHelper.createMultiVariant(modelId, rotation.getRotation(), false));
+		});
 	}
 }

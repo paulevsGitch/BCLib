@@ -4,6 +4,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.client.renderer.block.model.BlockModel;
+import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -20,6 +21,7 @@ import ru.bclib.client.models.PatternsHelper;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class BaseBookshelfBlock extends BaseBlock {
@@ -41,9 +43,9 @@ public class BaseBookshelfBlock extends BaseBlock {
 	
 	@Override
 	@Environment(EnvType.CLIENT)
-	public @Nullable BlockModel getBlockModel(ResourceLocation blockId, BlockState blockState) {
-		Optional<String> pattern = PatternsHelper.createJson(BasePatterns.BLOCK_BOOKSHELF, replacePath(blockId));
-		return ModelsHelper.fromPattern(pattern);
+	public void registerModels(ResourceLocation blockID, Map<ResourceLocation, UnbakedModel> modelRegistry, Map<ResourceLocation, UnbakedModel> unbakedCache) {
+		Optional<String> pattern = PatternsHelper.createJson(BasePatterns.BLOCK_BOOKSHELF, replacePath(blockID));
+		modelRegistry.put(blockID, ModelsHelper.fromPattern(pattern));
 	}
 	
 	private ResourceLocation replacePath(ResourceLocation blockId) {
