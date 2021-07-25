@@ -1,5 +1,7 @@
 package ru.bclib.mixin.client;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import net.minecraft.client.renderer.block.BlockModelShaper;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.renderer.block.model.multipart.MultiPart;
@@ -23,6 +25,7 @@ import ru.bclib.BCLib;
 import ru.bclib.interfaces.BlockModelProvider;
 import ru.bclib.interfaces.ItemModelProvider;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -39,6 +42,8 @@ public abstract class ModelBakeryMixin {
 	@Shadow
 	protected abstract void cacheAndQueueDependencies(ResourceLocation resourceLocation, UnbakedModel unbakedModel);
 	
+	private final Map<ResourceLocation, UnbakedModel> modelRegistry = Maps.newHashMap();
+	
 	@Inject(method = "loadModel", at = @At("HEAD"), cancellable = true)
 	private void bclib_loadModels(ResourceLocation resourceLocation, CallbackInfo info) {
 		if (resourceLocation instanceof ModelResourceLocation) {
@@ -46,53 +51,13 @@ public abstract class ModelBakeryMixin {
 			String path = resourceLocation.getPath();
 			ResourceLocation clearLoc = new ResourceLocation(modId, path);
 			ModelResourceLocation modelId = (ModelResourceLocation) resourceLocation;
-			
-			if ("inventory".equals(modelId.getVariant())) {
+			if (modelId.getVariant().equals("inventory")) {
 				if (bclib_loadItemModel(modId, path, clearLoc, modelId)) {
 					info.cancel();
 				}
 			}
-			else {
-				ResourceLocation stateLoc = new ResourceLocation(modId, "blockstates/" + path + ".json");
-				if (!resourceManager.hasResource(stateLoc)) {
-					Block block = Registry.BLOCK.get(clearLoc);
-					if (block instanceof BlockModelProvider) {
-						List<BlockState> possibleStates = block.getStateDefinition().getPossibleStates();
-						Optional<BlockState> possibleState = possibleStates
-							.stream()
-							.filter(state -> modelId.equals(
-								BlockModelShaper.stateToModelLocation(
-									clearLoc,
-									state
-								)
-							)).findFirst();
-						if (possibleState.isPresent()) {
-							UnbakedModel modelVariant = ((BlockModelProvider) block).getModelVariant(
-								modelId,
-								possibleState.get(),
-								unbakedCache
-							);
-							if (modelVariant != null) {
-								if (modelVariant instanceof MultiPart) {
-									possibleStates.forEach(state -> {
-										ResourceLocation stateId = BlockModelShaper.stateToModelLocation(
-											clearLoc,
-											state
-										);
-										cacheAndQueueDependencies(stateId, modelVariant);
-									});
-								}
-								else {
-									cacheAndQueueDependencies(modelId, modelVariant);
-								}
-							}
-							else {
-								BCLib.LOGGER.warning("Error loading variant: {}", modelId);
-							}
-							info.cancel();
-						}
-					}
-				}
+			else if (bclib_loadBlockModel(modId, path, clearLoc, modelId)) {
+				info.cancel();
 			}
 		}
 	}
@@ -152,36 +117,27 @@ public abstract class ModelBakeryMixin {
 			return false;
 		}
 		
-		List<BlockState> possibleStates = block.getStateDefinition().getPossibleStates();
-		Optional<BlockState> possibleState = possibleStates
-			.stream()
-			.filter(state -> modelId.equals(
-				BlockModelShaper.stateToModelLocation(
-					clearLoc,
-					state
-				)
-			)).findFirst();
+		BlockModelProvider modelProvider = (BlockModelProvider) block;
 		
-		if (!possibleState.isPresent()) {
-			return false;
-		}
-		
-		UnbakedModel model = ((BlockModelProvider) block).getModelVariant(modelId, possibleState.get(), unbakedCache);
-		if (model != null) {
+		modelRegistry.clear();
+		modelProvider.registerModels(new ResourceLocation(modId, path), modelRegistry, unbakedCache);
+		modelRegistry.forEach((id, model) -> {
 			bclib_updateModelName(model, modelId);
-			if (model instanceof MultiPart) {
-				possibleStates.forEach(state -> {
-					ResourceLocation stateId = BlockModelShaper.stateToModelLocation(clearLoc, state);
-					cacheAndQueueDependencies(stateId, model);
-				});
+			unbakedCache.put(id, model);
+		});
+		
+		List<BlockState> possibleStates = block.getStateDefinition().getPossibleStates();
+		possibleStates.forEach(state -> {
+			ResourceLocation stateId = BlockModelShaper.stateToModelLocation(clearLoc, state);
+			ResourceLocation modelID = modelProvider.getStateModel(stateId, state);
+			UnbakedModel model = unbakedCache.get(modelID);
+			if (model != null) {
+				cacheAndQueueDependencies(stateId, model);
 			}
 			else {
-				cacheAndQueueDependencies(modelId, model);
+				BCLib.LOGGER.warning("Error loading variant: {}", modelId);
 			}
-		}
-		else {
-			BCLib.LOGGER.warning("Error loading variant: {}", modelId);
-		}
+		});
 		
 		return true;
 	}
