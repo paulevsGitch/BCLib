@@ -13,7 +13,7 @@ public interface BlockModelProvider extends ItemModelProvider {
 	default void registerModels(ResourceLocation blockID, Map<ResourceLocation, UnbakedModel> modelRegistry, Map<ResourceLocation, UnbakedModel> unbakedCache) {}
 	
 	@Environment(EnvType.CLIENT)
-	default ResourceLocation getStateModel(ResourceLocation stateId, BlockState blockState) {
+	default ResourceLocation getStateModel(ResourceLocation blockID, ResourceLocation stateId, BlockState blockState) {
 		return new ResourceLocation(stateId.getNamespace(), "block/" + stateId.getPath());
 	}
 }

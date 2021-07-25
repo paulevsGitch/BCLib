@@ -3,6 +3,7 @@ package ru.bclib.blocks;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
+import net.minecraft.client.renderer.block.BlockModelShaper;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.resources.ResourceLocation;
@@ -38,23 +39,14 @@ public class BaseRotatedPillarBlock extends RotatedPillarBlock implements BlockM
 	
 	@Override
 	@Environment(EnvType.CLIENT)
-	public BlockModel getItemModel(ResourceLocation blockId) {
-		return getBlockModel(blockId, defaultBlockState());
+	public void registerModels(ResourceLocation blockID, Map<ResourceLocation, UnbakedModel> modelRegistry, Map<ResourceLocation, UnbakedModel> unbakedCache) {
+		Optional<String> pattern = createBlockPattern(blockID);
+		modelRegistry.put(blockID, ModelsHelper.fromPattern(pattern));
 	}
 	
-	@Override
 	@Environment(EnvType.CLIENT)
-	public @Nullable BlockModel getBlockModel(ResourceLocation blockId, BlockState blockState) {
-		Optional<String> pattern = createBlockPattern(blockId);
-		return ModelsHelper.fromPattern(pattern);
-	}
-	
-	@Override
-	@Environment(EnvType.CLIENT)
-	public UnbakedModel getModelVariant(ResourceLocation stateId, BlockState blockState, Map<ResourceLocation, UnbakedModel> modelCache) {
-		ResourceLocation modelId = new ResourceLocation(stateId.getNamespace(), "block/" + stateId.getPath());
-		registerBlockModel(stateId, modelId, blockState, modelCache);
-		return ModelsHelper.createRotatedModel(modelId, blockState.getValue(AXIS));
+	public ResourceLocation getStateModel(ResourceLocation blockID, ResourceLocation stateId, BlockState blockState) {
+		return blockID;
 	}
 	
 	protected Optional<String> createBlockPattern(ResourceLocation blockId) {

@@ -70,9 +70,9 @@ public abstract class BaseAnvilBlock extends AnvilBlock implements BlockModelPro
 	
 	@Override
 	@Environment(EnvType.CLIENT)
-	public ResourceLocation getStateModel(ResourceLocation stateId, BlockState blockState) {
+	public ResourceLocation getStateModel(ResourceLocation blockID, ResourceLocation stateId, BlockState blockState) {
 		int destruction = blockState.getValue(DESTRUCTION);
-		return getModelLocation(destruction, stateId);
+		return getModelLocation(destruction, blockID);
 	}
 	
 	@Override

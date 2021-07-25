@@ -103,6 +103,7 @@ public abstract class ModelBakeryMixin {
 	
 	private boolean bclib_loadBlockModel(String modId, String path, ResourceLocation clearLoc, ResourceLocation modelId) {
 		ResourceLocation stateLoc = new ResourceLocation(modId, "blockstates/" + path + ".json");
+		ResourceLocation blockID = new ResourceLocation(modId, path);
 		
 		if (resourceManager.hasResource(stateLoc)) {
 			return false;
@@ -116,7 +117,7 @@ public abstract class ModelBakeryMixin {
 		BlockModelProvider modelProvider = (BlockModelProvider) block;
 		
 		modelRegistry.clear();
-		modelProvider.registerModels(new ResourceLocation(modId, path), modelRegistry, unbakedCache);
+		modelProvider.registerModels(blockID, modelRegistry, unbakedCache);
 		modelRegistry.forEach((id, model) -> {
 			bclib_updateModelName(model, modelId);
 			unbakedCache.put(id, model);
@@ -125,7 +126,7 @@ public abstract class ModelBakeryMixin {
 		List<BlockState> possibleStates = block.getStateDefinition().getPossibleStates();
 		possibleStates.forEach(state -> {
 			ResourceLocation stateId = BlockModelShaper.stateToModelLocation(clearLoc, state);
-			ResourceLocation modelID = modelProvider.getStateModel(stateId, state);
+			ResourceLocation modelID = modelProvider.getStateModel(blockID, stateId, state);
 			UnbakedModel model = unbakedCache.get(modelID);
 			if (model != null) {
 				cacheAndQueueDependencies(stateId, model);

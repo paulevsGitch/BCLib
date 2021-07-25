@@ -1,17 +1,23 @@
 package ru.bclib.blocks;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.client.renderer.block.model.BlockModel;
+import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.MaterialColor;
 import net.minecraft.world.level.storage.loot.LootContext;
+import ru.bclib.client.models.ModelsHelper;
+import ru.bclib.client.models.PatternsHelper;
 import ru.bclib.interfaces.BlockModelProvider;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 /**
@@ -44,14 +50,9 @@ public class BaseBlock extends Block implements BlockModelProvider {
 		return Collections.singletonList(new ItemStack(this));
 	}
 	
-	/**
-	 * {@inheritDoc}
-	 * <p>
-	 * This implementation will load the Block-Model and return it as the Item-Model
-	 */
-	@Override
-	public BlockModel getItemModel(ResourceLocation blockId) {
-		return getBlockModel(blockId, defaultBlockState());
+	@Environment(EnvType.CLIENT)
+	public void registerModels(ResourceLocation blockID, Map<ResourceLocation, UnbakedModel> modelRegistry, Map<ResourceLocation, UnbakedModel> unbakedCache) {
+		modelRegistry.put(blockID, ModelsHelper.createBlockSimple(blockID));
 	}
 	
 	/**
