@@ -9,7 +9,7 @@ import java.util.Map;
 
 public interface ItemModelProvider {
 	@Environment(EnvType.CLIENT)
-	default UnbakedModel getItemModel(ResourceLocation resourceLocation, Map<ResourceLocation, UnbakedModel> unbakedCache) {
-		return unbakedCache.get(resourceLocation);
+	default UnbakedModel getItemModel(ResourceLocation itemID, Map<ResourceLocation, UnbakedModel> unbakedCache) {
+		return unbakedCache.get(itemID);
 	}
 }

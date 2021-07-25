@@ -6,7 +6,6 @@ import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.state.BlockState;
 
-import java.util.Collection;
 import java.util.Map;
 
 public interface BlockModelProvider extends ItemModelProvider {

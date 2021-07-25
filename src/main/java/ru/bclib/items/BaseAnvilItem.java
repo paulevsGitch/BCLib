@@ -2,8 +2,7 @@ package ru.bclib.items;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.renderer.block.model.BlockModel;
-import net.minecraft.core.Registry;
+import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
@@ -17,11 +16,11 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import org.jetbrains.annotations.Nullable;
 import ru.bclib.blocks.BaseAnvilBlock;
-import ru.bclib.interfaces.BlockModelProvider;
 import ru.bclib.interfaces.ItemModelProvider;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class BaseAnvilItem extends BlockItem implements ItemModelProvider {
 	public final static String DESTRUCTION = "destruction";
@@ -65,9 +64,7 @@ public class BaseAnvilItem extends BlockItem implements ItemModelProvider {
 	
 	@Override
 	@Environment(EnvType.CLIENT)
-	public BlockModel getItemModel(ResourceLocation resourceLocation) {
-		Block anvilBlock = getBlock();
-		ResourceLocation blockId = Registry.BLOCK.getKey(anvilBlock);
-		return ((BlockModelProvider) anvilBlock).getBlockModel(blockId, anvilBlock.defaultBlockState());
+	public UnbakedModel getItemModel(ResourceLocation itemID, Map<ResourceLocation, UnbakedModel> unbakedCache) {
+		return ((ItemModelProvider) getBlock()).getItemModel(itemID, unbakedCache);
 	}
 }

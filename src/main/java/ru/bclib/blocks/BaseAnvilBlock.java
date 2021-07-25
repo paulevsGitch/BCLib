@@ -6,7 +6,6 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
-import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
@@ -21,7 +20,6 @@ import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.material.MaterialColor;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
-import org.jetbrains.annotations.Nullable;
 import ru.bclib.client.models.BasePatterns;
 import ru.bclib.client.models.ModelsHelper;
 import ru.bclib.client.models.PatternsHelper;
@@ -57,32 +55,36 @@ public abstract class BaseAnvilBlock extends AnvilBlock implements BlockModelPro
 	
 	@Override
 	@Environment(EnvType.CLIENT)
-	public BlockModel getItemModel(ResourceLocation blockId) {
-		return getBlockModel(blockId, defaultBlockState());
+	public void registerModels(ResourceLocation blockID, Map<ResourceLocation, UnbakedModel> modelRegistry, Map<ResourceLocation, UnbakedModel> unbakedCache) {
+		for (int destruction = 0; destruction < 3; destruction++) {
+			String name = blockID.getPath();
+			Map<String, String> textures = Maps.newHashMap();
+			textures.put("%modid%", blockID.getNamespace());
+			textures.put("%anvil%", name);
+			textures.put("%top%", name + "_top_" + destruction);
+			Optional<String> pattern = PatternsHelper.createJson(BasePatterns.BLOCK_ANVIL, textures);
+			ResourceLocation location = getModelLocation(destruction, blockID);
+			modelRegistry.put(location, ModelsHelper.fromPattern(pattern));
+		}
 	}
 	
 	@Override
 	@Environment(EnvType.CLIENT)
-	public @Nullable BlockModel getBlockModel(ResourceLocation blockId, BlockState blockState) {
+	public ResourceLocation getStateModel(ResourceLocation stateId, BlockState blockState) {
 		int destruction = blockState.getValue(DESTRUCTION);
-		String name = blockId.getPath();
-		Map<String, String> textures = Maps.newHashMap();
-		textures.put("%modid%", blockId.getNamespace());
-		textures.put("%anvil%", name);
-		textures.put("%top%", name + "_top_" + destruction);
-		Optional<String> pattern = PatternsHelper.createJson(BasePatterns.BLOCK_ANVIL, textures);
-		return ModelsHelper.fromPattern(pattern);
+		return getModelLocation(destruction, stateId);
 	}
 	
 	@Override
 	@Environment(EnvType.CLIENT)
-	public UnbakedModel getModelVariant(ResourceLocation stateId, BlockState blockState, Map<ResourceLocation, UnbakedModel> modelCache) {
-		int destruction = blockState.getValue(DESTRUCTION);
-		String modId = stateId.getNamespace();
-		String modelId = "block/" + stateId.getPath() + "_top_" + destruction;
-		ResourceLocation modelLocation = new ResourceLocation(modId, modelId);
-		registerBlockModel(stateId, modelLocation, blockState, modelCache);
-		return ModelsHelper.createFacingModel(modelLocation, blockState.getValue(FACING), false, false);
+	public UnbakedModel getItemModel(ResourceLocation itemID, Map<ResourceLocation, UnbakedModel> unbakedCache) {
+		return unbakedCache.get(getModelLocation(0, itemID));
+	}
+	
+	private ResourceLocation getModelLocation(int destruction, ResourceLocation blockID) {
+		String namespace = blockID.getNamespace();
+		String path = "block/" + blockID.getPath() + "_top_" + destruction;
+		return new ResourceLocation(namespace, path);
 	}
 	
 	@Override
