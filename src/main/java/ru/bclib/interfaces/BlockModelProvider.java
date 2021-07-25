@@ -9,9 +9,9 @@ import ru.bclib.client.models.ModelsHelper;
 
 import java.util.Map;
 
-public interface BlockModelProvider {
+public interface BlockModelProvider extends ItemModelProvider {
 	@Environment(EnvType.CLIENT)
-	default UnbakedModel getModelVariant(ResourceLocation stateId, BlockState blockState, Map<ResourceLocation, UnbakedModel> modelCache) {
+	default UnbakedModel getModelVariant(ResourceLocation stateId, BlockState blockState, Map<ResourceLocation, UnbakedModel> unbakedCache) {
 		ResourceLocation modelId = new ResourceLocation(stateId.getNamespace(), "block/" + stateId.getPath());
 		return ModelsHelper.createBlockSimple(modelId);
 	}

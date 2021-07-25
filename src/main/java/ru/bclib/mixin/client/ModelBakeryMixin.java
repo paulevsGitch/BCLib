@@ -46,33 +46,10 @@ public abstract class ModelBakeryMixin {
 			String path = resourceLocation.getPath();
 			ResourceLocation clearLoc = new ResourceLocation(modId, path);
 			ModelResourceLocation modelId = (ModelResourceLocation) resourceLocation;
+			
 			if ("inventory".equals(modelId.getVariant())) {
-				ResourceLocation itemLoc = new ResourceLocation(modId, "item/" + path);
-				ResourceLocation itemModelLoc = new ResourceLocation(modId, "models/" + itemLoc.getPath() + ".json");
-				if (!resourceManager.hasResource(itemModelLoc)) {
-					Item item = Registry.ITEM.get(clearLoc);
-					ItemModelProvider modelProvider = null;
-					if (item instanceof ItemModelProvider) {
-						modelProvider = (ItemModelProvider) item;
-					}
-					else if (item instanceof BlockItem) {
-						Block block = Registry.BLOCK.get(clearLoc);
-						if (block instanceof ItemModelProvider) {
-							modelProvider = (ItemModelProvider) block;
-						}
-					}
-					if (modelProvider != null) {
-						BlockModel model = modelProvider.getItemModel(clearLoc);
-						if (model != null) {
-							model.name = itemLoc.toString();
-							cacheAndQueueDependencies(modelId, model);
-							unbakedCache.put(itemLoc, model);
-						}
-						else {
-							BCLib.LOGGER.warning("Error loading model: {}", itemLoc);
-						}
-						info.cancel();
-					}
+				if (bclib_loadItemModel(modId, path, clearLoc, modelId)) {
+					info.cancel();
 				}
 			}
 			else {
@@ -81,13 +58,14 @@ public abstract class ModelBakeryMixin {
 					Block block = Registry.BLOCK.get(clearLoc);
 					if (block instanceof BlockModelProvider) {
 						List<BlockState> possibleStates = block.getStateDefinition().getPossibleStates();
-						Optional<BlockState> possibleState = possibleStates.stream()
-																		   .filter(state -> modelId.equals(
-																			   BlockModelShaper.stateToModelLocation(
-																				   clearLoc,
-																				   state
-																			   )))
-																		   .findFirst();
+						Optional<BlockState> possibleState = possibleStates
+							.stream()
+							.filter(state -> modelId.equals(
+								BlockModelShaper.stateToModelLocation(
+									clearLoc,
+									state
+								)
+							)).findFirst();
 						if (possibleState.isPresent()) {
 							UnbakedModel modelVariant = ((BlockModelProvider) block).getModelVariant(
 								modelId,
@@ -117,5 +95,94 @@ public abstract class ModelBakeryMixin {
 				}
 			}
 		}
+	}
+	
+	private void bclib_updateModelName(UnbakedModel model, ResourceLocation id) {
+		if (model instanceof BlockModel) {
+			((BlockModel) model).name = id.toString();
+		}
+	}
+	
+	private boolean bclib_loadItemModel(String modId, String path, ResourceLocation clearLoc, ResourceLocation modelId) {
+		ResourceLocation itemLoc = new ResourceLocation(modId, "item/" + path);
+		ResourceLocation itemModelLoc = new ResourceLocation(modId, "models/" + itemLoc.getPath() + ".json");
+		
+		if (resourceManager.hasResource(itemModelLoc)) {
+			return false;
+		}
+		
+		Item item = Registry.ITEM.get(clearLoc);
+		ItemModelProvider modelProvider = null;
+		if (item instanceof ItemModelProvider) {
+			modelProvider = (ItemModelProvider) item;
+		}
+		else if (item instanceof BlockItem) {
+			Block block = Registry.BLOCK.get(clearLoc);
+			if (block instanceof ItemModelProvider) {
+				modelProvider = (ItemModelProvider) block;
+			}
+		}
+		
+		if (modelProvider == null) {
+			return false;
+		}
+		
+		UnbakedModel model = modelProvider.getItemModel(clearLoc, unbakedCache);
+		if (model != null) {
+			bclib_updateModelName(model, itemLoc);
+			cacheAndQueueDependencies(modelId, model);
+			unbakedCache.put(itemLoc, model);
+		}
+		else {
+			BCLib.LOGGER.warning("Error loading model: {}", itemLoc);
+		}
+		
+		return true;
+	}
+	
+	private boolean bclib_loadBlockModel(String modId, String path, ResourceLocation clearLoc, ResourceLocation modelId) {
+		ResourceLocation stateLoc = new ResourceLocation(modId, "blockstates/" + path + ".json");
+		
+		if (resourceManager.hasResource(stateLoc)) {
+			return false;
+		}
+		
+		Block block = Registry.BLOCK.get(clearLoc);
+		if (!(block instanceof BlockModelProvider)) {
+			return false;
+		}
+		
+		List<BlockState> possibleStates = block.getStateDefinition().getPossibleStates();
+		Optional<BlockState> possibleState = possibleStates
+			.stream()
+			.filter(state -> modelId.equals(
+				BlockModelShaper.stateToModelLocation(
+					clearLoc,
+					state
+				)
+			)).findFirst();
+		
+		if (!possibleState.isPresent()) {
+			return false;
+		}
+		
+		UnbakedModel model = ((BlockModelProvider) block).getModelVariant(modelId, possibleState.get(), unbakedCache);
+		if (model != null) {
+			bclib_updateModelName(model, modelId);
+			if (model instanceof MultiPart) {
+				possibleStates.forEach(state -> {
+					ResourceLocation stateId = BlockModelShaper.stateToModelLocation(clearLoc, state);
+					cacheAndQueueDependencies(stateId, model);
+				});
+			}
+			else {
+				cacheAndQueueDependencies(modelId, model);
+			}
+		}
+		else {
+			BCLib.LOGGER.warning("Error loading variant: {}", modelId);
+		}
+		
+		return true;
 	}
 }
