@@ -50,8 +50,9 @@ public class ModelsHelper {
 		return new MultiVariant(Lists.newArrayList(variant));
 	}
 	
-	public static MultiVariant createBlockSimple(ResourceLocation resourceLocation) {
-		return createMultiVariant(resourceLocation, Transformation.identity(), false);
+	public static BlockModel createBlockSimple(ResourceLocation resourceLocation) {
+		Optional<String> pattern = PatternsHelper.createBlockSimple(resourceLocation);
+		return fromPattern(pattern);
 	}
 	
 	public static MultiVariant createFacingModel(ResourceLocation resourceLocation, Direction facing, boolean uvLock, boolean inverted) {
