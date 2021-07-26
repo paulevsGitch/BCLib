@@ -1,5 +1,7 @@
 package ru.bclib.api.datafixer;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.toasts.SystemToast;
@@ -168,6 +170,7 @@ public class DataFixerAPI {
 		return profile;
 	}
 	
+	@Environment(EnvType.CLIENT)
 	static void showBackupWarning(String levelID, Consumer<Boolean> whenFinished){
 		TranslatableComponent promptText = new TranslatableComponent("bclib.datafixer.backupWarning.prompt");
 		TranslatableComponent buttonTitle = new TranslatableComponent("bclib.datafixer.backupWarning.button");
