@@ -1,59 +1,218 @@
 package ru.bclib.api.datafixer;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.Util;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.toasts.SystemToast;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.worldselection.EditWorldScreen;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtIo;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.util.ProgressListener;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.chunk.storage.RegionFile;
+import net.minecraft.world.level.storage.LevelResource;
+import net.minecraft.world.level.storage.LevelStorageSource;
 import ru.bclib.BCLib;
 import ru.bclib.api.WorldDataAPI;
 import ru.bclib.config.Configs;
+import ru.bclib.gui.screens.ConfirmFixScreen;
 import ru.bclib.util.Logger;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * API to manage Patches that need to get applied to a world
+ */
 public class DataFixerAPI {
 	static final Logger LOGGER = new Logger("DataFixerAPI");
 	static class State {
 		public boolean didFail = false;
 	}
 	
-	public static void fixData(File dir) {
+	@FunctionalInterface
+	public static interface Callback {
+		public void call();
+	}
+	
+	/**
+	 * Will apply necessary Patches to the world.
+	 *
+	 * @param levelSource The SourceStorage for this Minecraft instance, You can get this using
+	 * {@code Minecraft.getInstance().getLevelSource()}
+	 * @param levelID The ID of the Level you want to patch
+	 * @param showUI {@code true}, if you want to present the user with a Screen that offers to backup the world
+	 *                              before applying the patches
+	 * @param onResume When this method retursn {@code true}, this function will be called when the world is ready
+	 * @return {@code true} if the UI was displayed. The UI is only displayed if {@code showUI} was {@code true} and
+	 * patches were enabled in the config and the Guardian did find any patches that need to be applied to the world.
+	 *
+	 */
+	public static boolean fixData(LevelStorageSource levelSource, String levelID, boolean showUI, Consumer<Boolean> onResume) {
+		
+		LevelStorageSource.LevelStorageAccess levelStorageAccess;
+		try {
+			levelStorageAccess = levelSource.createAccess(levelID);
+		} catch (IOException e) {
+			BCLib.LOGGER.warning((String)"Failed to read level {} data", levelID, e);
+			SystemToast.onWorldAccessFailure(Minecraft.getInstance(), levelID);
+			Minecraft.getInstance().setScreen((Screen)null);
+			return true;
+		}
+		
+		boolean cancelRun = fixData(levelStorageAccess, showUI, onResume);
+		
+		try {
+			levelStorageAccess.close();
+		} catch (IOException e) {
+			BCLib.LOGGER.warning((String)"Failed to unlock access to level {}", levelID, e);
+		}
+		
+		return cancelRun;
+	}
+	
+	/**
+	 * Will apply necessary Patches to the world.
+	 *
+	 * @param levelStorageAccess The access class of the level you want to patch
+	 * @param showUI {@code true}, if you want to present the user with a Screen that offers to backup the world
+	 *                              before applying the patches
+	 * @param onResume When this method retursn {@code true}, this function will be called when the world is ready
+	 * @return {@code true} if the UI was displayed. The UI is only displayed if {@code showUI} was {@code true} and
+	 * patches were enabled in the config and the Guardian did find any patches that need to be applied to the world.
+	 *
+	 */
+	public static boolean fixData(LevelStorageSource.LevelStorageAccess levelStorageAccess, boolean showUI, Consumer<Boolean> onResume){
+		File levelPath = levelStorageAccess.getLevelPath(LevelResource.ROOT).toFile();
+		WorldDataAPI.load(new File(levelPath, "data"));
+		return fixData(levelPath, levelStorageAccess.getLevelId(), showUI, onResume);
+	}
+	
+	private static boolean fixData(File dir, String levelID, boolean showUI, Consumer<Boolean> onResume) {
+		MigrationProfile profile = loadProfile(dir, levelID);
+		
+		Consumer<Boolean> runFixes = (applyFixes) -> {
+			if (applyFixes) {
+				runDataFixes(dir, profile, new ProgressListener() {
+					private long timeStamp = Util.getMillis();
+
+					public void progressStartNoAbort(Component component) {
+					}
+
+					public void progressStart(Component component) {
+					}
+
+					public void progressStagePercentage(int i) {
+						if (Util.getMillis() - this.timeStamp >= 1000L) {
+							this.timeStamp = Util.getMillis();
+							BCLib.LOGGER.info((String) "Patching... {}%", (Object) i);
+						}
+					}
+
+					public void stop() {
+					}
+
+					public void progressStage(Component component) {
+					}
+				});
+			} else {
+				//System.out.println("NO FIXES");
+			}
+			
+			//UI is asynchronous, so we need to send the callback now
+			if (profile != null && showUI) {
+				onResume.accept(applyFixes);
+			}
+		};
+		
+		//we have some migrations
+		if (profile != null) {
+			//display the confirm UI.
+			if (showUI){
+				showBackupWarning(levelID, runFixes);
+				return true;
+			} else {
+				BCLib.LOGGER.warning("Applying Fixes on Level");
+				runFixes.accept(true);
+			}
+		}
+		return false;
+	}
+	
+	static MigrationProfile loadProfile(File dir, String levelID){
 		if (!Configs.MAIN_CONFIG.getBoolean(Configs.MAIN_PATCH_CATEGORY, "applyPatches", true)) {
 			LOGGER.info("World Patches are disabled");
-			return;
+			return null;
 		}
 		
 		final CompoundTag patchConfig = WorldDataAPI.getCompoundTag(BCLib.MOD_ID, Configs.MAIN_PATCH_CATEGORY);
-		MigrationProfile data = Patch.createMigrationData(patchConfig);
-		if (!data.hasAnyFixes()) {
+		MigrationProfile profile = Patch.createMigrationData(patchConfig);
+		
+		 if (!profile.hasAnyFixes()) {
 			LOGGER.info("Everything up to date");
-			return;
-		}
+			return null;
+		 }
+		
+		return profile;
+	}
+	
+	@Environment(EnvType.CLIENT)
+	static void showBackupWarning(String levelID, Consumer<Boolean> whenFinished){
+		TranslatableComponent promptText = new TranslatableComponent("bclib.datafixer.backupWarning.prompt");
+		TranslatableComponent buttonTitle = new TranslatableComponent("bclib.datafixer.backupWarning.button");
+		
+		Minecraft.getInstance().setScreen(new ConfirmFixScreen((Screen) null, (createBackup, applyFixes) -> {
+			if (createBackup) {
+				EditWorldScreen.makeBackupAndShowToast(Minecraft.getInstance().getLevelSource(), levelID);
+			}
+			
+			Minecraft.getInstance().setScreen((Screen)null);
+			whenFinished.accept(applyFixes);
+		}));
+		
+	}
 
+	private static void runDataFixes(File dir, MigrationProfile profile, ProgressListener progress) {
+		System.out.println("RUNNING fixes");
+		if (dir!= null) return;
+		
 		State state = new State();
 		
 		List<File> regions = getAllRegions(dir, null);
-		regions.parallelStream().forEach((file) -> fixRegion(data, state, file));
+		progress.progressStagePercentage(0);
+		int[] count = {0};
+		regions.parallelStream().forEach((file) -> {
+			fixRegion(profile, state, file);
+			count[0]++;
+			progress.progressStagePercentage((100 * count[0])/regions.size());
+		});
+		progress.stop();
 
 		List<File> players = getAllPlayers(dir);
-		players.parallelStream().forEach((file) -> fixPlayer(data, state, file));
+		players.parallelStream().forEach((file) -> fixPlayer(profile, state, file));
 
-		fixLevel(data, state, new File(dir, "level.dat"));
+		fixLevel(profile, state, new File(dir, "level.dat"));
 		
 		if (!state.didFail) {
-			data.markApplied();
+			profile.markApplied();
 			WorldDataAPI.saveFile(BCLib.MOD_ID);
 		}
 	}
+	
 	private static void fixLevel(MigrationProfile data, State state, File file) {
 		try {
 			LOGGER.info("Inspecting " + file);
@@ -121,6 +280,7 @@ public class DataFixerAPI {
 			LOGGER.info("Inspecting " + file);
 			boolean[] changed = new boolean[1];
 			RegionFile region = new RegionFile(file, file.getParentFile(), true);
+			
 			for (int x = 0; x < 32; x++) {
 				for (int z = 0; z < 32; z++) {
 					ChunkPos pos = new ChunkPos(x, z);

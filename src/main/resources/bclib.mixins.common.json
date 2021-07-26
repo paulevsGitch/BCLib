@@ -15,7 +15,8 @@
 		"AnvilBlockMixin",
 		"AnvilMenuMixin",
 		"TagLoaderMixin",
-		"BiomeMixin"
+		"BiomeMixin",
+        "MainMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

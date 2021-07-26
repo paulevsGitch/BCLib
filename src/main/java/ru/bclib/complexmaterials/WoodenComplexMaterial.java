@@ -41,6 +41,7 @@ import ru.bclib.complexmaterials.entry.RecipeEntry;
 import ru.bclib.config.PathConfig;
 import ru.bclib.recipes.GridRecipe;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class WoodenComplexMaterial extends ComplexMaterial {
@@ -96,8 +97,14 @@ public class WoodenComplexMaterial extends ComplexMaterial {
 	
 	@Override
 	protected void initDefault(FabricBlockSettings blockSettings, FabricItemSettings itemSettings) {
+		initDefault(blockSettings, itemSettings, new String[0]);
+	}
+	
+	final protected void initDefault(FabricBlockSettings blockSettings, FabricItemSettings itemSettings, String[] excludedSuffixes) {
 		Tag.Named<Block> tagBlockLog = getBlockTag(TAG_LOGS);
 		Tag.Named<Item> tagItemLog = getItemTag(TAG_LOGS);
+		List<String> excl = Arrays.asList(excludedSuffixes);
+		
 		
 		addBlockEntry(
 			new BlockEntry(BLOCK_STRIPPED_LOG, (complexMaterial, settings) -> {
@@ -173,12 +180,18 @@ public class WoodenComplexMaterial extends ComplexMaterial {
 		addBlockEntry(new BlockEntry(BLOCK_BARREL, (complexMaterial, settings) -> {
 			return new BaseBarrelBlock(getBlock(BLOCK_PLANKS));
 		}));
-		addBlockEntry(new BlockEntry(BLOCK_BOOKSHELF, (complexMaterial, settings) -> {
-			return new BaseBookshelfBlock(getBlock(BLOCK_PLANKS));
-		}).setBlockTags(TagAPI.BLOCK_BOOKSHELVES));
-		addBlockEntry(new BlockEntry(BLOCK_COMPOSTER, (complexMaterial, settings) -> {
-			return new BaseComposterBlock(getBlock(BLOCK_PLANKS));
-		}));
+		
+		if (!excl.contains(BLOCK_BOOKSHELF)) {
+			addBlockEntry(new BlockEntry(BLOCK_BOOKSHELF, (complexMaterial, settings) -> {
+				return new BaseBookshelfBlock(getBlock(BLOCK_PLANKS));
+			}).setBlockTags(TagAPI.BLOCK_BOOKSHELVES));
+		}
+		
+		if (!excl.contains(BLOCK_COMPOSTER)) {
+			addBlockEntry(new BlockEntry(BLOCK_COMPOSTER, (complexMaterial, settings) -> {
+				return new BaseComposterBlock(getBlock(BLOCK_PLANKS));
+			}));
+		}
 	}
 	
 	@Override
