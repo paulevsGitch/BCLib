@@ -119,6 +119,10 @@ public class DataFixerAPI {
 	}
 	/**
 	 * Initializes the DataStorage for this world. If the world is new, the patch registry is initialized to the
+	 * current versions of the plugins.
+	 * <p>
+	 * This implementation will create a new  {@link LevelStorageAccess} and call {@link #initializeWorldData(File, boolean)}
+	 * using the provided root path.
 	 * @param levelSource The SourceStorage for this Minecraft instance, You can get this using
 	 * {@code Minecraft.getInstance().getLevelSource()}
 	 * @param levelID The ID of the Level you want to patch

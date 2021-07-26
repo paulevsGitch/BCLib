@@ -6,6 +6,7 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
+import net.minecraft.world.level.storage.LevelStorageSource.LevelStorageAccess;
 import ru.bclib.BCLib;
 import ru.bclib.api.datafixer.DataFixerAPI;
 
@@ -14,7 +15,15 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 
+/**
+ * Mod-specifix data-storage for a world.
+ * 
+ * This class provides the ability for mod to store persistent data inside a world. The Storage for the world is 
+ * currently initialized as part of the {@link DataFixerAPI} in {@link DataFixerAPI#fixData(LevelStorageAccess, boolean, Consumer)}
+ * or {@link DataFixerAPI#initializeWorldData(File, boolean)}
+ */
 public class WorldDataAPI {
 	private static final Map<String, CompoundTag> TAGS = Maps.newHashMap();
 	private static final List<String> MODS = Lists.newArrayList();
