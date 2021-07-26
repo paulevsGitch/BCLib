@@ -104,6 +104,9 @@ public class WorldDataAPI {
 	 */
 	public static void saveFile(String modID) {
 		try {
+			if (!dataDir.exists()){
+				dataDir.mkdirs();
+			}
 			NbtIo.writeCompressed(getRootTag(modID), new File(dataDir, modID + ".nbt"));
 		}
 		catch (IOException e) {

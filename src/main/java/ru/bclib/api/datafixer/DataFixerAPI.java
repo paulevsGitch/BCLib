@@ -17,6 +17,8 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.chunk.storage.RegionFile;
 import net.minecraft.world.level.storage.LevelResource;
 import net.minecraft.world.level.storage.LevelStorageSource;
+import net.minecraft.world.level.storage.LevelStorageSource.LevelStorageAccess;
+import org.jetbrains.annotations.NotNull;
 import ru.bclib.BCLib;
 import ru.bclib.api.WorldDataAPI;
 import ru.bclib.config.Configs;
@@ -31,6 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -49,6 +52,29 @@ public class DataFixerAPI {
 		public void call();
 	}
 	
+	private static boolean wrapCall(LevelStorageSource levelSource, String levelID, Function<LevelStorageAccess, Boolean> runWithLevel) {
+		
+		LevelStorageSource.LevelStorageAccess levelStorageAccess;
+		try {
+			levelStorageAccess = levelSource.createAccess(levelID);
+		} catch (IOException e) {
+			BCLib.LOGGER.warning((String)"Failed to read level {} data", levelID, e);
+			SystemToast.onWorldAccessFailure(Minecraft.getInstance(), levelID);
+			Minecraft.getInstance().setScreen((Screen)null);
+			return true;
+		}
+		
+		boolean returnValue = runWithLevel.apply(levelStorageAccess);
+		
+		try {
+			levelStorageAccess.close();
+		} catch (IOException e) {
+			BCLib.LOGGER.warning((String)"Failed to unlock access to level {}", levelID, e);
+		}
+		
+		return returnValue;
+	}
+	
 	/**
 	 * Will apply necessary Patches to the world.
 	 *
@@ -63,26 +89,7 @@ public class DataFixerAPI {
 	 *
 	 */
 	public static boolean fixData(LevelStorageSource levelSource, String levelID, boolean showUI, Consumer<Boolean> onResume) {
-		
-		LevelStorageSource.LevelStorageAccess levelStorageAccess;
-		try {
-			levelStorageAccess = levelSource.createAccess(levelID);
-		} catch (IOException e) {
-			BCLib.LOGGER.warning((String)"Failed to read level {} data", levelID, e);
-			SystemToast.onWorldAccessFailure(Minecraft.getInstance(), levelID);
-			Minecraft.getInstance().setScreen((Screen)null);
-			return true;
-		}
-		
-		boolean cancelRun = fixData(levelStorageAccess, showUI, onResume);
-		
-		try {
-			levelStorageAccess.close();
-		} catch (IOException e) {
-			BCLib.LOGGER.warning((String)"Failed to unlock access to level {}", levelID, e);
-		}
-		
-		return cancelRun;
+		return wrapCall(levelSource, levelID, (levelStorageAccess) -> fixData(levelStorageAccess, showUI, onResume));
 	}
 	
 	/**
@@ -98,12 +105,50 @@ public class DataFixerAPI {
 	 */
 	public static boolean fixData(LevelStorageSource.LevelStorageAccess levelStorageAccess, boolean showUI, Consumer<Boolean> onResume){
 		File levelPath = levelStorageAccess.getLevelPath(LevelResource.ROOT).toFile();
-		WorldDataAPI.load(new File(levelPath, "data"));
+		
+		boolean newWorld = false;
+		if (!levelPath.exists()) {
+			BCLib.LOGGER.info("Creating a new World, no fixes needed");
+			newWorld = true;
+		}
+		
+		initializeWorldData(levelPath, newWorld);
+		if (newWorld) return false;
+		
 		return fixData(levelPath, levelStorageAccess.getLevelId(), showUI, onResume);
+	}
+	/**
+	 * Initializes the DataStorage for this world. If the world is new, the patch registry is initialized to the
+	 * @param levelSource The SourceStorage for this Minecraft instance, You can get this using
+	 * {@code Minecraft.getInstance().getLevelSource()}
+	 * @param levelID The ID of the Level you want to patch
+	 * @param newWorld {@code true} if this is a fresh world
+	 */
+	public static void initializeWorldData(LevelStorageSource levelSource, String levelID, boolean newWorld) {
+		wrapCall(levelSource, levelID, (levelStorageAccess) -> {
+			initializeWorldData(levelStorageAccess.getLevelPath(LevelResource.ROOT).toFile(), newWorld);
+			return true;
+		});
+	}
+	
+	/**
+	 * Initializes the DataStorage for this world. If the world is new, the patch registry is initialized to the
+	 * current versions of the plugins.
+	 * @param levelPath Folder of the world
+	 * @param newWorld {@code true} if this is a fresh world
+	 *
+	 */
+	public static void initializeWorldData(File levelPath, boolean newWorld){
+		WorldDataAPI.load(new File(levelPath, "data"));
+		
+		if (newWorld){
+			getMigrationProfile().markApplied();
+			WorldDataAPI.saveFile(BCLib.MOD_ID);
+		}
 	}
 	
 	private static boolean fixData(File dir, String levelID, boolean showUI, Consumer<Boolean> onResume) {
-		MigrationProfile profile = loadProfile(dir, levelID);
+		MigrationProfile profile = loadProfileIfNeeded();
 		
 		Consumer<Boolean> runFixes = (applyFixes) -> {
 			if (applyFixes) {
@@ -153,20 +198,26 @@ public class DataFixerAPI {
 		return false;
 	}
 	
-	static MigrationProfile loadProfile(File dir, String levelID){
+	private static MigrationProfile loadProfileIfNeeded(){
 		if (!Configs.MAIN_CONFIG.getBoolean(Configs.MAIN_PATCH_CATEGORY, "applyPatches", true)) {
 			LOGGER.info("World Patches are disabled");
 			return null;
 		}
 		
-		final CompoundTag patchConfig = WorldDataAPI.getCompoundTag(BCLib.MOD_ID, Configs.MAIN_PATCH_CATEGORY);
-		MigrationProfile profile = Patch.createMigrationData(patchConfig);
+		MigrationProfile profile = getMigrationProfile();
 		
-		 if (!profile.hasAnyFixes()) {
+		if (!profile.hasAnyFixes()) {
 			LOGGER.info("Everything up to date");
 			return null;
 		 }
 		
+		return profile;
+	}
+	
+	@NotNull
+	private static MigrationProfile getMigrationProfile() {
+		final CompoundTag patchConfig = WorldDataAPI.getCompoundTag(BCLib.MOD_ID, Configs.MAIN_PATCH_CATEGORY);
+		MigrationProfile profile = Patch.createMigrationData(patchConfig);
 		return profile;
 	}
 	
