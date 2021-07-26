@@ -5,6 +5,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -12,6 +14,8 @@ import java.util.stream.Collectors;
 class MigrationProfile {
 	final Set<String> mods;
 	final Map<String, String> idReplacements;
+	final List<PatchFunction<CompoundTag, Boolean>> levelPatchers;
+	
 	private final CompoundTag config;
 	
 	MigrationProfile(CompoundTag config) {
@@ -23,6 +27,7 @@ class MigrationProfile {
 													 .collect(Collectors.toSet()));
 		
 		HashMap<String, String> replacements = new HashMap<String, String>();
+		List<PatchFunction<CompoundTag, Boolean>> levelPatches = new LinkedList<>();
 		for (String modID : mods) {
 			Patch.getALL()
 				 .stream()
@@ -30,6 +35,8 @@ class MigrationProfile {
 				 .forEach(patch -> {
 					 if (currentPatchLevel(modID) < patch.level) {
 						 replacements.putAll(patch.getIDReplacements());
+						 if (patch.getLevelDatPatcher()!=null)
+							 levelPatches.add(patch.getLevelDatPatcher());
 						 DataFixerAPI.LOGGER.info("Applying " + patch);
 					 }
 					 else {
@@ -39,6 +46,7 @@ class MigrationProfile {
 		}
 		
 		this.idReplacements = Collections.unmodifiableMap(replacements);
+		this.levelPatchers = Collections.unmodifiableList(levelPatches);
 	}
 	
 	final public void markApplied() {
@@ -58,7 +66,7 @@ class MigrationProfile {
 	}
 	
 	public boolean hasAnyFixes() {
-		return idReplacements.size() > 0;
+		return idReplacements.size() > 0 || levelPatchers.size() > 0;
 	}
 	
 	public boolean replaceStringFromIDs(@NotNull CompoundTag tag, @NotNull String key) {
@@ -74,5 +82,13 @@ class MigrationProfile {
 		}
 		
 		return false;
+	}
+	
+	public boolean patchLevelDat(@NotNull CompoundTag level) throws PatchDidiFailException {
+		boolean changed = false;
+		for (PatchFunction<CompoundTag, Boolean> f : levelPatchers) {
+			changed |= f.apply(level);
+		}
+		return changed;
 	}
 }

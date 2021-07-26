@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 public abstract class Patch {
+	
 	private static List<Patch> ALL = new ArrayList<>(10);
 	
 	/**
@@ -118,6 +119,19 @@ public abstract class Patch {
 	public Map<String, String> getIDReplacements() {
 		return new HashMap<String, String>();
 	}
+	
+	/**
+	 * Return a {@link PatchFunction} that is called with the content of <i>level.dat</i>.
+	 * <p>
+	 * The function needs to return {@code true}, if changes were made to the data.
+	 * If an error occurs, the method shoudl throw a {@link PatchDidiFailException}
+	 *
+	 * The default implementation of this method returns null.
+	 *
+	 * @return The returned function is called a {@code CompoundTag} that contains the
+	 * contents of <i>level.dat</i>
+	 */
+	public PatchFunction<CompoundTag, Boolean> getLevelDatPatcher() { return null; }
 	
 	/**
 	 * Generates ready to use data for all currently registered patches. The list of
