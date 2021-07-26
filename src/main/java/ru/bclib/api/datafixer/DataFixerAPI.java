@@ -22,6 +22,9 @@ import java.util.regex.Pattern;
 
 public class DataFixerAPI {
 	static final Logger LOGGER = new Logger("DataFixerAPI");
+	static class State {
+		public boolean didFail = false;
+	}
 	
 	public static void fixData(File dir) {
 		if (!Configs.MAIN_CONFIG.getBoolean(Configs.MAIN_PATCH_CATEGORY, "applyPatches", true)) {
@@ -36,22 +39,22 @@ public class DataFixerAPI {
 			return;
 		}
 
-		boolean[] allOk = {true};
+		State state = new State();
 		
 		List<File> regions = getAllRegions(dir, null);
-		regions.parallelStream().forEach((file) -> fixRegion(data, allOk, file));
+		regions.parallelStream().forEach((file) -> fixRegion(data, state, file));
 
 		List<File> players = getAllPlayers(dir);
-		players.parallelStream().forEach((file) -> fixPlayer(data, allOk, file));
+		players.parallelStream().forEach((file) -> fixPlayer(data, state, file));
 
-		fixLevel(data, allOk, new File(dir, "level.dat"));
+		fixLevel(data, state, new File(dir, "level.dat"));
 		
-		if (allOk[0]) {
+		if (!state.didFail) {
 			data.markApplied();
 			WorldDataAPI.saveFile(BCLib.MOD_ID);
 		}
 	}
-	private static void fixLevel(MigrationProfile data, boolean[] allOk, File file) {
+	private static void fixLevel(MigrationProfile data, State state, File file) {
 		try {
 			LOGGER.info("Inspecting " + file);
 			CompoundTag level = NbtIo.readCompressed(file);
@@ -64,6 +67,13 @@ public class DataFixerAPI {
 					fixPlayerNbt(player, changed, data);
 				}
 			}
+			
+			try {
+				changed[0] |= data.patchLevelDat(level);
+			} catch (PatchDidiFailException e){
+				state.didFail = true;
+				BCLib.LOGGER.error(e.getMessage());
+			}
 
 			if (changed[0]) {
 				LOGGER.warning("Writing '{}'", file);
@@ -71,12 +81,13 @@ public class DataFixerAPI {
 			}
 		}
 		catch (Exception e) {
-			allOk[0] = false;
+			BCLib.LOGGER.error("Failed fixing Level-Data.");
+			state.didFail = true;
 			e.printStackTrace();
 		}
 	}
 
-	private static void fixPlayer(MigrationProfile data, boolean[] allOk, File file) {
+	private static void fixPlayer(MigrationProfile data, State state, File file) {
 		try {
 			LOGGER.info("Inspecting " + file);
 			CompoundTag player = NbtIo.readCompressed(file);
@@ -89,7 +100,8 @@ public class DataFixerAPI {
 			}
 		}
 		catch (Exception e) {
-			allOk[0] = false;
+			BCLib.LOGGER.error("Failed fixing Player-Data.");
+			state.didFail = true;
 			e.printStackTrace();
 		}
 	}
@@ -104,7 +116,7 @@ public class DataFixerAPI {
 		fixInventory(enderitems, changed, data, true);
 	}
 
-	private static void fixRegion(MigrationProfile data, boolean[] allOk, File file) {
+	private static void fixRegion(MigrationProfile data, State state, File file) {
 		try {
 			LOGGER.info("Inspecting " + file);
 			boolean[] changed = new boolean[1];
@@ -155,7 +167,8 @@ public class DataFixerAPI {
 			region.close();
 		}
 		catch (Exception e) {
-			allOk[0] = false;
+			BCLib.LOGGER.error("Failed fixing Player Data.");
+			state.didFail = true;
 			e.printStackTrace();
 		}
 	}
