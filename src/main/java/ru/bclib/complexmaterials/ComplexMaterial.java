@@ -36,8 +36,8 @@ public abstract class ComplexMaterial {
 	private final Map<String, Block> blocks = Maps.newHashMap();
 	private final Map<String, Item> items = Maps.newHashMap();
 	
-	private final String baseName;
-	private final String modID;
+	protected final String baseName;
+	protected final String modID;
 	
 	public ComplexMaterial(String modID, String baseName) {
 		this.baseName = baseName;

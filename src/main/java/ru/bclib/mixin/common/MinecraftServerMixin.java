@@ -6,7 +6,6 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.ServerResources;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.storage.LevelResource;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.WorldData;
 import org.spongepowered.asm.mixin.Final;
@@ -17,11 +16,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import ru.bclib.api.BiomeAPI;
-import ru.bclib.api.WorldDataAPI;
-import ru.bclib.api.datafixer.DataFixerAPI;
 import ru.bclib.recipes.BCLRecipeManager;
 
-import java.io.File;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -38,12 +34,14 @@ public class MinecraftServerMixin {
 	@Final
 	@Shadow
 	protected WorldData worldData;
+	
 
 	@Inject(method="convertFromRegionFormatIfNeeded", at = @At("HEAD"))
 	private static void bclib_applyPatches(LevelStorageSource.LevelStorageAccess session, CallbackInfo ci){
-		File levelPath = session.getLevelPath(LevelResource.ROOT).toFile();
+		
+		/*File levelPath = session.getLevelPath(LevelResource.ROOT).toFile();
 		WorldDataAPI.load(new File(levelPath, "data"));
-		DataFixerAPI.fixData(levelPath);
+		DataFixerAPI.fixData(levelPath, session.getLevelId());*/
 	}
 
 
