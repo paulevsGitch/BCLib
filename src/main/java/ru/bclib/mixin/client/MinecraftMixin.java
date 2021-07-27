@@ -5,6 +5,9 @@ import net.minecraft.client.color.block.BlockColors;
 import net.minecraft.client.color.item.ItemColors;
 import net.minecraft.client.main.GameConfig;
 import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess.RegistryHolder;
+import net.minecraft.world.level.LevelSettings;
+import net.minecraft.world.level.levelgen.WorldGenSettings;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -65,6 +68,11 @@ public abstract class MinecraftMixin {
 		}
 		
 		return levelID;
+	}
+	
+	@Inject(method="createLevel", at=@At("HEAD"))
+	private void bclib_initPatchData(String levelID, LevelSettings levelSettings, RegistryHolder registryHolder, WorldGenSettings worldGenSettings, CallbackInfo ci) {
+		DataFixerAPI.initializeWorldData(this.levelSource, levelID, true);
 	}
 	
 	
