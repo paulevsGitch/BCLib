@@ -3,11 +3,14 @@ package ru.bclib.server;
 import net.fabricmc.api.DedicatedServerModInitializer;
 import ru.bclib.api.ModIntegrationAPI;
 import ru.bclib.api.PostInitAPI;
+import ru.bclib.api.dataexchange.*;
 
 public class BCLibServer implements DedicatedServerModInitializer {
 	@Override
 	public void onInitializeServer() {
 		ModIntegrationAPI.registerAll();
+		DataExchangeAPI.registerServersideHandler(TestHandler.DESCRIPTOR);
+		
 		PostInitAPI.postInit(false);
 	}
 }

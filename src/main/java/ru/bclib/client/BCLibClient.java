@@ -3,6 +3,8 @@ package ru.bclib.client;
 import net.fabricmc.api.ClientModInitializer;
 import ru.bclib.api.ModIntegrationAPI;
 import ru.bclib.api.PostInitAPI;
+import ru.bclib.api.dataexchange.DataExchangeAPI;
+import ru.bclib.api.dataexchange.TestHandler;
 import ru.bclib.registry.BaseBlockEntityRenders;
 
 public class BCLibClient implements ClientModInitializer {
@@ -10,6 +12,8 @@ public class BCLibClient implements ClientModInitializer {
 	public void onInitializeClient() {
 		ModIntegrationAPI.registerAll();
 		BaseBlockEntityRenders.register();
+		DataExchangeAPI.registerClientsideHandler(TestHandler.DESCRIPTOR);
+		
 		PostInitAPI.postInit(true);
 	}
 }
