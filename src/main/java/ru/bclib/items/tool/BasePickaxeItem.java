@@ -7,6 +7,7 @@ import net.fabricmc.fabric.api.tool.attribute.v1.FabricToolTags;
 import net.fabricmc.fabric.impl.tool.attribute.ToolManagerImpl;
 import net.fabricmc.fabric.impl.tool.attribute.ToolManagerImpl.Entry;
 import net.minecraft.client.renderer.block.model.BlockModel;
+import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.Tag;
 import net.minecraft.world.entity.LivingEntity;
@@ -17,6 +18,8 @@ import net.minecraft.world.item.Tier;
 import net.minecraft.world.level.block.state.BlockState;
 import ru.bclib.client.models.ModelsHelper;
 import ru.bclib.interfaces.ItemModelProvider;
+
+import java.util.Map;
 
 public class BasePickaxeItem extends PickaxeItem implements DynamicAttributeTool, ItemModelProvider {
 	public BasePickaxeItem(Tier material, int attackDamage, float attackSpeed, Properties settings) {
@@ -42,7 +45,7 @@ public class BasePickaxeItem extends PickaxeItem implements DynamicAttributeTool
 	
 	@Override
 	@Environment(EnvType.CLIENT)
-	public BlockModel getItemModel(ResourceLocation resourceLocation) {
-		return ModelsHelper.createHandheldItem(resourceLocation);
+	public UnbakedModel getItemModel(ResourceLocation itemID, Map<ResourceLocation, UnbakedModel> unbakedCache) {
+		return ModelsHelper.createHandheldItem(itemID);
 	}
 }
