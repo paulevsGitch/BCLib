@@ -1,6 +1,5 @@
 package ru.bclib.complexmaterials;
 
-import com.google.common.collect.Lists;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.registry.FlammableBlockRegistry;
@@ -36,13 +35,8 @@ import ru.bclib.blocks.BaseWoodenButtonBlock;
 import ru.bclib.blocks.StripableBarkBlock;
 import ru.bclib.blocks.WoodenPressurePlateBlock;
 import ru.bclib.complexmaterials.entry.BlockEntry;
-import ru.bclib.complexmaterials.entry.ItemEntry;
 import ru.bclib.complexmaterials.entry.RecipeEntry;
-import ru.bclib.config.PathConfig;
 import ru.bclib.recipes.GridRecipe;
-
-import java.util.Arrays;
-import java.util.List;
 
 public class WoodenComplexMaterial extends ComplexMaterial {
 	public static final ResourceLocation MATERIAL_ID = BCLib.makeID("wooden_material");
@@ -97,14 +91,8 @@ public class WoodenComplexMaterial extends ComplexMaterial {
 	
 	@Override
 	protected void initDefault(FabricBlockSettings blockSettings, FabricItemSettings itemSettings) {
-		initDefault(blockSettings, itemSettings, new String[0]);
-	}
-	
-	final protected void initDefault(FabricBlockSettings blockSettings, FabricItemSettings itemSettings, String[] excludedSuffixes) {
 		Tag.Named<Block> tagBlockLog = getBlockTag(TAG_LOGS);
 		Tag.Named<Item> tagItemLog = getItemTag(TAG_LOGS);
-		List<String> excl = Arrays.asList(excludedSuffixes);
-		
 		
 		addBlockEntry(
 			new BlockEntry(BLOCK_STRIPPED_LOG, (complexMaterial, settings) -> {
@@ -181,17 +169,16 @@ public class WoodenComplexMaterial extends ComplexMaterial {
 			return new BaseBarrelBlock(getBlock(BLOCK_PLANKS));
 		}));
 		
-		if (!excl.contains(BLOCK_BOOKSHELF)) {
-			addBlockEntry(new BlockEntry(BLOCK_BOOKSHELF, (complexMaterial, settings) -> {
-				return new BaseBookshelfBlock(getBlock(BLOCK_PLANKS));
-			}).setBlockTags(TagAPI.BLOCK_BOOKSHELVES));
-		}
 		
-		if (!excl.contains(BLOCK_COMPOSTER)) {
-			addBlockEntry(new BlockEntry(BLOCK_COMPOSTER, (complexMaterial, settings) -> {
-				return new BaseComposterBlock(getBlock(BLOCK_PLANKS));
-			}));
-		}
+		addBlockEntry(new BlockEntry(BLOCK_BOOKSHELF, (complexMaterial, settings) -> {
+			return new BaseBookshelfBlock(getBlock(BLOCK_PLANKS));
+		}).setBlockTags(TagAPI.BLOCK_BOOKSHELVES));
+	
+	
+	
+		addBlockEntry(new BlockEntry(BLOCK_COMPOSTER, (complexMaterial, settings) -> {
+			return new BaseComposterBlock(getBlock(BLOCK_PLANKS));
+		}));
 	}
 	
 	@Override
