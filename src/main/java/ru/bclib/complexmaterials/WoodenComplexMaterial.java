@@ -91,6 +91,12 @@ public class WoodenComplexMaterial extends ComplexMaterial {
 	
 	@Override
 	protected void initDefault(FabricBlockSettings blockSettings, FabricItemSettings itemSettings) {
+		initBase(blockSettings, itemSettings);
+		initStorage(blockSettings, itemSettings);
+		initDecorations(blockSettings, itemSettings);
+	}
+	
+	protected void initBase(FabricBlockSettings blockSettings, FabricItemSettings itemSettings) {
 		Tag.Named<Block> tagBlockLog = getBlockTag(TAG_LOGS);
 		Tag.Named<Item> tagItemLog = getItemTag(TAG_LOGS);
 		
@@ -152,9 +158,7 @@ public class WoodenComplexMaterial extends ComplexMaterial {
 			return new BaseDoorBlock(getBlock(BLOCK_PLANKS));
 		}).setBlockTags(BlockTags.DOORS, BlockTags.WOODEN_DOORS).setItemTags(ItemTags.DOORS, ItemTags.WOODEN_DOORS));
 		
-		addBlockEntry(new BlockEntry(BLOCK_CRAFTING_TABLE, (complexMaterial, settings) -> {
-			return new BaseCraftingTableBlock(getBlock(BLOCK_PLANKS));
-		}).setBlockTags(TagAPI.BLOCK_WORKBENCHES).setItemTags(TagAPI.ITEM_WORKBENCHES));
+		
 		addBlockEntry(new BlockEntry(BLOCK_LADDER, (complexMaterial, settings) -> {
 			return new BaseLadderBlock(getBlock(BLOCK_PLANKS));
 		}).setBlockTags(BlockTags.CLIMBABLE));
@@ -162,20 +166,27 @@ public class WoodenComplexMaterial extends ComplexMaterial {
 			return new BaseSignBlock(getBlock(BLOCK_PLANKS));
 		}).setBlockTags(BlockTags.SIGNS).setItemTags(ItemTags.SIGNS));
 		
+		
+	}
+	
+	protected void initStorage(FabricBlockSettings blockSettings, FabricItemSettings itemSettings){
 		addBlockEntry(new BlockEntry(BLOCK_CHEST, (complexMaterial, settings) -> {
 			return new BaseChestBlock(getBlock(BLOCK_PLANKS));
 		}).setBlockTags(TagAPI.BLOCK_CHEST).setItemTags(TagAPI.ITEM_CHEST));
 		addBlockEntry(new BlockEntry(BLOCK_BARREL, (complexMaterial, settings) -> {
 			return new BaseBarrelBlock(getBlock(BLOCK_PLANKS));
 		}));
-		
+	}
+	
+	protected void initDecorations(FabricBlockSettings blockSettings, FabricItemSettings itemSettings){
+		addBlockEntry(new BlockEntry(BLOCK_CRAFTING_TABLE, (complexMaterial, settings) -> {
+			return new BaseCraftingTableBlock(getBlock(BLOCK_PLANKS));
+		}).setBlockTags(TagAPI.BLOCK_WORKBENCHES).setItemTags(TagAPI.ITEM_WORKBENCHES));
 		
 		addBlockEntry(new BlockEntry(BLOCK_BOOKSHELF, (complexMaterial, settings) -> {
 			return new BaseBookshelfBlock(getBlock(BLOCK_PLANKS));
 		}).setBlockTags(TagAPI.BLOCK_BOOKSHELVES));
-	
-	
-	
+		
 		addBlockEntry(new BlockEntry(BLOCK_COMPOSTER, (complexMaterial, settings) -> {
 			return new BaseComposterBlock(getBlock(BLOCK_PLANKS));
 		}));
