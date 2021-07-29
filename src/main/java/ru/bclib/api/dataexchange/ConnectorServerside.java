@@ -1,7 +1,5 @@
 package ru.bclib.api.dataexchange;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.FriendlyByteBuf;
@@ -10,7 +8,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import ru.bclib.BCLib;
 
-@Environment(EnvType.SERVER)
 class ConnectorServerside extends Connector {
 	private MinecraftServer server;
 	ConnectorServerside(DataExchangeAPI api) {
@@ -28,30 +25,32 @@ class ConnectorServerside extends Connector {
 			BCLib.LOGGER.warning("Server changed!");
 		}
 		this.server = server;
-		for(DataHandlerDescriptor desc : descriptors){
-			ServerPlayNetworking.registerReceiver(handler, desc.identifier, (_server, _player, _handler, _buf, _responseSender) -> {
+		for(DataHandlerDescriptor desc : getDescriptors()){
+			ServerPlayNetworking.registerReceiver(handler, desc.IDENTIFIER, (_server, _player, _handler, _buf, _responseSender) -> {
 				receiveFromClient(desc, _server, _player, _handler, _buf, _responseSender);
 			});
 		}
 	}
 	
 	void onPlayReady(ServerGamePacketListenerImpl handler, PacketSender sender, MinecraftServer server){
-		for(DataHandlerDescriptor desc : descriptors){
+		for(DataHandlerDescriptor desc : getDescriptors()){
 			if (desc.sendOnJoin){
-				DataHandler h = desc.instancer.get();
-				h.sendToClient(server, handler.player);
+				DataHandler h = desc.JOIN_INSTANCE.get();
+				if (h.getOriginatesOnServer()) {
+					h.sendToClient(server, handler.player);
+				}
 			}
 		}
 	}
 	
 	void onPlayDisconnect(ServerGamePacketListenerImpl handler, MinecraftServer server){
-		for(DataHandlerDescriptor desc : descriptors){
-			ServerPlayNetworking.unregisterReceiver(handler, desc.identifier);
+		for(DataHandlerDescriptor desc : getDescriptors()){
+			ServerPlayNetworking.unregisterReceiver(handler, desc.IDENTIFIER);
 		}
 	}
 	
 	void receiveFromClient(DataHandlerDescriptor desc, MinecraftServer server, ServerPlayer player, ServerGamePacketListenerImpl handler, FriendlyByteBuf buf, PacketSender responseSender){
-		DataHandler h = desc.instancer.get();
+		DataHandler h = desc.INSTANCE.get();
 		h.receiveFromClient(server, player, handler, buf, responseSender);
 	}
 	

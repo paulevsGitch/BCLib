@@ -14,7 +14,7 @@ public class TestHandler extends DataHandler{
 	public static DataHandlerDescriptor DESCRIPTOR = new DataHandlerDescriptor(new ResourceLocation(BCLib.MOD_ID, "__test"), TestHandler::new, true);
 	
 	public TestHandler() {
-		super(DESCRIPTOR.identifier, true);
+		super(DESCRIPTOR.IDENTIFIER, true);
 	}
 	
 	@Override

@@ -9,7 +9,7 @@ public class BCLibServer implements DedicatedServerModInitializer {
 	@Override
 	public void onInitializeServer() {
 		ModIntegrationAPI.registerAll();
-		DataExchangeAPI.registerServersideHandler(TestHandler.DESCRIPTOR);
+		DataExchangeAPI.prepareServerside();
 		
 		PostInitAPI.postInit(false);
 	}

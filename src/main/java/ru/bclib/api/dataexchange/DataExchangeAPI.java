@@ -5,57 +5,62 @@ import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class DataExchangeAPI {
 	private static DataExchangeAPI instance;
-	private final ConnectorServerside server;
-	private final ConnectorClientside client;
+	private ConnectorServerside server;
+	private ConnectorClientside client;
+	protected final Set<DataHandlerDescriptor> descriptors;
+	
+	
+	private DataExchangeAPI(){
+		descriptors = new HashSet<>();
+	}
 	
 	public static DataExchangeAPI getInstance(){
-		return instance;
-	}
-	
-	private static DataExchangeAPI getOrCreateInstance(boolean isClient){
 		if (instance==null){
-			instance = new DataExchangeAPI(isClient);
+			instance = new DataExchangeAPI();
 		}
 		return instance;
 	}
 	
-	private DataExchangeAPI(boolean isClient){
-		if (isClient){
-			client = new ConnectorClientside(this);
-			server = null;
-			
-			ClientPlayConnectionEvents.INIT.register(client::onPlayInit);
-			ClientPlayConnectionEvents.JOIN.register(client::onPlayReady);
-			ClientPlayConnectionEvents.DISCONNECT.register(client::onPlayDisconnect);
-		} else {
-			client = null;
-			server = new ConnectorServerside(this);
-			
-			ServerPlayConnectionEvents.INIT.register(server::onPlayInit);
-			ServerPlayConnectionEvents.JOIN.register(server::onPlayReady);
-			ServerPlayConnectionEvents.DISCONNECT.register(server::onPlayDisconnect);
-		}
+	@Environment(EnvType.CLIENT)
+	private void initClientside(){
+		if (client!=null) return;
+		client = new ConnectorClientside(this);
+		
+		ClientPlayConnectionEvents.INIT.register(client::onPlayInit);
+		ClientPlayConnectionEvents.JOIN.register(client::onPlayReady);
+		ClientPlayConnectionEvents.DISCONNECT.register(client::onPlayDisconnect);
+	}
+	
+	private void initServerSide(){
+		if (server!=null) return;
+		server = new ConnectorServerside(this);
+		
+		ServerPlayConnectionEvents.INIT.register(server::onPlayInit);
+		ServerPlayConnectionEvents.JOIN.register(server::onPlayReady);
+		ServerPlayConnectionEvents.DISCONNECT.register(server::onPlayDisconnect);
+	}
+	
+	public static void registerDescriptor(DataHandlerDescriptor desc){
+		DataExchangeAPI api = DataExchangeAPI.getInstance();
+		api.descriptors.add(desc);
 	}
 	
 	
 	@Environment(EnvType.CLIENT)
-	public static void registerClientsideHandler(DataHandlerDescriptor desc){
-		DataExchangeAPI api = DataExchangeAPI.getOrCreateInstance(true);
-		if (api.client == null){
-			throw new RuntimeException("[Internal Error] DataExchangeAPI was already created as a Server");
-		}
-		api.client.addDescriptor(desc);
+	public static void prepareClientside(){
+		DataExchangeAPI api = DataExchangeAPI.getInstance();
+		api.initClientside();
+		
 	}
 	
-	@Environment(EnvType.SERVER)
-	public static void registerServersideHandler(DataHandlerDescriptor desc){
-		DataExchangeAPI api = DataExchangeAPI.getOrCreateInstance(false);
-		if (api.server == null){
-			throw new RuntimeException("[Internal Error] DataExchangeAPI was already created as a Client");
-		}
-		api.server.addDescriptor(desc);
+	public static void prepareServerside(){
+		DataExchangeAPI api = DataExchangeAPI.getInstance();
+		api.initServerSide();
 	}
 	
 	public static void send(DataHandler h){
@@ -65,5 +70,6 @@ public class DataExchangeAPI {
 			DataExchangeAPI.getInstance().client.sendToServer(h);
 		}
 	}
+	
 	
 }

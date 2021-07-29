@@ -40,7 +40,6 @@ public abstract class DataHandler {
 		client.execute(() -> runOnClient(client));
 	}
 	
-	@Environment(EnvType.SERVER)
 	void receiveFromClient(MinecraftServer server, ServerPlayer player, ServerGamePacketListenerImpl handler, FriendlyByteBuf buf, PacketSender responseSender){
 		deserializeFromIncomingData(buf, responseSender, true);
 		server.execute(() -> runOnServer(server));
@@ -54,7 +53,6 @@ public abstract class DataHandler {
 	
 	}
 	
-	@Environment(EnvType.SERVER)
 	protected void runOnServer(MinecraftServer server){
 	
 	}
@@ -63,7 +61,6 @@ public abstract class DataHandler {
 	
 	}
 	
-	@Environment(EnvType.SERVER)
 	void sendToClient(MinecraftServer server){
 		FriendlyByteBuf buf = PacketByteBufs.create();
 		serializeData(buf);
@@ -73,7 +70,6 @@ public abstract class DataHandler {
 		}
 	}
 	
-	@Environment(EnvType.SERVER)
 	void sendToClient(MinecraftServer server, ServerPlayer player){
 		FriendlyByteBuf buf = PacketByteBufs.create();
 		serializeData(buf);
