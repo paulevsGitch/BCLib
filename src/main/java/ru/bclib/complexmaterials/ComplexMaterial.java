@@ -251,6 +251,20 @@ public abstract class ComplexMaterial {
 	}
 	
 	/**
+	 * Replaces or Adds a default {@link BlockEntry} to this {@link ComplexMaterial}. Used to initiate blocks later.
+	 * <p>
+	 * If this {@link ComplexMaterial} does already contain an entry for the {@link ResourceLocation}, the entry will
+	 * be removed first.
+	 * @param entry {@link BlockEntry}
+	 */
+	protected void replaceOrAddBlockEntry(BlockEntry entry) {
+		int pos = defaultBlockEntries.indexOf(entry);
+		if (pos>=0) defaultBlockEntries.remove(entry);
+		
+		addBlockEntry(entry);
+	}
+	
+	/**
 	 * Adds a default {@link ItemEntry} to this {@link ComplexMaterial}. Used to initiate items later.
 	 * @param entry {@link ItemEntry}
 	 */
