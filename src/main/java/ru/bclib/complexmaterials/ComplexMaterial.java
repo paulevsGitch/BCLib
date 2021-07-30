@@ -38,10 +38,12 @@ public abstract class ComplexMaterial {
 	
 	protected final String baseName;
 	protected final String modID;
+	protected final String receipGroupPrefix;
 	
-	public ComplexMaterial(String modID, String baseName) {
+	public ComplexMaterial(String modID, String baseName, String receipGroupPrefix) {
 		this.baseName = baseName;
 		this.modID = modID;
+		this.receipGroupPrefix = receipGroupPrefix;
 		MATERIALS.add(this);
 	}
 	
@@ -246,6 +248,20 @@ public abstract class ComplexMaterial {
 	 */
 	protected void addBlockEntry(BlockEntry entry) {
 		defaultBlockEntries.add(entry);
+	}
+	
+	/**
+	 * Replaces or Adds a default {@link BlockEntry} to this {@link ComplexMaterial}. Used to initiate blocks later.
+	 * <p>
+	 * If this {@link ComplexMaterial} does already contain an entry for the {@link ResourceLocation}, the entry will
+	 * be removed first.
+	 * @param entry {@link BlockEntry}
+	 */
+	protected void replaceOrAddBlockEntry(BlockEntry entry) {
+		int pos = defaultBlockEntries.indexOf(entry);
+		if (pos>=0) defaultBlockEntries.remove(entry);
+		
+		addBlockEntry(entry);
 	}
 	
 	/**

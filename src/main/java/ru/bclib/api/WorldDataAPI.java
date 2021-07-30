@@ -8,6 +8,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.world.level.storage.LevelStorageSource.LevelStorageAccess;
 import ru.bclib.BCLib;
+import ru.bclib.api.dataexchange.DataExchangeAPI;
 import ru.bclib.api.datafixer.DataFixerAPI;
 
 import java.io.File;
@@ -62,11 +63,14 @@ public class WorldDataAPI {
 	
 	/**
 	 * Register mod cache, world cache is located in world data folder.
+	 * <p>
+	 * Will also register the Mod for the {@link DataExchangeAPI} using {@link DataExchangeAPI#registerMod(String)}
 	 *
 	 * @param modID - {@link String} modID.
 	 */
 	public static void registerModCache(String modID) {
 		MODS.add(modID);
+		DataExchangeAPI.registerMod(modID);
 	}
 	
 	/**

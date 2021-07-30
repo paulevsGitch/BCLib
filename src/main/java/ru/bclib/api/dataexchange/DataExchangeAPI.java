@@ -1,5 +1,6 @@
 package ru.bclib.api.dataexchange;
 
+import com.google.common.collect.Lists;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
@@ -7,9 +8,11 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.network.FriendlyByteBuf;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class DataExchangeAPI {
+	private final static List<String> MODS = Lists.newArrayList();
 	private static DataExchangeAPI instance;
 	private ConnectorServerside server;
 	private ConnectorClientside client;
@@ -44,6 +47,23 @@ public class DataExchangeAPI {
 		ServerPlayConnectionEvents.INIT.register(server::onPlayInit);
 		ServerPlayConnectionEvents.JOIN.register(server::onPlayReady);
 		ServerPlayConnectionEvents.DISCONNECT.register(server::onPlayDisconnect);
+	}
+	
+	/**
+	 * Register a mod to participate in the DataExchange.
+	 *
+	 * @param modID - {@link String} modID.
+	 */
+	public static void registerMod(String modID) {
+		MODS.add(modID);
+	}
+	
+	/**
+	 * Returns the IDs of all registered Mods.
+	 * @return List of modIDs
+	 */
+	public static List<String> registeredMods(){
+		return MODS;
 	}
 	
 	/**
