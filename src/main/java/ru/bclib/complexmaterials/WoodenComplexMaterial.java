@@ -117,14 +117,14 @@ public class WoodenComplexMaterial extends ComplexMaterial {
 		
 		addBlockEntry(
 			new BlockEntry(BLOCK_LOG, (complexMaterial, settings) -> {
-				return new BaseStripableLogBlock(woodColor, getBlock("stripped_log"));
+				return new BaseStripableLogBlock(woodColor, getBlock(BLOCK_STRIPPED_LOG));
 			})
 			.setBlockTags(BlockTags.LOGS, BlockTags.LOGS_THAT_BURN, tagBlockLog)
 			.setItemTags(ItemTags.LOGS, ItemTags.LOGS_THAT_BURN, tagItemLog)
 		);
 		addBlockEntry(
 			new BlockEntry(BLOCK_BARK, (complexMaterial, settings) -> {
-				return new StripableBarkBlock(woodColor, getBlock("stripped_bark"));
+				return new StripableBarkBlock(woodColor, getBlock(BLOCK_STRIPPED_BARK));
 			})
 			.setBlockTags(BlockTags.LOGS, BlockTags.LOGS_THAT_BURN, tagBlockLog)
 			.setItemTags(ItemTags.LOGS, ItemTags.LOGS_THAT_BURN, tagItemLog)
