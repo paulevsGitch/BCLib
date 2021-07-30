@@ -1,5 +1,7 @@
 package ru.bclib.api.dataexchange;
 
+import io.netty.buffer.ByteBufUtil;
+import io.netty.util.CharsetUtil;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -15,6 +17,8 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import org.jetbrains.annotations.NotNull;
+
+import java.nio.charset.StandardCharsets;
 
 public abstract class DataHandler {
 	private final boolean originatesOnServer;
@@ -103,5 +107,24 @@ public abstract class DataHandler {
 	@Override
 	public String toString() {
 		return "DataHandler{" + "originatesOnServer=" + originatesOnServer + ", identifier=" + identifier + '}';
+	}
+	
+	/**
+	 * Write a String to a buffer (Convenience Method)
+	 * @param buf The buffer to write to
+	 * @param s The String you want to write
+	 */
+	public static void writeString(FriendlyByteBuf buf, String s){
+		buf.writeByteArray(s.getBytes(StandardCharsets.UTF_8));
+	}
+	
+	/**
+	 * Read a string from a buffer (Convenience Method)
+	 * @param buf Thea buffer to read from
+	 * @return The received String
+	 */
+	public static String readString(FriendlyByteBuf buf){
+		byte[] data = buf.readByteArray();
+		return new String(data, StandardCharsets.UTF_8);
 	}
 }

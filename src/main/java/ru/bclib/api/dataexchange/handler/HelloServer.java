@@ -1,5 +1,7 @@
 package ru.bclib.api.dataexchange.handler;
 
+import io.netty.buffer.ByteBufUtil;
+import io.netty.util.CharsetUtil;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
@@ -8,11 +10,18 @@ import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
 import ru.bclib.BCLib;
+import ru.bclib.api.WorldDataAPI;
+import ru.bclib.api.dataexchange.DataExchangeAPI;
 import ru.bclib.api.dataexchange.DataHandler;
 import ru.bclib.api.dataexchange.DataHandlerDescriptor;
 import ru.bclib.api.datafixer.DataFixerAPI;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 
 public class HelloServer extends DataHandler {
@@ -35,22 +44,41 @@ public class HelloServer extends DataHandler {
 		return getModVersion(BCLib.MOD_ID);
 	}
 	
+	String bclibVersion ="0.0.0";
+	Map<String, String> modVersion = new HashMap<>();
 	@Override
 	protected void deserializeFromIncomingData(FriendlyByteBuf buf, PacketSender responseSender, boolean fromClient) {
-		String bclibVersion = DataFixerAPI.getModVersion(buf.readInt());
-		String localBclibVersion = getBCLibVersion();
+		bclibVersion = DataFixerAPI.getModVersion(buf.readInt());
+		modVersion = new HashMap<>();
 		
-		BCLib.LOGGER.info("Hello Server received from BCLib. (server="+localBclibVersion+", client="+bclibVersion+")");
+		int count = buf.readInt();
+		for (int i=0; i< count; i++){
+			String id = readString(buf);
+			String version = DataFixerAPI.getModVersion(buf.readInt());
+			modVersion.put(id, version);
+		}
 	}
 	
 	@Override
-	@Environment(EnvType.CLIENT)
-	protected void runOnClient(Minecraft client) {
-	
+	protected void runOnServer(MinecraftServer server) {
+		String localBclibVersion = getBCLibVersion();
+		BCLib.LOGGER.info("Hello Server received from BCLib. (server="+localBclibVersion+", client="+bclibVersion+")");
+		
+		for (Entry<String, String> e : modVersion.entrySet()){
+			String ver = getModVersion(e.getKey());
+			BCLib.LOGGER.info("    - " + e.getKey() + " (server="+ver+", client="+ver+")");
+		}
 	}
 	
 	@Override
 	protected void serializeData(FriendlyByteBuf buf) {
+		final List<String> mods = DataExchangeAPI.registeredMods();
 		buf.writeInt(DataFixerAPI.getModVersion(getBCLibVersion()));
+		
+		buf.writeInt(mods.size());
+		for (String modID : mods) {
+			writeString(buf, modID);
+			buf.writeInt(DataFixerAPI.getModVersion(getModVersion(modID)));
+		}
 	}
 }
