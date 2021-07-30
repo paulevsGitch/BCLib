@@ -90,17 +90,15 @@ public abstract class ModelBakeryMixin {
 			}
 		});
 		
-		Registry.ITEM.forEach(item -> {
-			if (item instanceof ItemModelProvider) {
-				ResourceLocation registryID = Registry.ITEM.getKey(item);
-				ResourceLocation storageID = new ResourceLocation(registryID.getNamespace(), "models/item/" + registryID.getPath() + ".json");
-				if (!resourceManager.hasResource(storageID)) {
-					ResourceLocation itemID = new ModelResourceLocation(registryID.getNamespace(), registryID.getPath(), "inventory");
-					ItemModelProvider provider = (ItemModelProvider) item;
-					BlockModel model = provider.getItemModel(registryID);
-					cache.put(itemID, model);
-					topLevel.put(itemID, model);
-				}
+		Registry.ITEM.stream().filter(item -> item instanceof ItemModelProvider).parallel().forEach(item -> {
+			ResourceLocation registryID = Registry.ITEM.getKey(item);
+			ResourceLocation storageID = new ResourceLocation(registryID.getNamespace(), "models/item/" + registryID.getPath() + ".json");
+			if (!resourceManager.hasResource(storageID)) {
+				ResourceLocation itemID = new ModelResourceLocation(registryID.getNamespace(), registryID.getPath(), "inventory");
+				ItemModelProvider provider = (ItemModelProvider) item;
+				BlockModel model = provider.getItemModel(registryID);
+				cache.put(itemID, model);
+				topLevel.put(itemID, model);
 			}
 		});
 		
