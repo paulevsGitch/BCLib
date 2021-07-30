@@ -96,7 +96,7 @@ public class WoodenComplexMaterial extends ComplexMaterial {
 		initDecorations(blockSettings, itemSettings);
 	}
 	
-	protected void initBase(FabricBlockSettings blockSettings, FabricItemSettings itemSettings) {
+	final protected void initBase(FabricBlockSettings blockSettings, FabricItemSettings itemSettings) {
 		Tag.Named<Block> tagBlockLog = getBlockTag(TAG_LOGS);
 		Tag.Named<Item> tagItemLog = getItemTag(TAG_LOGS);
 		
@@ -169,7 +169,7 @@ public class WoodenComplexMaterial extends ComplexMaterial {
 		
 	}
 	
-	protected void initStorage(FabricBlockSettings blockSettings, FabricItemSettings itemSettings){
+	final protected void initStorage(FabricBlockSettings blockSettings, FabricItemSettings itemSettings){
 		addBlockEntry(new BlockEntry(BLOCK_CHEST, (complexMaterial, settings) -> {
 			return new BaseChestBlock(getBlock(BLOCK_PLANKS));
 		}).setBlockTags(TagAPI.BLOCK_CHEST).setItemTags(TagAPI.ITEM_CHEST));
@@ -178,7 +178,7 @@ public class WoodenComplexMaterial extends ComplexMaterial {
 		}));
 	}
 	
-	protected void initDecorations(FabricBlockSettings blockSettings, FabricItemSettings itemSettings){
+	final protected void initDecorations(FabricBlockSettings blockSettings, FabricItemSettings itemSettings){
 		addBlockEntry(new BlockEntry(BLOCK_CRAFTING_TABLE, (complexMaterial, settings) -> {
 			return new BaseCraftingTableBlock(getBlock(BLOCK_PLANKS));
 		}).setBlockTags(TagAPI.BLOCK_WORKBENCHES).setItemTags(TagAPI.ITEM_WORKBENCHES));
