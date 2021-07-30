@@ -46,15 +46,15 @@ import java.util.Random;
 
 @SuppressWarnings("deprecation")
 public class BaseTerrainBlock extends BaseBlock {
-	
 	private final Block baseBlock;
 	private Block pathBlock;
 	
 	public BaseTerrainBlock(Block baseBlock, MaterialColor color) {
-		super(FabricBlockSettings.copyOf(baseBlock)
-								 .materialColor(color)
-								 .sound(BlockSounds.TERRAIN_SOUND)
-								 .randomTicks());
+		super(FabricBlockSettings
+			.copyOf(baseBlock)
+			.materialColor(color)
+			.sound(BlockSounds.TERRAIN_SOUND)
+			.randomTicks());
 		this.baseBlock = baseBlock;
 	}
 	
@@ -122,6 +122,27 @@ public class BaseTerrainBlock extends BaseBlock {
 	
 	@Override
 	@Environment(EnvType.CLIENT)
+	public UnbakedModel getItemModel(ResourceLocation itemID, Map<ResourceLocation, UnbakedModel> unbakedCache) {
+		return unbakedCache.get(new ResourceLocation(itemID.getNamespace(), itemID.getPath()));
+	}
+	
+	@Override
+	@Environment(EnvType.CLIENT)
+	public void registerModels(ResourceLocation blockID, Map<ResourceLocation, UnbakedModel> modelRegistry, Map<ResourceLocation, UnbakedModel> unbakedCache) {
+		ResourceLocation baseId = Registry.BLOCK.getKey(baseBlock);
+		String modId = blockID.getNamespace();
+		String path = blockID.getPath();
+		String bottom = baseId.getNamespace() + ":block/" + baseId.getPath();
+		Map<String, String> textures = Maps.newHashMap();
+		textures.put("%top%", modId + ":block/" + path + "_top");
+		textures.put("%side%", modId + ":block/" + path + "_side");
+		textures.put("%bottom%", bottom);
+		Optional<String> pattern = PatternsHelper.createJson(BasePatterns.BLOCK_TOP_SIDE_BOTTOM, textures);
+		modelRegistry.put(blockID, ModelsHelper.fromPattern(pattern));
+	}
+	
+	/*@Override
+	@Environment(EnvType.CLIENT)
 	public BlockModel getItemModel(ResourceLocation blockId) {
 		return getBlockModel(blockId, defaultBlockState());
 	}
@@ -147,5 +168,5 @@ public class BaseTerrainBlock extends BaseBlock {
 		ResourceLocation modelId = new ResourceLocation(stateId.getNamespace(), "block/" + stateId.getPath());
 		registerBlockModel(stateId, modelId, blockState, modelCache);
 		return ModelsHelper.createRandomTopModel(modelId);
-	}
+	}*/
 }
