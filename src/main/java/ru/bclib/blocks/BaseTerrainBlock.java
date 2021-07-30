@@ -88,7 +88,7 @@ public class BaseTerrainBlock extends BaseBlock {
 		if (tool != null && EnchantmentHelper.getItemEnchantmentLevel(Enchantments.SILK_TOUCH, tool) > 0) {
 			return Collections.singletonList(new ItemStack(this));
 		}
-		return Collections.singletonList(new ItemStack(Blocks.END_STONE));
+		return Collections.singletonList(new ItemStack(getBaseBlock()));
 	}
 	
 	@Override
