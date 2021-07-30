@@ -1,5 +1,6 @@
 package ru.bclib.mixin.client;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import net.minecraft.client.color.block.BlockColors;
 import net.minecraft.client.renderer.block.BlockModelShaper;
@@ -47,38 +48,44 @@ public abstract class ModelBakeryMixin {
 		)
 	)
 	private void bclib_initCustomModels(ResourceManager resourceManager, BlockColors blockColors, ProfilerFiller profiler, int mipmap, CallbackInfo info) {
-		Map<ResourceLocation, UnbakedModel> cache = Maps.newHashMap();
-		Map<ResourceLocation, UnbakedModel> topLevel = Maps.newHashMap();
+		Map<ResourceLocation, UnbakedModel> cache = Maps.newConcurrentMap();
+		Map<ResourceLocation, UnbakedModel> topLevel = Maps.newConcurrentMap();
 		
-		Registry.BLOCK.forEach(block -> {
-			if (block instanceof BlockModelProvider) {
-				ResourceLocation blockID = Registry.BLOCK.getKey(block);
-				ResourceLocation storageID = new ResourceLocation(blockID.getNamespace(), "blockstates/" + blockID.getPath() + ".json");
-				BlockModelProvider provider = (BlockModelProvider) block;
+		Registry.BLOCK.stream().filter(block -> block instanceof BlockModelProvider).parallel().forEach(block -> {
+			ResourceLocation blockID = Registry.BLOCK.getKey(block);
+			ResourceLocation storageID = new ResourceLocation(blockID.getNamespace(), "blockstates/" + blockID.getPath() + ".json");
+			BlockModelProvider provider = (BlockModelProvider) block;
+			
+			if (!resourceManager.hasResource(storageID)) {
+				BlockState defaultState = block.defaultBlockState();
+				ResourceLocation defaultStateID = BlockModelShaper.stateToModelLocation(blockID, defaultState);
 				
-				if (!resourceManager.hasResource(storageID)) {
-					BlockState defaultState = block.defaultBlockState();
-					ResourceLocation defaultStateID = BlockModelShaper.stateToModelLocation(blockID, defaultState);
-					
-					UnbakedModel defaultModel = provider.getModelVariant(defaultStateID, defaultState, cache);
-					cache.put(blockID, defaultModel);
-					topLevel.put(blockID, defaultModel);
-					
-					block.getStateDefinition().getPossibleStates().forEach(blockState -> {
+				UnbakedModel defaultModel = provider.getModelVariant(defaultStateID, defaultState, cache);
+				cache.put(blockID, defaultModel);
+				topLevel.put(blockID, defaultModel);
+				
+				ImmutableList<BlockState> states = block.getStateDefinition().getPossibleStates();
+				if (states.size() == 1) {
+					ResourceLocation stateID = BlockModelShaper.stateToModelLocation(blockID, block.defaultBlockState());
+					cache.put(stateID, defaultModel);
+					topLevel.put(stateID, defaultModel);
+				}
+				else {
+					states.forEach(blockState -> {
 						ResourceLocation stateID = BlockModelShaper.stateToModelLocation(blockID, blockState);
 						BlockModel model = provider.getBlockModel(stateID, blockState);
 						cache.put(stateID, model != null ? model : defaultModel);
 					});
 				}
-				
-				if (Registry.ITEM.get(blockID) != Items.AIR) {
-					storageID = new ResourceLocation(blockID.getNamespace(), "models/item/" + blockID.getPath() + ".json");
-					if (!resourceManager.hasResource(storageID)) {
-						ResourceLocation itemID = new ModelResourceLocation(blockID.getNamespace(), blockID.getPath(), "inventory");
-						BlockModel model = provider.getItemModel(itemID);
-						cache.put(itemID, model);
-						topLevel.put(itemID, model);
-					}
+			}
+			
+			if (Registry.ITEM.get(blockID) != Items.AIR) {
+				storageID = new ResourceLocation(blockID.getNamespace(), "models/item/" + blockID.getPath() + ".json");
+				if (!resourceManager.hasResource(storageID)) {
+					ResourceLocation itemID = new ModelResourceLocation(blockID.getNamespace(), blockID.getPath(), "inventory");
+					BlockModel model = provider.getItemModel(itemID);
+					cache.put(itemID, model);
+					topLevel.put(itemID, model);
 				}
 			}
 		});
