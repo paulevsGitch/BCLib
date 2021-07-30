@@ -46,15 +46,16 @@ import java.util.Random;
 
 @SuppressWarnings("deprecation")
 public class BaseTerrainBlock extends BaseBlock {
-	
 	private final Block baseBlock;
 	private Block pathBlock;
 	
 	public BaseTerrainBlock(Block baseBlock, MaterialColor color) {
-		super(FabricBlockSettings.copyOf(baseBlock)
-								 .materialColor(color)
-								 .sound(BlockSounds.TERRAIN_SOUND)
-								 .randomTicks());
+		super(FabricBlockSettings
+			.copyOf(baseBlock)
+			.materialColor(color)
+			.sound(BlockSounds.TERRAIN_SOUND)
+			.randomTicks()
+		);
 		this.baseBlock = baseBlock;
 	}
 	
@@ -93,7 +94,7 @@ public class BaseTerrainBlock extends BaseBlock {
 	@Override
 	public void randomTick(BlockState state, ServerLevel world, BlockPos pos, Random random) {
 		if (random.nextInt(16) == 0 && !canStay(state, world, pos)) {
-			world.setBlockAndUpdate(pos, Blocks.END_STONE.defaultBlockState());
+			world.setBlockAndUpdate(pos, getBaseBlock().defaultBlockState());
 		}
 	}
 	
@@ -129,7 +130,7 @@ public class BaseTerrainBlock extends BaseBlock {
 	@Override
 	@Environment(EnvType.CLIENT)
 	public @Nullable BlockModel getBlockModel(ResourceLocation blockId, BlockState blockState) {
-		ResourceLocation baseId = Registry.BLOCK.getKey(baseBlock);
+		ResourceLocation baseId = Registry.BLOCK.getKey(getBaseBlock());
 		String modId = blockId.getNamespace();
 		String path = blockId.getPath();
 		String bottom = baseId.getNamespace() + ":block/" + baseId.getPath();
