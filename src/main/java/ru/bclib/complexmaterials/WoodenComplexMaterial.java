@@ -67,8 +67,8 @@ public class WoodenComplexMaterial extends ComplexMaterial {
 	public final MaterialColor planksColor;
 	public final MaterialColor woodColor;
 	
-	public WoodenComplexMaterial(String modID, String baseName, MaterialColor woodColor, MaterialColor planksColor) {
-		super(modID, baseName);
+	public WoodenComplexMaterial(String modID, String baseName, String receipGroupPrefix, MaterialColor woodColor, MaterialColor planksColor) {
+		super(modID, baseName, receipGroupPrefix);
 		this.planksColor = planksColor;
 		this.woodColor = woodColor;
 	}
@@ -217,7 +217,7 @@ public class WoodenComplexMaterial extends ComplexMaterial {
 				.setOutputCount(4)
 				.setList("#")
 				.addMaterial('#', log, bark, log_stripped, bark_stripped)
-				.setGroup("end_planks")
+				.setGroup(receipGroupPrefix +"_planks")
 				.build();
 		}));
 		addRecipeEntry(new RecipeEntry("stairs", (material, config, id) -> {
@@ -226,7 +226,7 @@ public class WoodenComplexMaterial extends ComplexMaterial {
 				.setOutputCount(4)
 				.setShape("#  ", "## ", "###")
 				.addMaterial('#', planks)
-				.setGroup("end_planks_stairs")
+				.setGroup(receipGroupPrefix +"_planks_stairs")
 				.build();
 		}));
 		addRecipeEntry(new RecipeEntry("slab", (material, config, id) -> {
@@ -235,7 +235,7 @@ public class WoodenComplexMaterial extends ComplexMaterial {
 				.setOutputCount(6)
 				.setShape("###")
 				.addMaterial('#', planks)
-				.setGroup("end_planks_slabs")
+				.setGroup(receipGroupPrefix +"_planks_slabs")
 				.build();
 		}));
 		addRecipeEntry(new RecipeEntry("fence", (material, config, id) -> {
@@ -245,7 +245,7 @@ public class WoodenComplexMaterial extends ComplexMaterial {
 				.setShape("#I#", "#I#")
 				.addMaterial('#', planks)
 				.addMaterial('I', Items.STICK)
-				.setGroup("end_planks_fences")
+				.setGroup(receipGroupPrefix +"_planks_fences")
 				.build();
 		}));
 		addRecipeEntry(new RecipeEntry("gate", (material, config, id) -> {
@@ -254,7 +254,7 @@ public class WoodenComplexMaterial extends ComplexMaterial {
 				.setShape("I#I", "I#I")
 				.addMaterial('#', planks)
 				.addMaterial('I', Items.STICK)
-				.setGroup("end_planks_gates")
+				.setGroup(receipGroupPrefix +"_planks_gates")
 				.build();
 		}));
 		addRecipeEntry(new RecipeEntry("button", (material, config, id) -> {
@@ -262,7 +262,7 @@ public class WoodenComplexMaterial extends ComplexMaterial {
 				.checkConfig(config)
 				.setList("#")
 				.addMaterial('#', planks)
-				.setGroup("end_planks_buttons")
+				.setGroup(receipGroupPrefix +"_planks_buttons")
 				.build();
 		}));
 		addRecipeEntry(new RecipeEntry("pressure_plate", (material, config, id) -> {
@@ -270,7 +270,7 @@ public class WoodenComplexMaterial extends ComplexMaterial {
 				.checkConfig(config)
 				.setShape("##")
 				.addMaterial('#', planks)
-				.setGroup("end_planks_plates")
+				.setGroup(receipGroupPrefix +"_planks_plates")
 				.build();
 		}));
 		addRecipeEntry(new RecipeEntry("trapdoor", (material, config, id) -> {
@@ -279,7 +279,7 @@ public class WoodenComplexMaterial extends ComplexMaterial {
 				.setOutputCount(2)
 				.setShape("###", "###")
 				.addMaterial('#', planks)
-				.setGroup("end_trapdoors")
+				.setGroup(receipGroupPrefix +"_trapdoors")
 				.build();
 		}));
 		addRecipeEntry(new RecipeEntry("door", (material, config, id) -> {
@@ -288,7 +288,7 @@ public class WoodenComplexMaterial extends ComplexMaterial {
 				.setOutputCount(3)
 				.setShape("##", "##", "##")
 				.addMaterial('#', planks)
-				.setGroup("end_doors")
+				.setGroup(receipGroupPrefix +"_doors")
 				.build();
 		}));
 		addRecipeEntry(new RecipeEntry("crafting_table", (material, config, id) -> {
@@ -296,7 +296,7 @@ public class WoodenComplexMaterial extends ComplexMaterial {
 				.checkConfig(config)
 				.setShape("##", "##")
 				.addMaterial('#', planks)
-				.setGroup("end_tables")
+				.setGroup(receipGroupPrefix +"_tables")
 				.build();
 		}));
 		addRecipeEntry(new RecipeEntry("ladder", (material, config, id) -> {
@@ -306,7 +306,7 @@ public class WoodenComplexMaterial extends ComplexMaterial {
 				.setShape("I I", "I#I", "I I")
 				.addMaterial('#', planks)
 				.addMaterial('I', Items.STICK)
-				.setGroup("end_ladders")
+				.setGroup(receipGroupPrefix +"_ladders")
 				.build();
 		}));
 		addRecipeEntry(new RecipeEntry("sign", (material, config, id) -> {
@@ -316,7 +316,7 @@ public class WoodenComplexMaterial extends ComplexMaterial {
 				.setShape("###", "###", " I ")
 				.addMaterial('#', planks)
 				.addMaterial('I', Items.STICK)
-				.setGroup("end_signs")
+				.setGroup(receipGroupPrefix +"_signs")
 				.build();
 		}));
 		addRecipeEntry(new RecipeEntry("chest", (material, config, id) -> {
@@ -324,7 +324,7 @@ public class WoodenComplexMaterial extends ComplexMaterial {
 				.checkConfig(config)
 				.setShape("###", "# #", "###")
 				.addMaterial('#', planks)
-				.setGroup("end_chests")
+				.setGroup(receipGroupPrefix +"_chests")
 				.build();
 		}));
 		addRecipeEntry(new RecipeEntry("barrel", (material, config, id) -> {
@@ -333,7 +333,7 @@ public class WoodenComplexMaterial extends ComplexMaterial {
 				.setShape("#S#", "# #", "#S#")
 				.addMaterial('#', planks)
 				.addMaterial('S', getBlock(BLOCK_SLAB))
-				.setGroup("end_barrels")
+				.setGroup(receipGroupPrefix +"_barrels")
 				.build();
 		}));
 		addRecipeEntry(new RecipeEntry("bookshelf", (material, config, id) -> {
@@ -342,7 +342,7 @@ public class WoodenComplexMaterial extends ComplexMaterial {
 				.setShape("###", "PPP", "###")
 				.addMaterial('#', planks)
 				.addMaterial('P', Items.BOOK)
-				.setGroup("end_bookshelves")
+				.setGroup(receipGroupPrefix +"_bookshelves")
 				.build();
 		}));
 		addRecipeEntry(new RecipeEntry("bark", (material, config, id) -> {

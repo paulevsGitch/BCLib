@@ -38,10 +38,12 @@ public abstract class ComplexMaterial {
 	
 	protected final String baseName;
 	protected final String modID;
+	protected final String receipGroupPrefix;
 	
-	public ComplexMaterial(String modID, String baseName) {
+	public ComplexMaterial(String modID, String baseName, String receipGroupPrefix) {
 		this.baseName = baseName;
 		this.modID = modID;
+		this.receipGroupPrefix = receipGroupPrefix;
 		MATERIALS.add(this);
 	}
 	
