@@ -242,9 +242,6 @@ public class DataFixerAPI {
 	}
 
 	private static void runDataFixes(File dir, MigrationProfile profile, ProgressListener progress) {
-		System.out.println("RUNNING fixes");
-		if (dir!= null) return;
-		
 		State state = new State();
 		
 		List<File> regions = getAllRegions(dir, null);
