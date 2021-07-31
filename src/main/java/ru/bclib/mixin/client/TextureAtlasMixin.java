@@ -19,7 +19,7 @@ import java.io.IOException;
 
 @Mixin(TextureAtlas.class)
 public class TextureAtlasMixin {
-	private static final int EMISSIVE_ALPHA = 253 << 24;
+	private static final int EMISSIVE_ALPHA = 254 << 24;
 	private boolean bclib_modifyAtlas;
 	
 	@Inject(method = "<init>*", at = @At("TAIL"))
