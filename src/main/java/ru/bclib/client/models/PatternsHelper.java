@@ -14,6 +14,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class PatternsHelper {
+	private static final Map<ResourceLocation, String> JSON_CACHE = Maps.newConcurrentMap();
+	
 	public static Optional<String> createItemGenerated(ResourceLocation itemId) {
 		return createJson(BasePatterns.ITEM_GENERATED, itemId);
 	}
@@ -52,8 +54,11 @@ public class PatternsHelper {
 	public static Optional<String> createJson(ResourceLocation patternId, Map<String, String> textures) {
 		ResourceManager resourceManager = Minecraft.getInstance().getResourceManager();
 		try (InputStream input = resourceManager.getResource(patternId).getInputStream()) {
-			String json = new BufferedReader(new InputStreamReader(input, StandardCharsets.UTF_8)).lines()
-																								  .collect(Collectors.joining());
+			String json = JSON_CACHE.get(patternId);
+			if (json == null) {
+				json = new BufferedReader(new InputStreamReader(input, StandardCharsets.UTF_8)).lines().collect(Collectors.joining());
+				JSON_CACHE.put(patternId, json);
+			}
 			for (Map.Entry<String, String> texture : textures.entrySet()) {
 				json = json.replace(texture.getKey(), texture.getValue());
 			}

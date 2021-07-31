@@ -72,7 +72,7 @@ public abstract class ModelBakeryMixin {
 					});
 				}
 				else {
-					states.stream().parallel().forEach(blockState -> {
+					states.forEach(blockState -> {
 						ResourceLocation stateID = BlockModelShaper.stateToModelLocation(blockID, blockState);
 						UnbakedModel model = provider.getModelVariant(stateID, blockState, cache);
 						cache.put(stateID, model);
