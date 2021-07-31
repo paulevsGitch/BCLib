@@ -105,9 +105,9 @@ public class DataFixerAPI {
 	 */
 	public static boolean fixData(LevelStorageSource.LevelStorageAccess levelStorageAccess, boolean showUI, Consumer<Boolean> onResume){
 		File levelPath = levelStorageAccess.getLevelPath(LevelResource.ROOT).toFile();
-		
+		File levelDat = levelStorageAccess.getLevelPath(LevelResource.LEVEL_DATA_FILE).toFile();
 		boolean newWorld = false;
-		if (!levelPath.exists()) {
+		if (!levelDat.exists()) {
 			BCLib.LOGGER.info("Creating a new World, no fixes needed");
 			newWorld = true;
 		}
