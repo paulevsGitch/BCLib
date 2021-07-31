@@ -91,7 +91,6 @@ public class HelloClient extends DataHandler {
 	
 	@Environment(EnvType.CLIENT)
 	protected void showBCLibError(Minecraft client){
-		client.pauseGame(false);
 		BCLib.LOGGER.error("BCLib differs on client and server.");
 		client.setScreen(new WarnBCLibVersionMismatch((download) -> {
 			Minecraft.getInstance().setScreen((Screen)null);

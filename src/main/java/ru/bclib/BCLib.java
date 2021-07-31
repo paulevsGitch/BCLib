@@ -8,6 +8,7 @@ import ru.bclib.api.TagAPI;
 import ru.bclib.api.WorldDataAPI;
 import ru.bclib.api.dataexchange.DataExchangeAPI;
 import ru.bclib.api.dataexchange.handler.HelloClient;
+import ru.bclib.api.dataexchange.handler.HelloServer;
 import ru.bclib.config.Configs;
 import ru.bclib.recipes.CraftingRecipes;
 import ru.bclib.registry.BaseBlockEntities;
@@ -30,6 +31,7 @@ public class BCLib implements ModInitializer {
 		Configs.save();
 		
 		DataExchangeAPI.registerDescriptor(HelloClient.DESCRIPTOR);
+		DataExchangeAPI.registerDescriptor(HelloServer.DESCRIPTOR);
 	}
 	
 	public static boolean isDevEnvironment() {

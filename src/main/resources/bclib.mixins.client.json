@@ -6,6 +6,7 @@
 	"client": [
 		"EnchantingTableBlockMixin",
 		"BackgroundRendererMixin",
+		"GameMixin",
 		"TextureAtlasMixin",
 		"ModelBakeryMixin",
 		"MinecraftMixin"
