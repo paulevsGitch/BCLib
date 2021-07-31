@@ -40,24 +40,19 @@ public abstract class DataHandler {
 	
 	@Environment(EnvType.CLIENT)
 	void receiveFromServer(Minecraft client, ClientPacketListener handler, FriendlyByteBuf buf, PacketSender responseSender){
-		deserializeFromIncomingData(buf, responseSender, false);
-		client.execute(() -> runOnClient(client));
+		deserializeFromIncomingData(buf, responseSender, true);
+		client.execute(() -> runOnGameThread(client, null, true));
 	}
 	
 	void receiveFromClient(MinecraftServer server, ServerPlayer player, ServerGamePacketListenerImpl handler, FriendlyByteBuf buf, PacketSender responseSender){
-		deserializeFromIncomingData(buf, responseSender, true);
-		server.execute(() -> runOnServer(server));
+		deserializeFromIncomingData(buf, responseSender, false);
+		server.execute(() -> runOnGameThread(null, server, false));
 	}
 	
-	protected void deserializeFromIncomingData(FriendlyByteBuf buf, PacketSender responseSender, boolean fromClient){
+	protected void deserializeFromIncomingData(FriendlyByteBuf buf, PacketSender responseSender, boolean isClient){
 	}
 	
-	@Environment(EnvType.CLIENT)
-	protected void runOnClient(Minecraft client){
-	
-	}
-	
-	protected void runOnServer(MinecraftServer server){
+	protected void runOnGameThread(Minecraft client, MinecraftServer server, boolean isClient){
 	
 	}
 	

@@ -1,7 +1,5 @@
 package ru.bclib.api.dataexchange.handler;
 
-import io.netty.buffer.ByteBufUtil;
-import io.netty.util.CharsetUtil;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
@@ -12,7 +10,6 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import ru.bclib.BCLib;
-import ru.bclib.api.WorldDataAPI;
 import ru.bclib.api.dataexchange.DataExchangeAPI;
 import ru.bclib.api.dataexchange.DataHandler;
 import ru.bclib.api.dataexchange.DataHandlerDescriptor;
@@ -24,11 +21,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 
-public class HelloServer extends DataHandler {
-	public static DataHandlerDescriptor DESCRIPTOR = new DataHandlerDescriptor(new ResourceLocation(BCLib.MOD_ID, "hello_server"), HelloServer::new, true);
+public class HelloClient extends DataHandler {
+	public static DataHandlerDescriptor DESCRIPTOR = new DataHandlerDescriptor(new ResourceLocation(BCLib.MOD_ID, "hello_client"), HelloClient::new, true);
 	
-	public HelloServer() {
-		super(DESCRIPTOR.IDENTIFIER, false);
+	public HelloClient() {
+		super(DESCRIPTOR.IDENTIFIER, true);
 	}
 	
 	public static String getModVersion(String modID){
@@ -60,13 +57,18 @@ public class HelloServer extends DataHandler {
 	}
 	
 	@Override
-	protected void runOnServer(MinecraftServer server) {
+	protected void runOnGameThread(Minecraft client, MinecraftServer server, boolean isClient) {
 		String localBclibVersion = getBCLibVersion();
-		BCLib.LOGGER.info("Hello Server received from BCLib. (server="+localBclibVersion+", client="+bclibVersion+")");
+		BCLib.LOGGER.info("Hello Client received from BCLib. (client="+localBclibVersion+", server="+bclibVersion+")");
+		
+		if (DataFixerAPI.getModVersion(localBclibVersion) == DataFixerAPI.getModVersion(bclibVersion)){
+			showBCLibError(client);
+			return;
+		}
 		
 		for (Entry<String, String> e : modVersion.entrySet()){
 			String ver = getModVersion(e.getKey());
-			BCLib.LOGGER.info("    - " + e.getKey() + " (server="+ver+", client="+ver+")");
+			BCLib.LOGGER.info("    - " + e.getKey() + " (client="+ver+", server="+ver+")");
 		}
 	}
 	
@@ -80,5 +82,11 @@ public class HelloServer extends DataHandler {
 			writeString(buf, modID);
 			buf.writeInt(DataFixerAPI.getModVersion(getModVersion(modID)));
 		}
+	}
+	
+	@Environment(EnvType.CLIENT)
+	protected void showBCLibError(Minecraft client){
+		BCLib.LOGGER.error("BCLib differs on client and server. Stopping.");
+		client.stop();
 	}
 }
