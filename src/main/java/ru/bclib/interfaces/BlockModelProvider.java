@@ -1,6 +1,5 @@
 package ru.bclib.interfaces;
 
-import com.google.common.collect.Maps;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.block.model.BlockModel;
@@ -14,8 +13,6 @@ import ru.bclib.client.models.PatternsHelper;
 
 import java.util.Map;
 import java.util.Optional;
-
-import static net.minecraft.client.resources.model.ModelBakery.MISSING_MODEL_LOCATION;
 
 public interface BlockModelProvider extends ItemModelProvider {
 	@Environment(EnvType.CLIENT)

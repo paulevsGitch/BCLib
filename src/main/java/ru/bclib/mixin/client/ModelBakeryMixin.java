@@ -5,6 +5,7 @@ import com.google.common.collect.Maps;
 import net.minecraft.client.color.block.BlockColors;
 import net.minecraft.client.renderer.block.BlockModelShaper;
 import net.minecraft.client.renderer.block.model.BlockModel;
+import net.minecraft.client.renderer.block.model.multipart.MultiPart;
 import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.client.resources.model.UnbakedModel;
@@ -58,24 +59,23 @@ public abstract class ModelBakeryMixin {
 			BlockModelProvider provider = (BlockModelProvider) block;
 			
 			if (!resourceManager.hasResource(storageID)) {
-				BlockState defaultState = block.defaultBlockState();
-				ResourceLocation defaultStateID = BlockModelShaper.stateToModelLocation(blockID, defaultState);
-				
-				UnbakedModel defaultModel = provider.getModelVariant(defaultStateID, defaultState, cache);
-				cache.put(blockID, defaultModel);
-				topLevel.put(blockID, defaultModel);
-				
 				ImmutableList<BlockState> states = block.getStateDefinition().getPossibleStates();
-				if (states.size() == 1) {
-					ResourceLocation stateID = BlockModelShaper.stateToModelLocation(blockID, block.defaultBlockState());
-					cache.put(stateID, defaultModel);
-					topLevel.put(stateID, defaultModel);
-				}
-				else {
+				BlockState defaultState = block.defaultBlockState();
+				
+				ResourceLocation defaultStateID = BlockModelShaper.stateToModelLocation(blockID, defaultState);
+				UnbakedModel defaultModel = provider.getModelVariant(defaultStateID, defaultState, cache);
+				
+				if (defaultModel instanceof MultiPart) {
 					states.forEach(blockState -> {
 						ResourceLocation stateID = BlockModelShaper.stateToModelLocation(blockID, blockState);
-						BlockModel model = provider.getBlockModel(stateID, blockState);
-						cache.put(stateID, model != null ? model : defaultModel);
+						cache.put(stateID, defaultModel);
+					});
+				}
+				else {
+					states.stream().parallel().forEach(blockState -> {
+						ResourceLocation stateID = BlockModelShaper.stateToModelLocation(blockID, blockState);
+						UnbakedModel model = provider.getModelVariant(stateID, blockState, cache);
+						cache.put(stateID, model);
 					});
 				}
 			}
