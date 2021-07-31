@@ -7,7 +7,7 @@ import net.minecraft.resources.ResourceLocation;
 import ru.bclib.api.TagAPI;
 import ru.bclib.api.WorldDataAPI;
 import ru.bclib.api.dataexchange.DataExchangeAPI;
-import ru.bclib.api.dataexchange.handler.HelloServer;
+import ru.bclib.api.dataexchange.handler.HelloClient;
 import ru.bclib.config.Configs;
 import ru.bclib.recipes.CraftingRecipes;
 import ru.bclib.registry.BaseBlockEntities;
@@ -28,7 +28,8 @@ public class BCLib implements ModInitializer {
 		CraftingRecipes.init();
 		WorldDataAPI.registerModCache(MOD_ID);
 		Configs.save();
-		DataExchangeAPI.registerDescriptor(HelloServer.DESCRIPTOR);
+		
+		DataExchangeAPI.registerDescriptor(HelloClient.DESCRIPTOR);
 	}
 	
 	public static boolean isDevEnvironment() {
