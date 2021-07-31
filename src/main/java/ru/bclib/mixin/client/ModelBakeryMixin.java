@@ -49,8 +49,6 @@ public abstract class ModelBakeryMixin {
 		)
 	)
 	private void bclib_initCustomModels(ResourceManager resourceManager, BlockColors blockColors, ProfilerFiller profiler, int mipmap, CallbackInfo info) {
-		System.out.println("Cache size 1: " + unbakedCache.size());
-		
 		Map<ResourceLocation, UnbakedModel> cache = Maps.newConcurrentMap();
 		Map<ResourceLocation, UnbakedModel> topLevel = Maps.newConcurrentMap();
 		
@@ -104,8 +102,6 @@ public abstract class ModelBakeryMixin {
 				topLevel.put(itemID, model);
 			}
 		});
-		
-		System.out.println("Cache size 2: " + unbakedCache.size());
 		
 		cache.values().forEach(model -> {
 			loadingStack.addAll(model.getDependencies());
