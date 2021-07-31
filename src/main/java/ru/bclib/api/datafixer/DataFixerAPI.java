@@ -227,9 +227,6 @@ public class DataFixerAPI {
 	
 	@Environment(EnvType.CLIENT)
 	static void showBackupWarning(String levelID, Consumer<Boolean> whenFinished){
-		TranslatableComponent promptText = new TranslatableComponent("bclib.datafixer.backupWarning.prompt");
-		TranslatableComponent buttonTitle = new TranslatableComponent("bclib.datafixer.backupWarning.button");
-		
 		Minecraft.getInstance().setScreen(new ConfirmFixScreen((Screen) null, (createBackup, applyFixes) -> {
 			if (createBackup) {
 				EditWorldScreen.makeBackupAndShowToast(Minecraft.getInstance().getLevelSource(), levelID);
@@ -238,7 +235,6 @@ public class DataFixerAPI {
 			Minecraft.getInstance().setScreen((Screen)null);
 			whenFinished.accept(applyFixes);
 		}));
-		
 	}
 
 	private static void runDataFixes(File dir, MigrationProfile profile, ProgressListener progress) {

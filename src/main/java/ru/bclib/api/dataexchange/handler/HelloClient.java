@@ -6,6 +6,8 @@ import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.worldselection.EditWorldScreen;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
@@ -14,12 +16,15 @@ import ru.bclib.api.dataexchange.DataExchangeAPI;
 import ru.bclib.api.dataexchange.DataHandler;
 import ru.bclib.api.dataexchange.DataHandlerDescriptor;
 import ru.bclib.api.datafixer.DataFixerAPI;
+import ru.bclib.gui.screens.ConfirmFixScreen;
+import ru.bclib.gui.screens.WarnBCLibVersionMismatch;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 public class HelloClient extends DataHandler {
 	public static DataHandlerDescriptor DESCRIPTOR = new DataHandlerDescriptor(new ResourceLocation(BCLib.MOD_ID, "hello_client"), HelloClient::new, true);
@@ -86,7 +91,19 @@ public class HelloClient extends DataHandler {
 	
 	@Environment(EnvType.CLIENT)
 	protected void showBCLibError(Minecraft client){
-		BCLib.LOGGER.error("BCLib differs on client and server. Stopping.");
-		client.stop();
+		client.pauseGame(false);
+		BCLib.LOGGER.error("BCLib differs on client and server.");
+		client.setScreen(new WarnBCLibVersionMismatch((download) -> {
+			Minecraft.getInstance().setScreen((Screen)null);
+			if (download){
+				requestDownloads((hadErrors)->{
+					client.stop();
+				});
+			}
+		}));
+	}
+	
+	private void requestDownloads(Consumer<Boolean> whenFinished){
+		BCLib.LOGGER.warning("Starting download of BCLib");
 	}
 }

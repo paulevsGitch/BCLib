@@ -14,37 +14,30 @@ import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 import ru.bclib.BCLib;
 import ru.bclib.gui.GridLayout;
+import ru.bclib.gui.GridScreen;
 
 @Environment(EnvType.CLIENT)
-public class ConfirmFixScreen extends Screen {
+public class ConfirmFixScreen extends GridScreen {
 	static final ResourceLocation BCLIB_LOGO_LOCATION = new ResourceLocation(BCLib.MOD_ID,
 		"icon.png");
 	@Nullable
 	private final Screen lastScreen;
-	protected final BackupConfirmScreen.Listener listener;
+	protected final ConfirmFixScreen.Listener listener;
 	private final Component description;
-	private MultiLineLabel message;
 	protected int id;
-	private GridLayout grid = null;
 	
-	public ConfirmFixScreen(@Nullable Screen screen, BackupConfirmScreen.Listener listener) {
-		super(new TranslatableComponent("bclib.datafixer.backupWarning.title"));
-		this.message = MultiLineLabel.EMPTY;
+	public ConfirmFixScreen(@Nullable Screen screen, ConfirmFixScreen.Listener listener) {
+		super(30, new TranslatableComponent("bclib.datafixer.backupWarning.title"));
 		this.lastScreen = screen;
 		this.listener = listener;
 		
 		this.description = new TranslatableComponent("bclib.datafixer.backupWarning.message");
 	}
 	
-	protected void init() {
-		super.init();
-		this.grid = new GridLayout(30, this.width, this.font, this::addRenderableWidget);
-		
-		final int BUTTON_WIDTH = 150;
-		final int BUTTON_SPACE = 10;
+	protected void initLayout() {
 		final int BUTTON_HEIGHT = 20;
 		
-		grid.addMessageRow(MultiLineLabel.create(this.font, this.description, this.width - 50));
+		grid.addMessageRow(this.description, 25);
 		
 		grid.startRow();
 		grid.addButton( BUTTON_HEIGHT, new TranslatableComponent("bclib.datafixer.backupWarning.backup"), (button) -> {
@@ -67,13 +60,6 @@ public class ConfirmFixScreen extends Screen {
 		grid.endRow();
 	}
 	
-	public void render(PoseStack poseStack, int i, int j, float f) {
-		this.renderBackground(poseStack);
-		drawCenteredString(poseStack, this.font, this.title, grid.width / 2, grid.topStart, 16777215);
-		if (grid!=null) grid.render(poseStack);
-		super.render(poseStack, i, j, f);
-	}
-	
 	public boolean shouldCloseOnEsc() {
 		return false;
 	}
@@ -89,6 +75,6 @@ public class ConfirmFixScreen extends Screen {
 	
 	@Environment(EnvType.CLIENT)
 	public interface Listener {
-		void proceed(boolean bl, boolean bl2);
+		void proceed(boolean createBackup, boolean applyPatches);
 	}
 }
