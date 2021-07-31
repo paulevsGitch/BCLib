@@ -41,7 +41,6 @@ public interface BlockModelProvider extends ItemModelProvider {
 			}
 			else {
 				BCLib.LOGGER.warning("Error loading model: {}", modelId);
-				modelCache.put(modelId, modelCache.get(MISSING_MODEL_LOCATION));
 			}
 		}
 	}

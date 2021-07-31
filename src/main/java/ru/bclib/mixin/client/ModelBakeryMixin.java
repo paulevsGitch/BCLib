@@ -25,6 +25,7 @@ import ru.bclib.interfaces.BlockModelProvider;
 import ru.bclib.interfaces.ItemModelProvider;
 
 import java.util.Map;
+import java.util.Set;
 
 @Mixin(ModelBakery.class)
 public abstract class ModelBakeryMixin {
@@ -34,20 +35,22 @@ public abstract class ModelBakeryMixin {
 	@Final
 	@Shadow
 	private Map<ResourceLocation, UnbakedModel> topLevelModels;
-	
-	//private Map<ResourceLocation, UnbakedModel> cache = Maps.newHashMap();
-	//private Map<ResourceLocation, UnbakedModel> topLevel = Maps.newHashMap();
+	@Final
+	@Shadow
+	private Set<ResourceLocation> loadingStack;
 	
 	@Inject(
 		method = "<init>*",
 		at = @At(
 			value = "INVOKE_STRING",
-			target = "Lnet/minecraft/util/profiling/ProfilerFiller;popPush(Ljava/lang/String;)V",
-			args = "ldc=static_definitions",
+			target = "Lnet/minecraft/util/profiling/ProfilerFiller;push(Ljava/lang/String;)V",
+			args = "ldc=missing_model",
 			shift = Shift.BEFORE
 		)
 	)
 	private void bclib_initCustomModels(ResourceManager resourceManager, BlockColors blockColors, ProfilerFiller profiler, int mipmap, CallbackInfo info) {
+		System.out.println("Cache size 1: " + unbakedCache.size());
+		
 		Map<ResourceLocation, UnbakedModel> cache = Maps.newConcurrentMap();
 		Map<ResourceLocation, UnbakedModel> topLevel = Maps.newConcurrentMap();
 		
@@ -100,6 +103,12 @@ public abstract class ModelBakeryMixin {
 				cache.put(itemID, model);
 				topLevel.put(itemID, model);
 			}
+		});
+		
+		System.out.println("Cache size 2: " + unbakedCache.size());
+		
+		cache.values().forEach(model -> {
+			loadingStack.addAll(model.getDependencies());
 		});
 		
 		topLevelModels.putAll(topLevel);
