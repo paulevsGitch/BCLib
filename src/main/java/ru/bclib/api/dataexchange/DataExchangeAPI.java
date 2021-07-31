@@ -3,8 +3,10 @@ package ru.bclib.api.dataexchange;
 import com.google.common.collect.Lists;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.client.networking.v1.ClientLoginConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 
 import java.util.HashSet;
@@ -34,7 +36,12 @@ public class DataExchangeAPI {
 	private void initClientside(){
 		if (client!=null) return;
 		client = new ConnectorClientside(this);
-		
+		ClientLoginConnectionEvents.INIT.register((a, b) ->{
+			System.out.println("INIT");
+		});
+		ClientLoginConnectionEvents.QUERY_START.register((a, b) ->{
+			System.out.println("INIT");
+		});
 		ClientPlayConnectionEvents.INIT.register(client::onPlayInit);
 		ClientPlayConnectionEvents.JOIN.register(client::onPlayReady);
 		ClientPlayConnectionEvents.DISCONNECT.register(client::onPlayDisconnect);
@@ -117,5 +124,21 @@ public class DataExchangeAPI {
 		}
 	}
 	
-	
+	/**
+	 * Automatically called before the player enters the world.
+	 * <p>
+	 * This will send all {@link DataHandler}-Objects that have {@link DataHandlerDescriptor#sendBeforeEnter} set to*
+	 * {@Code true},
+	 */
+	@Environment(EnvType.CLIENT)
+	public static void sendOnEnter(){
+		getInstance().descriptors.forEach((desc)-> {
+			if (desc.sendBeforeEnter){
+				DataHandler h = desc.JOIN_INSTANCE.get();
+				if (!h.getOriginatesOnServer()) {
+					getInstance().client.sendToServer(h);
+				}
+			}
+		});
+	}
 }

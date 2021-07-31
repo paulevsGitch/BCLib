@@ -27,7 +27,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 public class HelloClient extends DataHandler {
-	public static DataHandlerDescriptor DESCRIPTOR = new DataHandlerDescriptor(new ResourceLocation(BCLib.MOD_ID, "hello_client"), HelloClient::new, true);
+	public static DataHandlerDescriptor DESCRIPTOR = new DataHandlerDescriptor(new ResourceLocation(BCLib.MOD_ID, "hello_client"), HelloClient::new, false, false);
 	
 	public HelloClient() {
 		super(DESCRIPTOR.IDENTIFIER, true);
@@ -42,7 +42,7 @@ public class HelloClient extends DataHandler {
 		return "0.0.0";
 	}
 	
-	protected static String getBCLibVersion(){
+	static String getBCLibVersion(){
 		return getModVersion(BCLib.MOD_ID);
 	}
 	
@@ -64,7 +64,7 @@ public class HelloClient extends DataHandler {
 	@Override
 	protected void runOnGameThread(Minecraft client, MinecraftServer server, boolean isClient) {
 		String localBclibVersion = getBCLibVersion();
-		BCLib.LOGGER.info("Hello Client received from BCLib. (client="+localBclibVersion+", server="+bclibVersion+")");
+		BCLib.LOGGER.info("Received Hello from Server. (client="+localBclibVersion+", server="+bclibVersion+")");
 		
 		if (DataFixerAPI.getModVersion(localBclibVersion) == DataFixerAPI.getModVersion(bclibVersion)){
 			showBCLibError(client);

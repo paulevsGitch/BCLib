@@ -1,7 +1,5 @@
 package ru.bclib.api.dataexchange;
 
-import io.netty.buffer.ByteBufUtil;
-import io.netty.util.CharsetUtil;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -44,7 +42,9 @@ public abstract class DataHandler {
 		client.execute(() -> runOnGameThread(client, null, true));
 	}
 	
+	private ServerPlayer lastMessageSender;
 	void receiveFromClient(MinecraftServer server, ServerPlayer player, ServerGamePacketListenerImpl handler, FriendlyByteBuf buf, PacketSender responseSender){
+		lastMessageSender = player;
 		deserializeFromIncomingData(buf, responseSender, false);
 		server.execute(() -> runOnGameThread(null, server, false));
 	}
@@ -53,11 +53,15 @@ public abstract class DataHandler {
 	}
 	
 	protected void runOnGameThread(Minecraft client, MinecraftServer server, boolean isClient){
-	
 	}
 	
 	protected void serializeData(FriendlyByteBuf buf) {
+	}
 	
+	final protected boolean reply(DataHandler message, MinecraftServer server){
+		if (lastMessageSender==null) return false;
+		message.sendToClient(server, lastMessageSender);
+		return true;
 	}
 	
 	void sendToClient(MinecraftServer server){
