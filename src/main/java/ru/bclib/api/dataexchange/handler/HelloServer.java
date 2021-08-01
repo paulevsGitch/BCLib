@@ -26,7 +26,7 @@ public class HelloServer extends DataHandler {
 	@Override
 	protected void runOnGameThread(Minecraft client, MinecraftServer server, boolean isClient) {
 		String localBclibVersion = HelloClient.getBCLibVersion();
-		BCLib.LOGGER.info("Received Hello from Server. (server="+localBclibVersion+", client="+bclibVersion+")");
+		BCLib.LOGGER.info("Received Hello from Client. (server="+localBclibVersion+", client="+bclibVersion+")");
 		reply(new HelloClient(), server);
 	}
 	
