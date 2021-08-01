@@ -50,8 +50,8 @@ public abstract class ModelBakeryMixin {
 	}
 	
 	// If Injection above failed - with Optifine, for example
-	@Inject(method = "getModel", at = @At("HEAD"))
-	private void bclib_loadModelsIfNecessary(ResourceLocation resourceLocation, CallbackInfoReturnable<UnbakedModel> model) {
+	@Inject(method = "loadModel(Lnet/minecraft/resources/ResourceLocation;)V", at = @At("HEAD"))
+	private void bclib_loadModelsIfNecessary(ResourceLocation resourceLocation, CallbackInfo model) {
 		if (!CustomModelBakery.areModelsLoaded()) {
 			ResourceManager resourceManager = Minecraft.getInstance().getResourceManager();
 			CustomModelBakery.loadCustomModels(resourceManager, unbakedCache, topLevelModels, loadingStack);
