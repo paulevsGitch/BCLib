@@ -52,6 +52,11 @@ public class SimpleReloadableResourceManagerMixin {
 		
 		ResourceManager resourceManager = this.namespacedPacks.get(resourceLocation.getNamespace());
 		if (resourceManager != null) {
+			Resource resource = resourceManager.getResource(resourceLocation);
+			if (resource != null) {
+				info.setReturnValue(resource);
+				return;
+			}
 			resourceLocation = BCLib.makeID("materialmaps/block/alpha_emission.json");
 			info.setReturnValue(resourceManager.getResource(resourceLocation));
 		}
