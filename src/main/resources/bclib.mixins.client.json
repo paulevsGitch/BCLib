@@ -4,6 +4,7 @@
 	"package": "ru.bclib.mixin.client",
 	"compatibilityLevel": "JAVA_16",
 	"client": [
+		"SimpleReloadableResourceManagerMixin",
 		"EnchantingTableBlockMixin",
 		"BackgroundRendererMixin",
 		"TextureAtlasMixin",

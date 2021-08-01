@@ -14,6 +14,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import ru.bclib.BCLib;
+import ru.bclib.client.render.EmissiveTextureInfo;
 
 import java.io.IOException;
 
@@ -26,6 +27,9 @@ public class TextureAtlasMixin {
 	private void bclib_onAtlasInit(ResourceLocation resourceLocation, CallbackInfo info) {
 		boolean hasOptifine = FabricLoader.getInstance().isModLoaded("optifabric");
 		bclib_modifyAtlas = !hasOptifine && resourceLocation.toString().equals("minecraft:textures/atlas/blocks.png");
+		if (bclib_modifyAtlas) {
+			EmissiveTextureInfo.clear();
+		}
 	}
 	
 	@Inject(method = "load(Lnet/minecraft/server/packs/resources/ResourceManager;Lnet/minecraft/client/renderer/texture/TextureAtlasSprite$Info;IIIII)Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;", at = @At("HEAD"), cancellable = true)
@@ -91,6 +95,7 @@ public class TextureAtlasMixin {
 					posY,
 					sprite
 				);
+				EmissiveTextureInfo.addTexture(location);
 				info.setReturnValue(result);
 			}
 		}

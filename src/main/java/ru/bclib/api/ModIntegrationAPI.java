@@ -1,12 +1,14 @@
 package ru.bclib.api;
 
 import com.google.common.collect.Lists;
+import net.fabricmc.loader.api.FabricLoader;
 import ru.bclib.integration.ModIntegration;
 
 import java.util.List;
 
 public class ModIntegrationAPI {
 	private static final List<ModIntegration> INTEGRATIONS = Lists.newArrayList();
+	private static final boolean HAS_CANVAS = FabricLoader.getInstance().isModLoaded("canvas");
 	
 	/**
 	 * Registers mod integration
@@ -37,5 +39,9 @@ public class ModIntegrationAPI {
 				integration.init();
 			}
 		});
+	}
+	
+	public static boolean hasCanvas() {
+		return HAS_CANVAS;
 	}
 }
