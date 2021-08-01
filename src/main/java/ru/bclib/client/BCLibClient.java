@@ -12,7 +12,6 @@ public class BCLibClient implements ClientModInitializer {
 		ModIntegrationAPI.registerAll();
 		BaseBlockEntityRenders.register();
 		DataExchangeAPI.prepareClientside();
-		
 		PostInitAPI.postInit(true);
 	}
 }

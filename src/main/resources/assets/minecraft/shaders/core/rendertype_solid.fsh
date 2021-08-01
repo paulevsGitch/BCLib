@@ -11,6 +11,7 @@ uniform vec4 FogColor;
 in float vertexDistance;
 in vec4 vertexColor;
 in vec2 texCoord0;
+in vec4 normal;
 
 out vec4 fragColor;
 
@@ -29,9 +30,9 @@ vec3 hsvToRGB(vec3 color) {
 	return color.z * mix(k.xxx, clamp(p - k.xxx, 0.0, 1.0), color.y);
 }
 
-// Value between 252 and 254
+// Value near 254
 bool isEmissive(float alpha) {
-    return 0.9883 < alpha && alpha < 0.9961;
+    return 0.9960 < alpha && alpha < 0.9962;
 }
 
 void main() {
