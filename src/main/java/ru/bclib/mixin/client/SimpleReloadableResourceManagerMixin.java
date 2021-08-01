@@ -29,7 +29,7 @@ public class SimpleReloadableResourceManagerMixin {
 	@Shadow
 	private Map<String, FallbackResourceManager> namespacedPacks;
 	
-	private Resource bclib_alphaEmissionMaterial;
+	private ResourceLocation bclib_alphaEmissionMaterial = BCLib.makeID("materialmaps/block/alpha_emission.json");
 	
 	@Inject(method = "getResource", at = @At("HEAD"), cancellable = true)
 	private void bclib_getResource(ResourceLocation resourceLocation, CallbackInfoReturnable<Resource> info) throws IOException {
@@ -51,14 +51,8 @@ public class SimpleReloadableResourceManagerMixin {
 		}
 		
 		ResourceManager resourceManager = this.namespacedPacks.get(resourceLocation.getNamespace());
-		if (resourceManager != null) {
-			Resource resource = resourceManager.getResource(resourceLocation);
-			if (resource != null) {
-				info.setReturnValue(resource);
-				return;
-			}
-			resourceLocation = BCLib.makeID("materialmaps/block/alpha_emission.json");
-			info.setReturnValue(resourceManager.getResource(resourceLocation));
+		if (resourceManager != null && !resourceManager.hasResource(resourceLocation)) {
+			info.setReturnValue(resourceManager.getResource(bclib_alphaEmissionMaterial));
 		}
 	}
 }
