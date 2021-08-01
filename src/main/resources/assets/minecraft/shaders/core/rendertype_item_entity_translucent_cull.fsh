@@ -42,7 +42,6 @@ void main() {
 		discard;
 	}
 	vec4 color = tex * ColorModulator;
-	color.rgb = mix(overlayColor.rgb, color.rgb, overlayColor.a);
 	vec4 vertex = vertexColor;
 	if (isEmissive(tex.a)) {
 		vec3 hsv = rgbToHSV(vertex.rgb);
