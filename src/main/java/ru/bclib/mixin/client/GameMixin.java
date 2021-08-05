@@ -13,6 +13,6 @@ public class GameMixin {
 	
 	@Inject(method="onStartGameSession", at=@At("TAIL"))
 	public void bcliv_onStart(CallbackInfo ci){
-		DataExchangeAPI.send(new HelloServer());
+		DataExchangeAPI.sendOnEnter();
 	}
 }

@@ -140,7 +140,7 @@ public class DataExchangeAPI {
 	/**
 	 * Automatically called before the player enters the world.
 	 * <p>
-	 * This will send all {@link DataHandler}-Objects that have {@link DataHandlerDescriptor#sendBeforeEnter} set to*
+	 * This is automatically called by BCLib. It will send all {@link DataHandler}-Objects that have {@link DataHandlerDescriptor#sendBeforeEnter} set to*
 	 * {@Code true},
 	 */
 	@Environment(EnvType.CLIENT)
