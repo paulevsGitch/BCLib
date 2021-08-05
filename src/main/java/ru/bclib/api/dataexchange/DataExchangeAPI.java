@@ -6,12 +6,14 @@ import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientLoginConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
-import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 
 public class DataExchangeAPI {
 	private final static List<String> MODS = Lists.newArrayList();
@@ -19,6 +21,17 @@ public class DataExchangeAPI {
 	private ConnectorServerside server;
 	private ConnectorClientside client;
 	protected final Set<DataHandlerDescriptor> descriptors;
+
+	private static class AutoFileSyncEntry {
+		public final Predicate<Object> needTransfer;
+		public final File fileName;
+
+		private AutoFileSyncEntry(Predicate<Object> needTransfer, File fileName) {
+			this.needTransfer = needTransfer;
+			this.fileName = fileName;
+		}
+	}
+	protected final List<AutoFileSyncEntry> autoSyncFiles = new ArrayList<>(4);
 	
 	
 	private DataExchangeAPI(){
@@ -140,5 +153,15 @@ public class DataExchangeAPI {
 				}
 			}
 		});
+	}
+
+	/**
+	 * Registers a File for automatic client syncing.
+	 *
+	 * @param needTransfer If the predicate returns true, the file needs to get copied to the server.
+	 * @param fileName The name of the File
+	 */
+	public static void addAutoSyncFile(Predicate<Object> needTransfer, File fileName){
+		DataExchangeAPI.getInstance().autoSyncFiles.add(new AutoFileSyncEntry(needTransfer, fileName));
 	}
 }

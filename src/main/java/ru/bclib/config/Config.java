@@ -2,6 +2,7 @@ package ru.bclib.config;
 
 import org.jetbrains.annotations.Nullable;
 import ru.bclib.BCLib;
+import ru.bclib.api.dataexchange.DataExchangeAPI;
 import ru.bclib.config.ConfigKeeper.BooleanEntry;
 import ru.bclib.config.ConfigKeeper.Entry;
 import ru.bclib.config.ConfigKeeper.FloatEntry;
@@ -13,16 +14,19 @@ import java.io.File;
 
 public abstract class Config {
 	protected final ConfigKeeper keeper;
-	
+	protected final boolean autoSync;
 	protected abstract void registerEntries();
-	
-	public Config(String modID, String group) {
-		this(modID, group, null);
+
+	protected Config(String modID, String group) {
+		this(modID, group, true);
 	}
 	
-	protected Config(String modID, String group, File path) {
-		this.keeper = new ConfigKeeper(modID, group, path);
+	protected Config(String modID, String group, boolean autoSync) {
+		this.keeper = new ConfigKeeper(modID, group);
 		this.registerEntries();
+		this.autoSync = autoSync;
+
+		DataExchangeAPI.addAutoSyncFile((content)->{return false;}, keeper.getConfigFile());
 	}
 	
 	public void saveChanges() {
