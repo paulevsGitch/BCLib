@@ -12,6 +12,7 @@ import ru.bclib.api.dataexchange.handler.DataExchange.AutoSyncID;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class RequestFiles extends DataHandler {
 	public static DataHandlerDescriptor DESCRIPTOR = new DataHandlerDescriptor(new ResourceLocation(BCLib.MOD_ID, "request_files"), RequestFiles::new, false, false);
@@ -55,6 +56,11 @@ public class RequestFiles extends DataHandler {
 	
 	@Override
 	protected void runOnGameThread(Minecraft client, MinecraftServer server, boolean isClient) {
-	
+		List<DataExchange.AutoFileSyncEntry> syncEntries = files
+				.stream().map(asid -> DataExchange.AutoFileSyncEntry.findMatching(asid))
+				.filter(e -> e!=null)
+				.collect(Collectors.toList());
+
+		reply(new SendFiles(syncEntries), server);
 	}
 }

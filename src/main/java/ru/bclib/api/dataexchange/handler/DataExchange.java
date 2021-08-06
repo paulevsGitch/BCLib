@@ -97,15 +97,27 @@ abstract public class DataExchange {
             return new byte[0];
         }
 
+        public void serializeContent(FriendlyByteBuf buf){
+            DataHandler.writeString(buf, modID);
+            DataHandler.writeString(buf, uniqueID);
+            serializeFileContent(buf);
+        }
+        public static Pair<AutoFileSyncEntry, byte[]> deserializeContent(FriendlyByteBuf buf){
+            final String modID = DataHandler.readString(buf);
+            final String uniqueID = DataHandler.readString(buf);
+            byte[] data = deserializeFileContent(buf);
 
+            AutoFileSyncEntry entry = AutoFileSyncEntry.findMatching(modID, uniqueID);
+            return new Pair<>(entry, data);
+        }
+
+        
         public void serialize(FriendlyByteBuf buf){
             getFileHash().serialize(buf);
             buf.writeBoolean(requestContent);
 
             if (requestContent) {
-                byte[] content = getContent();
-                buf.writeInt(content.length);
-                buf.writeByteArray(content);
+                serializeFileContent(buf);
             }
         }
 
@@ -120,19 +132,38 @@ abstract public class DataExchange {
             boolean withContent = buf.readBoolean();
             byte[] data = null;
             if (withContent) {
-                int size = buf.readInt();
-                data = buf.readByteArray(size);
+                data = deserializeFileContent(buf);
             }
 
             return new Pair(hash, data);
         }
 
+        private void serializeFileContent(FriendlyByteBuf buf) {
+            byte[] content = getContent();
+            buf.writeInt(content.length);
+            buf.writeByteArray(content);
+        }
+
+        private static byte[] deserializeFileContent(FriendlyByteBuf buf) {
+            byte[] data;
+            int size = buf.readInt();
+            data = buf.readByteArray(size);
+            return data;
+        }
+
         public static AutoFileSyncEntry findMatching(FileHash hash){
+            return findMatching(hash.modID, hash.uniqueID);
+        }
+        public static AutoFileSyncEntry findMatching(AutoSyncID aid){
+            return findMatching(aid.getModID(), aid.getUniqueID());
+        }
+
+        public static AutoFileSyncEntry findMatching(String modID, String uniqueID){
             return DataExchange
                     .getInstance()
                     .autoSyncFiles
                     .stream()
-                    .filter(asf -> asf.modID.equals(hash.modID) && asf.uniqueID.equals(hash.uniqueID))
+                    .filter(asf -> asf.modID.equals(modID) && asf.uniqueID.equals(uniqueID))
                     .findFirst()
                     .orElse(null);
         }
