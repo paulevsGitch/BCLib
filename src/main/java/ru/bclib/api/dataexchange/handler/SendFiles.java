@@ -57,6 +57,7 @@ public class SendFiles extends DataHandler {
 			receivedFiles = new ArrayList<>(0);
 			return;
 		}
+		RequestFiles.newToken();
 
 		int size = buf.readInt();
 		receivedFiles = new ArrayList<>(size);
