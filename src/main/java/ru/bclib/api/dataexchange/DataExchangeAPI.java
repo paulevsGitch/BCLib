@@ -59,12 +59,21 @@ public class DataExchangeAPI extends DataExchange {
 	}
 	
 	/**
-	 * Add a new Descriptor for a DataHandler.
+	 * Add a new Descriptor for a {@link DataHandler}.
 	 * @param desc The Descriptor you want to add.
 	 */
 	public static void registerDescriptor(DataHandlerDescriptor desc){
 		DataExchange api = DataExchange.getInstance();
 		api.getDescriptors().add(desc);
+	}
+
+	/**
+	 * Bulk-Add a Descriptors for your {@link DataHandler}-Objects.
+	 * @param desc The Descriptors you want to add.
+	 */
+	public static void registerDescriptors(List<DataHandlerDescriptor> desc){
+		DataExchange api = DataExchange.getInstance();
+		api.getDescriptors().addAll(desc);
 	}
 
 	/**

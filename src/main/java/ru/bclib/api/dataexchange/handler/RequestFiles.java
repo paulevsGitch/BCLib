@@ -12,10 +12,12 @@ import ru.bclib.api.dataexchange.handler.DataExchange.AutoSyncID;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class RequestFiles extends DataHandler {
 	public static DataHandlerDescriptor DESCRIPTOR = new DataHandlerDescriptor(new ResourceLocation(BCLib.MOD_ID, "request_files"), RequestFiles::new, false, false);
+	static String currentToken = "";
 	
 	protected List<AutoSyncID> files;
 	private RequestFiles(){
@@ -29,6 +31,9 @@ public class RequestFiles extends DataHandler {
 	
 	@Override
 	protected void serializeData(FriendlyByteBuf buf) {
+		newToken();
+		writeString(buf, currentToken);
+
 		buf.writeInt(files.size());
 		
 		for (AutoSyncID a : files){
@@ -36,9 +41,11 @@ public class RequestFiles extends DataHandler {
 			writeString(buf, a.getUniqueID());
 		}
 	}
-	
+
+	String receivedToken = "";
 	@Override
 	protected void deserializeFromIncomingData(FriendlyByteBuf buf, PacketSender responseSender, boolean fromClient) {
+		receivedToken = readString(buf);
 		int size = buf.readInt();
 		files = new ArrayList<>(size);
 		
@@ -61,6 +68,16 @@ public class RequestFiles extends DataHandler {
 				.filter(e -> e!=null)
 				.collect(Collectors.toList());
 
-		reply(new SendFiles(syncEntries), server);
+		reply(new SendFiles(syncEntries, receivedToken), server);
+	}
+
+
+
+	public static void newToken(){
+		currentToken =  UUID.randomUUID().toString();
+	}
+
+	static {
+		newToken();
 	}
 }

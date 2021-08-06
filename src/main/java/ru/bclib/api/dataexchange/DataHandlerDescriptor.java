@@ -1,6 +1,10 @@
 package ru.bclib.api.dataexchange;
 
 import net.minecraft.resources.ResourceLocation;
+import ru.bclib.api.dataexchange.handler.HelloClient;
+import ru.bclib.api.dataexchange.handler.HelloServer;
+import ru.bclib.api.dataexchange.handler.RequestFiles;
+import ru.bclib.api.dataexchange.handler.SendFiles;
 
 import java.util.function.Supplier;
 

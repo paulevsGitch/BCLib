@@ -16,6 +16,7 @@ import ru.bclib.api.dataexchange.DataHandler;
 import ru.bclib.api.dataexchange.DataHandlerDescriptor;
 import ru.bclib.api.dataexchange.handler.DataExchange.AutoSyncID;
 import ru.bclib.api.datafixer.DataFixerAPI;
+import ru.bclib.gui.screens.SyncFilesScreen;
 import ru.bclib.gui.screens.WarnBCLibVersionMismatch;
 
 import java.util.ArrayList;
@@ -134,8 +135,10 @@ public class HelloClient extends DataHandler {
 			
 			BCLib.LOGGER.info("    - " + e + ": " + (willRequest ? " (requesting)":""));
 		}
+
 		if (filesToRequest.size()>0) {
 			showDonwloadConfigs(client, filesToRequest);
+			return;
 		}
 	}
 	
@@ -154,9 +157,13 @@ public class HelloClient extends DataHandler {
 	
 	@Environment(EnvType.CLIENT)
 	protected void showDonwloadConfigs(Minecraft client, List<AutoSyncID> files){
-		requestFileDownloads((hadErrors)->{
-			client.stop();
-		}, files);
+		client.setScreen(new SyncFilesScreen((download) -> {
+			Minecraft.getInstance().setScreen((Screen)null);
+			if (download){
+				requestFileDownloads(files);
+			}
+		}));
+
 	}
 	
 	private void requestBCLibDownload(Consumer<Boolean> whenFinished){
@@ -164,9 +171,8 @@ public class HelloClient extends DataHandler {
 		whenFinished.accept(true);
 	}
 	
-	private void requestFileDownloads(Consumer<Boolean> whenFinished, List<AutoSyncID> files){
+	private void requestFileDownloads(List<AutoSyncID> files){
 		BCLib.LOGGER.info("Starting download of Files:" + files.size());
 		DataExchangeAPI.send(new RequestFiles(files));
-		whenFinished.accept(true);
 	}
 }

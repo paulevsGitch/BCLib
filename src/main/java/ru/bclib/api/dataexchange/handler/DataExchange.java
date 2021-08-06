@@ -97,10 +97,10 @@ abstract public class DataExchange {
             return new byte[0];
         }
 
-        public void serializeContent(FriendlyByteBuf buf){
+        public int serializeContent(FriendlyByteBuf buf){
             DataHandler.writeString(buf, modID);
             DataHandler.writeString(buf, uniqueID);
-            serializeFileContent(buf);
+            return serializeFileContent(buf);
         }
         public static Pair<AutoFileSyncEntry, byte[]> deserializeContent(FriendlyByteBuf buf){
             final String modID = DataHandler.readString(buf);
@@ -138,10 +138,11 @@ abstract public class DataExchange {
             return new Pair(hash, data);
         }
 
-        private void serializeFileContent(FriendlyByteBuf buf) {
+        private int serializeFileContent(FriendlyByteBuf buf) {
             byte[] content = getContent();
             buf.writeInt(content.length);
             buf.writeByteArray(content);
+            return content.length;
         }
 
         private static byte[] deserializeFileContent(FriendlyByteBuf buf) {
