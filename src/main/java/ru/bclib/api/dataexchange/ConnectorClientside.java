@@ -8,11 +8,15 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.network.FriendlyByteBuf;
 import ru.bclib.BCLib;
+import ru.bclib.api.dataexchange.handler.DataExchange;
 
+/**
+ * This is an internal class that handles a Clienetside players Connection to a Server
+ */
 @Environment(EnvType.CLIENT)
-class ConnectorClientside extends Connector {
+public class ConnectorClientside extends Connector {
 	private Minecraft client;
-	ConnectorClientside(DataExchangeAPI api) {
+	ConnectorClientside(DataExchange api) {
 		super(api);
 		this.client = null;
 	}
@@ -23,7 +27,7 @@ class ConnectorClientside extends Connector {
 		return true;
 	}
 	
-	protected void onPlayInit(ClientPacketListener handler, Minecraft client){
+	public void onPlayInit(ClientPacketListener handler, Minecraft client){
 		if (this.client!=null && this.client != client){
 			BCLib.LOGGER.warning("Client changed!");
 		}
@@ -34,8 +38,8 @@ class ConnectorClientside extends Connector {
 			});
 		}
 	}
-	
-	void onPlayReady(ClientPacketListener handler, PacketSender sender, Minecraft client){
+
+	public void onPlayReady(ClientPacketListener handler, PacketSender sender, Minecraft client){
 		for(DataHandlerDescriptor desc : getDescriptors()){
 			if (desc.sendOnJoin){
 				DataHandler h = desc.JOIN_INSTANCE.get();
@@ -45,8 +49,8 @@ class ConnectorClientside extends Connector {
 			}
 		}
 	}
-	
-	void onPlayDisconnect(ClientPacketListener handler, Minecraft client){
+
+	public void onPlayDisconnect(ClientPacketListener handler, Minecraft client){
 		for(DataHandlerDescriptor desc : getDescriptors()) {
 			ClientPlayNetworking.unregisterReceiver(desc.IDENTIFIER);
 		}
@@ -57,7 +61,7 @@ class ConnectorClientside extends Connector {
 		h.receiveFromServer(client, handler, buf, responseSender);
 	}
 	
-	void sendToServer(DataHandler h){
+	public void sendToServer(DataHandler h){
 		if (client==null){
 			throw new RuntimeException("[internal error] Client not initialized yet!");
 		}

@@ -48,16 +48,16 @@ public abstract class DataHandler {
 		deserializeFromIncomingData(buf, responseSender, false);
 		server.execute(() -> runOnGameThread(null, server, false));
 	}
-	
+
+	protected void serializeData(FriendlyByteBuf buf) {
+	}
+
 	protected void deserializeFromIncomingData(FriendlyByteBuf buf, PacketSender responseSender, boolean isClient){
 	}
 	
 	protected void runOnGameThread(Minecraft client, MinecraftServer server, boolean isClient){
 	}
-	
-	protected void serializeData(FriendlyByteBuf buf) {
-	}
-	
+
 	final protected boolean reply(DataHandler message, MinecraftServer server){
 		if (lastMessageSender==null) return false;
 		message.sendToClient(server, lastMessageSender);

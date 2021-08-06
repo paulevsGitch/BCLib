@@ -2,6 +2,7 @@ package ru.bclib.api.datafixer;
 
 import net.minecraft.nbt.CompoundTag;
 import org.jetbrains.annotations.NotNull;
+import ru.bclib.api.WorldDataAPI;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -11,10 +12,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-class MigrationProfile {
+public class MigrationProfile {
 	final Set<String> mods;
 	final Map<String, String> idReplacements;
 	final List<PatchFunction<CompoundTag, Boolean>> levelPatchers;
+	final List<Patch> worldDataPatchers;
 	
 	private final CompoundTag config;
 	
@@ -28,6 +30,7 @@ class MigrationProfile {
 		
 		HashMap<String, String> replacements = new HashMap<String, String>();
 		List<PatchFunction<CompoundTag, Boolean>> levelPatches = new LinkedList<>();
+		List<Patch> worldDataPatches = new LinkedList<>();
 		for (String modID : mods) {
 			Patch.getALL()
 				 .stream()
@@ -37,6 +40,8 @@ class MigrationProfile {
 						 replacements.putAll(patch.getIDReplacements());
 						 if (patch.getLevelDatPatcher()!=null)
 							 levelPatches.add(patch.getLevelDatPatcher());
+						 if (patch.getWorldDataPatcher()!=null)
+							 worldDataPatches.add(patch);
 						 DataFixerAPI.LOGGER.info("Applying " + patch);
 					 }
 					 else {
@@ -47,6 +52,7 @@ class MigrationProfile {
 		
 		this.idReplacements = Collections.unmodifiableMap(replacements);
 		this.levelPatchers = Collections.unmodifiableList(levelPatches);
+		this.worldDataPatchers = Collections.unmodifiableList(worldDataPatches);
 	}
 	
 	final public void markApplied() {
@@ -66,7 +72,7 @@ class MigrationProfile {
 	}
 	
 	public boolean hasAnyFixes() {
-		return idReplacements.size() > 0 || levelPatchers.size() > 0;
+		return idReplacements.size() > 0 || levelPatchers.size() > 0 || worldDataPatchers.size() > 0;
 	}
 	
 	public boolean replaceStringFromIDs(@NotNull CompoundTag tag, @NotNull String key) {
@@ -87,8 +93,18 @@ class MigrationProfile {
 	public boolean patchLevelDat(@NotNull CompoundTag level) throws PatchDidiFailException {
 		boolean changed = false;
 		for (PatchFunction<CompoundTag, Boolean> f : levelPatchers) {
-			changed |= f.apply(level);
+			changed |= f.apply(level, this);
 		}
 		return changed;
+	}
+
+	public void patchWorldData() throws PatchDidiFailException {
+		for (Patch patch : worldDataPatchers) {
+			CompoundTag root = WorldDataAPI.getRootTag(patch.modID);
+			boolean changed = patch.getWorldDataPatcher().apply(root, this);
+			if (changed) {
+				WorldDataAPI.saveFile(patch.modID);
+			}
+		}
 	}
 }

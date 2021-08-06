@@ -6,56 +6,33 @@ import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientLoginConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
-import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
+import ru.bclib.BCLib;
+import ru.bclib.api.dataexchange.handler.DataExchange;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
-public class DataExchangeAPI {
+public class DataExchangeAPI extends DataExchange {
 	private final static List<String> MODS = Lists.newArrayList();
-	private static DataExchangeAPI instance;
-	private ConnectorServerside server;
-	private ConnectorClientside client;
-	protected final Set<DataHandlerDescriptor> descriptors;
-	
-	
-	private DataExchangeAPI(){
-		descriptors = new HashSet<>();
+
+	/**
+	 * You should never need to create a custom instance of this Object.
+	 */
+	public DataExchangeAPI() {
+		super((api) -> new ConnectorClientside(api), (api) -> new ConnectorServerside(api));
 	}
-	
-	static DataExchangeAPI getInstance(){
-		if (instance==null){
-			instance = new DataExchangeAPI();
-		}
-		return instance;
-	}
-	
-	@Environment(EnvType.CLIENT)
-	private void initClientside(){
-		if (client!=null) return;
-		client = new ConnectorClientside(this);
-		ClientLoginConnectionEvents.INIT.register((a, b) ->{
-			System.out.println("INIT");
-		});
-		ClientLoginConnectionEvents.QUERY_START.register((a, b) ->{
-			System.out.println("INIT");
-		});
-		ClientPlayConnectionEvents.INIT.register(client::onPlayInit);
-		ClientPlayConnectionEvents.JOIN.register(client::onPlayReady);
-		ClientPlayConnectionEvents.DISCONNECT.register(client::onPlayDisconnect);
-	}
-	
-	private void initServerSide(){
-		if (server!=null) return;
-		server = new ConnectorServerside(this);
-		
-		ServerPlayConnectionEvents.INIT.register(server::onPlayInit);
-		ServerPlayConnectionEvents.JOIN.register(server::onPlayReady);
-		ServerPlayConnectionEvents.DISCONNECT.register(server::onPlayDisconnect);
-	}
-	
+
+
 	/**
 	 * Register a mod to participate in the DataExchange.
 	 *
@@ -78,34 +55,10 @@ public class DataExchangeAPI {
 	 * @param desc The Descriptor you want to add.
 	 */
 	public static void registerDescriptor(DataHandlerDescriptor desc){
-		DataExchangeAPI api = DataExchangeAPI.getInstance();
-		api.descriptors.add(desc);
+		DataExchange api = DataExchange.getInstance();
+		api.getDescriptors().add(desc);
 	}
-	
-	
-	/**
-	 * Initializes all datastructures that need to exist in the client component.
-	 * <p>
-	 * This is automatically called by BCLib. You can register {@link DataHandler}-Objects before this Method is called
-	 */
-	@Environment(EnvType.CLIENT)
-	public static void prepareClientside(){
-		DataExchangeAPI api = DataExchangeAPI.getInstance();
-		api.initClientside();
-		
-	}
-	
-	/**
-	 * Initializes all datastructures that need to exist in the server component.
-	 * <p>
-	 * This is automatically called by BCLib. You can register {@link DataHandler}-Objects before this Method is called
-	 */
-	public static void prepareServerside(){
-		DataExchangeAPI api = DataExchangeAPI.getInstance();
-		api.initServerSide();
-	}
-	
-	
+
 	/**
 	 * Sends the Handler.
 	 * <p>
@@ -123,22 +76,62 @@ public class DataExchangeAPI {
 			DataExchangeAPI.getInstance().client.sendToServer(h);
 		}
 	}
-	
+
 	/**
-	 * Automatically called before the player enters the world.
-	 * <p>
-	 * This will send all {@link DataHandler}-Objects that have {@link DataHandlerDescriptor#sendBeforeEnter} set to*
-	 * {@Code true},
+	 * Registers a File for automatic client syncing.
+	 *
+	 * @param modID The ID of the calling Mod
+	 * @param fileName The name of the File
 	 */
-	@Environment(EnvType.CLIENT)
-	public static void sendOnEnter(){
-		getInstance().descriptors.forEach((desc)-> {
-			if (desc.sendBeforeEnter){
-				DataHandler h = desc.JOIN_INSTANCE.get();
-				if (!h.getOriginatesOnServer()) {
-					getInstance().client.sendToServer(h);
-				}
-			}
-		});
+	public static void addAutoSyncFile(String modID, File fileName){
+		getInstance().addAutoSyncFileData(modID, fileName, false, FileHash.NEED_TRANSFER);
+	}
+
+	/**
+	 * Registers a File for automatic client syncing.
+	 *
+	 * @param modID The ID of the calling Mod
+	 * @param uniqueID A unique Identifier for the File. (see {@link ru.bclib.api.dataexchange.FileHash#uniqueID} for
+	 *                 Details
+	 * @param fileName The name of the File
+	 */
+	public static void addAutoSyncFile(String modID, String uniqueID, File fileName){
+		getInstance().addAutoSyncFileData(modID, uniqueID, fileName, false, FileHash.NEED_TRANSFER);
+	}
+
+	/**
+	 * Registers a File for automatic client syncing.
+	 *
+	 * @param modID The ID of the calling Mod
+	 * @param fileName The name of the File
+	 * @param requestContent When {@code true} the content of the file is requested for comparison. This will copy the
+	 *                       entire file from the client to the server.
+	 *                       <p>
+	 *                       You should only use this option, if you need to compare parts of the file in order to decide
+	 *                       If the File needs to be copied. Normally using the {@link ru.bclib.api.dataexchange.FileHash}
+	 *                       for comparison is sufficient.
+	 * @param needTransfer If the predicate returns true, the file needs to get copied to the server.
+	 */
+	public static void addAutoSyncFile(String modID, File fileName, boolean requestContent, NeedTransferPredicate needTransfer){
+		getInstance().addAutoSyncFileData(modID, fileName, requestContent, needTransfer);
+	}
+
+	/**
+	 * Registers a File for automatic client syncing.
+	 *
+	 * @param modID The ID of the calling Mod
+	 * @param uniqueID A unique Identifier for the File. (see {@link ru.bclib.api.dataexchange.FileHash#uniqueID} for
+	 *                 Details
+	 * @param fileName The name of the File
+	 * @param requestContent When {@code true} the content of the file is requested for comparison. This will copy the
+	 *                       entire file from the client to the server.
+	 *                       <p>
+	 *                       You should only use this option, if you need to compare parts of the file in order to decide
+	 *                       If the File needs to be copied. Normally using the {@link ru.bclib.api.dataexchange.FileHash}
+	 *                       for comparison is sufficient.
+	 * @param needTransfer If the predicate returns true, the file needs to get copied to the server.
+	 */
+	public static void addAutoSyncFile(String modID, String uniqueID, File fileName, boolean requestContent, NeedTransferPredicate needTransfer){
+		getInstance().addAutoSyncFileData(modID, uniqueID, fileName, requestContent, needTransfer);
 	}
 }

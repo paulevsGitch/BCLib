@@ -254,6 +254,13 @@ public class DataFixerAPI {
 		players.parallelStream().forEach((file) -> fixPlayer(profile, state, file));
 
 		fixLevel(profile, state, new File(dir, "level.dat"));
+
+		try {
+			profile.patchWorldData();
+		} catch (PatchDidiFailException e){
+			state.didFail = true;
+			BCLib.LOGGER.error(e.getMessage());
+		}
 		
 		if (!state.didFail) {
 			profile.markApplied();
