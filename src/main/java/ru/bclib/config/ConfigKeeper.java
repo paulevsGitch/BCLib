@@ -22,12 +22,12 @@ public final class ConfigKeeper {
 	private boolean changed = false;
 	
 	public ConfigKeeper(String modID, String group) {
-		this(modID, group, null);
-	}
-	
-	protected ConfigKeeper(String modID, String group, File path) {
-		this.writer = new ConfigWriter(modID, group, path);
+		this.writer = new ConfigWriter(modID, group);
 		this.configObject = writer.load();
+	}
+
+	File getConfigFile(){
+		return this.writer.getConfigFile();
 	}
 	
 	public void save() {

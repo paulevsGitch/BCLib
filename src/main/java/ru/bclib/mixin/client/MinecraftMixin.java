@@ -3,7 +3,9 @@ package ru.bclib.mixin.client;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.color.block.BlockColors;
 import net.minecraft.client.color.item.ItemColors;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.main.GameConfig;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess.RegistryHolder;
 import net.minecraft.world.level.LevelSettings;
@@ -16,6 +18,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import ru.bclib.api.dataexchange.DataExchangeAPI;
 import ru.bclib.api.datafixer.DataFixerAPI;
 import ru.bclib.interfaces.CustomColorProvider;
 
@@ -51,6 +54,8 @@ public abstract class MinecraftMixin {
 		if (levelID.startsWith(BCLIB_RECURSION)) {
 			levelID = levelID.substring(BCLIB_RECURSION.length());
 			recursiveCall = true;
+		} else {
+			DataExchangeAPI.prepareServerside();
 		}
 
 		final String recursiveLevelID = BCLIB_RECURSION + levelID;

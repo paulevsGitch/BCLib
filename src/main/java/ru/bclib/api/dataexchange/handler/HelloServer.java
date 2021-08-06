@@ -1,8 +1,7 @@
 package ru.bclib.api.dataexchange.handler;
 
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
-import net.fabricmc.loader.api.FabricLoader;
-import net.fabricmc.loader.api.ModContainer;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
@@ -12,67 +11,71 @@ import ru.bclib.api.dataexchange.DataHandler;
 import ru.bclib.api.dataexchange.DataHandlerDescriptor;
 import ru.bclib.api.datafixer.DataFixerAPI;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Optional;
+import java.io.File;
 
+/**
+ * This message is sent once a player enters the world. It initiates a sequence of Messages that will sync files between both
+ * client and server.
+ * <p>
+ * <tab<le>
+ *     <tr>
+ *         <th>Server</th>
+ *         <th></th>
+ *         <th>Client</th>
+ *         <th></th>
+ *     </tr>
+ *     <tr>
+ *         <td colspan="4">Player enters World</td>
+ *     </tr>
+ *     <tr>
+ *         <td></td>
+ *         <td>&lt;--</td>
+ *         <td>{@link HelloServer}</td>
+ *         <td>Sends the current BLib-Version installed on the Client</td>
+ *     </tr>
+ *	   <tr>
+ *         <td>{@link HelloClient}</td>
+ *         <td>--&gt;</td>
+ *         <td></td>
+ *         <td>Sends the current BClIb-Version, the Version of all Plugins and data for all AutpoSync-Files
+ *         ({@link DataExchangeAPI#addAutoSyncFile(String, File)} on the Server</td>
+ *     </tr>
+ *     <tr>
+ *         <td></td>
+ *         <td>&lt;--</td>
+ *         <td>{@link RequestFiles}</td>
+ *         <td>Request missing or out of sync Files from the Server</td>
+ *     </tr>
+ *     <tr>
+ *         <td>{@link SendFiles}</td>
+ *         <td>--&gt;</td>
+ *         <td></td>
+ *         <td>Send Files from the Server to the Client</td>
+ *     </tr>
+ * </table>
+ */
 public class HelloServer extends DataHandler {
-	public static DataHandlerDescriptor DESCRIPTOR = new DataHandlerDescriptor(new ResourceLocation(BCLib.MOD_ID, "hello_server"), HelloServer::new, true);
+	public static DataHandlerDescriptor DESCRIPTOR = new DataHandlerDescriptor(new ResourceLocation(BCLib.MOD_ID, "hello_server"), HelloServer::new, false, true);
 	
+	protected String bclibVersion ="0.0.0";
 	public HelloServer() {
 		super(DESCRIPTOR.IDENTIFIER, false);
 	}
-	
-	public static String getModVersion(String modID){
-		Optional<ModContainer> optional = FabricLoader.getInstance().getModContainer(modID);
-		if (optional.isPresent()) {
-			ModContainer modContainer = optional.get();
-			return modContainer.getMetadata().getVersion().toString();
-		}
-		return "0.0.0";
+
+	@Override
+	protected void serializeData(FriendlyByteBuf buf) {
+		buf.writeInt(DataFixerAPI.getModVersion(HelloClient.getBCLibVersion()));
 	}
 	
-	protected static String getBCLibVersion(){
-		return getModVersion(BCLib.MOD_ID);
-	}
-	
-	String bclibVersion ="0.0.0";
-	Map<String, String> modVersion = new HashMap<>();
 	@Override
 	protected void deserializeFromIncomingData(FriendlyByteBuf buf, PacketSender responseSender, boolean fromClient) {
 		bclibVersion = DataFixerAPI.getModVersion(buf.readInt());
-		modVersion = new HashMap<>();
-		
-		int count = buf.readInt();
-		for (int i=0; i< count; i++){
-			String id = readString(buf);
-			String version = DataFixerAPI.getModVersion(buf.readInt());
-			modVersion.put(id, version);
-		}
 	}
 	
 	@Override
-	protected void runOnServer(MinecraftServer server) {
-		String localBclibVersion = getBCLibVersion();
-		BCLib.LOGGER.info("Hello Server received from BCLib. (server="+localBclibVersion+", client="+bclibVersion+")");
-		
-		for (Entry<String, String> e : modVersion.entrySet()){
-			String ver = getModVersion(e.getKey());
-			BCLib.LOGGER.info("    - " + e.getKey() + " (server="+ver+", client="+ver+")");
-		}
-	}
-	
-	@Override
-	protected void serializeData(FriendlyByteBuf buf) {
-		final List<String> mods = DataExchangeAPI.registeredMods();
-		buf.writeInt(DataFixerAPI.getModVersion(getBCLibVersion()));
-		
-		buf.writeInt(mods.size());
-		for (String modID : mods) {
-			writeString(buf, modID);
-			buf.writeInt(DataFixerAPI.getModVersion(getModVersion(modID)));
-		}
+	protected void runOnGameThread(Minecraft client, MinecraftServer server, boolean isClient) {
+		String localBclibVersion = HelloClient.getBCLibVersion();
+		BCLib.LOGGER.info("Received Hello from Client. (server="+localBclibVersion+", client="+bclibVersion+")");
+		reply(new HelloClient(), server);
 	}
 }

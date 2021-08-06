@@ -15,19 +15,16 @@ public class ConfigWriter {
 	private JsonObject configObject;
 	
 	public ConfigWriter(String modID, String configFile) {
-		this(modID, configFile, null);
-	}
-	
-	public ConfigWriter(String modID, String configFile, File configFolder) {
-		this.configFile = new File((configFolder == null ? GAME_CONFIG_DIR.resolve(modID).toFile() : new File(
-			configFolder,
-			modID
-		)), configFile + ".json");
+		this.configFile = new File(GAME_CONFIG_DIR.resolve(modID).toFile() , configFile + ".json");
 		File parent = this.configFile.getParentFile();
 		if (!parent.exists()) {
 			parent.mkdirs();
 		}
 		this.load();
+	}
+
+	File getConfigFile(){
+		return this.configFile;
 	}
 	
 	public JsonObject getConfig() {

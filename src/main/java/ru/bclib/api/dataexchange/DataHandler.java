@@ -38,29 +38,30 @@ public abstract class DataHandler {
 	
 	@Environment(EnvType.CLIENT)
 	void receiveFromServer(Minecraft client, ClientPacketListener handler, FriendlyByteBuf buf, PacketSender responseSender){
-		deserializeFromIncomingData(buf, responseSender, false);
-		client.execute(() -> runOnClient(client));
-	}
-	
-	void receiveFromClient(MinecraftServer server, ServerPlayer player, ServerGamePacketListenerImpl handler, FriendlyByteBuf buf, PacketSender responseSender){
 		deserializeFromIncomingData(buf, responseSender, true);
-		server.execute(() -> runOnServer(server));
+		client.execute(() -> runOnGameThread(client, null, true));
 	}
 	
-	protected void deserializeFromIncomingData(FriendlyByteBuf buf, PacketSender responseSender, boolean fromClient){
+	private ServerPlayer lastMessageSender;
+	void receiveFromClient(MinecraftServer server, ServerPlayer player, ServerGamePacketListenerImpl handler, FriendlyByteBuf buf, PacketSender responseSender){
+		lastMessageSender = player;
+		deserializeFromIncomingData(buf, responseSender, false);
+		server.execute(() -> runOnGameThread(null, server, false));
 	}
-	
-	@Environment(EnvType.CLIENT)
-	protected void runOnClient(Minecraft client){
-	
-	}
-	
-	protected void runOnServer(MinecraftServer server){
-	
-	}
-	
+
 	protected void serializeData(FriendlyByteBuf buf) {
+	}
+
+	protected void deserializeFromIncomingData(FriendlyByteBuf buf, PacketSender responseSender, boolean isClient){
+	}
 	
+	protected void runOnGameThread(Minecraft client, MinecraftServer server, boolean isClient){
+	}
+
+	final protected boolean reply(DataHandler message, MinecraftServer server){
+		if (lastMessageSender==null) return false;
+		message.sendToClient(server, lastMessageSender);
+		return true;
 	}
 	
 	void sendToClient(MinecraftServer server){

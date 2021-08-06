@@ -105,9 +105,9 @@ public class DataFixerAPI {
 	 */
 	public static boolean fixData(LevelStorageSource.LevelStorageAccess levelStorageAccess, boolean showUI, Consumer<Boolean> onResume){
 		File levelPath = levelStorageAccess.getLevelPath(LevelResource.ROOT).toFile();
-		
+		File levelDat = levelStorageAccess.getLevelPath(LevelResource.LEVEL_DATA_FILE).toFile();
 		boolean newWorld = false;
-		if (!levelPath.exists()) {
+		if (!levelDat.exists()) {
 			BCLib.LOGGER.info("Creating a new World, no fixes needed");
 			newWorld = true;
 		}
@@ -227,9 +227,6 @@ public class DataFixerAPI {
 	
 	@Environment(EnvType.CLIENT)
 	static void showBackupWarning(String levelID, Consumer<Boolean> whenFinished){
-		TranslatableComponent promptText = new TranslatableComponent("bclib.datafixer.backupWarning.prompt");
-		TranslatableComponent buttonTitle = new TranslatableComponent("bclib.datafixer.backupWarning.button");
-		
 		Minecraft.getInstance().setScreen(new ConfirmFixScreen((Screen) null, (createBackup, applyFixes) -> {
 			if (createBackup) {
 				EditWorldScreen.makeBackupAndShowToast(Minecraft.getInstance().getLevelSource(), levelID);
@@ -238,7 +235,6 @@ public class DataFixerAPI {
 			Minecraft.getInstance().setScreen((Screen)null);
 			whenFinished.accept(applyFixes);
 		}));
-		
 	}
 
 	private static void runDataFixes(File dir, MigrationProfile profile, ProgressListener progress) {
@@ -258,6 +254,13 @@ public class DataFixerAPI {
 		players.parallelStream().forEach((file) -> fixPlayer(profile, state, file));
 
 		fixLevel(profile, state, new File(dir, "level.dat"));
+
+		try {
+			profile.patchWorldData();
+		} catch (PatchDidiFailException e){
+			state.didFail = true;
+			BCLib.LOGGER.error(e.getMessage());
+		}
 		
 		if (!state.didFail) {
 			profile.markApplied();

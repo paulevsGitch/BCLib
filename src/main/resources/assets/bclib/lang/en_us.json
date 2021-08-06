@@ -4,5 +4,11 @@
 	"bclib.datafixer.backupWarning.message": "The Guardian detected, that the internals of the following Mods did change since this world was last played.\n\nWe can automatically change the world for you. If you continue without applying the changes the world may not load correct. Before you continue, you should create a Backup.",
 	"bclib.datafixer.backupWarning.backup": "Create Backup and Continue",
 	"bclib.datafixer.backupWarning.nofixes": "Continue Without Fixes",
-	"bclib.datafixer.backupWarning.continue": "Continue Without Backup"
+	"bclib.datafixer.backupWarning.continue": "Continue Without Backup",
+	"bclib.datafixer.bclibmissmatch.title": "Version Mismatch",
+	"bclib.datafixer.bclibmissmatch.message": "The Version of BCLib on the server and this client do not match. This will cause problems when playing.\n\nDo you want to automatically download the BCLib-Version from the server. You will need to delete the old version from your Mods Directory and restart the game.",
+	"bclib.datafixer.syncfiles.title": "Mismatching (Config-)Files",
+	"bclib.datafixer.syncfiles.message": "Some Files on the Server doe not match the versions on the client.\n\nDo you want to replace the local versions with the ones from the server?",
+	"bclib.datafixer.confirmrestart.title": "Restart Required",
+	"bclib.datafixer.confirmrestart.message": "The requested files were processed. You need o restart Minecraft now."
 }

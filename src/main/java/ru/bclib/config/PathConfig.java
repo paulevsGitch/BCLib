@@ -8,13 +8,13 @@ import ru.bclib.config.ConfigKeeper.IntegerRange;
 import java.io.File;
 
 public class PathConfig extends Config {
-	
-	public PathConfig(String modID, String group) {
-		this(modID, group, null);
+
+	public PathConfig(String modID, String group, boolean autoSync) {
+		super(modID, group, autoSync);
 	}
 	
-	protected PathConfig(String modID, String group, File path) {
-		super(modID, group, path);
+	public PathConfig(String modID, String group) {
+		super(modID, group);
 	}
 	
 	@Override

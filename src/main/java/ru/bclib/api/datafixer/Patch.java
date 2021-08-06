@@ -124,14 +124,25 @@ public abstract class Patch {
 	 * Return a {@link PatchFunction} that is called with the content of <i>level.dat</i>.
 	 * <p>
 	 * The function needs to return {@code true}, if changes were made to the data.
-	 * If an error occurs, the method shoudl throw a {@link PatchDidiFailException}
+	 * If an error occurs, the method should throw a {@link PatchDidiFailException}
 	 *
 	 * The default implementation of this method returns null.
 	 *
-	 * @return The returned function is called a {@code CompoundTag} that contains the
-	 * contents of <i>level.dat</i>
+	 * @return {@code true} if changes were applied and we need to save the data
 	 */
 	public PatchFunction<CompoundTag, Boolean> getLevelDatPatcher() { return null; }
+
+	/**
+	 * Return a {@link PatchFunction} that is called with the content from the
+	 * {@link ru.bclib.api.WorldDataAPI} for this Mod.
+	 * The function needs to return {@code true}, if changes were made to the data.
+	 * If an error occurs, the method should throw a {@link PatchDidiFailException}
+	 *
+	 * The default implementation of this method returns null.
+	 *
+	 * @return {@code true} if changes were applied and we need to save the data
+	 */
+	public PatchFunction<CompoundTag, Boolean> getWorldDataPatcher() { return null; }
 	
 	/**
 	 * Generates ready to use data for all currently registered patches. The list of
