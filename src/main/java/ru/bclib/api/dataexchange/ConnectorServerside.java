@@ -7,10 +7,14 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import ru.bclib.BCLib;
+import ru.bclib.api.dataexchange.handler.DataExchange;
 
-class ConnectorServerside extends Connector {
+/**
+ * This is an internal class that handles a Serverside Connection to a Client-Player
+ */
+public class ConnectorServerside extends Connector {
 	private MinecraftServer server;
-	ConnectorServerside(DataExchangeAPI api) {
+	ConnectorServerside(DataExchange api) {
 		super(api);
 		server = null;
 	}
@@ -20,7 +24,7 @@ class ConnectorServerside extends Connector {
 		return false;
 	}
 	
-	protected void onPlayInit(ServerGamePacketListenerImpl handler, MinecraftServer server){
+	public void onPlayInit(ServerGamePacketListenerImpl handler, MinecraftServer server){
 		if (this.server!=null && this.server != server){
 			BCLib.LOGGER.warning("Server changed!");
 		}
@@ -31,8 +35,8 @@ class ConnectorServerside extends Connector {
 			});
 		}
 	}
-	
-	void onPlayReady(ServerGamePacketListenerImpl handler, PacketSender sender, MinecraftServer server){
+
+	public void onPlayReady(ServerGamePacketListenerImpl handler, PacketSender sender, MinecraftServer server){
 		for(DataHandlerDescriptor desc : getDescriptors()){
 			if (desc.sendOnJoin){
 				DataHandler h = desc.JOIN_INSTANCE.get();
@@ -42,8 +46,8 @@ class ConnectorServerside extends Connector {
 			}
 		}
 	}
-	
-	void onPlayDisconnect(ServerGamePacketListenerImpl handler, MinecraftServer server){
+
+	public void onPlayDisconnect(ServerGamePacketListenerImpl handler, MinecraftServer server){
 		for(DataHandlerDescriptor desc : getDescriptors()){
 			ServerPlayNetworking.unregisterReceiver(handler, desc.IDENTIFIER);
 		}
@@ -54,7 +58,7 @@ class ConnectorServerside extends Connector {
 		h.receiveFromClient(server, player, handler, buf, responseSender);
 	}
 	
-	void sendToClient(DataHandler h){
+	public void sendToClient(DataHandler h){
 		if (server==null){
 			throw new RuntimeException("[internal error] Server not initialized yet!");
 		}
