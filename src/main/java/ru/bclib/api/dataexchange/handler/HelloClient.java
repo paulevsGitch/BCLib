@@ -67,10 +67,10 @@ public class HelloClient extends DataHandler {
 		}
 
 		//send config Data
-		final List<DataExchange.AutoFileSyncEntry> autoSyncFiles = DataExchange.getInstance().autoSyncFiles;
+		final List<AutoFileSyncEntry> autoSyncFiles = DataExchange.getInstance().autoSyncFiles;
 		buf.writeInt(autoSyncFiles.size());
-		for (DataExchange.AutoFileSyncEntry entry : autoSyncFiles) {
-			System.out.println("Serializing " + entry.getFileHash());
+		for (AutoFileSyncEntry entry : autoSyncFiles) {
+			//System.out.println("Serializing " + entry.getFileHash());
 			entry.serialize(buf);
 		}
 	}
@@ -96,10 +96,10 @@ public class HelloClient extends DataHandler {
 		count = buf.readInt();
 		autoSyncedFiles = new ArrayList<>(count);
 		for (int i=0; i< count; i++) {
-			System.out.println("Deserializing ");
-			DataExchange.AutoSyncTriple t = DataExchange.AutoFileSyncEntry.deserializeAndMatch(buf);
+			//System.out.println("Deserializing ");
+			DataExchange.AutoSyncTriple t = AutoFileSyncEntry.deserializeAndMatch(buf);
 			autoSyncedFiles.add(t);
-			System.out.println(t.first);
+			//System.out.println(t.first);
 		}
 	}
 	

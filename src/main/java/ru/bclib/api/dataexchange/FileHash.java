@@ -23,7 +23,7 @@ import java.util.function.Predicate;
  * You can compare instances using {@link #equals(Object)} to determine if two files are
  * identical.
  */
-public class FileHash {
+public class FileHash extends DataExchange.AutoSyncID {
     /**
      * The md5-hash of the file
      */
@@ -40,35 +40,19 @@ public class FileHash {
      */
     public final int value;
 
-    /**
-     * A Unique ID for the referenced File.
-     * <p>
-     * Files with the same {@link #modID} need to have a unique IDs. Normally the filename from {@link #FileHash(String, File, byte[], int, int)}
-     * is used to generated that ID, but you can directly specify one using {@link #FileHash(String, String, byte[], int, int)}.
-     */
-    @NotNull
-    public final String uniqueID;
 
-    /**
-     * The ID of the Mod that is registering the File
-     */
-    @NotNull
-    public final String modID;
 
     FileHash(String modID, File file, byte[] md5, int size, int value) {
         this(modID, file.getName(), md5, size, value);
     }
 
     FileHash(String modID, String uniqueID, byte[] md5, int size, int value) {
-        Objects.nonNull(modID);
-        Objects.nonNull(uniqueID);
+        super(modID, uniqueID);
         Objects.nonNull(md5);
 
         this.md5 = md5;
         this.size = size;
         this.value = value;
-        this.modID = modID;
-        this.uniqueID = uniqueID;
     }
 
     private static int ERR_DOES_NOT_EXIST = -10;
@@ -85,7 +69,7 @@ public class FileHash {
 
     @Override
     public String toString() {
-        return String.format("%08x", size)
+        return super.toString()+": "+String.format("%08x", size)
             + "-"
             + String.format("%08x", value)
             + "-"

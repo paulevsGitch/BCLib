@@ -5,7 +5,7 @@ import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientLoginConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
-import net.minecraft.network.FriendlyByteBuf;
+import org.jetbrains.annotations.NotNull;
 import ru.bclib.api.dataexchange.ConnectorClientside;
 import ru.bclib.api.dataexchange.ConnectorServerside;
 import ru.bclib.api.dataexchange.DataExchangeAPI;
@@ -16,17 +16,11 @@ import ru.bclib.util.Pair;
 import ru.bclib.util.Triple;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-import java.util.function.Predicate;
 
 abstract public class DataExchange {
     @FunctionalInterface
@@ -34,21 +28,50 @@ abstract public class DataExchange {
         public boolean test(FileHash clientHash, FileHash serverHash, byte[] content);
     }
     
-    final static class AutoSyncID extends Pair<String, String>{
+    public static class AutoSyncID {
+        /**
+         * A Unique ID for the referenced File.
+         * <p>
+         * Files with the same {@link #modID} need to have a unique IDs. Normally the filename from {@link #FileHash(String, File, byte[], int, int)}
+         * is used to generated that ID, but you can directly specify one using {@link #FileHash(String, String, byte[], int, int)}.
+         */
+        @NotNull
+        public final String uniqueID;
+
+        /**
+         * The ID of the Mod that is registering the File
+         */
+        @NotNull
+        public final String modID;
+
         public AutoSyncID(String modID, String uniqueID) {
-            super(modID, uniqueID);
+            Objects.nonNull(modID);
+            Objects.nonNull(uniqueID);
+
+            this.modID = modID;
+            this.uniqueID = uniqueID;
         }
-        
-        public String getModID() { return this.first; }
-        public String getUniqueID() { return this.second; }
     
         @Override
         public String toString() {
-            return first+"."+second;
+            return modID+"."+uniqueID;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            AutoSyncID that = (AutoSyncID) o;
+            return uniqueID.equals(that.uniqueID) && modID.equals(that.modID);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(uniqueID, modID);
         }
     }
 
-    final static class AutoSyncTriple extends Triple<FileHash, byte[], DataExchange.AutoFileSyncEntry>{
+    final static class AutoSyncTriple extends Triple<FileHash, byte[], AutoFileSyncEntry>{
         public AutoSyncTriple(FileHash first, byte[] second, AutoFileSyncEntry third) {
             super(first, second, third);
         }
@@ -56,117 +79,6 @@ abstract public class DataExchange {
         @Override
         public String toString() {
             return first.modID+"."+first.uniqueID;
-        }
-    }
-    static class AutoFileSyncEntry {
-        public final NeedTransferPredicate needTransfer;
-        public final File fileName;
-        public final String modID;
-        public final String uniqueID;
-        public final boolean requestContent;
-        private FileHash hash;
-
-        AutoFileSyncEntry(String modID, File fileName, boolean requestContent, NeedTransferPredicate needTransfer) {
-            this(modID, fileName.getName(), fileName, requestContent, needTransfer);
-        }
-
-        AutoFileSyncEntry(String modID, String uniqueID, File fileName, boolean requestContent, NeedTransferPredicate needTransfer) {
-            this.needTransfer = needTransfer;
-            this.fileName = fileName;
-            this.modID = modID;
-            this.uniqueID = uniqueID;
-            this.requestContent = requestContent;
-        }
-
-        public FileHash getFileHash(){
-            if (hash == null) {
-                hash = FileHash.create(modID, fileName, uniqueID);
-            }
-            return hash;
-        }
-
-        public byte[] getContent(){
-            if (!fileName.exists()) return new byte[0];
-            final Path path = fileName.toPath();
-
-            try {
-                return Files.readAllBytes(path);
-            } catch (IOException e) {
-
-            }
-            return new byte[0];
-        }
-
-        public int serializeContent(FriendlyByteBuf buf){
-            DataHandler.writeString(buf, modID);
-            DataHandler.writeString(buf, uniqueID);
-            return serializeFileContent(buf);
-        }
-        public static Pair<AutoFileSyncEntry, byte[]> deserializeContent(FriendlyByteBuf buf){
-            final String modID = DataHandler.readString(buf);
-            final String uniqueID = DataHandler.readString(buf);
-            byte[] data = deserializeFileContent(buf);
-
-            AutoFileSyncEntry entry = AutoFileSyncEntry.findMatching(modID, uniqueID);
-            return new Pair<>(entry, data);
-        }
-
-        
-        public void serialize(FriendlyByteBuf buf){
-            getFileHash().serialize(buf);
-            buf.writeBoolean(requestContent);
-
-            if (requestContent) {
-                serializeFileContent(buf);
-            }
-        }
-
-        public static AutoSyncTriple deserializeAndMatch(FriendlyByteBuf buf){
-            Pair<FileHash, byte[]> e = deserialize(buf);
-            AutoFileSyncEntry match = findMatching(e.first);
-            return new AutoSyncTriple(e.first, e.second, match);
-        }
-
-        public static Pair<FileHash, byte[]> deserialize(FriendlyByteBuf buf){
-            FileHash hash = FileHash.deserialize(buf);
-            boolean withContent = buf.readBoolean();
-            byte[] data = null;
-            if (withContent) {
-                data = deserializeFileContent(buf);
-            }
-
-            return new Pair(hash, data);
-        }
-
-        private int serializeFileContent(FriendlyByteBuf buf) {
-            byte[] content = getContent();
-            buf.writeInt(content.length);
-            buf.writeByteArray(content);
-            return content.length;
-        }
-
-        private static byte[] deserializeFileContent(FriendlyByteBuf buf) {
-            byte[] data;
-            int size = buf.readInt();
-            data = buf.readByteArray(size);
-            return data;
-        }
-
-        public static AutoFileSyncEntry findMatching(FileHash hash){
-            return findMatching(hash.modID, hash.uniqueID);
-        }
-        public static AutoFileSyncEntry findMatching(AutoSyncID aid){
-            return findMatching(aid.getModID(), aid.getUniqueID());
-        }
-
-        public static AutoFileSyncEntry findMatching(String modID, String uniqueID){
-            return DataExchange
-                    .getInstance()
-                    .autoSyncFiles
-                    .stream()
-                    .filter(asf -> asf.modID.equals(modID) && asf.uniqueID.equals(uniqueID))
-                    .findFirst()
-                    .orElse(null);
         }
     }
 

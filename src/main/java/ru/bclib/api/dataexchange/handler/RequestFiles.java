@@ -37,8 +37,8 @@ public class RequestFiles extends DataHandler {
 		buf.writeInt(files.size());
 		
 		for (AutoSyncID a : files){
-			writeString(buf, a.getModID());
-			writeString(buf, a.getUniqueID());
+			writeString(buf, a.modID);
+			writeString(buf, a.uniqueID);
 		}
 	}
 
@@ -63,15 +63,13 @@ public class RequestFiles extends DataHandler {
 	
 	@Override
 	protected void runOnGameThread(Minecraft client, MinecraftServer server, boolean isClient) {
-		List<DataExchange.AutoFileSyncEntry> syncEntries = files
-				.stream().map(asid -> DataExchange.AutoFileSyncEntry.findMatching(asid))
+		List<AutoFileSyncEntry> syncEntries = files
+				.stream().map(asid -> AutoFileSyncEntry.findMatching(asid))
 				.filter(e -> e!=null)
 				.collect(Collectors.toList());
 
 		reply(new SendFiles(syncEntries, receivedToken), server);
 	}
-
-
 
 	public static void newToken(){
 		currentToken =  UUID.randomUUID().toString();
