@@ -29,9 +29,17 @@ public class DataExchangeAPI extends DataExchange {
 	 * You should never need to create a custom instance of this Object.
 	 */
 	public DataExchangeAPI() {
-		super((api) -> new ConnectorClientside(api), (api) -> new ConnectorServerside(api));
+		super();
 	}
 
+	@Environment(EnvType.CLIENT)
+	protected ConnectorClientside clientSupplier(DataExchange api) {
+		return new ConnectorClientside(api);
+	}
+
+	protected ConnectorServerside serverSupplier(DataExchange api) {
+		return new ConnectorServerside(api);
+	}
 
 	/**
 	 * Register a mod to participate in the DataExchange.

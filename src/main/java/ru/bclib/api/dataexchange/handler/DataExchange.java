@@ -182,13 +182,11 @@ abstract public class DataExchange {
     protected final Set<DataHandlerDescriptor> descriptors;
     protected final List<AutoFileSyncEntry> autoSyncFiles = new ArrayList<>(4);
 
-    private final Function<DataExchange, ConnectorClientside> clientSupplier;
-    private final Function<DataExchange, ConnectorServerside> serverSupplier;
+    abstract protected ConnectorClientside clientSupplier(DataExchange api);
+    abstract protected ConnectorServerside serverSupplier(DataExchange api);
 
-    protected DataExchange(Function<DataExchange, ConnectorClientside> client, Function<DataExchange, ConnectorServerside> server){
+    protected DataExchange(){
         descriptors = new HashSet<>();
-        this.clientSupplier = client;
-        this.serverSupplier = server;
     }
 
     public Set<DataHandlerDescriptor> getDescriptors() { return descriptors; }
@@ -196,7 +194,7 @@ abstract public class DataExchange {
     @Environment(EnvType.CLIENT)
     protected void initClientside(){
         if (client!=null) return;
-        client = clientSupplier.apply(this);
+        client = clientSupplier(this);
         ClientLoginConnectionEvents.INIT.register((a, b) ->{
             System.out.println("INIT");
         });
@@ -210,7 +208,7 @@ abstract public class DataExchange {
 
     protected void initServerSide(){
         if (server!=null) return;
-        server = serverSupplier.apply(this);
+        server = serverSupplier(this);
 
         ServerPlayConnectionEvents.INIT.register(server::onPlayInit);
         ServerPlayConnectionEvents.JOIN.register(server::onPlayReady);
