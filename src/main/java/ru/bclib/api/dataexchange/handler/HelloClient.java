@@ -14,10 +14,9 @@ import ru.bclib.BCLib;
 import ru.bclib.api.dataexchange.DataExchangeAPI;
 import ru.bclib.api.dataexchange.DataHandler;
 import ru.bclib.api.dataexchange.DataHandlerDescriptor;
-import ru.bclib.api.dataexchange.FileHash;
+import ru.bclib.api.dataexchange.handler.DataExchange.AutoSyncID;
 import ru.bclib.api.datafixer.DataFixerAPI;
 import ru.bclib.gui.screens.WarnBCLibVersionMismatch;
-import ru.bclib.util.Triple;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -108,22 +107,35 @@ public class HelloClient extends DataHandler {
 		String localBclibVersion = getBCLibVersion();
 		BCLib.LOGGER.info("Received Hello from Server. (client="+localBclibVersion+", server="+bclibVersion+")");
 		
-		if (DataFixerAPI.getModVersion(localBclibVersion) == DataFixerAPI.getModVersion(bclibVersion)){
+		if (DataFixerAPI.getModVersion(localBclibVersion) != DataFixerAPI.getModVersion(bclibVersion)){
 			showBCLibError(client);
 			return;
 		}
+		
+		List<AutoSyncID> filesToRequest = new ArrayList<>(4);
 		
 		for (Entry<String, String> e : modVersion.entrySet()){
 			String ver = getModVersion(e.getKey());
 			BCLib.LOGGER.info("    - " + e.getKey() + " (client="+ver+", server="+ver+")");
 		}
-
+		
+		BCLib.LOGGER.info("Server offered Files to sync.");
 		for (DataExchange.AutoSyncTriple e : autoSyncedFiles) {
+			boolean willRequest = false;
 			if (e.third == null) {
-				BCLib.LOGGER.info("    - File " + e.first.modID + "." + e.first.uniqueID + ": Does not exist on client.");
+				filesToRequest.add(new AutoSyncID(e.first.modID, e.first.uniqueID));
+				willRequest = true;
+				BCLib.LOGGER.info("    - File " + e + ": Does not exist on client.");
 			} else if (e.third.needTransfer.test(e.third.getFileHash(), e.first, e.second)) {
-				BCLib.LOGGER.info("    - File " + e.first.modID + "." + e.first.uniqueID + ": Needs Transfer");
+				willRequest = true;
+				filesToRequest.add(new AutoSyncID(e.first.modID, e.first.uniqueID));
+				BCLib.LOGGER.info("    - File " + e + ": Needs Transfer");
 			}
+			
+			BCLib.LOGGER.info("    - " + e + ": " + (willRequest ? " (requesting)":""));
+		}
+		if (filesToRequest.size()>0) {
+			showDonwloadConfigs(client, filesToRequest);
 		}
 	}
 	
@@ -133,14 +145,28 @@ public class HelloClient extends DataHandler {
 		client.setScreen(new WarnBCLibVersionMismatch((download) -> {
 			Minecraft.getInstance().setScreen((Screen)null);
 			if (download){
-				requestDownloads((hadErrors)->{
+				requestBCLibDownload((hadErrors)->{
 					client.stop();
 				});
 			}
 		}));
 	}
 	
-	private void requestDownloads(Consumer<Boolean> whenFinished){
+	@Environment(EnvType.CLIENT)
+	protected void showDonwloadConfigs(Minecraft client, List<AutoSyncID> files){
+		requestFileDownloads((hadErrors)->{
+			client.stop();
+		}, files);
+	}
+	
+	private void requestBCLibDownload(Consumer<Boolean> whenFinished){
 		BCLib.LOGGER.warning("Starting download of BCLib");
+		whenFinished.accept(true);
+	}
+	
+	private void requestFileDownloads(Consumer<Boolean> whenFinished, List<AutoSyncID> files){
+		BCLib.LOGGER.info("Starting download of Files:" + files.size());
+		DataExchangeAPI.send(new RequestFiles(files));
+		whenFinished.accept(true);
 	}
 }

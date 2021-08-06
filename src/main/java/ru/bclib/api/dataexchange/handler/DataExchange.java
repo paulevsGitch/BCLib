@@ -33,10 +33,29 @@ abstract public class DataExchange {
     public interface NeedTransferPredicate  {
         public boolean test(FileHash clientHash, FileHash serverHash, byte[] content);
     }
+    
+    final static class AutoSyncID extends Pair<String, String>{
+        public AutoSyncID(String modID, String uniqueID) {
+            super(modID, uniqueID);
+        }
+        
+        public String getModID() { return this.first; }
+        public String getUniqueID() { return this.second; }
+    
+        @Override
+        public String toString() {
+            return first+"."+second;
+        }
+    }
 
     final static class AutoSyncTriple extends Triple<FileHash, byte[], DataExchange.AutoFileSyncEntry>{
         public AutoSyncTriple(FileHash first, byte[] second, AutoFileSyncEntry third) {
             super(first, second, third);
+        }
+    
+        @Override
+        public String toString() {
+            return first.modID+"."+first.uniqueID;
         }
     }
     static class AutoFileSyncEntry {
