@@ -54,16 +54,19 @@ public class HelloClient extends DataHandler {
 
 	@Override
 	protected void serializeData(FriendlyByteBuf buf) {
+		final String vbclib = getBCLibVersion();
+		BCLib.LOGGER.info("Sending Hello to Client. (server="+vbclib+")");
 		final List<String> mods = DataExchangeAPI.registeredMods();
 
 		//write BCLibVersion (=protocol version)
-		buf.writeInt(DataFixerAPI.getModVersion(getBCLibVersion()));
-
+		buf.writeInt(DataFixerAPI.getModVersion(vbclib));
 		//write Plugin Versions
 		buf.writeInt(mods.size());
 		for (String modID : mods) {
 			writeString(buf, modID);
-			buf.writeInt(DataFixerAPI.getModVersion(getModVersion(modID)));
+			final String ver = getModVersion(modID);
+			buf.writeInt(DataFixerAPI.getModVersion(ver));
+			BCLib.LOGGER.info("    - Listing Mod " + modID + " v" + ver);
 		}
 
 		//send config Data
@@ -72,6 +75,7 @@ public class HelloClient extends DataHandler {
 		for (AutoFileSyncEntry entry : autoSyncFiles) {
 			//System.out.println("Serializing " + entry.getFileHash());
 			entry.serialize(buf);
+			BCLib.LOGGER.info("    - Offering File " + entry);
 		}
 	}
 	

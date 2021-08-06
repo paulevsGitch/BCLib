@@ -4,6 +4,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import ru.bclib.api.dataexchange.DataHandler;
 import ru.bclib.api.dataexchange.FileHash;
 import ru.bclib.util.Pair;
+import ru.bclib.util.Triple;
 
 import java.io.File;
 import java.io.IOException;
@@ -53,13 +54,13 @@ class AutoFileSyncEntry extends DataExchange.AutoSyncID {
         return serializeFileContent(buf);
     }
 
-    public static Pair<AutoFileSyncEntry, byte[]> deserializeContent(FriendlyByteBuf buf) {
+    public static Triple<AutoFileSyncEntry, byte[], DataExchange.AutoSyncID> deserializeContent(FriendlyByteBuf buf) {
         final String modID = DataHandler.readString(buf);
         final String uniqueID = DataHandler.readString(buf);
         byte[] data = deserializeFileContent(buf);
 
         AutoFileSyncEntry entry = AutoFileSyncEntry.findMatching(modID, uniqueID);
-        return new Pair<>(entry, data);
+        return new Triple<>(entry, data, new DataExchange.AutoSyncID(modID, uniqueID));
     }
 
 

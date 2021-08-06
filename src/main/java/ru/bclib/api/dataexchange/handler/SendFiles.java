@@ -13,7 +13,9 @@ import ru.bclib.api.dataexchange.DataHandler;
 import ru.bclib.api.dataexchange.DataHandlerDescriptor;
 import ru.bclib.gui.screens.ConfirmRestartScreen;
 import ru.bclib.util.Pair;
+import ru.bclib.util.Triple;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -38,6 +40,12 @@ public class SendFiles extends DataHandler {
 	@Override
 	protected void serializeData(FriendlyByteBuf buf) {
 		List<AutoFileSyncEntry> existingFiles = files.stream().filter(e -> e.fileName.exists()).collect(Collectors.toList());
+		/*
+		//this will try to send a file that was not registered or requested by the client
+		existingFiles.add(new AutoFileSyncEntry("none", new File("D:\\MinecraftPlugins\\BetterNether\\run\\server.properties"),true,(a, b, content) -> {
+			System.out.println("Got Content:" + content.length);
+			return true;
+		}));*/
 		writeString(buf, token);
 		buf.writeInt(existingFiles.size());
 
@@ -64,12 +72,12 @@ public class SendFiles extends DataHandler {
 		receivedFiles = new ArrayList<>(size);
 		BCLib.LOGGER.info("Server sent " + size + " Files:");
 		for (int i=0; i<size; i++){
-			Pair<AutoFileSyncEntry, byte[]> p = AutoFileSyncEntry.deserializeContent(buf);
+			Triple<AutoFileSyncEntry, byte[], DataExchange.AutoSyncID> p = AutoFileSyncEntry.deserializeContent(buf);
 			if (p.first != null) {
 				receivedFiles.add(p);
 				BCLib.LOGGER.info("    - " + p.first + " (" + p.second.length + " Bytes)");
 			} else {
-				BCLib.LOGGER.error("    - Failed to receive File");
+				BCLib.LOGGER.error("   - Failed to receive File " +p.third+ ", possibly sent from a Mod that is not installed on the client.");
 			}
 		}
 	}
