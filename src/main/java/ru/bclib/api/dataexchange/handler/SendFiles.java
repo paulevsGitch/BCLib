@@ -35,16 +35,21 @@ public class SendFiles extends DataHandler {
 			entry.serializeContent(buf);
 		}
 	}
-	
+
+	private List<Pair<DataExchange.AutoFileSyncEntry, byte[]>> receivedFiles;
 	@Override
 	protected void deserializeFromIncomingData(FriendlyByteBuf buf, PacketSender responseSender, boolean fromClient) {
 		int size = buf.readInt();
-		List<Pair<DataExchange.AutoFileSyncEntry, byte[]>> receivedFiles = new ArrayList<>(size);
+		receivedFiles = new ArrayList<>(size);
 		BCLib.LOGGER.info("Server sent " + size + " Files:");
 		for (int i=0; i<size; i++){
 			Pair<DataExchange.AutoFileSyncEntry, byte[]> p = DataExchange.AutoFileSyncEntry.deserializeContent(buf);
-			receivedFiles.add(p);
-			BCLib.LOGGER.info("    - " + p.first + " (" + p.second.length + " Bytes)");
+			if (p.first != null) {
+				receivedFiles.add(p);
+				BCLib.LOGGER.info("    - " + p.first + " (" + p.second.length + " Bytes)");
+			} else {
+				BCLib.LOGGER.error("    - Failed to receive File");
+			}
 		}
 	}
 	
