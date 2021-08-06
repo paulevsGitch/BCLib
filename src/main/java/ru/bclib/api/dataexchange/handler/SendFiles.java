@@ -53,6 +53,7 @@ public class SendFiles extends DataHandler {
 	protected void deserializeFromIncomingData(FriendlyByteBuf buf, PacketSender responseSender, boolean fromClient) {
 		token = readString(buf);
 		if (!token.equals(RequestFiles.currentToken)) {
+			RequestFiles.newToken();
 			BCLib.LOGGER.error("Unrequested File Transfer!");
 			receivedFiles = new ArrayList<>(0);
 			return;
