@@ -3,6 +3,7 @@ package ru.bclib.api.dataexchange;
 import net.minecraft.network.FriendlyByteBuf;
 import org.jetbrains.annotations.NotNull;
 import ru.bclib.BCLib;
+import ru.bclib.api.dataexchange.handler.DataExchange;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,6 +13,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.function.Predicate;
 
 /**
  * Calculates a hash based on the contents of a File.
@@ -38,11 +40,47 @@ public class FileHash {
      */
     public final int value;
 
-    FileHash(byte[] md5, int size, int value) {
+    /**
+     * A Unique ID for the referenced File.
+     * <p>
+     * Files with the same {@link #modID} need to have a unique IDs. Normally the filename from {@link #FileHash(String, File, byte[], int, int)}
+     * is used to generated that ID, but you can directly specify one using {@link #FileHash(String, String, byte[], int, int)}.
+     */
+    @NotNull
+    public final String uniqueID;
+
+    /**
+     * The ID of the Mod that is registering the File
+     */
+    @NotNull
+    public final String modID;
+
+    FileHash(String modID, File file, byte[] md5, int size, int value) {
+        this(modID, file.getName(), md5, size, value);
+    }
+
+    FileHash(String modID, String uniqueID, byte[] md5, int size, int value) {
+        Objects.nonNull(modID);
+        Objects.nonNull(uniqueID);
         Objects.nonNull(md5);
+
         this.md5 = md5;
         this.size = size;
         this.value = value;
+        this.modID = modID;
+        this.uniqueID = uniqueID;
+    }
+
+    private static int ERR_DOES_NOT_EXIST = -10;
+    private static int ERR_IO_ERROR = -20;
+    static FileHash createForEmpty(String modID, String uniqueID, int errCode){
+        return new FileHash(modID, uniqueID, new byte[0], 0, errCode);
+    }
+
+    final static DataExchange.NeedTransferPredicate NEED_TRANSFER = (clientHash, serverHash, content)-> !clientHash.equals(serverHash);
+
+    public boolean noFile() {
+        return md5.length == 0;
     }
 
     @Override
@@ -58,13 +96,13 @@ public class FileHash {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        FileHash that = (FileHash) o;
-        return size == that.size && value == that.value && Arrays.equals(md5, that.md5);
+        FileHash fileHash = (FileHash) o;
+        return size == fileHash.size && value == fileHash.value && Arrays.equals(md5, fileHash.md5) && uniqueID.equals(fileHash.uniqueID) && modID.equals(fileHash.modID);
     }
 
     @Override
     public int hashCode() {
-        int result = Objects.hash(size, value);
+        int result = Objects.hash(size, value, uniqueID, modID);
         result = 31 * result + Arrays.hashCode(md5);
         return result;
     }
@@ -76,14 +114,17 @@ public class FileHash {
     public String getMd5String(){
         return toHexString(md5);
     }
+
     /**
      * Serializes the Object to a buffer
      * @param buf The buffer to write to
      */
-    public void writeString(FriendlyByteBuf buf) {
+    public void serialize(FriendlyByteBuf buf) {
         buf.writeInt(size);
         buf.writeInt(value);
         buf.writeByteArray(md5);
+        DataHandler.writeString(buf, modID);
+        DataHandler.writeString(buf, uniqueID);
     }
 
     /**
@@ -91,12 +132,14 @@ public class FileHash {
      * @param buf Thea buffer to read from
      * @return The received String
      */
-    public static FileHash readString(FriendlyByteBuf buf){
+    public static FileHash deserialize(FriendlyByteBuf buf){
         final int size = buf.readInt();
         final int value = buf.readInt();
         final byte[] md5 = buf.readByteArray();
+        final String modID = DataHandler.readString(buf);
+        final String uniqueID = DataHandler.readString(buf);
 
-        return new FileHash(md5, size, value);
+        return new FileHash(modID, uniqueID, md5, size, value);
     }
 
     /**
@@ -116,12 +159,28 @@ public class FileHash {
 
     /**
      * Create a new {@link FileHash}.
+     * <p>
+     * Will call {@link #create(String, File, String)} using the name of the File as {@code uniqueID}.
+     * @param modID ID of the calling Mod
      * @param file The input file
+     *
      * @return A new Instance. You can compare instances using {@link #equals(Object)} to determine if two files are
-     * identical.
+     * identical. Will return {@code null} when an error occurs or the File does not exist
      */
-    public static FileHash createFromBinary(File file){
-        if (!file.exists()) return null;
+    public static FileHash create(String modID, File file){
+        return create(modID, file, file.getName());
+    }
+
+    /**
+     * Create a new {@link FileHash}.
+     * @param modID ID of the calling Mod
+     * @param file The input file
+     * @param uniqueID The unique ID that is used for this File (see {@link FileHash#uniqueID} for Details.
+     * @return A new Instance. You can compare instances using {@link #equals(Object)} to determine if two files are
+     * identical. Will return {@code null} when an error occurs or the File does not exist
+     */
+    public static FileHash create(String modID, File file, String uniqueID){
+        if (!file.exists()) return createForEmpty(modID, uniqueID, ERR_DOES_NOT_EXIST);
         final Path path = file.toPath();
 
         int size = 0;
@@ -140,12 +199,14 @@ public class FileHash {
             md.update(data);
             md5 = md.digest();
 
-            return new FileHash(md5, size, value);
+            return new FileHash(modID, uniqueID, md5, size, value);
         } catch (IOException e) {
             BCLib.LOGGER.error("Failed to read file: " + file);
             return null;
         } catch (NoSuchAlgorithmException e) {
             BCLib.LOGGER.error("Unable to build hash for file: " + file);
         }
+
+        return createForEmpty(modID, uniqueID,  ERR_IO_ERROR);
     }
 }

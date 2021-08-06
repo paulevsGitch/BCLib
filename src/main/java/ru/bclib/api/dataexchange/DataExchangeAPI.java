@@ -7,9 +7,14 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientLoginConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.network.FriendlyByteBuf;
+import ru.bclib.BCLib;
 import ru.bclib.api.dataexchange.handler.DataExchange;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -20,7 +25,10 @@ import java.util.function.Predicate;
 public class DataExchangeAPI extends DataExchange {
 	private final static List<String> MODS = Lists.newArrayList();
 
-	protected DataExchangeAPI() {
+	/**
+	 * You should never need to create a custom instance of this Object.
+	 */
+	public DataExchangeAPI() {
 		super((api) -> new ConnectorClientside(api), (api) -> new ConnectorServerside(api));
 	}
 
@@ -47,8 +55,8 @@ public class DataExchangeAPI extends DataExchange {
 	 * @param desc The Descriptor you want to add.
 	 */
 	public static void registerDescriptor(DataHandlerDescriptor desc){
-		DataExchangeAPI api = DataExchange.getInstance();
-		api.descriptors.add(desc);
+		DataExchange api = DataExchange.getInstance();
+		api.getDescriptors().add(desc);
 	}
 
 	/**
@@ -72,10 +80,58 @@ public class DataExchangeAPI extends DataExchange {
 	/**
 	 * Registers a File for automatic client syncing.
 	 *
-	 * @param needTransfer If the predicate returns true, the file needs to get copied to the server.
+	 * @param modID The ID of the calling Mod
 	 * @param fileName The name of the File
 	 */
-	public static void addAutoSyncFile(Predicate<Object> needTransfer, File fileName){
-		DataExchangeAPI.getInstance().addAutoSyncFileData(needTransfer, fileName);
+	public static void addAutoSyncFile(String modID, File fileName){
+		getInstance().addAutoSyncFileData(modID, fileName, false, FileHash.NEED_TRANSFER);
+	}
+
+	/**
+	 * Registers a File for automatic client syncing.
+	 *
+	 * @param modID The ID of the calling Mod
+	 * @param uniqueID A unique Identifier for the File. (see {@link ru.bclib.api.dataexchange.FileHash#uniqueID} for
+	 *                 Details
+	 * @param fileName The name of the File
+	 */
+	public static void addAutoSyncFile(String modID, String uniqueID, File fileName){
+		getInstance().addAutoSyncFileData(modID, uniqueID, fileName, false, FileHash.NEED_TRANSFER);
+	}
+
+	/**
+	 * Registers a File for automatic client syncing.
+	 *
+	 * @param modID The ID of the calling Mod
+	 * @param fileName The name of the File
+	 * @param requestContent When {@code true} the content of the file is requested for comparison. This will copy the
+	 *                       entire file from the client to the server.
+	 *                       <p>
+	 *                       You should only use this option, if you need to compare parts of the file in order to decide
+	 *                       If the File needs to be copied. Normally using the {@link ru.bclib.api.dataexchange.FileHash}
+	 *                       for comparison is sufficient.
+	 * @param needTransfer If the predicate returns true, the file needs to get copied to the server.
+	 */
+	public static void addAutoSyncFile(String modID, File fileName, boolean requestContent, NeedTransferPredicate needTransfer){
+		getInstance().addAutoSyncFileData(modID, fileName, requestContent, needTransfer);
+	}
+
+	/**
+	 * Registers a File for automatic client syncing.
+	 *
+	 * @param modID The ID of the calling Mod
+	 * @param uniqueID A unique Identifier for the File. (see {@link ru.bclib.api.dataexchange.FileHash#uniqueID} for
+	 *                 Details
+	 * @param fileName The name of the File
+	 * @param requestContent When {@code true} the content of the file is requested for comparison. This will copy the
+	 *                       entire file from the client to the server.
+	 *                       <p>
+	 *                       You should only use this option, if you need to compare parts of the file in order to decide
+	 *                       If the File needs to be copied. Normally using the {@link ru.bclib.api.dataexchange.FileHash}
+	 *                       for comparison is sufficient.
+	 * @param needTransfer If the predicate returns true, the file needs to get copied to the server.
+	 */
+	public static void addAutoSyncFile(String modID, String uniqueID, File fileName, boolean requestContent, NeedTransferPredicate needTransfer){
+		getInstance().addAutoSyncFileData(modID, uniqueID, fileName, requestContent, needTransfer);
 	}
 }
