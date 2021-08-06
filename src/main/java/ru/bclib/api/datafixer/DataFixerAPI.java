@@ -396,22 +396,7 @@ public class DataFixerAPI {
 		return patchConfTag;
 	}
 
-	private static void fixInventory(ListTag inventory, boolean[] changed, MigrationProfile data, boolean recursive) {
-		inventory.forEach(item -> {
-			changed[0] |= data.replaceStringFromIDs((CompoundTag)item, "id");
-
-			if (((CompoundTag) item).contains("tag")) {
-				CompoundTag tag = (CompoundTag)((CompoundTag) item).get("tag");
-				if (tag.contains("BlockEntityTag")){
-					CompoundTag blockEntityTag = (CompoundTag)((CompoundTag) tag).get("BlockEntityTag");
-					ListTag items = blockEntityTag.getList("Items", 10);
-					fixItemArrayWithID(items, changed, data, recursive);
-				}
-			}
-		});
-	}
-
-	private static void fixItemArrayWithID(ListTag items, boolean[] changed, MigrationProfile data, boolean recursive) {
+	static void fixItemArrayWithID(ListTag items, boolean[] changed, MigrationProfile data, boolean recursive) {
 		items.forEach(inTag -> {
 			fixID((CompoundTag) inTag, changed, data, recursive);
 		});
@@ -432,7 +417,16 @@ public class DataFixerAPI {
 		}
 		if (recursive && tag.contains("Inventory")) {
 			ListTag inventory = tag.getList("Inventory", 10);
-			fixInventory(inventory, changed, data, recursive);
+			fixItemArrayWithID(inventory, changed, data, true);
+		}
+		if (tag.contains("tag")) {
+			CompoundTag entityTag = (CompoundTag)tag.get("tag");
+			if (entityTag.contains("BlockEntityTag")){
+				CompoundTag blockEntityTag = (CompoundTag)entityTag.get("BlockEntityTag");
+				fixID(blockEntityTag, changed, data, recursive);
+				/*ListTag items = blockEntityTag.getList("Items", 10);
+				fixItemArrayWithID(items, changed, data, recursive);*/
+			}
 		}
 	}
 
