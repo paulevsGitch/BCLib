@@ -323,11 +323,11 @@ public class DataFixerAPI {
 	private static void fixPlayerNbt(CompoundTag player, boolean[] changed, MigrationProfile data) {
 		//Checking Inventory
 		ListTag inventory = player.getList("Inventory", 10);
-		fixInventory(inventory, changed, data, true);
+		fixItemArrayWithID(inventory, changed, data, true);
 
 		//Checking EnderChest
 		ListTag enderitems = player.getList("EnderItems", 10);
-		fixInventory(enderitems, changed, data, true);
+		fixItemArrayWithID(enderitems, changed, data, true);
 	}
 
 	private static void fixRegion(MigrationProfile data, State state, File file) {

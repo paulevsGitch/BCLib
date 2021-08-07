@@ -1,6 +1,8 @@
 package ru.bclib.api.datafixer;
 
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 import org.jetbrains.annotations.NotNull;
 import ru.bclib.api.WorldDataAPI;
 
@@ -88,6 +90,46 @@ public class MigrationProfile {
 		}
 		
 		return false;
+	}
+
+	private boolean replaceIDatPath(@NotNull ListTag list, @NotNull String[] parts, int level){
+		boolean[] changed = {false};
+		if (level == parts.length-1) {
+			DataFixerAPI.fixItemArrayWithID(list, changed, this, true);
+		} else {
+			list.forEach(inTag -> changed[0] |= replaceIDatPath((CompoundTag)inTag, parts, level));
+		}
+		return changed[0];
+	}
+
+	private boolean replaceIDatPath(@NotNull CompoundTag tag, @NotNull String[] parts, int level){
+		boolean changed = false;
+		for (int i=level; i<parts.length-1; i++) {
+			final String part = parts[i];
+			if (tag.contains(part)) {
+				final Tag subTag = tag.get(part);
+				if (subTag instanceof ListTag) {
+					ListTag list = (ListTag)subTag;
+					return replaceIDatPath(list, parts, i+1);
+				} else if (subTag instanceof CompoundTag) {
+					tag = (CompoundTag)tag;
+				}
+			} else {
+				return false;
+			}
+		}
+
+		if (tag!=null && parts.length>0) {
+			replaceStringFromIDs(tag, parts[parts.length-1]);
+		}
+
+
+		return false;
+	}
+
+	public boolean replaceIDatPath(@NotNull CompoundTag root, @NotNull String path){
+		String[] parts = path.split("\\.");
+		return replaceIDatPath(root, parts, 0);
 	}
 	
 	public boolean patchLevelDat(@NotNull CompoundTag level) throws PatchDidiFailException {

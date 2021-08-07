@@ -156,5 +156,15 @@ public abstract class Patch {
 	static MigrationProfile createMigrationData(CompoundTag config) {
 		return new MigrationProfile(config);
 	}
+
+	/**
+	 * Returns a list of paths,where your mod stores IDs in your {@link ru.bclib.api.WorldDataAPI}-File.
+	 * <p>
+	 * {@link DataFixerAPI} will use information from the latest patch that returns a non-null-result.
+	 * @return {@code null} if nothing changes or a list of Paths in your {@link ru.bclib.api.WorldDataAPI}-File
+	 */
+	public List<String> getIIDPathsInWorldDataAPI() {
+		return null;
+	}
 	
 }
