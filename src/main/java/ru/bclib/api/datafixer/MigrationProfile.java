@@ -19,6 +19,7 @@ public class MigrationProfile {
 	final Map<String, String> idReplacements;
 	final List<PatchFunction<CompoundTag, Boolean>> levelPatchers;
 	final List<Patch> worldDataPatchers;
+	final Map<String, List<String>> worldDataIDPaths;
 	
 	private final CompoundTag config;
 	
@@ -33,11 +34,16 @@ public class MigrationProfile {
 		HashMap<String, String> replacements = new HashMap<String, String>();
 		List<PatchFunction<CompoundTag, Boolean>> levelPatches = new LinkedList<>();
 		List<Patch> worldDataPatches = new LinkedList<>();
+		HashMap<String, List<String>> worldDataIDPaths = new HashMap<>();
 		for (String modID : mods) {
+
 			Patch.getALL()
 				 .stream()
 				 .filter(p -> p.modID.equals(modID))
 				 .forEach(patch -> {
+					 List<String> paths = patch.getWorldDataIDPaths();
+					 if (paths!=null) worldDataIDPaths.put(modID, paths);
+
 					 if (currentPatchLevel(modID) < patch.level) {
 						 replacements.putAll(patch.getIDReplacements());
 						 if (patch.getLevelDatPatcher()!=null)
@@ -51,7 +57,8 @@ public class MigrationProfile {
 					 }
 				 });
 		}
-		
+
+		this.worldDataIDPaths = Collections.unmodifiableMap(worldDataIDPaths);
 		this.idReplacements = Collections.unmodifiableMap(replacements);
 		this.levelPatchers = Collections.unmodifiableList(levelPatches);
 		this.worldDataPatchers = Collections.unmodifiableList(worldDataPatches);
@@ -97,7 +104,7 @@ public class MigrationProfile {
 		if (level == parts.length-1) {
 			DataFixerAPI.fixItemArrayWithID(list, changed, this, true);
 		} else {
-			list.forEach(inTag -> changed[0] |= replaceIDatPath((CompoundTag)inTag, parts, level));
+			list.forEach(inTag -> changed[0] |= replaceIDatPath((CompoundTag)inTag, parts, level+1));
 		}
 		return changed[0];
 	}
@@ -107,12 +114,12 @@ public class MigrationProfile {
 		for (int i=level; i<parts.length-1; i++) {
 			final String part = parts[i];
 			if (tag.contains(part)) {
-				final Tag subTag = tag.get(part);
-				if (subTag instanceof ListTag) {
-					ListTag list = (ListTag)subTag;
-					return replaceIDatPath(list, parts, i+1);
-				} else if (subTag instanceof CompoundTag) {
-					tag = (CompoundTag)tag;
+				final byte type = tag.getTagType(part);
+				if (type == Tag.TAG_LIST) {
+					ListTag list = tag.getList(part, 10);
+					return replaceIDatPath(list, parts, i);
+				} else if (type == Tag.TAG_COMPOUND) {
+					tag = tag.getCompound(part);
 				}
 			} else {
 				return false;
@@ -120,7 +127,21 @@ public class MigrationProfile {
 		}
 
 		if (tag!=null && parts.length>0) {
-			replaceStringFromIDs(tag, parts[parts.length-1]);
+			final String key = parts[parts.length-1];
+			final byte type = tag.getTagType(key);
+			if (type == Tag.TAG_LIST) {
+				final ListTag list = tag.getList(key, 10);
+				final boolean[] _changed = {false};
+				DataFixerAPI.fixItemArrayWithID(list, _changed, this, true);
+				return _changed[0];
+			} else  if (type == Tag.TAG_STRING) {
+				return replaceStringFromIDs(tag, key);
+			} else if (type == Tag.TAG_COMPOUND) {
+				final CompoundTag cTag = tag.getCompound(key);
+				boolean[] _changed = {false};
+				DataFixerAPI.fixID(cTag, _changed, this, true);
+				return _changed[0];
+			}
 		}
 
 
@@ -146,6 +167,18 @@ public class MigrationProfile {
 			boolean changed = patch.getWorldDataPatcher().apply(root, this);
 			if (changed) {
 				WorldDataAPI.saveFile(patch.modID);
+			}
+		}
+
+		for (Map.Entry<String, List<String>> entry : worldDataIDPaths.entrySet()){
+			CompoundTag root = WorldDataAPI.getRootTag(entry.getKey());
+			boolean[] changed = {false};
+			entry.getValue().forEach(path -> {
+				changed[0] |= replaceIDatPath(root, path);
+			});
+
+			if (changed[0]){
+				WorldDataAPI.saveFile(entry.getKey());
 			}
 		}
 	}

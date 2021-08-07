@@ -158,12 +158,37 @@ public abstract class Patch {
 	}
 
 	/**
-	 * Returns a list of paths,where your mod stores IDs in your {@link ru.bclib.api.WorldDataAPI}-File.
+	 * Returns a list of paths,where your mod may IDs in your {@link ru.bclib.api.WorldDataAPI}-File.
 	 * <p>
-	 * {@link DataFixerAPI} will use information from the latest patch that returns a non-null-result.
-	 * @return {@code null} if nothing changes or a list of Paths in your {@link ru.bclib.api.WorldDataAPI}-File
+	 * {@link DataFixerAPI} will use information from the latest patch that returns a non-null-result. This list is used 
+	 * to automatically fix changed IDs from all active patches (see {@link Patch#getIDReplacements()}
+	 * <p>
+	 * The end of the path can either be a {@link net.minecraft.nbt.StringTag}, a {@link net.minecraft.nbt.ListTag} or
+	 * a {@link CompoundTag}. If the Path contains a non-leaf {@link net.minecraft.nbt.ListTag}, all members of that
+	 * list will be processed. For example:
+	 * <pre>
+	 *     - global +
+	 *              | - key (String)
+	 *              | - items (List) +
+	 *                               | - { id (String) }
+	 *                               | - { id (String) }
+	 * </pre>
+	 * The path <b>global.items.id</b> will fix all <i>id</i>-entries in the <i>items</i>-list, while the path
+	 * <b>global.key</b> will only fix the  <i>key</i>-entry.
+	 * <p>
+	 * if the leaf-entry (= the last part of the path, which would be <i>items</i> in <b>global.items</b>) is a
+	 * {@link CompoundTag}, the system will fix any <i>id</i> entry. If the {@link CompoundTag} contains an <i>item</i>
+	 * or <i>tag.BlockEntityTag</i> entry, the system will recursivley continue with those. If an <i>items</i>
+	 * or <i>inventory</i>-{@link net.minecraft.nbt.ListTag} was found, the system will continue recursivley with
+	 * every item of that list.
+	 * <p>
+	 * if the leaf-entry is a {@link net.minecraft.nbt.ListTag}, it is handle the same as a child <i>items</i> entry
+	 * of a {@link CompoundTag}.
+	 * 
+	 * @return {@code null} if nothing changes or a list of Paths in your {@link ru.bclib.api.WorldDataAPI}-File.  
+	 * Paths are dot-seperated (see {@link ru.bclib.api.WorldDataAPI#getCompoundTag(String, String)}).
 	 */
-	public List<String> getIIDPathsInWorldDataAPI() {
+	public List<String> getWorldDataIDPaths() {
 		return null;
 	}
 	

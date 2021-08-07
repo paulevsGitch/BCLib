@@ -403,7 +403,7 @@ public class DataFixerAPI {
 	}
 
 
-	private static void fixID(CompoundTag inTag, boolean[] changed, MigrationProfile data, boolean recursive) {
+	static void fixID(CompoundTag inTag, boolean[] changed, MigrationProfile data, boolean recursive) {
 		final CompoundTag tag = inTag;
 
 		changed[0] |= data.replaceStringFromIDs(tag, "id");
