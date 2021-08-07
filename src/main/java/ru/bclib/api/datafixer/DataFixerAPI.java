@@ -10,8 +10,9 @@ import net.minecraft.client.gui.screens.worldselection.EditWorldScreen;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtIo;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.util.ProgressListener;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.chunk.storage.RegionFile;
@@ -322,12 +323,42 @@ public class DataFixerAPI {
 
 	private static void fixPlayerNbt(CompoundTag player, boolean[] changed, MigrationProfile data) {
 		//Checking Inventory
-		ListTag inventory = player.getList("Inventory", 10);
-		fixInventory(inventory, changed, data, true);
+		ListTag inventory = player.getList("Inventory", Tag.TAG_COMPOUND);
+		fixItemArrayWithID(inventory, changed, data, true);
 
 		//Checking EnderChest
-		ListTag enderitems = player.getList("EnderItems", 10);
-		fixInventory(enderitems, changed, data, true);
+		ListTag enderitems = player.getList("EnderItems", Tag.TAG_COMPOUND);
+		fixItemArrayWithID(enderitems, changed, data, true);
+
+		//Checking ReceipBook
+		if (player.contains("recipeBook")) {
+			CompoundTag recipeBook = player.getCompound("recipeBook");
+			changed[0] |= fixStringIDList(recipeBook, "recipes",  data);
+			changed[0] |=  fixStringIDList(recipeBook, "toBeDisplayed",  data);
+		}
+	}
+
+	static boolean fixStringIDList(CompoundTag root, String name, MigrationProfile data) {
+		boolean _changed = false;
+		if (root.contains(name)) {
+			ListTag items = root.getList(name, Tag.TAG_STRING);
+			ListTag newItems = new ListTag();
+
+			for (Tag tag : items) {
+				final StringTag str = (StringTag)tag;
+				final String replace = data.replaceStringFromIDs(str.getAsString());
+				if (replace!=null) {
+					_changed = true;
+					newItems.add(StringTag.valueOf(replace));
+				} else {
+					newItems.add(tag);
+				}
+			}
+			if (_changed) {
+				root.put(name, newItems);
+			}
+		}
+		return _changed;
 	}
 
 	private static void fixRegion(MigrationProfile data, State state, File file) {
@@ -350,18 +381,18 @@ public class DataFixerAPI {
 
 						//Checking TileEntities
 						ListTag tileEntities = root.getCompound("Level")
-												   .getList("TileEntities", 10);
+												   .getList("TileEntities", Tag.TAG_COMPOUND);
 						fixItemArrayWithID(tileEntities, changed, data, true);
 
 						//Checking Entities
-						ListTag entities = root.getList("Entities", 10);
+						ListTag entities = root.getList("Entities", Tag.TAG_COMPOUND);
 						fixItemArrayWithID(entities, changed, data, true);
 
 						//Checking Block Palette
 						ListTag sections = root.getCompound("Level")
-											   .getList("Sections", 10);
+											   .getList("Sections", Tag.TAG_COMPOUND);
 						sections.forEach((tag) -> {
-							ListTag palette = ((CompoundTag) tag).getList("Palette", 10);
+							ListTag palette = ((CompoundTag) tag).getList("Palette", Tag.TAG_COMPOUND);
 							palette.forEach((blockTag) -> {
 								CompoundTag blockTagCompound = ((CompoundTag) blockTag);
 								changed[0] |= data.replaceStringFromIDs(blockTagCompound, "Name");
@@ -396,29 +427,14 @@ public class DataFixerAPI {
 		return patchConfTag;
 	}
 
-	private static void fixInventory(ListTag inventory, boolean[] changed, MigrationProfile data, boolean recursive) {
-		inventory.forEach(item -> {
-			changed[0] |= data.replaceStringFromIDs((CompoundTag)item, "id");
-
-			if (((CompoundTag) item).contains("tag")) {
-				CompoundTag tag = (CompoundTag)((CompoundTag) item).get("tag");
-				if (tag.contains("BlockEntityTag")){
-					CompoundTag blockEntityTag = (CompoundTag)((CompoundTag) tag).get("BlockEntityTag");
-					ListTag items = blockEntityTag.getList("Items", 10);
-					fixItemArrayWithID(items, changed, data, recursive);
-				}
-			}
-		});
-	}
-
-	private static void fixItemArrayWithID(ListTag items, boolean[] changed, MigrationProfile data, boolean recursive) {
+	static void fixItemArrayWithID(ListTag items, boolean[] changed, MigrationProfile data, boolean recursive) {
 		items.forEach(inTag -> {
 			fixID((CompoundTag) inTag, changed, data, recursive);
 		});
 	}
 
 
-	private static void fixID(CompoundTag inTag, boolean[] changed, MigrationProfile data, boolean recursive) {
+	static void fixID(CompoundTag inTag, boolean[] changed, MigrationProfile data, boolean recursive) {
 		final CompoundTag tag = inTag;
 
 		changed[0] |= data.replaceStringFromIDs(tag, "id");
@@ -428,11 +444,20 @@ public class DataFixerAPI {
 		}
 
 		if (recursive && tag.contains("Items")) {
-			fixItemArrayWithID(tag.getList("Items", 10), changed, data, true);
+			fixItemArrayWithID(tag.getList("Items", Tag.TAG_COMPOUND), changed, data, true);
 		}
 		if (recursive && tag.contains("Inventory")) {
-			ListTag inventory = tag.getList("Inventory", 10);
-			fixInventory(inventory, changed, data, recursive);
+			ListTag inventory = tag.getList("Inventory", Tag.TAG_COMPOUND);
+			fixItemArrayWithID(inventory, changed, data, true);
+		}
+		if (tag.contains("tag")) {
+			CompoundTag entityTag = (CompoundTag)tag.get("tag");
+			if (entityTag.contains("BlockEntityTag")){
+				CompoundTag blockEntityTag = (CompoundTag)entityTag.get("BlockEntityTag");
+				fixID(blockEntityTag, changed, data, recursive);
+				/*ListTag items = blockEntityTag.getList("Items", Tag.TAG_COMPOUND);
+				fixItemArrayWithID(items, changed, data, recursive);*/
+			}
 		}
 	}
 

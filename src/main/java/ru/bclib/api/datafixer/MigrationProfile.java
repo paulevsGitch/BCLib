@@ -1,6 +1,8 @@
 package ru.bclib.api.datafixer;
 
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 import org.jetbrains.annotations.NotNull;
 import ru.bclib.api.WorldDataAPI;
 
@@ -17,6 +19,7 @@ public class MigrationProfile {
 	final Map<String, String> idReplacements;
 	final List<PatchFunction<CompoundTag, Boolean>> levelPatchers;
 	final List<Patch> worldDataPatchers;
+	final Map<String, List<String>> worldDataIDPaths;
 	
 	private final CompoundTag config;
 	
@@ -31,11 +34,16 @@ public class MigrationProfile {
 		HashMap<String, String> replacements = new HashMap<String, String>();
 		List<PatchFunction<CompoundTag, Boolean>> levelPatches = new LinkedList<>();
 		List<Patch> worldDataPatches = new LinkedList<>();
+		HashMap<String, List<String>> worldDataIDPaths = new HashMap<>();
 		for (String modID : mods) {
+
 			Patch.getALL()
 				 .stream()
 				 .filter(p -> p.modID.equals(modID))
 				 .forEach(patch -> {
+					 List<String> paths = patch.getWorldDataIDPaths();
+					 if (paths!=null) worldDataIDPaths.put(modID, paths);
+
 					 if (currentPatchLevel(modID) < patch.level) {
 						 replacements.putAll(patch.getIDReplacements());
 						 if (patch.getLevelDatPatcher()!=null)
@@ -49,7 +57,8 @@ public class MigrationProfile {
 					 }
 				 });
 		}
-		
+
+		this.worldDataIDPaths = Collections.unmodifiableMap(worldDataIDPaths);
 		this.idReplacements = Collections.unmodifiableMap(replacements);
 		this.levelPatchers = Collections.unmodifiableList(levelPatches);
 		this.worldDataPatchers = Collections.unmodifiableList(worldDataPatches);
@@ -74,10 +83,15 @@ public class MigrationProfile {
 	public boolean hasAnyFixes() {
 		return idReplacements.size() > 0 || levelPatchers.size() > 0 || worldDataPatchers.size() > 0;
 	}
+
+	public String replaceStringFromIDs(@NotNull String val) {
+		final String replace = idReplacements.get(val);
+		return replace;
+	}
 	
 	public boolean replaceStringFromIDs(@NotNull CompoundTag tag, @NotNull String key) {
 		if (!tag.contains(key)) return false;
-		
+
 		final String val = tag.getString(key);
 		final String replace = idReplacements.get(val);
 		
@@ -88,6 +102,64 @@ public class MigrationProfile {
 		}
 		
 		return false;
+	}
+
+	private boolean replaceIDatPath(@NotNull ListTag list, @NotNull String[] parts, int level){
+		boolean[] changed = {false};
+		if (level == parts.length-1) {
+			DataFixerAPI.fixItemArrayWithID(list, changed, this, true);
+		} else {
+			list.forEach(inTag -> changed[0] |= replaceIDatPath((CompoundTag)inTag, parts, level+1));
+		}
+		return changed[0];
+	}
+
+	private boolean replaceIDatPath(@NotNull CompoundTag tag, @NotNull String[] parts, int level){
+		boolean changed = false;
+		for (int i=level; i<parts.length-1; i++) {
+			final String part = parts[i];
+			if (tag.contains(part)) {
+				final byte type = tag.getTagType(part);
+				if (type == Tag.TAG_LIST) {
+					ListTag list = tag.getList(part, Tag.TAG_COMPOUND);
+					return replaceIDatPath(list, parts, i);
+				} else if (type == Tag.TAG_COMPOUND) {
+					tag = tag.getCompound(part);
+				}
+			} else {
+				return false;
+			}
+		}
+
+		if (tag!=null && parts.length>0) {
+			final String key = parts[parts.length-1];
+			final byte type = tag.getTagType(key);
+			if (type == Tag.TAG_LIST) {
+				final ListTag list = tag.getList(key, Tag.TAG_COMPOUND);
+				final boolean[] _changed = {false};
+				if (list.size()==0) {
+					_changed[0] = DataFixerAPI.fixStringIDList(tag, key, this);
+				} else {
+					DataFixerAPI.fixItemArrayWithID(list, _changed, this, true);
+				}
+				return _changed[0];
+			} else  if (type == Tag.TAG_STRING) {
+				return replaceStringFromIDs(tag, key);
+			} else if (type == Tag.TAG_COMPOUND) {
+				final CompoundTag cTag = tag.getCompound(key);
+				boolean[] _changed = {false};
+				DataFixerAPI.fixID(cTag, _changed, this, true);
+				return _changed[0];
+			}
+		}
+
+
+		return false;
+	}
+
+	public boolean replaceIDatPath(@NotNull CompoundTag root, @NotNull String path){
+		String[] parts = path.split("\\.");
+		return replaceIDatPath(root, parts, 0);
 	}
 	
 	public boolean patchLevelDat(@NotNull CompoundTag level) throws PatchDidiFailException {
@@ -104,6 +176,18 @@ public class MigrationProfile {
 			boolean changed = patch.getWorldDataPatcher().apply(root, this);
 			if (changed) {
 				WorldDataAPI.saveFile(patch.modID);
+			}
+		}
+
+		for (Map.Entry<String, List<String>> entry : worldDataIDPaths.entrySet()){
+			CompoundTag root = WorldDataAPI.getRootTag(entry.getKey());
+			boolean[] changed = {false};
+			entry.getValue().forEach(path -> {
+				changed[0] |= replaceIDatPath(root, path);
+			});
+
+			if (changed[0]){
+				WorldDataAPI.saveFile(entry.getKey());
 			}
 		}
 	}
