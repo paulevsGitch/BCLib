@@ -83,10 +83,15 @@ public class MigrationProfile {
 	public boolean hasAnyFixes() {
 		return idReplacements.size() > 0 || levelPatchers.size() > 0 || worldDataPatchers.size() > 0;
 	}
+
+	public String replaceStringFromIDs(@NotNull String val) {
+		final String replace = idReplacements.get(val);
+		return replace;
+	}
 	
 	public boolean replaceStringFromIDs(@NotNull CompoundTag tag, @NotNull String key) {
 		if (!tag.contains(key)) return false;
-		
+
 		final String val = tag.getString(key);
 		final String replace = idReplacements.get(val);
 		
@@ -116,7 +121,7 @@ public class MigrationProfile {
 			if (tag.contains(part)) {
 				final byte type = tag.getTagType(part);
 				if (type == Tag.TAG_LIST) {
-					ListTag list = tag.getList(part, 10);
+					ListTag list = tag.getList(part, Tag.TAG_COMPOUND);
 					return replaceIDatPath(list, parts, i);
 				} else if (type == Tag.TAG_COMPOUND) {
 					tag = tag.getCompound(part);
@@ -130,9 +135,13 @@ public class MigrationProfile {
 			final String key = parts[parts.length-1];
 			final byte type = tag.getTagType(key);
 			if (type == Tag.TAG_LIST) {
-				final ListTag list = tag.getList(key, 10);
+				final ListTag list = tag.getList(key, Tag.TAG_COMPOUND);
 				final boolean[] _changed = {false};
-				DataFixerAPI.fixItemArrayWithID(list, _changed, this, true);
+				if (list.size()==0) {
+					_changed[0] = DataFixerAPI.fixStringIDList(tag, key, this);
+				} else {
+					DataFixerAPI.fixItemArrayWithID(list, _changed, this, true);
+				}
 				return _changed[0];
 			} else  if (type == Tag.TAG_STRING) {
 				return replaceStringFromIDs(tag, key);
