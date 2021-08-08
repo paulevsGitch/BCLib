@@ -26,7 +26,8 @@ public abstract class GridScreen extends Screen {
 	protected abstract void initLayout();
 	
 	public void render(PoseStack poseStack, int i, int j, float f) {
-		this.renderBackground(poseStack);
+		//this.renderBackground(poseStack);
+		this.renderDirtBackground(i);
 		drawCenteredString(poseStack, this.font, this.title, grid.width / 2, grid.getTopStart(), 16777215);
 		if (grid!=null) grid.render(poseStack);
 		super.render(poseStack, i, j, f);

@@ -19,6 +19,19 @@ import org.jetbrains.annotations.NotNull;
 import java.nio.charset.StandardCharsets;
 
 public abstract class DataHandler {
+	
+	public abstract static class WithoutPayload extends DataHandler{
+		protected WithoutPayload(ResourceLocation identifier, boolean originatesOnServer) {
+			super(identifier, originatesOnServer);
+		}
+		
+		protected void serializeData(FriendlyByteBuf buf) {
+		}
+		
+		protected void deserializeFromIncomingData(FriendlyByteBuf buf, PacketSender responseSender, boolean isClient){
+		}
+	}
+	
 	private final boolean originatesOnServer;
 	@NotNull
 	private final ResourceLocation identifier;
@@ -49,14 +62,9 @@ public abstract class DataHandler {
 		server.execute(() -> runOnGameThread(null, server, false));
 	}
 
-	protected void serializeData(FriendlyByteBuf buf) {
-	}
-
-	protected void deserializeFromIncomingData(FriendlyByteBuf buf, PacketSender responseSender, boolean isClient){
-	}
-	
-	protected void runOnGameThread(Minecraft client, MinecraftServer server, boolean isClient){
-	}
+	abstract protected void serializeData(FriendlyByteBuf buf) ;
+	abstract protected void deserializeFromIncomingData(FriendlyByteBuf buf, PacketSender responseSender, boolean isClient);
+	abstract protected void runOnGameThread(Minecraft client, MinecraftServer server, boolean isClient);
 
 	final protected boolean reply(DataHandler message, MinecraftServer server){
 		if (lastMessageSender==null) return false;
