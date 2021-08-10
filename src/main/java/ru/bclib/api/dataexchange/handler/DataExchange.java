@@ -108,12 +108,12 @@ abstract public class DataExchange {
     protected void initClientside(){
         if (client!=null) return;
         client = clientSupplier(this);
-        ClientLoginConnectionEvents.INIT.register((a, b) ->{
+        /*ClientLoginConnectionEvents.INIT.register((a, b) ->{
             System.out.println("INIT");
         });
         ClientLoginConnectionEvents.QUERY_START.register((a, b) ->{
             System.out.println("INIT");
-        });
+        });*/
         ClientPlayConnectionEvents.INIT.register(client::onPlayInit);
         ClientPlayConnectionEvents.JOIN.register(client::onPlayReady);
         ClientPlayConnectionEvents.DISCONNECT.register(client::onPlayDisconnect);
