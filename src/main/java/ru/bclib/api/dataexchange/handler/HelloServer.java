@@ -65,6 +65,7 @@ public class HelloServer extends DataHandler {
 
 	@Override
 	protected void serializeData(FriendlyByteBuf buf) {
+		BCLib.LOGGER.info("Sending hello to server.");
 		buf.writeInt(DataFixerAPI.getModVersion(HelloClient.getBCLibVersion()));
 	}
 	
@@ -80,6 +81,8 @@ public class HelloServer extends DataHandler {
 
 		if (Configs.MAIN_CONFIG.getBoolean(Configs.MAIN_SYNC_CATEGORY, "enabled", true)) {
 			reply(new HelloClient(), server);
+		} else {
+			BCLib.LOGGER.info("Auto-Sync was disabled on the server.");
 		}
 	}
 }

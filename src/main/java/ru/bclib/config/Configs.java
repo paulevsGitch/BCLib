@@ -17,6 +17,7 @@ public class Configs {
 	public static void save() {
 		MAIN_CONFIG.saveChanges();
 		RECIPE_CONFIG.saveChanges();
+
 		if (BCLib.isClient()) {
 			CLIENT_CONFIG.saveChanges();
 		}

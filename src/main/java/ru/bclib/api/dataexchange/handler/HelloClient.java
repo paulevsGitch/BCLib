@@ -73,6 +73,7 @@ public class HelloClient extends DataHandler {
 				BCLib.LOGGER.info("    - Listing Mod " + modID + " v" + ver);
 			}
 		} else {
+			BCLib.LOGGER.info("Server will not list Mods.");
 			buf.writeInt(0);
 		}
 
@@ -92,6 +93,7 @@ public class HelloClient extends DataHandler {
 				BCLib.LOGGER.info("    - Offering File " + entry);
 			}
 		} else {
+			BCLib.LOGGER.info("Server will not offer Configs.");
 			buf.writeInt(0);
 		}
 	}
@@ -141,20 +143,21 @@ public class HelloClient extends DataHandler {
 			BCLib.LOGGER.info("    - " + e.getKey() + " (client="+ver+", server="+ver+")");
 		}
 
-		BCLib.LOGGER.info("Server offered Files to sync.");
+		if (autoSyncedFiles.size()>0) {
+			BCLib.LOGGER.info("Files offered by Server:");
+		}
+		final String requestText = SendFiles.acceptFiles()?"requesting":"differs";
 		for (DataExchange.AutoSyncTriple e : autoSyncedFiles) {
 			boolean willRequest = false;
 			if (e.third == null) {
-				filesToRequest.add(new AutoSyncID(e.first.modID, e.first.uniqueID));
 				willRequest = true;
-				BCLib.LOGGER.info("    - File " + e + ": Does not exist on client.");
+				filesToRequest.add(new AutoSyncID(e.first.modID, e.first.uniqueID));
 			} else if (e.third.needTransfer.test(e.third.getFileHash(), e.first, e.second)) {
 				willRequest = true;
 				filesToRequest.add(new AutoSyncID(e.first.modID, e.first.uniqueID));
-				BCLib.LOGGER.info("    - File " + e + ": Needs Transfer");
 			}
 			
-			BCLib.LOGGER.info("    - " + e + ": " + (willRequest ? " (requesting)":""));
+			BCLib.LOGGER.info("    - " + e + ": " + (willRequest ? (" ("+requestText+")" ):""));
 		}
 
 		if (filesToRequest.size()>0 && SendFiles.acceptFiles()) {

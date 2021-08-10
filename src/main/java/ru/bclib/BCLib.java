@@ -34,7 +34,6 @@ public class BCLib implements ModInitializer {
 		TagAPI.init();
 		CraftingRecipes.init();
 		WorldDataAPI.registerModCache(MOD_ID);
-		Configs.save();
 		
 		DataExchangeAPI.registerDescriptors(List.of(
 				HelloClient.DESCRIPTOR,
@@ -42,6 +41,8 @@ public class BCLib implements ModInitializer {
 				RequestFiles.DESCRIPTOR,
 				SendFiles.DESCRIPTOR
 		));
+
+		Configs.save();
 	}
 	
 	public static boolean isDevEnvironment() {
