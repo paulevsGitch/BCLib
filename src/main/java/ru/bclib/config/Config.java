@@ -22,6 +22,7 @@ public abstract class Config {
 	}
 	
 	protected Config(String modID, String group, boolean autoSync) {
+		BCLib.LOGGER.info("Registered Config " + modID+"."+group+" ("+autoSync+")");
 		this.keeper = new ConfigKeeper(modID, group);
 		this.registerEntries();
 		this.autoSync = autoSync;

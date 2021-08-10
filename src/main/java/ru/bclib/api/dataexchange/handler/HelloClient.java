@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /**
  * Sent from the Server to the Client.
@@ -69,8 +70,15 @@ public class HelloClient extends DataHandler {
 			BCLib.LOGGER.info("    - Listing Mod " + modID + " v" + ver);
 		}
 
+		//do only include files that exist on the server
+		final List<AutoFileSyncEntry> autoSyncFiles = DataExchange
+				.getInstance()
+				.autoSyncFiles
+				.stream()
+				.filter(e -> e.fileName.exists())
+				.collect(Collectors.toList());
+
 		//send config Data
-		final List<AutoFileSyncEntry> autoSyncFiles = DataExchange.getInstance().autoSyncFiles;
 		buf.writeInt(autoSyncFiles.size());
 		for (AutoFileSyncEntry entry : autoSyncFiles) {
 			//System.out.println("Serializing " + entry.getFileHash());
@@ -123,7 +131,7 @@ public class HelloClient extends DataHandler {
 			String ver = getModVersion(e.getKey());
 			BCLib.LOGGER.info("    - " + e.getKey() + " (client="+ver+", server="+ver+")");
 		}
-		
+
 		BCLib.LOGGER.info("Server offered Files to sync.");
 		for (DataExchange.AutoSyncTriple e : autoSyncedFiles) {
 			boolean willRequest = false;
