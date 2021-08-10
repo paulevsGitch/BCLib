@@ -47,7 +47,8 @@ public class DataExchangeAPI extends DataExchange {
      * @param modID - {@link String} modID.
      */
     public static void registerMod(String modID) {
-        MODS.add(modID);
+        if (!MODS.contains(modID))
+            MODS.add(modID);
     }
 
     /**
