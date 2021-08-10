@@ -112,10 +112,10 @@ public class HelloClient extends DataHandler {
 		String localBclibVersion = getBCLibVersion();
 		BCLib.LOGGER.info("Received Hello from Server. (client="+localBclibVersion+", server="+bclibVersion+")");
 		
-		if (DataFixerAPI.getModVersion(localBclibVersion) != DataFixerAPI.getModVersion(bclibVersion)){
-			showBCLibError(client);
-			return;
-		}
+		// if (DataFixerAPI.getModVersion(localBclibVersion) != DataFixerAPI.getModVersion(bclibVersion)){
+		// 	showBCLibError(client);
+		// 	return;
+		// }
 		
 		List<AutoSyncID> filesToRequest = new ArrayList<>(4);
 		

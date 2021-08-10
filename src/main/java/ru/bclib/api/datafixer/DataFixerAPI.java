@@ -139,12 +139,12 @@ public class DataFixerAPI {
 	/**
 	 * Initializes the DataStorage for this world. If the world is new, the patch registry is initialized to the
 	 * current versions of the plugins.
-	 * @param levelPath Folder of the world
+	 * @param levelBaseDir Folder of the world
 	 * @param newWorld {@code true} if this is a fresh world
 	 *
 	 */
-	public static void initializeWorldData(File levelPath, boolean newWorld){
-		WorldDataAPI.load(new File(levelPath, "data"));
+	public static void initializeWorldData(File levelBaseDir, boolean newWorld){
+		WorldDataAPI.load(new File(levelBaseDir, "data"));
 		
 		if (newWorld){
 			getMigrationProfile().markApplied();
@@ -153,7 +153,7 @@ public class DataFixerAPI {
 	}
 	
 	private static boolean fixData(File dir, String levelID, boolean showUI, Consumer<Boolean> onResume) {
-		MigrationProfile profile = loadProfileIfNeeded();
+		MigrationProfile profile = loadProfileIfNeeded(dir);
 		
 		Consumer<Boolean> runFixes = (applyFixes) -> {
 			if (applyFixes) {
@@ -203,13 +203,14 @@ public class DataFixerAPI {
 		return false;
 	}
 	
-	private static MigrationProfile loadProfileIfNeeded(){
+	private static MigrationProfile loadProfileIfNeeded(File levelBaseDir){
 		if (!Configs.MAIN_CONFIG.getBoolean(Configs.MAIN_PATCH_CATEGORY, "applyPatches", true)) {
 			LOGGER.info("World Patches are disabled");
 			return null;
 		}
 		
 		MigrationProfile profile = getMigrationProfile();
+		profile.runPrePatches(levelBaseDir);
 		
 		if (!profile.hasAnyFixes()) {
 			LOGGER.info("Everything up to date");
@@ -254,7 +255,7 @@ public class DataFixerAPI {
 		List<File> players = getAllPlayers(dir);
 		players.parallelStream().forEach((file) -> fixPlayer(profile, state, file));
 
-		fixLevel(profile, state, new File(dir, "level.dat"));
+		fixLevel(profile, state, dir);
 
 		try {
 			profile.patchWorldData();
@@ -269,30 +270,29 @@ public class DataFixerAPI {
 		}
 	}
 	
-	private static void fixLevel(MigrationProfile data, State state, File file) {
+	private static void fixLevel(MigrationProfile profile, State state, File levelBaseDir) {
 		try {
-			LOGGER.info("Inspecting " + file);
-			CompoundTag level = NbtIo.readCompressed(file);
-			boolean[] changed = { false };
-
+			LOGGER.info("Inspecting level.dat in " + levelBaseDir);
+			
+			//load the level (could already contain patches applied by patchLevelDat)
+			CompoundTag level = profile.getLevelDat(levelBaseDir);
+			boolean[] changed = { profile.isLevelDatChanged() };
+			
+			if (profile.getPrePatchException()!=null){
+				throw profile.getPrePatchException();
+			}
+			
 			if (level.contains("Data")) {
 				CompoundTag dataTag = (CompoundTag)level.get("Data");
 				if (dataTag.contains("Player")) {
 					CompoundTag player = (CompoundTag)dataTag.get("Player");
-					fixPlayerNbt(player, changed, data);
+					fixPlayerNbt(player, changed, profile);
 				}
-			}
-			
-			try {
-				changed[0] |= data.patchLevelDat(level);
-			} catch (PatchDidiFailException e){
-				state.didFail = true;
-				BCLib.LOGGER.error(e.getMessage());
 			}
 
 			if (changed[0]) {
-				LOGGER.warning("Writing '{}'", file);
-				NbtIo.writeCompressed(level, file);
+				LOGGER.warning("Writing '{}'", profile.getLevelDatFile());
+				NbtIo.writeCompressed(level, profile.getLevelDatFile());
 			}
 		}
 		catch (Exception e) {
