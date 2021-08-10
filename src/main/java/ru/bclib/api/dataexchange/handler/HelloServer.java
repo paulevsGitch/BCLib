@@ -10,6 +10,7 @@ import ru.bclib.api.dataexchange.DataExchangeAPI;
 import ru.bclib.api.dataexchange.DataHandler;
 import ru.bclib.api.dataexchange.DataHandlerDescriptor;
 import ru.bclib.api.datafixer.DataFixerAPI;
+import ru.bclib.config.Configs;
 
 import java.io.File;
 
@@ -76,6 +77,9 @@ public class HelloServer extends DataHandler {
 	protected void runOnGameThread(Minecraft client, MinecraftServer server, boolean isClient) {
 		String localBclibVersion = HelloClient.getBCLibVersion();
 		BCLib.LOGGER.info("Received Hello from Client. (server="+localBclibVersion+", client="+bclibVersion+")");
-		reply(new HelloClient(), server);
+
+		if (Configs.MAIN_CONFIG.getBoolean(Configs.MAIN_SYNC_CATEGORY, "enabled", true)) {
+			reply(new HelloClient(), server);
+		}
 	}
 }

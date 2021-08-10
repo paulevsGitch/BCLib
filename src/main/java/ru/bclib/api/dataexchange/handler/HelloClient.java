@@ -16,6 +16,7 @@ import ru.bclib.api.dataexchange.DataHandler;
 import ru.bclib.api.dataexchange.DataHandlerDescriptor;
 import ru.bclib.api.dataexchange.handler.DataExchange.AutoSyncID;
 import ru.bclib.api.datafixer.DataFixerAPI;
+import ru.bclib.config.Configs;
 import ru.bclib.gui.screens.SyncFilesScreen;
 import ru.bclib.gui.screens.WarnBCLibVersionMismatch;
 
@@ -61,29 +62,37 @@ public class HelloClient extends DataHandler {
 
 		//write BCLibVersion (=protocol version)
 		buf.writeInt(DataFixerAPI.getModVersion(vbclib));
-		//write Plugin Versions
-		buf.writeInt(mods.size());
-		for (String modID : mods) {
-			writeString(buf, modID);
-			final String ver = getModVersion(modID);
-			buf.writeInt(DataFixerAPI.getModVersion(ver));
-			BCLib.LOGGER.info("    - Listing Mod " + modID + " v" + ver);
+
+		if (Configs.MAIN_CONFIG.getBoolean(Configs.MAIN_SYNC_CATEGORY, "offerMods", true)) {
+			//write Plugin Versions
+			buf.writeInt(mods.size());
+			for (String modID : mods) {
+				writeString(buf, modID);
+				final String ver = getModVersion(modID);
+				buf.writeInt(DataFixerAPI.getModVersion(ver));
+				BCLib.LOGGER.info("    - Listing Mod " + modID + " v" + ver);
+			}
+		} else {
+			buf.writeInt(0);
 		}
 
-		//do only include files that exist on the server
-		final List<AutoFileSyncEntry> autoSyncFiles = DataExchange
-				.getInstance()
-				.autoSyncFiles
-				.stream()
-				.filter(e -> e.fileName.exists())
-				.collect(Collectors.toList());
+		if (Configs.MAIN_CONFIG.getBoolean(Configs.MAIN_SYNC_CATEGORY, "offerConfigs", true)) {
+			//do only include files that exist on the server
+			final List<AutoFileSyncEntry> existingAutoSyncFiles = DataExchange
+					.getInstance()
+					.autoSyncFiles
+					.stream()
+					.filter(e -> e.fileName.exists())
+					.collect(Collectors.toList());
 
-		//send config Data
-		buf.writeInt(autoSyncFiles.size());
-		for (AutoFileSyncEntry entry : autoSyncFiles) {
-			//System.out.println("Serializing " + entry.getFileHash());
-			entry.serialize(buf);
-			BCLib.LOGGER.info("    - Offering File " + entry);
+			//send config Data
+			buf.writeInt(existingAutoSyncFiles.size());
+			for (AutoFileSyncEntry entry : existingAutoSyncFiles) {
+				entry.serialize(buf);
+				BCLib.LOGGER.info("    - Offering File " + entry);
+			}
+		} else {
+			buf.writeInt(0);
 		}
 	}
 	
@@ -148,7 +157,7 @@ public class HelloClient extends DataHandler {
 			BCLib.LOGGER.info("    - " + e + ": " + (willRequest ? " (requesting)":""));
 		}
 
-		if (filesToRequest.size()>0) {
+		if (filesToRequest.size()>0 && SendFiles.acceptFiles()) {
 			showDonwloadConfigs(client, filesToRequest);
 			return;
 		}

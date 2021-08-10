@@ -11,6 +11,7 @@ import net.minecraft.server.MinecraftServer;
 import ru.bclib.BCLib;
 import ru.bclib.api.dataexchange.DataHandler;
 import ru.bclib.api.dataexchange.DataHandlerDescriptor;
+import ru.bclib.config.Configs;
 import ru.bclib.gui.screens.ConfirmRestartScreen;
 import ru.bclib.util.Pair;
 import ru.bclib.util.Triple;
@@ -36,6 +37,10 @@ public class SendFiles extends DataHandler {
 		this.files = files;
 		this.token = token;
 	}
+
+	public static boolean acceptFiles() {
+		return Configs.CLIENT_CONFIG.getBoolean(Configs.MAIN_SYNC_CATEGORY, "acceptFiles", true);
+	}
 	
 	@Override
 	protected void serializeData(FriendlyByteBuf buf) {
@@ -59,45 +64,49 @@ public class SendFiles extends DataHandler {
 	private List<Pair<AutoFileSyncEntry, byte[]>> receivedFiles;
 	@Override
 	protected void deserializeFromIncomingData(FriendlyByteBuf buf, PacketSender responseSender, boolean fromClient) {
-		token = readString(buf);
-		if (!token.equals(RequestFiles.currentToken)) {
+		if (acceptFiles()) {
+			token = readString(buf);
+			if (!token.equals(RequestFiles.currentToken)) {
+				RequestFiles.newToken();
+				BCLib.LOGGER.error("Unrequested File Transfer!");
+				receivedFiles = new ArrayList<>(0);
+				return;
+			}
 			RequestFiles.newToken();
-			BCLib.LOGGER.error("Unrequested File Transfer!");
-			receivedFiles = new ArrayList<>(0);
-			return;
-		}
-		RequestFiles.newToken();
 
-		int size = buf.readInt();
-		receivedFiles = new ArrayList<>(size);
-		BCLib.LOGGER.info("Server sent " + size + " Files:");
-		for (int i=0; i<size; i++){
-			Triple<AutoFileSyncEntry, byte[], DataExchange.AutoSyncID> p = AutoFileSyncEntry.deserializeContent(buf);
-			if (p.first != null) {
-				receivedFiles.add(p);
-				BCLib.LOGGER.info("    - " + p.first + " (" + p.second.length + " Bytes)");
-			} else {
-				BCLib.LOGGER.error("   - Failed to receive File " +p.third+ ", possibly sent from a Mod that is not installed on the client.");
+			int size = buf.readInt();
+			receivedFiles = new ArrayList<>(size);
+			BCLib.LOGGER.info("Server sent " + size + " Files:");
+			for (int i = 0; i < size; i++) {
+				Triple<AutoFileSyncEntry, byte[], DataExchange.AutoSyncID> p = AutoFileSyncEntry.deserializeContent(buf);
+				if (p.first != null) {
+					receivedFiles.add(p);
+					BCLib.LOGGER.info("    - " + p.first + " (" + p.second.length + " Bytes)");
+				} else {
+					BCLib.LOGGER.error("   - Failed to receive File " + p.third + ", possibly sent from a Mod that is not installed on the client.");
+				}
 			}
 		}
 	}
 	
 	@Override
 	protected void runOnGameThread(Minecraft client, MinecraftServer server, boolean isClient) {
-		BCLib.LOGGER.info("Writing Files:");
-		for (Pair<AutoFileSyncEntry, byte[]> entry : receivedFiles) {
-			final AutoFileSyncEntry e = entry.first;
-			final byte[] data = entry.second;
-			Path path = e.fileName.toPath();
-			BCLib.LOGGER.info("    - Writing " + path + " (" + data.length + " Bytes)");
-			try {
-				Files.write(path, data);
-			} catch (IOException ioException) {
-				BCLib.LOGGER.error("    --> Writing "+e.fileName+" failed: " + ioException);
+		if (acceptFiles()) {
+			BCLib.LOGGER.info("Writing Files:");
+			for (Pair<AutoFileSyncEntry, byte[]> entry : receivedFiles) {
+				final AutoFileSyncEntry e = entry.first;
+				final byte[] data = entry.second;
+				Path path = e.fileName.toPath();
+				BCLib.LOGGER.info("    - Writing " + path + " (" + data.length + " Bytes)");
+				try {
+					Files.write(path, data);
+				} catch (IOException ioException) {
+					BCLib.LOGGER.error("    --> Writing " + e.fileName + " failed: " + ioException);
+				}
 			}
-		}
 
-		showConfirmRestart(client);
+			showConfirmRestart(client);
+		}
 	}
 
 	@Environment(EnvType.CLIENT)
