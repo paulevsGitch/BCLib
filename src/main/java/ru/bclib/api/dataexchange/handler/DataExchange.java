@@ -32,8 +32,8 @@ abstract public class DataExchange {
         /**
          * A Unique ID for the referenced File.
          * <p>
-         * Files with the same {@link #modID} need to have a unique IDs. Normally the filename from {@link #FileHash(String, File, byte[], int, int)}
-         * is used to generated that ID, but you can directly specify one using {@link #FileHash(String, String, byte[], int, int)}.
+         * Files with the same {@link #modID} need to have a unique IDs. Normally the filename from FileHash(String, File, byte[], int, int)
+         * is used to generated that ID, but you can directly specify one using FileHash(String, String, byte[], int, int).
          */
         @NotNull
         public final String uniqueID;
@@ -156,7 +156,7 @@ abstract public class DataExchange {
      * Automatically called before the player enters the world.
      * <p>
      * This is automatically called by BCLib. It will send all {@link DataHandler}-Objects that have {@link DataHandlerDescriptor#sendBeforeEnter} set to*
-     * {@Code true},
+     * {@code true},
      */
     @Environment(EnvType.CLIENT)
     public static void sendOnEnter(){
