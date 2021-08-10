@@ -2,10 +2,14 @@ package ru.bclib.api.datafixer;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.Tag;
 import org.jetbrains.annotations.NotNull;
+import ru.bclib.BCLib;
 import ru.bclib.api.WorldDataAPI;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -22,6 +26,11 @@ public class MigrationProfile {
 	final Map<String, List<String>> worldDataIDPaths;
 	
 	private final CompoundTag config;
+	private CompoundTag level;
+	private File levelBaseDir;
+	private boolean prePatchChangedLevelDat;
+	private boolean didRunPrePatch;
+	private Exception prePatchException;
 	
 	MigrationProfile(CompoundTag config) {
 		this.config = config;
@@ -64,6 +73,53 @@ public class MigrationProfile {
 		this.worldDataPatchers = Collections.unmodifiableList(worldDataPatches);
 	}
 	
+	final public CompoundTag getLevelDat(File levelBaseDir){
+		if (level == null || this.levelBaseDir==null || !this.levelBaseDir.equals(levelBaseDir)){
+			runPrePatches(levelBaseDir);
+		}
+		return level;
+	}
+	
+	final public boolean isLevelDatChanged(){
+		return prePatchChangedLevelDat;
+	}
+	
+	final public File getLevelDatFile(){
+		return new File(levelBaseDir, "level.dat");
+	}
+	
+	final public Exception getPrePatchException(){
+		return prePatchException;
+	}
+	
+	
+	final public void runPrePatches(File levelBaseDir){
+		if (didRunPrePatch){
+			BCLib.LOGGER.warning("Already did run PrePatches for " + this.levelBaseDir + ".");
+		}
+		BCLib.LOGGER.info("Running Pre Patchers on " + levelBaseDir);
+		
+		this.levelBaseDir = levelBaseDir;
+		this.level = null;
+		this.prePatchException = null;
+		didRunPrePatch = true;
+		
+		this.prePatchChangedLevelDat = runPreLevelPatches(getLevelDatFile());
+	}
+	
+	private boolean runPreLevelPatches(File levelDat){
+		try {
+			level = NbtIo.readCompressed(levelDat);
+			
+			boolean changed = patchLevelDat(level);
+			return changed;
+		}
+		catch (IOException | PatchDidiFailException e) {
+			prePatchException = e;
+			return false;
+		}
+	}
+	
 	final public void markApplied() {
 		for (String modID : mods) {
 			DataFixerAPI.LOGGER.info("Updating Patch-Level for '{}' from {} to {}", modID, currentPatchLevel(modID), Patch.maxPatchLevel(modID));
@@ -81,7 +137,14 @@ public class MigrationProfile {
 	}
 	
 	public boolean hasAnyFixes() {
-		return idReplacements.size() > 0 || levelPatchers.size() > 0 || worldDataPatchers.size() > 0;
+		boolean hasLevelDatPatches;
+		if (didRunPrePatch != false) {
+			hasLevelDatPatches = prePatchChangedLevelDat;
+		} else {
+			hasLevelDatPatches = levelPatchers.size()>0;
+		}
+		
+		return idReplacements.size() > 0 || hasLevelDatPatches || worldDataPatchers.size() > 0;
 	}
 
 	public String replaceStringFromIDs(@NotNull String val) {

@@ -26,7 +26,9 @@ public abstract class Config {
 		this.registerEntries();
 		this.autoSync = autoSync;
 
-		DataExchangeAPI.addAutoSyncFile(BCLib.MOD_ID, "CONFIG_"+modID+"_"+group, keeper.getConfigFile());
+		if (autoSync) {
+			DataExchangeAPI.addAutoSyncFile(BCLib.MOD_ID, "CONFIG_" + modID + "_" + group, keeper.getConfigFile());
+		}
 	}
 	
 	public void saveChanges() {
