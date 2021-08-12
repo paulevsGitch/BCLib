@@ -26,78 +26,90 @@ import java.util.Map;
 import java.util.Set;
 
 public class CustomModelBakery {
+	private static final Map<ResourceLocation, UnbakedModel> UNBAKED_CACHE = Maps.newConcurrentMap();
+	private static final Set<ResourceLocation> LOADING_STACK = Sets.newConcurrentHashSet();
 	private static boolean modelsLoaded;
 	
-	public static boolean areModelsLoaded() {
+	@Deprecated // Not working with Fabric model API
+	public static boolean modelsLoaded() {
 		return modelsLoaded;
 	}
 	
+	@Deprecated // Not working with Fabric model API
 	public static void setModelsLoaded(boolean modelsLoaded) {
 		CustomModelBakery.modelsLoaded = modelsLoaded;
 	}
 	
-	public static void loadCustomModels(ResourceManager resourceManager, Map<ResourceLocation, UnbakedModel> unbakedCache, Map<ResourceLocation, UnbakedModel> topLevelModels, Set<ResourceLocation> loadingStack) {
-		Map<ResourceLocation, UnbakedModel> cache = Maps.newConcurrentMap();
-		Map<ResourceLocation, UnbakedModel> topLevel = Maps.newConcurrentMap();
-		
-		Registry.BLOCK.stream().filter(block -> block instanceof BlockModelProvider).parallel().forEach(block -> {
+	@Deprecated // Not working with Fabric model API
+	public static void loadCustomModels(ResourceManager resourceManager, Map<ResourceLocation, UnbakedModel> unbakedCache, Set<ResourceLocation> loadingStack) {
+		Registry.BLOCK.stream().parallel().filter(block -> block instanceof BlockModelProvider).forEach(block -> {
 			ResourceLocation blockID = Registry.BLOCK.getKey(block);
 			ResourceLocation storageID = new ResourceLocation(blockID.getNamespace(), "blockstates/" + blockID.getPath() + ".json");
-			BlockModelProvider provider = (BlockModelProvider) block;
 			
 			if (!resourceManager.hasResource(storageID)) {
-				ImmutableList<BlockState> states = block.getStateDefinition().getPossibleStates();
-				BlockState defaultState = block.defaultBlockState();
-				
-				ResourceLocation defaultStateID = BlockModelShaper.stateToModelLocation(blockID, defaultState);
-				UnbakedModel defaultModel = provider.getModelVariant(defaultStateID, defaultState, cache);
-				
-				if (defaultModel instanceof MultiPart) {
-					states.forEach(blockState -> {
-						ResourceLocation stateID = BlockModelShaper.stateToModelLocation(blockID, blockState);
-						topLevel.put(stateID, defaultModel);
-						cache.put(stateID, defaultModel);
-					});
-				}
-				else {
-					states.forEach(blockState -> {
-						ResourceLocation stateID = BlockModelShaper.stateToModelLocation(blockID, blockState);
-						UnbakedModel model = stateID.equals(defaultStateID) ? defaultModel : provider.getModelVariant(stateID, blockState, cache);
-						topLevel.put(stateID, model);
-						cache.put(stateID, model);
-					});
-				}
+				addBlockModel(blockID, block);
 			}
 			
 			if (Registry.ITEM.get(blockID) != Items.AIR) {
-				storageID = new ResourceLocation(blockID.getNamespace(), "models/item/" + blockID.getPath() + ".json");
-				if (!resourceManager.hasResource(storageID)) {
-					ResourceLocation itemID = new ModelResourceLocation(blockID.getNamespace(), blockID.getPath(), "inventory");
-					BlockModel model = provider.getItemModel(itemID);
-					topLevel.put(itemID, model);
-					cache.put(itemID, model);
-				}
+				addItemModel(blockID, (ItemModelProvider) block);
 			}
 		});
 		
-		Registry.ITEM.stream().filter(item -> item instanceof ItemModelProvider).parallel().forEach(item -> {
+		Registry.ITEM.stream().parallel().filter(item -> item instanceof ItemModelProvider).forEach(item -> {
 			ResourceLocation registryID = Registry.ITEM.getKey(item);
 			ResourceLocation storageID = new ResourceLocation(registryID.getNamespace(), "models/item/" + registryID.getPath() + ".json");
 			if (!resourceManager.hasResource(storageID)) {
-				ResourceLocation itemID = new ModelResourceLocation(registryID.getNamespace(), registryID.getPath(), "inventory");
-				ItemModelProvider provider = (ItemModelProvider) item;
-				BlockModel model = provider.getItemModel(registryID);
-				topLevel.put(itemID, model);
-				cache.put(itemID, model);
+				addItemModel(registryID, (ItemModelProvider) item);
 			}
 		});
 		
-		cache.values().forEach(model -> {
-			loadingStack.addAll(model.getDependencies());
-		});
+		unbakedCache.putAll(UNBAKED_CACHE);
+		loadingStack.addAll(LOADING_STACK);
+		UNBAKED_CACHE.clear();
+		LOADING_STACK.clear();
 		
-		topLevelModels.putAll(topLevel);
-		unbakedCache.putAll(cache);
+		modelsLoaded = true;
+	}
+	
+	@Deprecated // Not working with Fabric model API
+	private static void addBlockModel(ResourceLocation blockID, Block block) {
+		BlockModelProvider provider = (BlockModelProvider) block;
+		ImmutableList<BlockState> states = block.getStateDefinition().getPossibleStates();
+		BlockState defaultState = block.defaultBlockState();
+		
+		ResourceLocation defaultStateID = BlockModelShaper.stateToModelLocation(blockID, defaultState);
+		UnbakedModel defaultModel = provider.getModelVariant(defaultStateID, defaultState, UNBAKED_CACHE);
+		
+		if (defaultModel instanceof MultiPart) {
+			states.forEach(blockState -> {
+				ResourceLocation stateID = BlockModelShaper.stateToModelLocation(blockID, blockState);
+				cacheAndQueueDependencies(stateID, defaultModel);
+			});
+		}
+		else {
+			states.forEach(blockState -> {
+				ResourceLocation stateID = BlockModelShaper.stateToModelLocation(blockID, blockState);
+				UnbakedModel model = stateID.equals(defaultStateID) ? defaultModel : provider.getModelVariant(stateID, blockState, UNBAKED_CACHE);
+				cacheAndQueueDependencies(stateID, model);
+			});
+		}
+	}
+	
+	@Deprecated // Not working with Fabric model API
+	private static void addItemModel(ResourceLocation itemID, ItemModelProvider provider) {
+		ModelResourceLocation modelLocation = new ModelResourceLocation(itemID.getNamespace(), itemID.getPath(), "inventory");
+		if (UNBAKED_CACHE.containsKey(modelLocation)) {
+			return;
+		}
+		BlockModel model = provider.getItemModel(modelLocation);
+		cacheAndQueueDependencies(modelLocation, model);
+		UNBAKED_CACHE.put(modelLocation, model);
+	}
+	
+	@Deprecated // Not working with Fabric model API
+	private static void cacheAndQueueDependencies(ResourceLocation resourceLocation, UnbakedModel unbakedModel) {
+		UNBAKED_CACHE.put(resourceLocation, unbakedModel);
+		LOADING_STACK.addAll(unbakedModel.getDependencies());
 	}
 	
 	public static void loadEmissiveModels(Map<ResourceLocation, UnbakedModel> unbakedCache) {
