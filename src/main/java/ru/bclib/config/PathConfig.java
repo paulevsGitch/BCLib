@@ -5,8 +5,6 @@ import ru.bclib.config.ConfigKeeper.Entry;
 import ru.bclib.config.ConfigKeeper.FloatRange;
 import ru.bclib.config.ConfigKeeper.IntegerRange;
 
-import java.io.File;
-
 public class PathConfig extends Config {
 
 	public PathConfig(String modID, String group, boolean autoSync) {

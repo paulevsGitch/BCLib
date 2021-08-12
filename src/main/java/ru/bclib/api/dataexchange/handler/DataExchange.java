@@ -2,7 +2,6 @@ package ru.bclib.api.dataexchange.handler;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.client.networking.v1.ClientLoginConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import org.jetbrains.annotations.NotNull;
@@ -12,7 +11,6 @@ import ru.bclib.api.dataexchange.DataExchangeAPI;
 import ru.bclib.api.dataexchange.DataHandler;
 import ru.bclib.api.dataexchange.DataHandlerDescriptor;
 import ru.bclib.api.dataexchange.FileHash;
-import ru.bclib.util.Pair;
 import ru.bclib.util.Triple;
 
 import java.io.File;

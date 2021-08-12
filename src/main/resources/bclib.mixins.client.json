@@ -7,10 +7,11 @@
 		"SimpleReloadableResourceManagerMixin",
 		"EnchantingTableBlockMixin",
 		"BackgroundRendererMixin",
-		"GameMixin",
+		"ModelManagerMixin",
 		"TextureAtlasMixin",
 		"ModelBakeryMixin",
-		"MinecraftMixin"
+		"MinecraftMixin",
+		"GameMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

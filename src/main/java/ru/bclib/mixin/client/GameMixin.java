@@ -6,7 +6,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import ru.bclib.api.dataexchange.DataExchangeAPI;
-import ru.bclib.api.dataexchange.handler.HelloServer;
 
 @Mixin(Game.class)
 public class GameMixin {

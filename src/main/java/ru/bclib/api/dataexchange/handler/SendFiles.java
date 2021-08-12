@@ -16,7 +16,6 @@ import ru.bclib.gui.screens.ConfirmRestartScreen;
 import ru.bclib.util.Pair;
 import ru.bclib.util.Triple;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;

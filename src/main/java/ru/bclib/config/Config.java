@@ -10,8 +10,6 @@ import ru.bclib.config.ConfigKeeper.IntegerEntry;
 import ru.bclib.config.ConfigKeeper.RangeEntry;
 import ru.bclib.config.ConfigKeeper.StringEntry;
 
-import java.io.File;
-
 public abstract class Config {
 	protected final ConfigKeeper keeper;
 	protected final boolean autoSync;

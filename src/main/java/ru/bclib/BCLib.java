@@ -7,7 +7,6 @@ import net.minecraft.resources.ResourceLocation;
 import ru.bclib.api.TagAPI;
 import ru.bclib.api.WorldDataAPI;
 import ru.bclib.api.dataexchange.DataExchangeAPI;
-import ru.bclib.api.dataexchange.DataHandler;
 import ru.bclib.api.dataexchange.handler.HelloClient;
 import ru.bclib.api.dataexchange.handler.HelloServer;
 import ru.bclib.api.dataexchange.handler.RequestFiles;
@@ -19,7 +18,6 @@ import ru.bclib.registry.BaseRegistry;
 import ru.bclib.util.Logger;
 import ru.bclib.world.surface.BCLSurfaceBuilders;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class BCLib implements ModInitializer {
