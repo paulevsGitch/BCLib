@@ -20,7 +20,7 @@ public class DimensionTypeMixin {
 		info.setReturnValue(new NoiseBasedChunkGenerator(
 			new BCLibNetherBiomeSource(biomeRegistry, seed),
 			seed,
-			() -> chunkGeneratorSettingsRegistry.getOrThrow(NoiseGeneratorSettings.END)
+			() -> chunkGeneratorSettingsRegistry.getOrThrow(NoiseGeneratorSettings.NETHER)
 		));
 	}
 	

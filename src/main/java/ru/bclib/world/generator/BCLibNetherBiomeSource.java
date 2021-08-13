@@ -6,19 +6,13 @@ import net.minecraft.core.Registry;
 import net.minecraft.resources.RegistryLookupCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.Biome.BiomeCategory;
 import net.minecraft.world.level.biome.BiomeSource;
-import net.minecraft.world.level.biome.Biomes;
-import net.minecraft.world.level.biome.TheEndBiomeSource;
-import net.minecraft.world.level.levelgen.WorldgenRandom;
-import net.minecraft.world.level.levelgen.synth.SimplexNoise;
 import ru.bclib.BCLib;
 import ru.bclib.api.BiomeAPI;
-import ru.bclib.noise.OpenSimplexNoise;
 import ru.bclib.world.biomes.BCLBiome;
 
-import java.awt.Point;
 import java.util.List;
-import java.util.function.Function;
 
 public class BCLibNetherBiomeSource extends BiomeSource {
 	public static final Codec<BCLibNetherBiomeSource> CODEC = RecordCodecBuilder.create((instance) -> {
@@ -35,17 +29,8 @@ public class BCLibNetherBiomeSource extends BiomeSource {
 	public BCLibNetherBiomeSource(Registry<Biome> biomeRegistry, long seed) {
 		super(getBiomes(biomeRegistry));
 		
-		this.biomeMap = new BiomeMap(seed, GeneratorOptions.getBiomeSizeEndLand(), BiomeAPI.NETHER_BIOME_PICKER);
-		this.biomeRegistry = biomeRegistry;
-		this.seed = seed;
-		
-		WorldgenRandom chunkRandom = new WorldgenRandom(seed);
-		chunkRandom.consumeCount(17292);
-	}
-	
-	private static List<Biome> getBiomes(Registry<Biome> biomeRegistry) {
 		BiomeAPI.NETHER_BIOME_PICKER.clearMutables();
-		biomeRegistry.forEach(biome -> {
+		this.possibleBiomes.forEach(biome -> {
 			ResourceLocation key = biomeRegistry.getKey(biome);
 			BCLBiome bclBiome = BiomeAPI.getBiome(key);
 			bclBiome.updateActualBiomes(biomeRegistry);
@@ -55,18 +40,24 @@ public class BCLibNetherBiomeSource extends BiomeSource {
 		});
 		BiomeAPI.NETHER_BIOME_PICKER.rebuild();
 		
-		return biomeRegistry.stream().filter(biome -> BiomeAPI.NETHER_BIOME_PICKER.contains(biomeRegistry.getKey(biome))).toList();
+		this.biomeMap = new BiomeMap(seed, GeneratorOptions.getBiomeSizeNether(), BiomeAPI.NETHER_BIOME_PICKER);
+		this.biomeRegistry = biomeRegistry;
+		this.seed = seed;
+	}
+	
+	private static List<Biome> getBiomes(Registry<Biome> biomeRegistry) {
+		return biomeRegistry.stream().filter(biome -> {
+			ResourceLocation key = biomeRegistry.getKey(biome);
+			return BiomeAPI.NETHER_BIOME_PICKER.containsImmutable(key) ||
+				(BiomeAPI.isDatapackBiome(key) && biome.getBiomeCategory() == BiomeCategory.NETHER);
+		}).toList();
 	}
 	
 	@Override
 	public Biome getNoiseBiome(int biomeX, int biomeY, int biomeZ) {
-		long i = (long) biomeX * (long) biomeX;
-		long j = (long) biomeZ * (long) biomeZ;
-		
-		if ((biomeX & 31) == 0 && (biomeZ & 31) == 0) {
+		if ((biomeX & 63) == 0 && (biomeZ & 63) == 0) {
 			biomeMap.clearCache();
 		}
-		
 		return biomeMap.getBiome(biomeX << 2, biomeZ << 2).getActualBiome();
 	}
 	

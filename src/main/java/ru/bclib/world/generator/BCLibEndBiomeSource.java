@@ -6,6 +6,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.resources.RegistryLookupCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.Biome.BiomeCategory;
 import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.biome.TheEndBiomeSource;
@@ -42,6 +43,19 @@ public class BCLibEndBiomeSource extends BiomeSource {
 	public BCLibEndBiomeSource(Registry<Biome> biomeRegistry, long seed) {
 		super(getBiomes(biomeRegistry));
 		
+		BiomeAPI.END_LAND_BIOME_PICKER.clearMutables();
+		BiomeAPI.END_VOID_BIOME_PICKER.clearMutables();
+		this.possibleBiomes.forEach(biome -> {
+			ResourceLocation key = biomeRegistry.getKey(biome);
+			BCLBiome bclBiome = BiomeAPI.getBiome(key);
+			bclBiome.updateActualBiomes(biomeRegistry);
+			if (!BiomeAPI.END_LAND_BIOME_PICKER.containsImmutable(key)) {
+				BiomeAPI.END_LAND_BIOME_PICKER.addBiomeMutable(bclBiome);
+			}
+		});
+		BiomeAPI.END_LAND_BIOME_PICKER.rebuild();
+		BiomeAPI.END_VOID_BIOME_PICKER.rebuild();
+		
 		this.mapLand = new BiomeMap(seed, GeneratorOptions.getBiomeSizeEndLand(), BiomeAPI.END_LAND_BIOME_PICKER);
 		this.mapVoid = new BiomeMap(seed, GeneratorOptions.getBiomeSizeEndVoid(), BiomeAPI.END_VOID_BIOME_PICKER);
 		this.centerBiome = biomeRegistry.getOrThrow(Biomes.THE_END);
@@ -58,22 +72,11 @@ public class BCLibEndBiomeSource extends BiomeSource {
 	}
 	
 	private static List<Biome> getBiomes(Registry<Biome> biomeRegistry) {
-		BiomeAPI.END_LAND_BIOME_PICKER.clearMutables();
-		BiomeAPI.END_VOID_BIOME_PICKER.clearMutables();
-		biomeRegistry.forEach(biome -> {
-			ResourceLocation key = biomeRegistry.getKey(biome);
-			BCLBiome bclBiome = BiomeAPI.getBiome(key);
-			bclBiome.updateActualBiomes(biomeRegistry);
-			if (!BiomeAPI.END_LAND_BIOME_PICKER.containsImmutable(key)) {
-				BiomeAPI.END_LAND_BIOME_PICKER.addBiomeMutable(bclBiome);
-			}
-		});
-		BiomeAPI.END_LAND_BIOME_PICKER.rebuild();
-		BiomeAPI.END_VOID_BIOME_PICKER.rebuild();
-		
 		return biomeRegistry.stream().filter(biome -> {
 			ResourceLocation key = biomeRegistry.getKey(biome);
-			return BiomeAPI.END_LAND_BIOME_PICKER.contains(key) || BiomeAPI.END_VOID_BIOME_PICKER.contains(key);
+			return BiomeAPI.END_LAND_BIOME_PICKER.contains(key) ||
+				BiomeAPI.END_VOID_BIOME_PICKER.contains(key) ||
+				(BiomeAPI.isDatapackBiome(key) && biome.getBiomeCategory() == BiomeCategory.THEEND);
 		}).toList();
 	}
 	
@@ -84,7 +87,7 @@ public class BCLibEndBiomeSource extends BiomeSource {
 		long check = GeneratorOptions.isFarEndBiomes() ? 65536L : 625L;
 		long dist = i + j;
 		
-		if ((biomeX & 31) == 0 && (biomeZ & 31) == 0) {
+		if ((biomeX & 63) == 0 && (biomeZ & 63) == 0) {
 			mapLand.clearCache();
 			mapVoid.clearCache();
 		}

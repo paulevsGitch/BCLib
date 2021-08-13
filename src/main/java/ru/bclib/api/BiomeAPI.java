@@ -15,6 +15,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biome.ClimateParameters;
 import net.minecraft.world.level.biome.Biomes;
+import org.jetbrains.annotations.Nullable;
 import ru.bclib.interfaces.BiomeListProvider;
 import ru.bclib.util.MHelper;
 import ru.bclib.world.biomes.BCLBiome;
@@ -40,18 +41,18 @@ public class BiomeAPI {
 	private static final Map<Biome, BCLBiome> CLIENT = Maps.newHashMap();
 	private static Registry<Biome> biomeRegistry;
 	
-	public static final BCLBiome NETHER_WASTES_BIOME = registerNetherBiome(BuiltinRegistries.BIOME.get(new ResourceLocation("nether_wastes")));
-	public static final BCLBiome CRIMSON_FOREST_BIOME = registerNetherBiome(BuiltinRegistries.BIOME.get(new ResourceLocation("crimson_forest")));
-	public static final BCLBiome WARPED_FOREST_BIOME = registerNetherBiome(BuiltinRegistries.BIOME.get(new ResourceLocation("warped_forest")));
-	public static final BCLBiome SOUL_SAND_VALLEY_BIOME = registerNetherBiome(BuiltinRegistries.BIOME.get(new ResourceLocation("soul_sand_valley")));
-	public static final BCLBiome BASALT_DELTAS_BIOME = registerNetherBiome(BuiltinRegistries.BIOME.get(new ResourceLocation("basalt_deltas")));
+	public static final BCLBiome NETHER_WASTES_BIOME = registerNetherBiome(getFromRegistry(new ResourceLocation("nether_wastes")));
+	public static final BCLBiome CRIMSON_FOREST_BIOME = registerNetherBiome(getFromRegistry(new ResourceLocation("crimson_forest")));
+	public static final BCLBiome WARPED_FOREST_BIOME = registerNetherBiome(getFromRegistry(new ResourceLocation("warped_forest")));
+	public static final BCLBiome SOUL_SAND_VALLEY_BIOME = registerNetherBiome(getFromRegistry(new ResourceLocation("soul_sand_valley")));
+	public static final BCLBiome BASALT_DELTAS_BIOME = registerNetherBiome(getFromRegistry(new ResourceLocation("basalt_deltas")));
 	
-	public static final BCLBiome THE_END = registerEndLandBiome(BuiltinRegistries.BIOME.get(new ResourceLocation("the_end")));
-	public static final BCLBiome END_MIDLANDS = registerSubBiome(THE_END, BuiltinRegistries.BIOME.get(new ResourceLocation("end_midlands")), 0.5F);
-	public static final BCLBiome END_HIGHLANDS = registerSubBiome(THE_END, BuiltinRegistries.BIOME.get(new ResourceLocation("end_highlands")), 0.5F);
+	public static final BCLBiome THE_END = registerEndLandBiome(getFromRegistry(new ResourceLocation("the_end")));
+	public static final BCLBiome END_MIDLANDS = registerSubBiome(THE_END, getFromRegistry(new ResourceLocation("end_midlands")), 0.5F);
+	public static final BCLBiome END_HIGHLANDS = registerSubBiome(THE_END, getFromRegistry(new ResourceLocation("end_highlands")), 0.5F);
 	
-	public static final BCLBiome END_BARRENS = registerEndVoidBiome(BuiltinRegistries.BIOME.get(new ResourceLocation("end_barrens")));
-	public static final BCLBiome SMALL_END_ISLANDS = registerEndVoidBiome(BuiltinRegistries.BIOME.get(new ResourceLocation("small_end_islands")));
+	public static final BCLBiome END_BARRENS = registerEndVoidBiome(getFromRegistry(new ResourceLocation("end_barrens")));
+	public static final BCLBiome SMALL_END_ISLANDS = registerEndVoidBiome(getFromRegistry(new ResourceLocation("small_end_islands")));
 	
 	/**
 	 * Initialize registry for current server.
@@ -282,12 +283,13 @@ public class BiomeAPI {
 		return ID_MAP.getOrDefault(biomeID, EMPTY_BIOME);
 	}
 	
-	/**
+	/** Use inner biome field instead.
 	 * Get actual {@link Biome} from given {@link BCLBiome}. If it is null it will request it from current {@link Registry}.
 	 *
 	 * @param biome - {@link BCLBiome}.
 	 * @return {@link Biome}.
 	 */
+	@Deprecated(forRemoval = true)
 	public static Biome getActualBiome(BCLBiome biome) {
 		Biome actual = biome.getActualBiome();
 		if (actual == null) {
@@ -327,11 +329,12 @@ public class BiomeAPI {
 		return biomeList == null ? Collections.emptyList() : biomeList.getBiomes();
 	}
 	
-	public static boolean isNetherBiome(ResourceLocation biomeID) {
-		return NETHER_BIOME_PICKER.contains(biomeID);
+	@Nullable
+	public static Biome getFromRegistry(ResourceLocation biomeID) {
+		return BuiltinRegistries.BIOME.get(biomeID);
 	}
 	
-	public static boolean isEndBiome(ResourceLocation biomeID) {
-		return END_LAND_BIOME_PICKER.contains(biomeID) || END_VOID_BIOME_PICKER.contains(biomeID);
+	public static boolean isDatapackBiome(ResourceLocation biomeID) {
+		return getFromRegistry(biomeID) == null;
 	}
 }
