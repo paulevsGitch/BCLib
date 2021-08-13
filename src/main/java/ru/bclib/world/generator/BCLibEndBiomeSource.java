@@ -42,19 +42,6 @@ public class BCLibEndBiomeSource extends BiomeSource {
 	public BCLibEndBiomeSource(Registry<Biome> biomeRegistry, long seed) {
 		super(getBiomes(biomeRegistry));
 		
-		BiomeAPI.END_LAND_BIOME_PICKER.clearMutables();
-		BiomeAPI.END_VOID_BIOME_PICKER.clearMutables();
-		biomeRegistry.forEach(biome -> {
-			ResourceLocation key = biomeRegistry.getKey(biome);
-			BCLBiome bclBiome = BiomeAPI.getBiome(key);
-			bclBiome.updateActualBiomes(biomeRegistry);
-			if (!BiomeAPI.END_LAND_BIOME_PICKER.containsImmutable(key)) {
-				BiomeAPI.END_LAND_BIOME_PICKER.addBiomeMutable(bclBiome);
-			}
-		});
-		BiomeAPI.END_LAND_BIOME_PICKER.rebuild();
-		BiomeAPI.END_VOID_BIOME_PICKER.rebuild();
-		
 		this.mapLand = new BiomeMap(seed, GeneratorOptions.getBiomeSizeEndLand(), BiomeAPI.END_LAND_BIOME_PICKER);
 		this.mapVoid = new BiomeMap(seed, GeneratorOptions.getBiomeSizeEndVoid(), BiomeAPI.END_VOID_BIOME_PICKER);
 		this.centerBiome = biomeRegistry.getOrThrow(Biomes.THE_END);
@@ -71,7 +58,23 @@ public class BCLibEndBiomeSource extends BiomeSource {
 	}
 	
 	private static List<Biome> getBiomes(Registry<Biome> biomeRegistry) {
-		return biomeRegistry.stream().filter(biome -> BiomeAPI.isEndBiome(biomeRegistry.getKey(biome))).toList();
+		BiomeAPI.END_LAND_BIOME_PICKER.clearMutables();
+		BiomeAPI.END_VOID_BIOME_PICKER.clearMutables();
+		biomeRegistry.forEach(biome -> {
+			ResourceLocation key = biomeRegistry.getKey(biome);
+			BCLBiome bclBiome = BiomeAPI.getBiome(key);
+			bclBiome.updateActualBiomes(biomeRegistry);
+			if (!BiomeAPI.END_LAND_BIOME_PICKER.containsImmutable(key)) {
+				BiomeAPI.END_LAND_BIOME_PICKER.addBiomeMutable(bclBiome);
+			}
+		});
+		BiomeAPI.END_LAND_BIOME_PICKER.rebuild();
+		BiomeAPI.END_VOID_BIOME_PICKER.rebuild();
+		
+		return biomeRegistry.stream().filter(biome -> {
+			ResourceLocation key = biomeRegistry.getKey(biome);
+			return BiomeAPI.END_LAND_BIOME_PICKER.contains(key) || BiomeAPI.END_VOID_BIOME_PICKER.contains(key);
+		}).toList();
 	}
 	
 	@Override

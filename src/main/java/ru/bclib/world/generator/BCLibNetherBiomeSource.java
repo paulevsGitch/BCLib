@@ -35,6 +35,15 @@ public class BCLibNetherBiomeSource extends BiomeSource {
 	public BCLibNetherBiomeSource(Registry<Biome> biomeRegistry, long seed) {
 		super(getBiomes(biomeRegistry));
 		
+		this.biomeMap = new BiomeMap(seed, GeneratorOptions.getBiomeSizeEndLand(), BiomeAPI.NETHER_BIOME_PICKER);
+		this.biomeRegistry = biomeRegistry;
+		this.seed = seed;
+		
+		WorldgenRandom chunkRandom = new WorldgenRandom(seed);
+		chunkRandom.consumeCount(17292);
+	}
+	
+	private static List<Biome> getBiomes(Registry<Biome> biomeRegistry) {
 		BiomeAPI.NETHER_BIOME_PICKER.clearMutables();
 		biomeRegistry.forEach(biome -> {
 			ResourceLocation key = biomeRegistry.getKey(biome);
@@ -46,16 +55,7 @@ public class BCLibNetherBiomeSource extends BiomeSource {
 		});
 		BiomeAPI.NETHER_BIOME_PICKER.rebuild();
 		
-		this.biomeMap = new BiomeMap(seed, GeneratorOptions.getBiomeSizeEndLand(), BiomeAPI.NETHER_BIOME_PICKER);
-		this.biomeRegistry = biomeRegistry;
-		this.seed = seed;
-		
-		WorldgenRandom chunkRandom = new WorldgenRandom(seed);
-		chunkRandom.consumeCount(17292);
-	}
-	
-	private static List<Biome> getBiomes(Registry<Biome> biomeRegistry) {
-		return biomeRegistry.stream().filter(biome -> BiomeAPI.isEndBiome(biomeRegistry.getKey(biome))).toList();
+		return biomeRegistry.stream().filter(biome -> BiomeAPI.NETHER_BIOME_PICKER.contains(biomeRegistry.getKey(biome))).toList();
 	}
 	
 	@Override
