@@ -48,6 +48,7 @@ public class PostInitAPI {
 			}
 		});
 		postInitFunctions = null;
+		BiomeAPI.loadFabricAPIBiomes();
 	}
 	
 	@Environment(EnvType.CLIENT)
