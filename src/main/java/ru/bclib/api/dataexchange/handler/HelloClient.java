@@ -160,10 +160,10 @@ public class HelloClient extends DataHandler {
 			BCLib.LOGGER.info("    - " + e + ": " + (willRequest ? (" ("+requestText+")" ):""));
 		}
 
-		if (filesToRequest.size()>0 && SendFiles.acceptFiles()) {
+		/*if (filesToRequest.size()>0 && SendFiles.acceptFiles()) {
 			showDonwloadConfigs(client, filesToRequest);
 			return;
-		}
+		}*/
 	}
 	
 	@Environment(EnvType.CLIENT)
