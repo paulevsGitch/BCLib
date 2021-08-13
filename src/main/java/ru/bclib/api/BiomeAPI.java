@@ -1,6 +1,7 @@
 package ru.bclib.api;
 
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.impl.biome.InternalBiomeData;
@@ -17,22 +18,23 @@ import ru.bclib.util.MHelper;
 import ru.bclib.world.biomes.BCLBiome;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 public class BiomeAPI {
 	/**
 	 * Empty biome used as default value if requested biome doesn't exist or linked. Shouldn't be registered anywhere to prevent bugs.
 	 * Have {@code Biomes.THE_VOID} as the reference biome.
 	 */
-	public static final BCLBiome EMPTY_BIOME = new BCLBiome(
-		Biomes.THE_VOID.location(),
-		BuiltinRegistries.BIOME.get(Biomes.THE_VOID),
-		1,
-		0
-	);
+	public static final BCLBiome EMPTY_BIOME = new BCLBiome(Biomes.THE_VOID.location(), BuiltinRegistries.BIOME.get(Biomes.THE_VOID), 1, 0);
 	
-	private static final HashMap<ResourceLocation, BCLBiome> ID_MAP = Maps.newHashMap();
-	private static final HashMap<Biome, BCLBiome> CLIENT = Maps.newHashMap();
+	private static final Set<BCLBiome> NETHER_BIOMES = Sets.newHashSet();
+	private static final Set<BCLBiome> END_LAND_BIOMES = Sets.newHashSet();
+	private static final Set<BCLBiome> END_VOID_BIOMES = Sets.newHashSet();
+	
+	private static final Map<ResourceLocation, BCLBiome> ID_MAP = Maps.newHashMap();
+	private static final Map<Biome, BCLBiome> CLIENT = Maps.newHashMap();
 	private static Registry<Biome> biomeRegistry;
 	
 	/**
@@ -45,6 +47,10 @@ public class BiomeAPI {
 		CLIENT.clear();
 	}
 	
+	/**
+	 * Register {@link BCLBiome} instance and its {@link Biome} if necessary.
+	 * @param biome {@link BCLBiome}
+	 */
 	public static void registerBiome(BCLBiome biome) {
 		if (BuiltinRegistries.BIOME.get(biome.getID()) == null) {
 			Registry.register(BuiltinRegistries.BIOME, biome.getID(), biome.getBiome());
@@ -53,10 +59,55 @@ public class BiomeAPI {
 	}
 	
 	/**
+	 * Register {@link BCLBiome} instance and its {@link Biome} if necessary.
+	 * After that biome will be added to BCLib Nether Biome Generator and into Fabric Biome API.
+	 * @param biome {@link BCLBiome}
+	 */
+	public static void registerNetherBiome(BCLBiome biome) {
+		registerBiome(biome);
+		Random random = new Random(biome.getID().hashCode());
+		ClimateParameters parameters = new ClimateParameters(
+			MHelper.randRange(-1.5F, 1.5F, random),
+			MHelper.randRange(-1.5F, 1.5F, random),
+			MHelper.randRange(-1.5F, 1.5F, random),
+			MHelper.randRange(-1.5F, 1.5F, random),
+			random.nextFloat()
+		);
+		ResourceKey<Biome> key = BuiltinRegistries.BIOME.getResourceKey(biome.getBiome()).get();
+		InternalBiomeData.addNetherBiome(key, parameters);
+	}
+	
+	/**
+	 * Register {@link BCLBiome} instance and its {@link Biome} if necessary.
+	 * After that biome will be added to BCLib End Biome Generator and into Fabric Biome API as a land biome (will generate only on islands).
+	 * @param biome {@link BCLBiome}
+	 */
+	public static void registerEndLandBiome(BCLBiome biome) {
+		registerBiome(biome);
+		float weight = biome.getGenChance();
+		ResourceKey<Biome> key = BuiltinRegistries.BIOME.getResourceKey(biome.getBiome()).get();
+		InternalBiomeData.addEndBiomeReplacement(Biomes.END_HIGHLANDS, key, weight);
+		InternalBiomeData.addEndBiomeReplacement(Biomes.END_MIDLANDS, key, weight);
+	}
+	
+	/**
+	 * Register {@link BCLBiome} instance and its {@link Biome} if necessary.
+	 * After that biome will be added to BCLib End Biome Generator and into Fabric Biome API as a void biome (will generate only in the End void - between islands).
+	 * @param biome {@link BCLBiome}
+	 */
+	public static void registerEndVoidBiome(BCLBiome biome) {
+		registerBiome(biome);
+		float weight = biome.getGenChance();
+		ResourceKey<Biome> key = BuiltinRegistries.BIOME.getResourceKey(biome.getBiome()).get();
+		InternalBiomeData.addEndBiomeReplacement(Biomes.SMALL_END_ISLANDS, key, weight);
+	}
+	
+	/**
 	 * Adds {@link BCLBiome} to FabricAPI biomes as the Nether biome (with random {@link ClimateParameters}).
 	 *
 	 * @param biome - {@link BCLBiome}.
 	 */
+	@Deprecated(forRemoval = true)
 	public static void addNetherBiomeToFabricApi(BCLBiome biome) {
 		ResourceKey<Biome> key = BuiltinRegistries.BIOME.getResourceKey(biome.getBiome()).get();
 		Random random = new Random(biome.getID().toString().hashCode());
@@ -71,10 +122,12 @@ public class BiomeAPI {
 	}
 	
 	/**
+	 * Use BiomeAPI.registerEndLandBiome instead of this.
 	 * Adds {@link BCLBiome} to FabricAPI biomes as an End land biome (generating on islands).
 	 *
 	 * @param biome - {@link BCLBiome}.
 	 */
+	@Deprecated(forRemoval = true)
 	public static void addEndLandBiomeToFabricApi(BCLBiome biome) {
 		float weight = biome.getGenChance();
 		ResourceKey<Biome> key = BuiltinRegistries.BIOME.getResourceKey(biome.getBiome()).get();
@@ -83,10 +136,12 @@ public class BiomeAPI {
 	}
 	
 	/**
+	 * Use BiomeAPI.registerEndVoidBiome instead of this.
 	 * Adds {@link BCLBiome} to FabricAPI biomes as an End void biome (generating between islands in the void).
 	 *
 	 * @param biome - {@link BCLBiome}.
 	 */
+	@Deprecated(forRemoval = true)
 	public static void addEndVoidBiomeToFabricApi(BCLBiome biome) {
 		float weight = biome.getGenChance();
 		ResourceKey<Biome> key = BuiltinRegistries.BIOME.getResourceKey(biome.getBiome()).get();
