@@ -45,6 +45,10 @@ public class BiomePicker {
 		return immutableIDs.contains(id);
 	}
 	
+	public boolean contains(ResourceLocation id) {
+		return biomes.contains(id);
+	}
+	
 	public void removeMutableBiome(ResourceLocation id) {
 		for (int i = biomeCount; i < biomes.size(); i++) {
 			BCLBiome biome = biomes.get(i);

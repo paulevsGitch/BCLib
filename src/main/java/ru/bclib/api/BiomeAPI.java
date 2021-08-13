@@ -32,6 +32,14 @@ public class BiomeAPI {
 	 */
 	public static final BCLBiome EMPTY_BIOME = new BCLBiome(Biomes.THE_VOID.location(), BuiltinRegistries.BIOME.get(Biomes.THE_VOID), 1, 0);
 	
+	public static final BiomePicker NETHER_BIOME_PICKER = new BiomePicker();
+	public static final BiomePicker END_LAND_BIOME_PICKER = new BiomePicker();
+	public static final BiomePicker END_VOID_BIOME_PICKER = new BiomePicker();
+	
+	private static final Map<ResourceLocation, BCLBiome> ID_MAP = Maps.newHashMap();
+	private static final Map<Biome, BCLBiome> CLIENT = Maps.newHashMap();
+	private static Registry<Biome> biomeRegistry;
+	
 	public static final BCLBiome NETHER_WASTES_BIOME = registerNetherBiome(BuiltinRegistries.BIOME.get(new ResourceLocation("nether_wastes")));
 	public static final BCLBiome CRIMSON_FOREST_BIOME = registerNetherBiome(BuiltinRegistries.BIOME.get(new ResourceLocation("crimson_forest")));
 	public static final BCLBiome WARPED_FOREST_BIOME = registerNetherBiome(BuiltinRegistries.BIOME.get(new ResourceLocation("warped_forest")));
@@ -44,18 +52,6 @@ public class BiomeAPI {
 	
 	public static final BCLBiome END_BARRENS = registerEndVoidBiome(BuiltinRegistries.BIOME.get(new ResourceLocation("end_barrens")));
 	public static final BCLBiome SMALL_END_ISLANDS = registerEndVoidBiome(BuiltinRegistries.BIOME.get(new ResourceLocation("small_end_islands")));
-	
-	private static final Map<ResourceLocation, BCLBiome> NETHER_BIOMES = Maps.newHashMap();
-	private static final Map<ResourceLocation, BCLBiome> END_LAND_BIOMES = Maps.newHashMap();
-	private static final Map<ResourceLocation, BCLBiome> END_VOID_BIOMES = Maps.newHashMap();
-	
-	public static final BiomePicker NETHER_BIOME_PICKER = new BiomePicker();
-	public static final BiomePicker END_LAND_BIOME_PICKER = new BiomePicker();
-	public static final BiomePicker END_VOID_BIOME_PICKER = new BiomePicker();
-	
-	private static final Map<ResourceLocation, BCLBiome> ID_MAP = Maps.newHashMap();
-	private static final Map<Biome, BCLBiome> CLIENT = Maps.newHashMap();
-	private static Registry<Biome> biomeRegistry;
 	
 	/**
 	 * Initialize registry for current server.
@@ -332,10 +328,10 @@ public class BiomeAPI {
 	}
 	
 	public static boolean isNetherBiome(ResourceLocation biomeID) {
-		return NETHER_BIOMES.containsKey(biomeID);
+		return NETHER_BIOME_PICKER.contains(biomeID);
 	}
 	
 	public static boolean isEndBiome(ResourceLocation biomeID) {
-		return END_LAND_BIOMES.containsKey(biomeID) || END_VOID_BIOMES.containsKey(biomeID);
+		return END_LAND_BIOME_PICKER.contains(biomeID) || END_VOID_BIOME_PICKER.contains(biomeID);
 	}
 }
