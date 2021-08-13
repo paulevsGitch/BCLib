@@ -2,6 +2,7 @@ package ru.bclib.world.generator;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.RegistryLookupCodec;
 import net.minecraft.resources.ResourceLocation;
@@ -45,14 +46,26 @@ public class BCLibEndBiomeSource extends BiomeSource {
 		
 		BiomeAPI.END_LAND_BIOME_PICKER.clearMutables();
 		BiomeAPI.END_VOID_BIOME_PICKER.clearMutables();
+		
 		this.possibleBiomes.forEach(biome -> {
 			ResourceLocation key = biomeRegistry.getKey(biome);
-			BCLBiome bclBiome = BiomeAPI.getBiome(key);
-			bclBiome.updateActualBiomes(biomeRegistry);
-			if (!BiomeAPI.END_LAND_BIOME_PICKER.containsImmutable(key)) {
+			if (!BiomeAPI.hasBiome(key)) {
+				BCLBiome bclBiome = new BCLBiome(key, biome, 1, 1);
 				BiomeAPI.END_LAND_BIOME_PICKER.addBiomeMutable(bclBiome);
 			}
+			else {
+				BCLBiome bclBiome = BiomeAPI.getBiome(key);
+				if (bclBiome != BiomeAPI.EMPTY_BIOME && !bclBiome.hasParentBiome()) {
+					if (!BiomeAPI.END_LAND_BIOME_PICKER.containsImmutable(key) && !BiomeAPI.END_VOID_BIOME_PICKER.containsImmutable(key)) {
+						BiomeAPI.END_LAND_BIOME_PICKER.addBiomeMutable(bclBiome);
+					}
+				}
+			}
 		});
+		
+		BiomeAPI.END_LAND_BIOME_PICKER.getBiomes().forEach(biome -> biome.updateActualBiomes(biomeRegistry));
+		BiomeAPI.END_VOID_BIOME_PICKER.getBiomes().forEach(biome -> biome.updateActualBiomes(biomeRegistry));
+		
 		BiomeAPI.END_LAND_BIOME_PICKER.rebuild();
 		BiomeAPI.END_VOID_BIOME_PICKER.rebuild();
 		
@@ -74,9 +87,14 @@ public class BCLibEndBiomeSource extends BiomeSource {
 	private static List<Biome> getBiomes(Registry<Biome> biomeRegistry) {
 		return biomeRegistry.stream().filter(biome -> {
 			ResourceLocation key = biomeRegistry.getKey(biome);
-			return BiomeAPI.END_LAND_BIOME_PICKER.contains(key) ||
-				BiomeAPI.END_VOID_BIOME_PICKER.contains(key) ||
-				(BiomeAPI.isDatapackBiome(key) && biome.getBiomeCategory() == BiomeCategory.THEEND);
+			BCLBiome bclBiome = BiomeAPI.getBiome(key);
+			if (bclBiome != BiomeAPI.EMPTY_BIOME) {
+				if (bclBiome.hasParentBiome()) {
+					bclBiome = bclBiome.getParentBiome();
+				}
+				key = bclBiome.getID();
+			}
+			return BiomeAPI.END_LAND_BIOME_PICKER.containsImmutable(key) || BiomeAPI.END_VOID_BIOME_PICKER.containsImmutable(key) || (biome.getBiomeCategory() == BiomeCategory.THEEND && BiomeAPI.isDatapackBiome(key));
 		}).toList();
 	}
 	

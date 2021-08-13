@@ -14,16 +14,22 @@ import java.util.Set;
 public class BiomePicker {
 	private final Set<ResourceLocation> immutableIDs = Sets.newHashSet();
 	private final List<BCLBiome> biomes = Lists.newArrayList();
-	private int biomeCount = 0;
 	private WeighTree<BCLBiome> tree;
+	private int biomeCount = 0;
 	
 	public void addBiome(BCLBiome biome) {
+		if (immutableIDs.contains(biome.getID())) {
+			return;
+		}
 		immutableIDs.add(biome.getID());
 		biomes.add(biome);
 		biomeCount++;
 	}
 	
 	public void addBiomeMutable(BCLBiome biome) {
+		if (immutableIDs.contains(biome.getID())) {
+			return;
+		}
 		biomes.add(biome);
 	}
 	
@@ -45,10 +51,6 @@ public class BiomePicker {
 		return immutableIDs.contains(id);
 	}
 	
-	public boolean contains(ResourceLocation id) {
-		return biomes.contains(id);
-	}
-	
 	public void removeMutableBiome(ResourceLocation id) {
 		for (int i = biomeCount; i < biomes.size(); i++) {
 			BCLBiome biome = biomes.get(i);
@@ -63,10 +65,10 @@ public class BiomePicker {
 		if (biomes.isEmpty()) {
 			return;
 		}
-		WeightedList<BCLBiome> list = new WeightedList<BCLBiome>();
-		biomes.forEach((biome) -> {
+		WeightedList<BCLBiome> list = new WeightedList<>();
+		biomes.forEach(biome -> {
 			list.add(biome, biome.getGenChance());
 		});
-		tree = new WeighTree<BCLBiome>(list);
+		tree = new WeighTree<>(list);
 	}
 }

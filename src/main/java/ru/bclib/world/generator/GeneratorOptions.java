@@ -11,7 +11,7 @@ public class GeneratorOptions {
 	private static int biomeSizeEndLand;
 	private static int biomeSizeEndVoid;
 	private static Function<Point, Boolean> endLandFunction;
-	private static boolean farEndBiomes;
+	private static boolean farEndBiomes = true;
 	
 	public static void init() {
 		biomeSizeNether = Configs.GENERATOR_CONFIG.getInt("nether.biomeMap", "biomeSize", 256);

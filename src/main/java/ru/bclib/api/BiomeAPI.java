@@ -41,15 +41,15 @@ public class BiomeAPI {
 	private static final Map<Biome, BCLBiome> CLIENT = Maps.newHashMap();
 	private static Registry<Biome> biomeRegistry;
 	
-	public static final BCLBiome NETHER_WASTES_BIOME = registerNetherBiome(getFromRegistry(new ResourceLocation("nether_wastes")));
-	public static final BCLBiome CRIMSON_FOREST_BIOME = registerNetherBiome(getFromRegistry(new ResourceLocation("crimson_forest")));
-	public static final BCLBiome WARPED_FOREST_BIOME = registerNetherBiome(getFromRegistry(new ResourceLocation("warped_forest")));
-	public static final BCLBiome SOUL_SAND_VALLEY_BIOME = registerNetherBiome(getFromRegistry(new ResourceLocation("soul_sand_valley")));
-	public static final BCLBiome BASALT_DELTAS_BIOME = registerNetherBiome(getFromRegistry(new ResourceLocation("basalt_deltas")));
+	public static final BCLBiome NETHER_WASTES_BIOME = registerNetherBiome(getFromRegistry(Biomes.NETHER_WASTES));
+	public static final BCLBiome CRIMSON_FOREST_BIOME = registerNetherBiome(getFromRegistry(Biomes.CRIMSON_FOREST));
+	public static final BCLBiome WARPED_FOREST_BIOME = registerNetherBiome(getFromRegistry(Biomes.WARPED_FOREST));
+	public static final BCLBiome SOUL_SAND_VALLEY_BIOME = registerNetherBiome(getFromRegistry(Biomes.SOUL_SAND_VALLEY));
+	public static final BCLBiome BASALT_DELTAS_BIOME = registerNetherBiome(getFromRegistry(Biomes.BASALT_DELTAS));
 	
-	public static final BCLBiome THE_END = registerEndLandBiome(getFromRegistry(new ResourceLocation("the_end")));
-	public static final BCLBiome END_MIDLANDS = registerSubBiome(THE_END, getFromRegistry(new ResourceLocation("end_midlands")), 0.5F);
-	public static final BCLBiome END_HIGHLANDS = registerSubBiome(THE_END, getFromRegistry(new ResourceLocation("end_highlands")), 0.5F);
+	public static final BCLBiome THE_END = registerEndLandBiome(getFromRegistry(Biomes.THE_END));
+	public static final BCLBiome END_MIDLANDS = registerSubBiome(THE_END, getFromRegistry(Biomes.END_MIDLANDS), 0.5F);
+	public static final BCLBiome END_HIGHLANDS = registerSubBiome(THE_END, getFromRegistry(Biomes.END_HIGHLANDS), 0.5F);
 	
 	public static final BCLBiome END_BARRENS = registerEndVoidBiome(getFromRegistry(new ResourceLocation("end_barrens")));
 	public static final BCLBiome SMALL_END_ISLANDS = registerEndVoidBiome(getFromRegistry(new ResourceLocation("small_end_islands")));
@@ -330,8 +330,13 @@ public class BiomeAPI {
 	}
 	
 	@Nullable
-	public static Biome getFromRegistry(ResourceLocation biomeID) {
-		return BuiltinRegistries.BIOME.get(biomeID);
+	public static Biome getFromRegistry(ResourceLocation key) {
+		return BuiltinRegistries.BIOME.get(key);
+	}
+	
+	@Nullable
+	public static Biome getFromRegistry(ResourceKey<Biome> key) {
+		return BuiltinRegistries.BIOME.get(key);
 	}
 	
 	public static boolean isDatapackBiome(ResourceLocation biomeID) {

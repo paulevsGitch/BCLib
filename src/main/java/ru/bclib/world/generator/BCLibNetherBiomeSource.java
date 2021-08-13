@@ -30,14 +30,24 @@ public class BCLibNetherBiomeSource extends BiomeSource {
 		super(getBiomes(biomeRegistry));
 		
 		BiomeAPI.NETHER_BIOME_PICKER.clearMutables();
+		
 		this.possibleBiomes.forEach(biome -> {
 			ResourceLocation key = biomeRegistry.getKey(biome);
-			BCLBiome bclBiome = BiomeAPI.getBiome(key);
-			bclBiome.updateActualBiomes(biomeRegistry);
-			if (!BiomeAPI.NETHER_BIOME_PICKER.containsImmutable(key)) {
+			if (!BiomeAPI.hasBiome(key)) {
+				BCLBiome bclBiome = new BCLBiome(key, biome, 1, 1);
 				BiomeAPI.NETHER_BIOME_PICKER.addBiomeMutable(bclBiome);
 			}
+			else {
+				BCLBiome bclBiome = BiomeAPI.getBiome(key);
+				if (bclBiome != BiomeAPI.EMPTY_BIOME && !bclBiome.hasParentBiome()) {
+					if (!BiomeAPI.NETHER_BIOME_PICKER.containsImmutable(key)) {
+						BiomeAPI.NETHER_BIOME_PICKER.addBiomeMutable(bclBiome);
+					}
+				}
+			}
 		});
+		
+		BiomeAPI.NETHER_BIOME_PICKER.getBiomes().forEach(biome -> biome.updateActualBiomes(biomeRegistry));
 		BiomeAPI.NETHER_BIOME_PICKER.rebuild();
 		
 		this.biomeMap = new BiomeMap(seed, GeneratorOptions.getBiomeSizeNether(), BiomeAPI.NETHER_BIOME_PICKER);
@@ -48,8 +58,14 @@ public class BCLibNetherBiomeSource extends BiomeSource {
 	private static List<Biome> getBiomes(Registry<Biome> biomeRegistry) {
 		return biomeRegistry.stream().filter(biome -> {
 			ResourceLocation key = biomeRegistry.getKey(biome);
-			return BiomeAPI.NETHER_BIOME_PICKER.containsImmutable(key) ||
-				(BiomeAPI.isDatapackBiome(key) && biome.getBiomeCategory() == BiomeCategory.NETHER);
+			BCLBiome bclBiome = BiomeAPI.getBiome(key);
+			if (bclBiome != BiomeAPI.EMPTY_BIOME) {
+				if (bclBiome.hasParentBiome()) {
+					bclBiome = bclBiome.getParentBiome();
+				}
+				key = bclBiome.getID();
+			}
+			return BiomeAPI.NETHER_BIOME_PICKER.containsImmutable(key) || (biome.getBiomeCategory() == BiomeCategory.NETHER && BiomeAPI.isDatapackBiome(key));
 		}).toList();
 	}
 	
