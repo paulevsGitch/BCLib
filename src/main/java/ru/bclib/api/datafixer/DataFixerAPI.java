@@ -54,14 +54,14 @@ public class DataFixerAPI {
 	}
 	
 	private static boolean wrapCall(LevelStorageSource levelSource, String levelID, Function<LevelStorageAccess, Boolean> runWithLevel) {
-		
 		LevelStorageSource.LevelStorageAccess levelStorageAccess;
 		try {
 			levelStorageAccess = levelSource.createAccess(levelID);
-		} catch (IOException e) {
-			BCLib.LOGGER.warning((String)"Failed to read level {} data", levelID, e);
+		}
+		catch (IOException e) {
+			BCLib.LOGGER.warning("Failed to read level {} data", levelID, e);
 			SystemToast.onWorldAccessFailure(Minecraft.getInstance(), levelID);
-			Minecraft.getInstance().setScreen((Screen)null);
+			Minecraft.getInstance().setScreen(null);
 			return true;
 		}
 		
@@ -69,8 +69,9 @@ public class DataFixerAPI {
 		
 		try {
 			levelStorageAccess.close();
-		} catch (IOException e) {
-			BCLib.LOGGER.warning((String)"Failed to unlock access to level {}", levelID, e);
+		}
+		catch (IOException e) {
+			BCLib.LOGGER.warning("Failed to unlock access to level {}", levelID, e);
 		}
 		
 		return returnValue;
