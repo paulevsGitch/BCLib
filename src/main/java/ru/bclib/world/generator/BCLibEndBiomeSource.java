@@ -42,6 +42,8 @@ public class BCLibEndBiomeSource extends BiomeSource {
 	public BCLibEndBiomeSource(Registry<Biome> biomeRegistry, long seed) {
 		super(getBiomes(biomeRegistry));
 		
+		BiomeAPI.END_LAND_BIOME_PICKER.clearMutables();
+		BiomeAPI.END_VOID_BIOME_PICKER.clearMutables();
 		biomeRegistry.forEach(biome -> {
 			ResourceLocation key = biomeRegistry.getKey(biome);
 			BCLBiome bclBiome = BiomeAPI.getBiome(key);
@@ -50,6 +52,8 @@ public class BCLibEndBiomeSource extends BiomeSource {
 				BiomeAPI.END_LAND_BIOME_PICKER.addBiomeMutable(bclBiome);
 			}
 		});
+		BiomeAPI.END_LAND_BIOME_PICKER.rebuild();
+		BiomeAPI.END_VOID_BIOME_PICKER.rebuild();
 		
 		this.mapLand = new BiomeMap(seed, GeneratorOptions.getBiomeSizeEndLand(), BiomeAPI.END_LAND_BIOME_PICKER);
 		this.mapVoid = new BiomeMap(seed, GeneratorOptions.getBiomeSizeEndVoid(), BiomeAPI.END_VOID_BIOME_PICKER);
@@ -74,6 +78,7 @@ public class BCLibEndBiomeSource extends BiomeSource {
 	public Biome getNoiseBiome(int biomeX, int biomeY, int biomeZ) {
 		long i = (long) biomeX * (long) biomeX;
 		long j = (long) biomeZ * (long) biomeZ;
+		long check = GeneratorOptions.isFarEndBiomes() ? 65536L : 625L;
 		long dist = i + j;
 		
 		if ((biomeX & 31) == 0 && (biomeZ & 31) == 0) {
@@ -81,9 +86,8 @@ public class BCLibEndBiomeSource extends BiomeSource {
 			mapVoid.clearCache();
 		}
 		
-		BCLBiome endBiome = null;
 		if (endLandFunction == null) {
-			if (dist <= 65536L) return centerBiome;
+			if (dist <= check) return centerBiome;
 			float height = TheEndBiomeSource.getHeightValue(
 				noise,
 				(biomeX >> 1) + 1,
@@ -104,10 +108,10 @@ public class BCLibEndBiomeSource extends BiomeSource {
 		else {
 			pos.setLocation(biomeX, biomeZ);
 			if (endLandFunction.apply(pos)) {
-				return dist <= 65536L ? centerBiome : mapLand.getBiome(biomeX << 2, biomeZ << 2).getActualBiome();
+				return dist <= check ? centerBiome : mapLand.getBiome(biomeX << 2, biomeZ << 2).getActualBiome();
 			}
 			else {
-				return dist <= 65536L ? barrens : mapVoid.getBiome(biomeX << 2, biomeZ << 2).getActualBiome();
+				return dist <= check ? barrens : mapVoid.getBiome(biomeX << 2, biomeZ << 2).getActualBiome();
 			}
 		}
 	}
@@ -123,6 +127,6 @@ public class BCLibEndBiomeSource extends BiomeSource {
 	}
 	
 	public static void register() {
-		Registry.register(Registry.BIOME_SOURCE, BCLib.makeID("better_end_biome_source"), CODEC);
+		Registry.register(Registry.BIOME_SOURCE, BCLib.makeID("end_biome_source"), CODEC);
 	}
 }

@@ -17,6 +17,7 @@ import ru.bclib.registry.BaseBlockEntities;
 import ru.bclib.registry.BaseRegistry;
 import ru.bclib.util.Logger;
 import ru.bclib.world.generator.BCLibEndBiomeSource;
+import ru.bclib.world.generator.BCLibNetherBiomeSource;
 import ru.bclib.world.surface.BCLSurfaceBuilders;
 
 import java.util.List;
@@ -31,6 +32,7 @@ public class BCLib implements ModInitializer {
 		BaseBlockEntities.register();
 		BCLSurfaceBuilders.register();
 		BCLibEndBiomeSource.register();
+		BCLibNetherBiomeSource.register();
 		TagAPI.init();
 		CraftingRecipes.init();
 		WorldDataAPI.registerModCache(MOD_ID);

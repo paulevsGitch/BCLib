@@ -15,7 +15,7 @@ import ru.bclib.interfaces.BiomeListProvider;
 import java.util.List;
 
 @Mixin(value = WeightedBiomePicker.class, remap = false)
-public class WeightedBiomePickerAccessor implements BiomeListProvider {
+public class WeightedBiomePickerMixin implements BiomeListProvider {
 	private final List<ResourceKey<Biome>> biomes = Lists.newArrayList();
 	
 	@Inject(method = "addBiome", at = @At("TAIL"))
