@@ -59,7 +59,7 @@ abstract public class DataExchange {
         @Override
         public boolean equals(Object o) {
             if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (!(o instanceof AutoSyncID)) return false;
             AutoSyncID that = (AutoSyncID) o;
             return uniqueID.equals(that.uniqueID) && modID.equals(that.modID);
         }
