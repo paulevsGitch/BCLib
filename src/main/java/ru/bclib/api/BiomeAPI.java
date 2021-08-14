@@ -95,7 +95,7 @@ public class BiomeAPI {
 	 * @param biome {@link BCLBiome}
 	 * @return {@link BCLBiome}
 	 */
-	public static void registerNetherBiome(BCLBiome biome) {
+	public static BCLBiome registerNetherBiome(BCLBiome biome) {
 		registerBiome(biome);
 		NETHER_BIOME_PICKER.addBiome(biome);
 		Random random = new Random(biome.getID().hashCode());
@@ -108,6 +108,7 @@ public class BiomeAPI {
 		);
 		ResourceKey<Biome> key = BuiltinRegistries.BIOME.getResourceKey(biome.getBiome()).get();
 		InternalBiomeData.addNetherBiome(key, parameters);
+		return biome;
 	}
 	
 	/**
