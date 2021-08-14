@@ -1,11 +1,9 @@
 package ru.bclib.api;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.impl.biome.InternalBiomeData;
-import net.fabricmc.fabric.impl.biome.WeightedBiomePicker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.Registry;
 import net.minecraft.data.BuiltinRegistries;
@@ -16,13 +14,11 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biome.ClimateParameters;
 import net.minecraft.world.level.biome.Biomes;
 import org.jetbrains.annotations.Nullable;
-import ru.bclib.interfaces.BiomeListProvider;
 import ru.bclib.util.MHelper;
 import ru.bclib.world.biomes.BCLBiome;
+import ru.bclib.world.biomes.FabricBiomesData;
 import ru.bclib.world.generator.BiomePicker;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -156,6 +152,21 @@ public class BiomeAPI {
 	}
 	
 	/**
+	 * Register {@link BCLBiome} wrapper for {@link Biome}.
+	 * After that biome will be added to BCLib End Biome Generator and into Fabric Biome API as a land biome (will generate only on islands).
+	 * @param biome {@link BCLBiome};
+	 * @param weight float generation chance.
+	 * @return {@link BCLBiome}
+	 */
+	public static BCLBiome registerEndLandBiome(Biome biome, float weight) {
+		ResourceKey<Biome> key = BuiltinRegistries.BIOME.getResourceKey(biome).get();
+		BCLBiome bclBiome = new BCLBiome(key.location(), biome, 1, weight);
+		END_LAND_BIOME_PICKER.addBiome(bclBiome);
+		registerBiome(bclBiome);
+		return bclBiome;
+	}
+	
+	/**
 	 * Register {@link BCLBiome} instance and its {@link Biome} if necessary.
 	 * After that biome will be added to BCLib End Biome Generator and into Fabric Biome API as a void biome (will generate only in the End void - between islands).
 	 * @param biome {@link BCLBiome}
@@ -179,6 +190,21 @@ public class BiomeAPI {
 	public static BCLBiome registerEndVoidBiome(Biome biome) {
 		ResourceKey<Biome> key = BuiltinRegistries.BIOME.getResourceKey(biome).get();
 		BCLBiome bclBiome = new BCLBiome(key.location(), biome, 1, 1);
+		END_VOID_BIOME_PICKER.addBiome(bclBiome);
+		registerBiome(bclBiome);
+		return bclBiome;
+	}
+	
+	/**
+	 * Register {@link BCLBiome} instance and its {@link Biome} if necessary.
+	 * After that biome will be added to BCLib End Biome Generator and into Fabric Biome API as a void biome (will generate only in the End void - between islands).
+	 * @param biome {@link BCLBiome};
+	 * @param weight float generation chance.
+	 * @return {@link BCLBiome}
+	 */
+	public static BCLBiome registerEndVoidBiome(Biome biome, float weight) {
+		ResourceKey<Biome> key = BuiltinRegistries.BIOME.getResourceKey(biome).get();
+		BCLBiome bclBiome = new BCLBiome(key.location(), biome, 1, weight);
 		END_VOID_BIOME_PICKER.addBiome(bclBiome);
 		registerBiome(bclBiome);
 		return bclBiome;
@@ -250,20 +276,23 @@ public class BiomeAPI {
 	 * Load biomes from Fabric API. For internal usage only.
 	 */
 	public static void loadFabricAPIBiomes() {
-		List<ResourceKey<Biome>> biomes = Lists.newArrayList();
-		biomes.addAll(getBiomes(InternalBiomeData.getEndBiomesMap().get(Biomes.SMALL_END_ISLANDS)));
-		biomes.addAll(getBiomes(InternalBiomeData.getEndBarrensMap().get(Biomes.END_BARRENS)));
-		biomes.forEach((key) -> registerEndVoidBiome(BuiltinRegistries.BIOME.get(key.location())));
+		FabricBiomesData.NETHER_BIOMES.forEach((key) -> {
+			if (!hasBiome(key.location())) {
+				registerNetherBiome(BuiltinRegistries.BIOME.get(key.location()));
+			}
+		});
 		
-		biomes.clear();
-		biomes.addAll(getBiomes(InternalBiomeData.getEndBiomesMap().get(Biomes.END_MIDLANDS)));
-		biomes.addAll(getBiomes(InternalBiomeData.getEndBiomesMap().get(Biomes.END_HIGHLANDS)));
-		biomes.forEach((key) -> registerEndLandBiome(BuiltinRegistries.BIOME.get(key.location())));
-	}
-	
-	private static List<ResourceKey<Biome>> getBiomes(WeightedBiomePicker picker) {
-		BiomeListProvider biomeList = (BiomeListProvider) (Object) picker;
-		return biomeList == null ? Collections.emptyList() : biomeList.getBiomes();
+		FabricBiomesData.END_LAND_BIOMES.forEach((key, weight) -> {
+			if (!hasBiome(key.location())) {
+				registerEndLandBiome(BuiltinRegistries.BIOME.get(key.location()), weight);
+			}
+		});
+		
+		FabricBiomesData.END_VOID_BIOMES.forEach((key, weight) -> {
+			if (!hasBiome(key.location())) {
+				registerEndVoidBiome(BuiltinRegistries.BIOME.get(key.location()), weight);
+			}
+		});
 	}
 	
 	@Nullable
