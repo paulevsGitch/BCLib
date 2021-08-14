@@ -33,8 +33,9 @@ public abstract class Config {
 
 		if (autoSync) {
 			final String uid = "CONFIG_" + modID + "_" + group;
-			DataExchangeAPI.addAutoSyncFile(BCLib.MOD_ID, uid, keeper.getConfigFile());
-			autoSyncConfigs.put(new DataExchange.AutoSyncID(modID, uid), this);
+			final DataExchange.AutoSyncID aid = new DataExchange.AutoSyncID(BCLib.MOD_ID, uid);
+			DataExchangeAPI.addAutoSyncFile(aid.modID, aid.uniqueID, keeper.getConfigFile());
+			autoSyncConfigs.put(aid, this);
 		}
 	}
 	
