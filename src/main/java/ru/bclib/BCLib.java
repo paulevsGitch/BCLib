@@ -11,6 +11,7 @@ import ru.bclib.api.dataexchange.handler.HelloClient;
 import ru.bclib.api.dataexchange.handler.HelloServer;
 import ru.bclib.api.dataexchange.handler.RequestFiles;
 import ru.bclib.api.dataexchange.handler.SendFiles;
+import ru.bclib.api.datafixer.DataFixerAPI;
 import ru.bclib.config.Configs;
 import ru.bclib.recipes.CraftingRecipes;
 import ru.bclib.registry.BaseBlockEntities;
@@ -38,7 +39,7 @@ public class BCLib implements ModInitializer {
 		TagAPI.init();
 		CraftingRecipes.init();
 		WorldDataAPI.registerModCache(MOD_ID);
-		
+		DataFixerAPI.registerPatch(() -> new BCLibPatch());
 		DataExchangeAPI.registerDescriptors(List.of(
 				HelloClient.DESCRIPTOR,
 				HelloServer.DESCRIPTOR,
