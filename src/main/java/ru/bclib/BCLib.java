@@ -4,6 +4,8 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.biome.Biomes;
+import ru.bclib.api.BiomeAPI;
 import ru.bclib.api.TagAPI;
 import ru.bclib.api.WorldDataAPI;
 import ru.bclib.api.dataexchange.DataExchangeAPI;
@@ -47,6 +49,14 @@ public class BCLib implements ModInitializer {
 		));
 
 		Configs.save();
+		
+		if (isDevEnvironment()) {
+			BiomeAPI.registerEndLandBiome(BiomeAPI.getFromRegistry(Biomes.FOREST));
+			BiomeAPI.registerEndLandBiome(BiomeAPI.getFromRegistry(Biomes.WARPED_FOREST));
+			BiomeAPI.registerEndLandBiome(BiomeAPI.getFromRegistry(Biomes.TAIGA));
+			BiomeAPI.registerEndLandBiome(BiomeAPI.getFromRegistry(Biomes.ICE_SPIKES));
+			BiomeAPI.registerEndLandBiome(BiomeAPI.getFromRegistry(Biomes.MUSHROOM_FIELDS));
+		}
 	}
 	
 	public static boolean isDevEnvironment() {

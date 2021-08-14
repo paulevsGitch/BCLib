@@ -185,52 +185,6 @@ public class BiomeAPI {
 	}
 	
 	/**
-	 * Adds {@link BCLBiome} to FabricAPI biomes as the Nether biome (with random {@link ClimateParameters}).
-	 *
-	 * @param biome - {@link BCLBiome}.
-	 */
-	@Deprecated(forRemoval = true)
-	public static void addNetherBiomeToFabricApi(BCLBiome biome) {
-		ResourceKey<Biome> key = BuiltinRegistries.BIOME.getResourceKey(biome.getBiome()).get();
-		Random random = new Random(biome.getID().toString().hashCode());
-		ClimateParameters parameters = new ClimateParameters(
-			MHelper.randRange(-2F, 2F, random),
-			MHelper.randRange(-2F, 2F, random),
-			MHelper.randRange(-2F, 2F, random),
-			MHelper.randRange(-2F, 2F, random),
-			random.nextFloat()
-		);
-		InternalBiomeData.addNetherBiome(key, parameters);
-	}
-	
-	/**
-	 * Use BiomeAPI.registerEndLandBiome instead of this.
-	 * Adds {@link BCLBiome} to FabricAPI biomes as an End land biome (generating on islands).
-	 *
-	 * @param biome - {@link BCLBiome}.
-	 */
-	@Deprecated(forRemoval = true)
-	public static void addEndLandBiomeToFabricApi(BCLBiome biome) {
-		float weight = biome.getGenChance();
-		ResourceKey<Biome> key = BuiltinRegistries.BIOME.getResourceKey(biome.getBiome()).get();
-		InternalBiomeData.addEndBiomeReplacement(Biomes.END_HIGHLANDS, key, weight);
-		InternalBiomeData.addEndBiomeReplacement(Biomes.END_MIDLANDS, key, weight);
-	}
-	
-	/**
-	 * Use BiomeAPI.registerEndVoidBiome instead of this.
-	 * Adds {@link BCLBiome} to FabricAPI biomes as an End void biome (generating between islands in the void).
-	 *
-	 * @param biome - {@link BCLBiome}.
-	 */
-	@Deprecated(forRemoval = true)
-	public static void addEndVoidBiomeToFabricApi(BCLBiome biome) {
-		float weight = biome.getGenChance();
-		ResourceKey<Biome> key = BuiltinRegistries.BIOME.getResourceKey(biome.getBiome()).get();
-		InternalBiomeData.addEndBiomeReplacement(Biomes.SMALL_END_ISLANDS, key, weight);
-	}
-	
-	/**
 	 * Get {@link BCLBiome} from {@link Biome} instance on server. Used to convert world biomes to BCLBiomes.
 	 *
 	 * @param biome - {@link Biome} from world.
@@ -254,9 +208,7 @@ public class BiomeAPI {
 		BCLBiome endBiome = CLIENT.get(biome);
 		if (endBiome == null) {
 			Minecraft minecraft = Minecraft.getInstance();
-			ResourceLocation id = minecraft.level.registryAccess()
-												 .registryOrThrow(Registry.BIOME_REGISTRY)
-												 .getKey(biome);
+			ResourceLocation id = minecraft.level.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY).getKey(biome);
 			endBiome = id == null ? EMPTY_BIOME : ID_MAP.getOrDefault(id, EMPTY_BIOME);
 			CLIENT.put(biome, endBiome);
 		}
@@ -282,22 +234,6 @@ public class BiomeAPI {
 	 */
 	public static BCLBiome getBiome(ResourceLocation biomeID) {
 		return ID_MAP.getOrDefault(biomeID, EMPTY_BIOME);
-	}
-	
-	/** Use inner biome field instead.
-	 * Get actual {@link Biome} from given {@link BCLBiome}. If it is null it will request it from current {@link Registry}.
-	 *
-	 * @param biome - {@link BCLBiome}.
-	 * @return {@link Biome}.
-	 */
-	@Deprecated(forRemoval = true)
-	public static Biome getActualBiome(BCLBiome biome) {
-		Biome actual = biome.getActualBiome();
-		if (actual == null) {
-			biome.updateActualBiomes(biomeRegistry);
-			actual = biome.getActualBiome();
-		}
-		return actual;
 	}
 	
 	/**
