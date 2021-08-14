@@ -99,6 +99,7 @@ public class SendFiles extends DataHandler {
 				BCLib.LOGGER.info("    - Writing " + path + " (" + data.length + " Bytes)");
 				try {
 					Files.write(path, data);
+					DataExchange.didReceiveFile(e, e.fileName);
 				} catch (IOException ioException) {
 					BCLib.LOGGER.error("    --> Writing " + e.fileName + " failed: " + ioException);
 				}

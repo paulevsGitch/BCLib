@@ -128,7 +128,8 @@ public class HelloClient extends DataHandler {
 	
 	@Override
 	protected void runOnGameThread(Minecraft client, MinecraftServer server, boolean isClient) {
-		String localBclibVersion = getBCLibVersion();
+		final boolean debugHashes = Configs.CLIENT_CONFIG.getBoolean(Configs.MAIN_SYNC_CATEGORY, "debugHashes", false);
+		final String localBclibVersion = getBCLibVersion();
 		BCLib.LOGGER.info("Received Hello from Server. (client="+localBclibVersion+", server="+bclibVersion+")");
 		
 		// if (DataFixerAPI.getModVersion(localBclibVersion) != DataFixerAPI.getModVersion(bclibVersion)){
@@ -158,12 +159,16 @@ public class HelloClient extends DataHandler {
 			}
 			
 			BCLib.LOGGER.info("    - " + e + ": " + (willRequest ? (" ("+requestText+")" ):""));
+			if (debugHashes) {
+				BCLib.LOGGER.info("      * " + e.first + " (Server)");
+				BCLib.LOGGER.info("      * " + e.third.getFileHash() + " (Client)");
+			}
 		}
 
-		/*if (filesToRequest.size()>0 && SendFiles.acceptFiles()) {
+		if (filesToRequest.size()>0 && SendFiles.acceptFiles()) {
 			showDonwloadConfigs(client, filesToRequest);
 			return;
-		}*/
+		}
 	}
 	
 	@Environment(EnvType.CLIENT)

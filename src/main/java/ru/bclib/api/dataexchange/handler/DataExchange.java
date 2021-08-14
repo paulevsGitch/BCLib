@@ -19,6 +19,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.BiConsumer;
 
 abstract public class DataExchange {
     @FunctionalInterface
@@ -68,6 +69,8 @@ abstract public class DataExchange {
             return Objects.hash(uniqueID, modID);
         }
     }
+
+    protected final static List<BiConsumer<AutoSyncID, File>> onWriteCallbacks = new ArrayList<>(2);
 
     final static class AutoSyncTriple extends Triple<FileHash, byte[], AutoFileSyncEntry>{
         public AutoSyncTriple(FileHash first, byte[] second, AutoFileSyncEntry third) {
@@ -202,5 +205,16 @@ abstract public class DataExchange {
      */
     protected void addAutoSyncFileData(String modID, String uniqueID, File fileName, boolean requestContent, NeedTransferPredicate needTransfer){
        autoSyncFiles.add(new AutoFileSyncEntry(modID, uniqueID, fileName, requestContent, needTransfer));
+    }
+
+    /**
+     * Called when {@code SendFiles} received a File on the Client and wrote it to the FileSystem.
+     * <p>
+     * This is the place where reload Code should go.
+     * @param aid The ID of the received File
+     * @param file The location of the FIle on the client
+     */
+    static void didReceiveFile(AutoSyncID aid, File file){
+        onWriteCallbacks.forEach(fkt -> fkt.accept(aid, file));
     }
 }

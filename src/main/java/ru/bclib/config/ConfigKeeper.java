@@ -6,6 +6,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.util.GsonHelper;
 import org.jetbrains.annotations.Nullable;
+import ru.bclib.api.dataexchange.handler.DataExchange;
 import ru.bclib.util.JsonFactory;
 
 import java.io.File;
@@ -16,7 +17,7 @@ import java.util.function.Supplier;
 
 public final class ConfigKeeper {
 	private final Map<ConfigKey, Entry<?>> configEntries = Maps.newHashMap();
-	private final JsonObject configObject;
+	private JsonObject configObject;
 	private final ConfigWriter writer;
 	
 	private boolean changed = false;
@@ -33,6 +34,11 @@ public final class ConfigKeeper {
 	public void save() {
 		if (!changed) return;
 		this.writer.save();
+		this.changed = false;
+	}
+
+	void reload() {
+		this.configObject = this.writer.reload();
 		this.changed = false;
 	}
 	

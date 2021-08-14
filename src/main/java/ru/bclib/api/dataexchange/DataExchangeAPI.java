@@ -5,9 +5,13 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.network.FriendlyByteBuf;
 import ru.bclib.api.dataexchange.handler.DataExchange;
+import ru.bclib.config.Config;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 public class DataExchangeAPI extends DataExchange {
     private final static List<String> MODS = Lists.newArrayList();
@@ -147,5 +151,20 @@ public class DataExchangeAPI extends DataExchange {
      */
     public static void addAutoSyncFile(String modID, String uniqueID, File fileName, NeedTransferPredicate needTransfer) {
         getInstance().addAutoSyncFileData(modID, uniqueID, fileName, true, needTransfer);
+    }
+
+    /**
+     * Register a function that is called whenever the client receives a file from the server and replaced toe local
+     * file with the new content.
+     * <p>
+     * This callback is usefull if you need to reload the new content before the game is quit.
+     * @param callback A Function that receives the AutoSyncID as well as the Filename.
+     */
+    public static void addOnWriteCallback(BiConsumer<AutoSyncID, File> callback) {
+        onWriteCallbacks.add(callback);
+    }
+
+    static {
+        addOnWriteCallback(Config::reloadSyncedConfig);
     }
 }

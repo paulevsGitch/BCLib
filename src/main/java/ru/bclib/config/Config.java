@@ -3,6 +3,7 @@ package ru.bclib.config;
 import org.jetbrains.annotations.Nullable;
 import ru.bclib.BCLib;
 import ru.bclib.api.dataexchange.DataExchangeAPI;
+import ru.bclib.api.dataexchange.handler.DataExchange;
 import ru.bclib.config.ConfigKeeper.BooleanEntry;
 import ru.bclib.config.ConfigKeeper.Entry;
 import ru.bclib.config.ConfigKeeper.FloatEntry;
@@ -10,7 +11,12 @@ import ru.bclib.config.ConfigKeeper.IntegerEntry;
 import ru.bclib.config.ConfigKeeper.RangeEntry;
 import ru.bclib.config.ConfigKeeper.StringEntry;
 
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
+
 public abstract class Config {
+	protected final static Map<DataExchange.AutoSyncID, Config> autoSyncConfigs = new HashMap<>();
 	protected final ConfigKeeper keeper;
 	protected final boolean autoSync;
 	protected abstract void registerEntries();
@@ -26,12 +32,25 @@ public abstract class Config {
 		this.autoSync = autoSync;
 
 		if (autoSync) {
-			DataExchangeAPI.addAutoSyncFile(BCLib.MOD_ID, "CONFIG_" + modID + "_" + group, keeper.getConfigFile());
+			final String uid = "CONFIG_" + modID + "_" + group;
+			DataExchangeAPI.addAutoSyncFile(BCLib.MOD_ID, uid, keeper.getConfigFile());
+			autoSyncConfigs.put(new DataExchange.AutoSyncID(modID, uid), this);
 		}
 	}
 	
 	public void saveChanges() {
 		this.keeper.save();
+	}
+	public static void reloadSyncedConfig(DataExchange.AutoSyncID aid, File file){
+		Config cfg =  autoSyncConfigs.get(aid);
+		if (cfg!=null) {
+			cfg.reload();
+		}
+	}
+
+	public void reload() {
+		this.keeper.reload();
+		BCLib.LOGGER.info("Did Reload " + keeper.getConfigFile());
 	}
 	
 	@Nullable
@@ -165,4 +184,6 @@ public abstract class Config {
 		}
 		return false;
 	}
+
+
 }

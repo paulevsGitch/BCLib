@@ -37,6 +37,11 @@ public class ConfigWriter {
 		}
 		save(configFile, configObject);
 	}
+
+	JsonObject reload() {
+		configObject = load(configFile);
+		return configObject;
+	}
 	
 	public JsonObject load() {
 		if (configObject == null) {
