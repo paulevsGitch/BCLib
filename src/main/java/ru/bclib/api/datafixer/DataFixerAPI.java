@@ -537,4 +537,22 @@ public class DataFixerAPI {
 		return String.format(Locale.ROOT, "%d.%d.%d", a, b, c);
 	}
 	
+	/**
+	 * {@code true} if the version v1 is larger than v2
+	 * @param v1 A Version string
+	 * @param v2 Another Version string
+	 * @return v1 &gt; v2
+	 */
+	public static boolean isLargerVersion(String v1, String v2){
+		return getModVersion(v1) > getModVersion(v2);
+	}
+	/**
+	 * {@code true} if the version v1 is larger or equal v2
+	 * @param v1 A Version string
+	 * @param v2 Another Version string
+	 * @return v1 &ge; v2
+	 */
+	public static boolean isLargerOrEqualVersion(String v1, String v2){
+		return getModVersion(v1) >= getModVersion(v2);
+	}
 }

@@ -77,11 +77,11 @@ public class HelloClient extends DataHandler {
 			buf.writeInt(0);
 		}
 
-		if (Configs.MAIN_CONFIG.getBoolean(Configs.MAIN_SYNC_CATEGORY, "offerConfigs", true)) {
+		if (Configs.MAIN_CONFIG.getBoolean(Configs.MAIN_SYNC_CATEGORY, "offerFiles", true)) {
 			//do only include files that exist on the server
 			final List<AutoFileSyncEntry> existingAutoSyncFiles = DataExchange
 					.getInstance()
-					.autoSyncFiles
+					.getAutoSyncFiles()
 					.stream()
 					.filter(e -> e.fileName.exists())
 					.collect(Collectors.toList());
@@ -93,9 +93,22 @@ public class HelloClient extends DataHandler {
 				BCLib.LOGGER.info("    - Offering File " + entry);
 			}
 		} else {
-			BCLib.LOGGER.info("Server will not offer Configs.");
+			BCLib.LOGGER.info("Server will not offer Files.");
 			buf.writeInt(0);
 		}
+		
+		//for the moment this is only hardcoded for the sync-folder offered by BCLIB, but it can be extended in future
+		if (Configs.MAIN_CONFIG.getBoolean(Configs.MAIN_SYNC_CATEGORY, "offserSyncFolder", true)) {
+			buf.writeInt(1); //currently we do only sync a single folder
+			writeString(buf, DataExchange.SYNC_FOLDER_ID); //the UID of the Folder
+			final List<String> fileNames = DataExchange.getInstance().getSyncFolderContent();
+			buf.writeInt(fileNames.size());
+			fileNames.forEach(fl -> writeString(buf, fl));
+		} else {
+			BCLib.LOGGER.info("Server will not offer Sync Folders.");
+			buf.writeInt(0);
+		}
+		Configs.MAIN_CONFIG.saveChanges();
 	}
 	
 	String bclibVersion ="0.0.0";
@@ -123,6 +136,25 @@ public class HelloClient extends DataHandler {
 			DataExchange.AutoSyncTriple t = AutoFileSyncEntry.deserializeAndMatch(buf);
 			autoSyncedFiles.add(t);
 			//System.out.println(t.first);
+		}
+		
+		//since this version we also send the sync folders
+		if (DataFixerAPI.isLargerOrEqualVersion(bclibVersion, "0.4.1")) {
+			final int folderCount = buf.readInt();
+			for (int i=0; i<folderCount; i++){
+				final String folderID = readString(buf);
+				final int entries = buf.readInt();
+				List<String> files = new ArrayList<>(entries);
+				for (int j=0; j<entries; j++){
+					files.add(readString(buf));
+				}
+				
+				if (folderID.equals(DataExchange.SYNC_FOLDER_ID)) {
+					//TODO: implement the syncing here
+				} else {
+					BCLib.LOGGER.warning("Unknown Sync-Folder '"+folderID+"'");
+				}
+			}
 		}
 	}
 	

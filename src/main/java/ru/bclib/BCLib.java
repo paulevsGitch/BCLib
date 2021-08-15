@@ -39,6 +39,7 @@ public class BCLib implements ModInitializer {
 		TagAPI.init();
 		CraftingRecipes.init();
 		WorldDataAPI.registerModCache(MOD_ID);
+		DataExchangeAPI.registerMod(MOD_ID);
 		DataFixerAPI.registerPatch(() -> new BCLibPatch());
 		DataExchangeAPI.registerDescriptors(List.of(
 				HelloClient.DESCRIPTOR,

@@ -4,14 +4,17 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
+import net.fabricmc.loader.api.FabricLoader;
 import ru.bclib.api.dataexchange.ConnectorClientside;
 import ru.bclib.api.dataexchange.ConnectorServerside;
 import ru.bclib.api.dataexchange.DataExchangeAPI;
 import ru.bclib.api.dataexchange.DataHandler;
 import ru.bclib.api.dataexchange.DataHandlerDescriptor;
 import ru.bclib.api.dataexchange.FileHash;
+import ru.bclib.config.Configs;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -19,6 +22,12 @@ import java.util.Set;
 import java.util.function.BiConsumer;
 
 abstract public class DataExchange {
+    public final static Path SYNC_FOLDER = FabricLoader.getInstance()
+                                                       .getGameDir()
+                                                       .resolve("bclib-sync")
+                                                       .toAbsolutePath();
+    public final static String SYNC_FOLDER_ID = "BCLIB-SYNC";
+    
     @FunctionalInterface
     public interface NeedTransferPredicate  {
         public boolean test(FileHash clientHash, FileHash serverHash, FileContentWrapper content);
@@ -54,7 +63,9 @@ abstract public class DataExchange {
     protected ConnectorServerside server;
     protected ConnectorClientside client;
     protected final Set<DataHandlerDescriptor> descriptors;
-    protected final List<AutoFileSyncEntry> autoSyncFiles = new ArrayList<>(4);
+    private final List<AutoFileSyncEntry> autoSyncFiles = new ArrayList<>(4);
+    
+    private boolean didLoadSyncFolder = false;
 
     abstract protected ConnectorClientside clientSupplier(DataExchange api);
     abstract protected ConnectorServerside serverSupplier(DataExchange api);
@@ -64,7 +75,11 @@ abstract public class DataExchange {
     }
 
     public Set<DataHandlerDescriptor> getDescriptors() { return descriptors; }
-
+    
+    public List<AutoFileSyncEntry> getAutoSyncFiles(){
+       return autoSyncFiles;
+    }
+    
     @Environment(EnvType.CLIENT)
     protected void initClientside(){
         if (client!=null) return;
@@ -176,5 +191,44 @@ abstract public class DataExchange {
      */
     static void didReceiveFile(AutoSyncID aid, File file){
         onWriteCallbacks.forEach(fkt -> fkt.accept(aid, file));
+    }
+    
+    private List<String> syncFolderContent;
+    protected List<String> getSyncFolderContent(){
+        if (syncFolderContent==null){
+            return new ArrayList<>(0);
+        }
+        return syncFolderContent;
+    }
+    
+    //we call this from HelloServer to prepare transfer
+    protected void loadSyncFolder() {
+        if (Configs.MAIN_CONFIG.getBoolean(Configs.MAIN_SYNC_CATEGORY, "offserSyncFolder", true))
+        {
+            final File syncPath = SYNC_FOLDER.toFile();
+            if (!syncPath.exists()) {
+                syncPath.mkdirs();
+            }
+    
+            if (syncFolderContent == null) {
+                syncFolderContent = new ArrayList<>(8);
+                addFilesForSyncFolder(syncPath);
+            }
+        }
+    }
+    
+    private void addFilesForSyncFolder(File path){
+        for (final File f : path.listFiles()) {
+            if (f.isDirectory()) {
+                addFilesForSyncFolder(f);
+            } else if (f.isFile()) {
+                if (!f.getName().startsWith(".")) {
+                    Path p = f.toPath();
+                    p = SYNC_FOLDER.relativize(p);
+                    syncFolderContent.add(p.toString());
+                }
+            }
+        
+        }
     }
 }

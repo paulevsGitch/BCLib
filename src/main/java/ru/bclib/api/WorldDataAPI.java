@@ -8,7 +8,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.world.level.storage.LevelStorageSource.LevelStorageAccess;
 import ru.bclib.BCLib;
-import ru.bclib.api.dataexchange.DataExchangeAPI;
 import ru.bclib.api.datafixer.DataFixerAPI;
 
 import java.io.File;
@@ -20,8 +19,8 @@ import java.util.function.Consumer;
 
 /**
  * Mod-specifix data-storage for a world.
- * 
- * This class provides the ability for mod to store persistent data inside a world. The Storage for the world is 
+ * <p>
+ * This class provides the ability for mod to store persistent data inside a world. The Storage for the world is
  * currently initialized as part of the {@link DataFixerAPI} in {@link DataFixerAPI#fixData(LevelStorageAccess, boolean, Consumer)}
  * or {@link DataFixerAPI#initializeWorldData(File, boolean)}
  */
@@ -32,45 +31,47 @@ public class WorldDataAPI {
 	
 	public static void load(File dataDir) {
 		WorldDataAPI.dataDir = dataDir;
-		MODS.stream().parallel().forEach(modID -> {
-			File file = new File(dataDir, modID + ".nbt");
-			CompoundTag root = new CompoundTag();
-			if (file.exists()) {
-				try {
-					root = NbtIo.readCompressed(file);
-				}
-				catch (IOException e) {
-					BCLib.LOGGER.error("World data loading failed", e);
-				}
-			}
-			else {
-				Optional<ModContainer> optional = FabricLoader.getInstance().getModContainer(modID);
-				if (optional.isPresent()) {
-					ModContainer modContainer = optional.get();
-					if (BCLib.isDevEnvironment()) {
-						root.putString("version", "255.255.9999");
+		MODS.stream()
+			.parallel()
+			.forEach(modID -> {
+				File file = new File(dataDir, modID + ".nbt");
+				CompoundTag root = new CompoundTag();
+				if (file.exists()) {
+					try {
+						root = NbtIo.readCompressed(file);
 					}
-					else {
-						root.putString("version", modContainer.getMetadata().getVersion().toString());
+					catch (IOException e) {
+						BCLib.LOGGER.error("World data loading failed", e);
 					}
-					saveFile(modID);
 				}
-			}
+				else {
+					Optional<ModContainer> optional = FabricLoader.getInstance()
+																  .getModContainer(modID);
+					if (optional.isPresent()) {
+						ModContainer modContainer = optional.get();
+						if (BCLib.isDevEnvironment()) {
+							root.putString("version", "255.255.9999");
+						}
+						else {
+							root.putString("version", modContainer.getMetadata()
+																  .getVersion()
+																  .toString());
+						}
+						saveFile(modID);
+					}
+				}
 			
-			TAGS.put(modID, root);
-		});
+				TAGS.put(modID, root);
+			});
 	}
 	
 	/**
 	 * Register mod cache, world cache is located in world data folder.
-	 * <p>
-	 * Will also register the Mod for the {@link DataExchangeAPI} using {@link DataExchangeAPI#registerMod(String)}
 	 *
 	 * @param modID - {@link String} modID.
 	 */
 	public static void registerModCache(String modID) {
 		MODS.add(modID);
-		DataExchangeAPI.registerMod(modID);
 	}
 	
 	/**
@@ -117,7 +118,7 @@ public class WorldDataAPI {
 	 */
 	public static void saveFile(String modID) {
 		try {
-			if (!dataDir.exists()){
+			if (!dataDir.exists()) {
 				dataDir.mkdirs();
 			}
 			NbtIo.writeCompressed(getRootTag(modID), new File(dataDir, modID + ".nbt"));

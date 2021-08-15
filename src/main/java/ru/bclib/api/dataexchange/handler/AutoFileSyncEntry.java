@@ -103,6 +103,7 @@ class AutoFileSyncEntry extends AutoSyncID {
         data = buf.readByteArray(size);
         return data;
     }
+    
 
     public static AutoFileSyncEntry findMatching(FileHash hash) {
         return findMatching(hash.modID, hash.uniqueID);
@@ -115,7 +116,7 @@ class AutoFileSyncEntry extends AutoSyncID {
     public static AutoFileSyncEntry findMatching(String modID, String uniqueID) {
         return DataExchange
                 .getInstance()
-                .autoSyncFiles
+                .getAutoSyncFiles()
                 .stream()
                 .filter(asf -> asf.modID.equals(modID) && asf.uniqueID.equals(uniqueID))
                 .findFirst()

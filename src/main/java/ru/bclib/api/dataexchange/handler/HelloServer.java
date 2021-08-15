@@ -84,5 +84,7 @@ public class HelloServer extends DataHandler {
 		} else {
 			BCLib.LOGGER.info("Auto-Sync was disabled on the server.");
 		}
+		
+		DataExchange.getInstance().loadSyncFolder();
 	}
 }
