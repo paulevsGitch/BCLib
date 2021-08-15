@@ -179,6 +179,7 @@ public class DataExchangeAPI extends DataExchange {
 													   .replace(":", "-")
 													   .replace("\\", "-")
 													   .replace("/", "-"))
+										 .normalize()
 										 .toFile();
 		
 		if (!fl.exists()) {

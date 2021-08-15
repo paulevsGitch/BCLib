@@ -51,6 +51,14 @@ public class SendFiles extends DataHandler {
 			System.out.println("Got Content:" + content.length);
 			return true;
 		}));*/
+		
+		//this will try to send a folder-file that was not registered or requested by the client
+		existingFiles.add(new AutoFileSyncEntry.ForDirectFileRequest(DataExchange.SYNC_FOLDER.folderID, new File("test.json"), DataExchange.SYNC_FOLDER.mapAbsolute("test.json").toFile()));
+		
+		//this will try to send a folder-file that was not registered or requested by the client and is outside the base-folder
+		existingFiles.add(new AutoFileSyncEntry.ForDirectFileRequest(DataExchange.SYNC_FOLDER.folderID, new File("../breakout.json"), DataExchange.SYNC_FOLDER.mapAbsolute("../breakout.json").toFile()));
+		
+		
 		writeString(buf, token);
 		buf.writeInt(existingFiles.size());
 

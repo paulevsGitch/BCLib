@@ -107,7 +107,7 @@ public class HelloClient extends DataHandler {
 		if (Configs.MAIN_CONFIG.getBoolean(Configs.MAIN_SYNC_CATEGORY, "offersSyncFolders", true)) {
 			buf.writeInt(((DataExchange) DataExchange.getInstance()).syncFolderDescriptions.size());
 			((DataExchange) DataExchange.getInstance()).syncFolderDescriptions.forEach(desc -> {
-				BCLib.LOGGER.info("    - Offering Folder " + desc.localFolder + " (allowDelete="+desc.removeAdditionalFiles+")");
+				BCLib.LOGGER.info("    - Offering Folder " + desc.localFolder + " (allowDelete=" + desc.removeAdditionalFiles + ")");
 				desc.serialize(buf);
 			});
 		}
@@ -175,30 +175,44 @@ public class HelloClient extends DataHandler {
 				BCLib.LOGGER.info("    - " + desc.folderID + " (" + desc.localFolder + ", allowRemove=" + desc.removeAdditionalFiles + ")");
 				localDescriptor.invalidateCache();
 				
+				desc.relativeFilesStream()
+					.filter(desc::discardChildElements)
+					.forEach(subFile -> {
+						BCLib.LOGGER.warning("       * " + subFile.relPath + " (REJECTED)");
+					});
+				
+				
 				if (desc.removeAdditionalFiles) {
 					List<AutoSyncID.ForDirectFileRequest> additionalFiles = localDescriptor.relativeFilesStream()
 																						   .filter(subFile -> !desc.hasRelativeFile(subFile))
-																						   .map(subFile -> new AutoSyncID.ForDirectFileRequest(desc.folderID, desc.localFolder.resolve(subFile.relPath).toFile()))
+																						   .map(desc::mapAbsolute)
+																						   .filter(desc::acceptChildElements)
+																						   .map(absPath -> new AutoSyncID.ForDirectFileRequest(desc.folderID, absPath.toFile()))
 																						   .collect(Collectors.toList());
 					
-					additionalFiles.forEach(aid -> BCLib.LOGGER.info("      * Removing " + aid.relFile));
+					additionalFiles.forEach(aid -> BCLib.LOGGER.info("       * " + desc.localFolder.relativize(aid.relFile.toPath()) + " (missing on server)"));
 					filesToRemove.addAll(additionalFiles);
 				}
 				
-				desc.relativeFilesStream().forEach(subFile -> {
-					SubFile localSubFile = localDescriptor.getLocalSubFile(subFile.relPath);
-					if (localSubFile != null){
-						//the file exists locally, check if the hashes match
-						if (!localSubFile.hash.equals(subFile.hash)){
-							BCLib.LOGGER.info("      * Changed " + subFile.relPath);
+				desc.relativeFilesStream()
+					.filter(desc::acceptChildElements)
+					.forEach(subFile -> {
+						SubFile localSubFile = localDescriptor.getLocalSubFile(subFile.relPath);
+						if (localSubFile != null) {
+							//the file exists locally, check if the hashes match
+							if (!localSubFile.hash.equals(subFile.hash)) {
+								BCLib.LOGGER.info("       * " + subFile.relPath + " (changed)");
+								filesToRequest.add(new AutoSyncID.ForDirectFileRequest(desc.folderID, new File(subFile.relPath)));
+							} else {
+								BCLib.LOGGER.info("       * " + subFile.relPath);
+							}
+						}
+						else {
+							//the file is missing locally
+							BCLib.LOGGER.info("       * " + subFile.relPath + " (missing on client)");
 							filesToRequest.add(new AutoSyncID.ForDirectFileRequest(desc.folderID, new File(subFile.relPath)));
 						}
-					} else {
-						//the file is missing locally
-						BCLib.LOGGER.info("      * Missing " + subFile.relPath);
-						filesToRequest.add(new AutoSyncID.ForDirectFileRequest(desc.folderID, new File(subFile.relPath)));
-					}
-				});
+					});
 				
 				//free some memory
 				localDescriptor.invalidateCache();
@@ -318,6 +332,7 @@ public class HelloClient extends DataHandler {
 				
 				filesToRemove.forEach(aid -> {
 					BCLib.LOGGER.info("    - " + aid.relFile + " (removing)");
+					
 					aid.relFile.delete();
 				});
 				

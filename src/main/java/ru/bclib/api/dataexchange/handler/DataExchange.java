@@ -17,6 +17,7 @@ import ru.bclib.api.dataexchange.FileHash;
 import ru.bclib.api.dataexchange.SyncFileHash;
 import ru.bclib.api.dataexchange.handler.AutoSyncID.ForDirectFileRequest;
 import ru.bclib.config.Configs;
+import ru.bclib.util.PathUtil;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -33,6 +34,7 @@ abstract public class DataExchange {
 	public final static SyncFolderDescriptor SYNC_FOLDER = new SyncFolderDescriptor("BCLIB-SYNC", FabricLoader.getInstance()
 																											  .getGameDir()
 																											  .resolve("bclib-sync")
+																											  .normalize()
 																											  .toAbsolutePath(), true);
 	final List<SyncFolderDescriptor> syncFolderDescriptions = Arrays.asList(SYNC_FOLDER);
 	
@@ -130,6 +132,11 @@ abstract public class DataExchange {
 				fileCache = new ArrayList<>(8);
 				fileWalker(localFolder.toFile(), p -> fileCache.add(new SubFile(localFolder.relativize(p)
 																						   .toString(), FileHash.create(p.toFile()))));
+				
+				//this tests if we can trick the system to load files that are not beneath the base-folder
+				if (!BCLib.isClient()){
+					fileCache.add(new SubFile("../breakout.json", FileHash.create(mapAbsolute("../breakout.json").toFile())));
+				}
 			}
 		}
 		
@@ -192,6 +199,26 @@ abstract public class DataExchange {
 		Stream<SubFile> relativeFilesStream() {
 			loadCache();
 			return fileCache.stream();
+		}
+		
+		public Path mapAbsolute(String relPath) {
+			return this.localFolder.resolve(relPath).normalize();
+		}
+		
+		public Path mapAbsolute(SubFile subFile) {
+			return this.localFolder.resolve(subFile.relPath).normalize();
+		}
+		
+		public boolean acceptChildElements(Path absPath){
+			return PathUtil.isChildOf(this.localFolder, absPath);
+		}
+		
+		public boolean acceptChildElements(SubFile subFile){
+			return acceptChildElements(mapAbsolute(subFile));
+		}
+		
+		public boolean discardChildElements(SubFile subFile){
+			return !acceptChildElements(subFile);
 		}
 	}
 	

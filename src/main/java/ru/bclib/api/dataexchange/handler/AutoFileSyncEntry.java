@@ -34,10 +34,19 @@ class AutoFileSyncEntry extends AutoSyncID {
 			final String relFile = DataHandler.readString(buf);
 			SyncFolderDescriptor desc = DataExchange.getSyncFolderDescriptor(syncID);
 			if (desc!=null) {
-				return new AutoFileSyncEntry.ForDirectFileRequest(syncID, new File(relFile), desc.localFolder.resolve(relFile)
-																											 .toFile());
+				//ensures that the file is not above the base-folder
+				if (desc.acceptChildElements(desc.mapAbsolute(relFile))) {
+					return new AutoFileSyncEntry.ForDirectFileRequest(syncID, new File(relFile), desc.localFolder.resolve(relFile)
+																												 .normalize()
+																												 .toFile());
+				}
 			}
 			return null;
+		}
+		
+		@Override
+		public String toString() {
+			return uniqueID + " - " + relFile;
 		}
 	}
 	public final DataExchange.NeedTransferPredicate needTransfer;
@@ -149,8 +158,11 @@ class AutoFileSyncEntry extends AutoSyncID {
 			if (desc != null) {
 				SubFile subFile = desc.getLocalSubFile(freq.relFile.toString());
 				if (subFile != null) {
-					final File absPath = desc.localFolder.resolve(subFile.relPath)
-									.toFile();
+					final File absPath = desc
+						.localFolder
+						.resolve(subFile.relPath)
+						.normalize()
+						.toFile();
 					return new AutoFileSyncEntry.ForDirectFileRequest(freq.uniqueID, new File(subFile.relPath), absPath);
 				}
 			}
