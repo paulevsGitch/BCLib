@@ -84,7 +84,7 @@ public final class ConfigKeeper {
 					changed = true;
 					me.add(myKey.first + myKey.second, otherValue);
 				}
-				else if (otherValue.isJsonPrimitive()) {
+				else if (otherValue.isJsonPrimitive() || otherValue.isJsonArray() || otherValue.isJsonNull()) {
 					if (!otherValue.equals(myValue)) {
 						changed = true;
 						me.add(myKey.first + myKey.second, otherValue);
@@ -93,17 +93,13 @@ public final class ConfigKeeper {
 				else if (otherValue.isJsonObject()) {
 					changed |= compareAndUpdateForSync(myValue.getAsJsonObject(), otherValue.getAsJsonObject());
 				}
-				else if (otherValue.isJsonArray()) {
-					if (!otherValue.equals(myValue)) {
-						changed = true;
-						me.add(myKey.first + myKey.second, otherValue);
-					}
-				}
-				
 			}
 			else { //no entry, just copy the value from other
-				changed = true;
-				me.add(otherKey.first + otherKey.second, otherValue);
+				if (!otherValue.isJsonNull()) {
+					changed = true;
+					temp = find(me, otherKey);
+					me.add(otherKey.first + otherKey.second, otherValue);
+				}
 			}
 		}
 		

@@ -108,6 +108,11 @@ public class SendFiles extends DataHandler {
 		Path path = fileName.toPath();
 		BCLib.LOGGER.info("    - Writing " + path + " (" + data.length + " Bytes)");
 		try {
+			final File parentFile = path.getParent()
+								  .toFile();
+			if (!parentFile.exists()){
+				parentFile.mkdirs();
+			}
 			Files.write(path, data);
 			DataExchange.didReceiveFile(e, fileName);
 		} catch (IOException ioException) {

@@ -98,22 +98,22 @@ public class DataExchangeAPI extends DataExchange {
 	 * @param fileName The name of the File
 	 */
 	public static void addAutoSyncFile(String modID, File fileName) {
-		getInstance().addAutoSyncFileData(modID, fileName, false, FileHash.NEED_TRANSFER);
+		getInstance().addAutoSyncFileData(modID, fileName, false, SyncFileHash.NEED_TRANSFER);
 	}
 	
 	/**
 	 * Registers a File for automatic client syncing.
 	 * <p>
-	 * The file is synced of the {@link FileHash} on client and server are not equal. This method will not copy the
+	 * The file is synced of the {@link SyncFileHash} on client and server are not equal. This method will not copy the
 	 * configs content from the client to the server.
 	 *
 	 * @param modID    The ID of the calling Mod
-	 * @param uniqueID A unique Identifier for the File. (see {@link ru.bclib.api.dataexchange.FileHash#uniqueID} for
+	 * @param uniqueID A unique Identifier for the File. (see {@link SyncFileHash#uniqueID} for
 	 *                 Details
 	 * @param fileName The name of the File
 	 */
 	public static void addAutoSyncFile(String modID, String uniqueID, File fileName) {
-		getInstance().addAutoSyncFileData(modID, uniqueID, fileName, false, FileHash.NEED_TRANSFER);
+		getInstance().addAutoSyncFileData(modID, uniqueID, fileName, false, SyncFileHash.NEED_TRANSFER);
 	}
 	
 	/**
@@ -123,7 +123,7 @@ public class DataExchangeAPI extends DataExchange {
 	 * entire file from the client to the server.
 	 * <p>
 	 * You should only use this option, if you need to compare parts of the file in order to decide
-	 * if the File needs to be copied. Normally using the {@link ru.bclib.api.dataexchange.FileHash}
+	 * if the File needs to be copied. Normally using the {@link SyncFileHash}
 	 * for comparison is sufficient.
 	 *
 	 * @param modID        The ID of the calling Mod
@@ -141,11 +141,11 @@ public class DataExchangeAPI extends DataExchange {
 	 * entire file from the client to the server.
 	 * <p>
 	 * You should only use this option, if you need to compare parts of the file in order to decide
-	 * if the File needs to be copied. Normally using the {@link ru.bclib.api.dataexchange.FileHash}
+	 * if the File needs to be copied. Normally using the {@link SyncFileHash}
 	 * for comparison is sufficient.
 	 *
 	 * @param modID        The ID of the calling Mod
-	 * @param uniqueID     A unique Identifier for the File. (see {@link ru.bclib.api.dataexchange.FileHash#uniqueID} for
+	 * @param uniqueID     A unique Identifier for the File. (see {@link SyncFileHash#uniqueID} for
 	 *                     Details
 	 * @param fileName     The name of the File
 	 * @param needTransfer If the predicate returns true, the file needs to get copied to the server.
@@ -174,14 +174,14 @@ public class DataExchangeAPI extends DataExchange {
 	 * @param modID ID of the Mod
 	 * @return The path to the sync-folder
 	 */
-	public static File getSyncFolder(String modID) {
-		File fl = SYNC_FOLDER.resolve(modID.replace(".", "-")
-										.replace(":", "-")
-										.replace("\\", "-")
-										.replace("/", "-"))
-						  .toFile();
+	public static File getModSyncFolder(String modID) {
+		File fl = SYNC_FOLDER.localFolder.resolve(modID.replace(".", "-")
+													   .replace(":", "-")
+													   .replace("\\", "-")
+													   .replace("/", "-"))
+										 .toFile();
 		
-		if (!fl.exists()){
+		if (!fl.exists()) {
 			fl.mkdirs();
 		}
 		return fl;

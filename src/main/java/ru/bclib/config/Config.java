@@ -3,7 +3,7 @@ package ru.bclib.config;
 import org.jetbrains.annotations.Nullable;
 import ru.bclib.BCLib;
 import ru.bclib.api.dataexchange.DataExchangeAPI;
-import ru.bclib.api.dataexchange.FileHash;
+import ru.bclib.api.dataexchange.SyncFileHash;
 import ru.bclib.api.dataexchange.handler.AutoSyncID;
 import ru.bclib.api.dataexchange.handler.FileContentWrapper;
 import ru.bclib.config.ConfigKeeper.BooleanEntry;
@@ -50,7 +50,7 @@ public abstract class Config {
 		}
 	}
 	
-	private boolean compareForSync(FileHash fileHash, FileHash fileHash1, FileContentWrapper content) {
+	private boolean compareForSync(SyncFileHash syncFileHash, SyncFileHash syncFileHash1, FileContentWrapper content) {
 		return keeper.compareAndUpdateForSync(content);
 	}
 	

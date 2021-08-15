@@ -1,6 +1,8 @@
 package ru.bclib.api.dataexchange.handler;
 
+import net.minecraft.network.FriendlyByteBuf;
 import org.jetbrains.annotations.NotNull;
+import ru.bclib.api.dataexchange.DataHandler;
 
 import java.io.File;
 import java.util.Objects;
@@ -14,6 +16,27 @@ public class AutoSyncID {
 			super(modID, uniqueID);
 			this.contentWrapper = contentWrapper;
 			this.localFile = localFile;
+		}
+	}
+	
+	static class ForDirectFileRequest extends AutoSyncID {
+		public final static String MOD_ID = "bclib::FILE";
+		final File relFile;
+		
+		ForDirectFileRequest(String syncID, File relFile) {
+			super(ForDirectFileRequest.MOD_ID, syncID);
+			this.relFile = relFile;
+		}
+		
+		@Override
+		void serializeData(FriendlyByteBuf buf) {
+			super.serializeData(buf);
+			DataHandler.writeString(buf, relFile.toString());
+		}
+		
+		static ForDirectFileRequest finishDeserialize(String modID, String uniqueID, FriendlyByteBuf buf){
+			final File fl = new File(DataHandler.readString(buf));
+			return new ForDirectFileRequest(uniqueID, fl);
 		}
 	}
 	/**
@@ -55,5 +78,21 @@ public class AutoSyncID {
 	@Override
 	public int hashCode() {
 		return Objects.hash(uniqueID, modID);
+	}
+	
+	void serializeData(FriendlyByteBuf buf) {
+		DataHandler.writeString(buf, modID);
+		DataHandler.writeString(buf, uniqueID);
+	}
+	
+	static AutoSyncID deserializeData(FriendlyByteBuf buf){
+		String modID = DataHandler.readString(buf);
+		String uID = DataHandler.readString(buf);
+		
+		if (ForDirectFileRequest.MOD_ID.equals(modID)){
+			return ForDirectFileRequest.finishDeserialize(modID, uID, buf);
+		} else {
+			return new AutoSyncID(modID, uID);
+		}
 	}
 }

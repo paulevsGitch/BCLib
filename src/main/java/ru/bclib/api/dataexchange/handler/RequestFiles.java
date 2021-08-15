@@ -36,8 +36,7 @@ public class RequestFiles extends DataHandler {
 		buf.writeInt(files.size());
 		
 		for (AutoSyncID a : files){
-			writeString(buf, a.modID);
-			writeString(buf, a.uniqueID);
+			a.serializeData(buf);
 		}
 	}
 
@@ -50,9 +49,7 @@ public class RequestFiles extends DataHandler {
 		
 		BCLib.LOGGER.info("Client requested " + size + " Files:");
 		for (int i=0; i<size; i++){
-			String modID = readString(buf);
-			String uID = readString(buf);
-			AutoSyncID asid = new AutoSyncID(modID, uID);
+			AutoSyncID asid = AutoSyncID.deserializeData(buf);
 			files.add(asid);
 			BCLib.LOGGER.info("    - " + asid);
 		}
