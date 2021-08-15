@@ -1,6 +1,8 @@
 package ru.bclib.config;
 
 import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.NotNull;
+import ru.bclib.util.Pair;
 
 import java.util.Arrays;
 
@@ -83,5 +85,16 @@ public class ConfigKey {
 		if (entry.isEmpty()) {
 			throw new IndexOutOfBoundsException("Config key must be not empty!");
 		}
+	}
+	
+	public static Pair<String, String> realKey(@NotNull String key) {
+		String[] parts = key.split("\\[default:", 2);
+		if (parts.length == 1) {
+			return new Pair(parts[0].trim(), "");
+		}
+		else if (parts.length == 2) {
+			return new Pair(parts[0].trim(), " " + ("[default:" + parts[1]).trim());
+		}
+		return new Pair(key, "");
 	}
 }

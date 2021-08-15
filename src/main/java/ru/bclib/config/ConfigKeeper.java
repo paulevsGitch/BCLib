@@ -6,9 +6,13 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.util.GsonHelper;
 import org.jetbrains.annotations.Nullable;
+import ru.bclib.api.dataexchange.handler.FileContentWrapper;
 import ru.bclib.util.JsonFactory;
+import ru.bclib.util.Pair;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.OutputStream;
 import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -25,24 +29,97 @@ public final class ConfigKeeper {
 		this.writer = new ConfigWriter(modID, group);
 		this.configObject = writer.load();
 	}
-
-	File getConfigFile(){
+	
+	File getConfigFile() {
 		return this.writer.getConfigFile();
 	}
 	
-	boolean compareAndUpdateForSync(JsonObject other) {
-		final JsonObject me = this.configObject;
-		return true;
+	boolean compareAndUpdateForSync(FileContentWrapper content) {
+		ByteArrayInputStream inputStream = content.getInputStream();
+		final JsonObject other = JsonFactory.getJsonObject(inputStream);
+		
+		boolean changed = this.compareAndUpdateForSync(other);
+		if (changed) {
+			OutputStream outStream = content.getEmptyOutputStream();
+			JsonFactory.storeJson(outStream, this.configObject);
+			content.syncWithOutputStream();
+		}
+		return changed;
 	}
+	
+	boolean compareAndUpdateForSync(JsonObject other) {
+		return compareAndUpdateForSync(this.configObject, other);
+	}
+	
+	private static Pair<JsonElement, Pair<String, String>> find(JsonObject json, Pair<String, String> key) {
+		for (var entry : json.entrySet()) {
+			final Pair<String, String> otherKey = ConfigKey.realKey(entry.getKey());
+			if (otherKey.first.equals(key.first)) return new Pair<>(entry.getValue(), otherKey);
+		}
+		
+		return null;
+	}
+	
+	/**
+	 * Called for content based auto-sync.
+	 *
+	 * @param me    - When called in AutoSync this represents the content of the client.
+	 * @param other - When called in AutoSync, this represents the content of the server
+	 * @return {@code true} if content was changed
+	 */
+	static boolean compareAndUpdateForSync(JsonObject me, JsonObject other) {
+		boolean changed = false;
+		for (var otherEntry : other.entrySet()) {
+			final Pair<String, String> otherKey = ConfigKey.realKey(otherEntry.getKey());
+			final JsonElement otherValue = otherEntry.getValue();
+			
+			Pair<JsonElement, Pair<String, String>> temp = find(me, otherKey);
+			//we already have an entry
+			if (temp != null) {
+				final Pair<String, String> myKey = temp.second;
+				final JsonElement myValue = temp.first;
+				
+				if ((otherValue.isJsonNull() && !myValue.isJsonNull()) || (otherValue.isJsonPrimitive() && !myValue.isJsonPrimitive()) || (otherValue.isJsonObject() && !myValue.isJsonObject()) || (otherValue.isJsonArray() && !myValue.isJsonArray())) {
+					//types are different => replace with "server"-version in other
+					changed = true;
+					me.add(myKey.first + myKey.second, otherValue);
+				}
+				else if (otherValue.isJsonPrimitive()) {
+					if (!otherValue.equals(myValue)) {
+						changed = true;
+						me.add(myKey.first + myKey.second, otherValue);
+					}
+				}
+				else if (otherValue.isJsonObject()) {
+					changed |= compareAndUpdateForSync(myValue.getAsJsonObject(), otherValue.getAsJsonObject());
+				}
+				else if (otherValue.isJsonArray()) {
+					if (!otherValue.equals(myValue)) {
+						changed = true;
+						me.add(myKey.first + myKey.second, otherValue);
+					}
+				}
+				
+			}
+			else { //no entry, just copy the value from other
+				changed = true;
+				me.add(otherKey.first + otherKey.second, otherValue);
+			}
+		}
+		
+		return changed;
+	}
+	
 	
 	public void save() {
 		if (!changed) return;
 		this.writer.save();
 		this.changed = false;
 	}
-
+	
 	void reload() {
 		this.configObject = this.writer.reload();
+		this.configEntries.clear();
 		this.changed = false;
 	}
 	

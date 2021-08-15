@@ -10,7 +10,7 @@ public class FileContentWrapper {
 	private byte[] rawContent;
 	private ByteArrayOutputStream outputStream;
 	
-	FileContentWrapper(byte[] content){
+	FileContentWrapper(byte[] content) {
 		this.rawContent = content;
 		this.outputStream = null;
 	}
@@ -20,14 +20,14 @@ public class FileContentWrapper {
 	}
 	
 	public byte[] getRawContent() {
-		if (outputStream!=null){
+		if (outputStream != null) {
 			return outputStream.toByteArray();
 		}
 		return rawContent;
 	}
 	
-	private void invalidateOutputStream(){
-		if (this.outputStream!=null){
+	private void invalidateOutputStream() {
+		if (this.outputStream != null) {
 			try {
 				this.outputStream.close();
 			}
@@ -43,25 +43,33 @@ public class FileContentWrapper {
 		invalidateOutputStream();
 	}
 	
-	public void syncWithOutputStream(){
-		if (outputStream!=null){
+	public void syncWithOutputStream() {
+		if (outputStream != null) {
+			try {
+				outputStream.flush();
+			}
+			catch (IOException e) {
+				BCLib.LOGGER.error(e.getMessage());
+				e.printStackTrace();
+			}
 			setRawContent(getRawContent());
+			invalidateOutputStream();
 		}
 	}
 	
-	public ByteArrayInputStream getInputStream(){
-		if (rawContent==null) return new ByteArrayInputStream(new byte[0]);
+	public ByteArrayInputStream getInputStream() {
+		if (rawContent == null) return new ByteArrayInputStream(new byte[0]);
 		return new ByteArrayInputStream(rawContent);
 	}
 	
-	public ByteArrayOutputStream getOrCreateOutputStream(){
-		if (this.outputStream == null){
+	public ByteArrayOutputStream getOrCreateOutputStream() {
+		if (this.outputStream == null) {
 			return this.getEmptyOutputStream();
 		}
 		return this.outputStream;
 	}
 	
-	public ByteArrayOutputStream getEmptyOutputStream(){
+	public ByteArrayOutputStream getEmptyOutputStream() {
 		invalidateOutputStream();
 		this.outputStream = new ByteArrayOutputStream(this.rawContent.length);
 		return this.outputStream;

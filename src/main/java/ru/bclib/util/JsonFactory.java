@@ -24,7 +24,8 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 
 public class JsonFactory {
-	public final static Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+	public final static Gson GSON = new GsonBuilder().setPrettyPrinting()
+													 .create();
 	
 	public static JsonObject getJsonObject(InputStream stream) {
 		try {
@@ -61,7 +62,8 @@ public class JsonFactory {
 	@Nullable
 	@Environment(EnvType.CLIENT)
 	public static JsonObject getJsonObject(ResourceLocation location) {
-		ResourceManager manager = Minecraft.getInstance().getResourceManager();
+		ResourceManager manager = Minecraft.getInstance()
+										   .getResourceManager();
 		JsonObject obj = null;
 		try {
 			Resource resource = manager.getResource(location);
@@ -108,6 +110,13 @@ public class JsonFactory {
 	public static void storeJson(OutputStream outStream, JsonElement jsonObject) {
 		OutputStreamWriter writer = new OutputStreamWriter(outStream);
 		GSON.toJson(jsonObject, writer);
+		try {
+			writer.flush();
+		}
+		catch (IOException e) {
+			BCLib.LOGGER.error(e.getMessage());
+			e.printStackTrace();
+		}
 	}
 	
 	public static int getInt(JsonObject object, String member, int def) {
