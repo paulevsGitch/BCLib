@@ -14,7 +14,7 @@ import ru.bclib.BCLib;
 import ru.bclib.api.dataexchange.DataExchangeAPI;
 import ru.bclib.api.dataexchange.DataHandler;
 import ru.bclib.api.dataexchange.DataHandlerDescriptor;
-import ru.bclib.api.dataexchange.handler.DataExchange.AutoSyncID;
+import ru.bclib.api.dataexchange.handler.AutoSyncID.WithContentOverride;
 import ru.bclib.api.datafixer.DataFixerAPI;
 import ru.bclib.config.Configs;
 import ru.bclib.gui.screens.SyncFilesScreen;
@@ -126,6 +126,7 @@ public class HelloClient extends DataHandler {
 		}
 	}
 	
+	
 	@Override
 	protected void runOnGameThread(Minecraft client, MinecraftServer server, boolean isClient) {
 		final boolean debugHashes = Configs.CLIENT_CONFIG.getBoolean(Configs.MAIN_SYNC_CATEGORY, "debugHashes", false);
@@ -137,7 +138,9 @@ public class HelloClient extends DataHandler {
 		// 	return;
 		// }
 		
-		List<AutoSyncID> filesToRequest = new ArrayList<>(4);
+		final List<AutoSyncID> filesToRequest = new ArrayList<>(2);
+		
+		
 		
 		for (Entry<String, String> e : modVersion.entrySet()){
 			String ver = getModVersion(e.getKey());
@@ -147,26 +150,32 @@ public class HelloClient extends DataHandler {
 		if (autoSyncedFiles.size()>0) {
 			BCLib.LOGGER.info("Files offered by Server:");
 		}
-		final String requestText = SendFiles.acceptFiles()?"requesting":"differs";
 		for (DataExchange.AutoSyncTriple e : autoSyncedFiles) {
-			boolean willRequest = false;
-			if (e.third == null) {
-				willRequest = true;
-				filesToRequest.add(new AutoSyncID(e.first.modID, e.first.uniqueID));
-			} else if (e.third.needTransfer.test(e.third.getFileHash(), e.first, e.second)) {
-				willRequest = true;
-				filesToRequest.add(new AutoSyncID(e.first.modID, e.first.uniqueID));
+			String actionString = "";
+			FileContentWrapper contentWrapper = new FileContentWrapper(e.serverContent);
+			if (e.localMatch == null) {
+				actionString = "(new, prepare update)";
+				filesToRequest.add(new AutoSyncID(e.serverHash.modID, e.serverHash.uniqueID));
+			} else if (e.localMatch.needTransfer.test(e.localMatch.getFileHash(), e.serverHash, contentWrapper)) {
+				actionString = "(prepare update)";
+				//we did not yet receive the new content
+				if (contentWrapper.getRawContent() == null) {
+					filesToRequest.add(new AutoSyncID(e.serverHash.modID, e.serverHash.uniqueID));
+				} else {
+					filesToRequest.add(new AutoSyncID.WithContentOverride(e.serverHash.modID, e.serverHash.uniqueID, contentWrapper, e.localMatch.fileName));
+				}
 			}
 			
-			BCLib.LOGGER.info("    - " + e + ": " + (willRequest ? (" ("+requestText+")" ):""));
+			BCLib.LOGGER.info("    - " + e + ": " + actionString);
 			if (debugHashes) {
-				BCLib.LOGGER.info("      * " + e.first + " (Server)");
-				BCLib.LOGGER.info("      * " + e.third.getFileHash() + " (Client)");
+				BCLib.LOGGER.info("      * " + e.serverHash + " (Server)");
+				BCLib.LOGGER.info("      * " + e.localMatch.getFileHash() + " (Client)");
+				BCLib.LOGGER.info("      * local Content " + (contentWrapper.getRawContent() == null));
 			}
 		}
 
 		if (filesToRequest.size()>0 && SendFiles.acceptFiles()) {
-			showDonwloadConfigs(client, filesToRequest);
+			showDownloadConfigs(client, filesToRequest);
 			return;
 		}
 	}
@@ -185,11 +194,27 @@ public class HelloClient extends DataHandler {
 	}
 	
 	@Environment(EnvType.CLIENT)
-	protected void showDonwloadConfigs(Minecraft client, List<AutoSyncID> files){
+	protected void showDownloadConfigs(Minecraft client, List<AutoSyncID> files){
 		client.setScreen(new SyncFilesScreen((download) -> {
 			Minecraft.getInstance().setScreen((Screen)null);
 			if (download){
-				requestFileDownloads(files);
+				BCLib.LOGGER.info("Updating local Files:");
+				List<AutoSyncID.WithContentOverride> localChanges = new ArrayList<>(files.toArray().length);
+				List<AutoSyncID> requestFiles = new ArrayList<>(files.toArray().length);
+				
+				files.forEach(aid -> {
+					if (aid instanceof WithContentOverride) {
+						final WithContentOverride aidc = (WithContentOverride)aid;
+						BCLib.LOGGER.info("    - " + aid + " (updating Content)");
+						
+						SendFiles.writeSyncedFile(aid, aidc.contentWrapper.getRawContent(), aidc.localFile);
+					} else {
+						requestFiles.add(aid);
+						BCLib.LOGGER.info("    - " + aid + " (requesting)");
+					}
+				});
+				
+				requestFileDownloads(requestFiles);
 			}
 		}));
 

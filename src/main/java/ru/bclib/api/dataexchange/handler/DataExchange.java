@@ -4,82 +4,42 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
-import org.jetbrains.annotations.NotNull;
 import ru.bclib.api.dataexchange.ConnectorClientside;
 import ru.bclib.api.dataexchange.ConnectorServerside;
 import ru.bclib.api.dataexchange.DataExchangeAPI;
 import ru.bclib.api.dataexchange.DataHandler;
 import ru.bclib.api.dataexchange.DataHandlerDescriptor;
 import ru.bclib.api.dataexchange.FileHash;
-import ru.bclib.util.Triple;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.function.BiConsumer;
 
 abstract public class DataExchange {
     @FunctionalInterface
     public interface NeedTransferPredicate  {
-        public boolean test(FileHash clientHash, FileHash serverHash, byte[] content);
+        public boolean test(FileHash clientHash, FileHash serverHash, FileContentWrapper content);
     }
     
-    public static class AutoSyncID {
-        /**
-         * A Unique ID for the referenced File.
-         * <p>
-         * Files with the same {@link #modID} need to have a unique IDs. Normally the filename from FileHash(String, File, byte[], int, int)
-         * is used to generated that ID, but you can directly specify one using FileHash(String, String, byte[], int, int).
-         */
-        @NotNull
-        public final String uniqueID;
-
-        /**
-         * The ID of the Mod that is registering the File
-         */
-        @NotNull
-        public final String modID;
-
-        public AutoSyncID(String modID, String uniqueID) {
-            Objects.nonNull(modID);
-            Objects.nonNull(uniqueID);
-
-            this.modID = modID;
-            this.uniqueID = uniqueID;
-        }
-    
-        @Override
-        public String toString() {
-            return modID+"."+uniqueID;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (!(o instanceof AutoSyncID)) return false;
-            AutoSyncID that = (AutoSyncID) o;
-            return uniqueID.equals(that.uniqueID) && modID.equals(that.modID);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(uniqueID, modID);
-        }
-    }
-
     protected final static List<BiConsumer<AutoSyncID, File>> onWriteCallbacks = new ArrayList<>(2);
 
-    final static class AutoSyncTriple extends Triple<FileHash, byte[], AutoFileSyncEntry>{
-        public AutoSyncTriple(FileHash first, byte[] second, AutoFileSyncEntry third) {
-            super(first, second, third);
+    final static class AutoSyncTriple {
+        public final FileHash serverHash;
+        public final byte[] serverContent;
+        public final AutoFileSyncEntry localMatch;
+        
+        public AutoSyncTriple(FileHash serverHash, byte[] serverContent, AutoFileSyncEntry localMatch) {
+            this.serverHash = serverHash;
+            this.serverContent = serverContent;
+            this.localMatch = localMatch;
         }
     
         @Override
         public String toString() {
-            return first.modID+"."+first.uniqueID;
+            return serverHash.modID+"."+serverHash.uniqueID;
         }
     }
 

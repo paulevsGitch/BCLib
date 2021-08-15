@@ -16,6 +16,7 @@ import ru.bclib.gui.screens.ConfirmRestartScreen;
 import ru.bclib.util.Pair;
 import ru.bclib.util.Triple;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -77,7 +78,7 @@ public class SendFiles extends DataHandler {
 			receivedFiles = new ArrayList<>(size);
 			BCLib.LOGGER.info("Server sent " + size + " Files:");
 			for (int i = 0; i < size; i++) {
-				Triple<AutoFileSyncEntry, byte[], DataExchange.AutoSyncID> p = AutoFileSyncEntry.deserializeContent(buf);
+				Triple<AutoFileSyncEntry, byte[], AutoSyncID> p = AutoFileSyncEntry.deserializeContent(buf);
 				if (p.first != null) {
 					receivedFiles.add(p);
 					BCLib.LOGGER.info("    - " + p.first + " (" + p.second.length + " Bytes)");
@@ -95,20 +96,25 @@ public class SendFiles extends DataHandler {
 			for (Pair<AutoFileSyncEntry, byte[]> entry : receivedFiles) {
 				final AutoFileSyncEntry e = entry.first;
 				final byte[] data = entry.second;
-				Path path = e.fileName.toPath();
-				BCLib.LOGGER.info("    - Writing " + path + " (" + data.length + " Bytes)");
-				try {
-					Files.write(path, data);
-					DataExchange.didReceiveFile(e, e.fileName);
-				} catch (IOException ioException) {
-					BCLib.LOGGER.error("    --> Writing " + e.fileName + " failed: " + ioException);
-				}
+				
+				writeSyncedFile(e, data, e.fileName);
 			}
 
 			showConfirmRestart(client);
 		}
 	}
-
+	
+	public static void writeSyncedFile(AutoSyncID e, byte[] data, File fileName) {
+		Path path = fileName.toPath();
+		BCLib.LOGGER.info("    - Writing " + path + " (" + data.length + " Bytes)");
+		try {
+			Files.write(path, data);
+			DataExchange.didReceiveFile(e, fileName);
+		} catch (IOException ioException) {
+			BCLib.LOGGER.error("    --> Writing " + fileName + " failed: " + ioException);
+		}
+	}
+	
 	@Environment(EnvType.CLIENT)
 	protected void showConfirmRestart(Minecraft client){
 		client.setScreen(new ConfirmRestartScreen(() -> {

@@ -27,5 +27,6 @@ bin/
 # fabric
 
 run/
+run-client/
 output/
 *.log

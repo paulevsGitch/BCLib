@@ -3,6 +3,7 @@ package ru.bclib.api.dataexchange;
 import net.minecraft.network.FriendlyByteBuf;
 import org.jetbrains.annotations.NotNull;
 import ru.bclib.BCLib;
+import ru.bclib.api.dataexchange.handler.AutoSyncID;
 import ru.bclib.api.dataexchange.handler.DataExchange;
 
 import java.io.File;
@@ -22,7 +23,7 @@ import java.util.Objects;
  * You can compare instances using {@link #equals(Object)} to determine if two files are
  * identical.
  */
-public class FileHash extends DataExchange.AutoSyncID {
+public class FileHash extends AutoSyncID {
     /**
      * The md5-hash of the file
      */

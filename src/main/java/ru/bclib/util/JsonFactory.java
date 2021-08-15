@@ -19,6 +19,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.Reader;
 
 public class JsonFactory {
@@ -101,6 +103,11 @@ public class JsonFactory {
 		catch (IOException ex) {
 			BCLib.LOGGER.catching(ex);
 		}
+	}
+	
+	public static void storeJson(OutputStream outStream, JsonElement jsonObject) {
+		OutputStreamWriter writer = new OutputStreamWriter(outStream);
+		GSON.toJson(jsonObject, writer);
 	}
 	
 	public static int getInt(JsonObject object, String member, int def) {

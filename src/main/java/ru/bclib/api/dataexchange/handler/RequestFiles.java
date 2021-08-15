@@ -8,7 +8,6 @@ import net.minecraft.server.MinecraftServer;
 import ru.bclib.BCLib;
 import ru.bclib.api.dataexchange.DataHandler;
 import ru.bclib.api.dataexchange.DataHandlerDescriptor;
-import ru.bclib.api.dataexchange.handler.DataExchange.AutoSyncID;
 
 import java.util.ArrayList;
 import java.util.List;

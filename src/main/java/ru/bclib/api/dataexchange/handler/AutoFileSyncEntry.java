@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-class AutoFileSyncEntry extends DataExchange.AutoSyncID {
+class AutoFileSyncEntry extends AutoSyncID {
     public final DataExchange.NeedTransferPredicate needTransfer;
     public final File fileName;
     public final boolean requestContent;
@@ -54,13 +54,13 @@ class AutoFileSyncEntry extends DataExchange.AutoSyncID {
         return serializeFileContent(buf);
     }
 
-    public static Triple<AutoFileSyncEntry, byte[], DataExchange.AutoSyncID> deserializeContent(FriendlyByteBuf buf) {
+    public static Triple<AutoFileSyncEntry, byte[], AutoSyncID> deserializeContent(FriendlyByteBuf buf) {
         final String modID = DataHandler.readString(buf);
         final String uniqueID = DataHandler.readString(buf);
         byte[] data = deserializeFileContent(buf);
 
         AutoFileSyncEntry entry = AutoFileSyncEntry.findMatching(modID, uniqueID);
-        return new Triple<>(entry, data, new DataExchange.AutoSyncID(modID, uniqueID));
+        return new Triple<>(entry, data, new AutoSyncID(modID, uniqueID));
     }
 
 
@@ -108,7 +108,7 @@ class AutoFileSyncEntry extends DataExchange.AutoSyncID {
         return findMatching(hash.modID, hash.uniqueID);
     }
 
-    public static AutoFileSyncEntry findMatching(DataExchange.AutoSyncID aid) {
+    public static AutoFileSyncEntry findMatching(AutoSyncID aid) {
         return findMatching(aid.modID, aid.uniqueID);
     }
 

@@ -30,6 +30,11 @@ public final class ConfigKeeper {
 		return this.writer.getConfigFile();
 	}
 	
+	boolean compareAndUpdateForSync(JsonObject other) {
+		final JsonObject me = this.configObject;
+		return true;
+	}
+	
 	public void save() {
 		if (!changed) return;
 		this.writer.save();

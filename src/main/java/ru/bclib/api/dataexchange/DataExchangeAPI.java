@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.network.FriendlyByteBuf;
+import ru.bclib.api.dataexchange.handler.AutoSyncID;
 import ru.bclib.api.dataexchange.handler.DataExchange;
 import ru.bclib.config.Config;
 

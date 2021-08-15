@@ -1,31 +1,40 @@
 package ru.bclib.config;
 
+import com.google.gson.JsonObject;
 import org.jetbrains.annotations.Nullable;
 import ru.bclib.BCLib;
 import ru.bclib.api.dataexchange.DataExchangeAPI;
-import ru.bclib.api.dataexchange.handler.DataExchange;
+import ru.bclib.api.dataexchange.FileHash;
+import ru.bclib.api.dataexchange.handler.AutoSyncID;
+import ru.bclib.api.dataexchange.handler.FileContentWrapper;
 import ru.bclib.config.ConfigKeeper.BooleanEntry;
 import ru.bclib.config.ConfigKeeper.Entry;
 import ru.bclib.config.ConfigKeeper.FloatEntry;
 import ru.bclib.config.ConfigKeeper.IntegerEntry;
 import ru.bclib.config.ConfigKeeper.RangeEntry;
 import ru.bclib.config.ConfigKeeper.StringEntry;
+import ru.bclib.util.JsonFactory;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
 public abstract class Config {
-	protected final static Map<DataExchange.AutoSyncID, Config> autoSyncConfigs = new HashMap<>();
+	protected final static Map<AutoSyncID, Config> autoSyncConfigs = new HashMap<>();
 	protected final ConfigKeeper keeper;
 	protected final boolean autoSync;
 	protected abstract void registerEntries();
 
 	protected Config(String modID, String group) {
-		this(modID, group, true);
+		this(modID, group, true, false);
 	}
 	
-	protected Config(String modID, String group, boolean autoSync) {
+	protected Config(String modID, String group, boolean autoSync){
+		this(modID, group, autoSync, false);
+	}
+	
+	protected Config(String modID, String group, boolean autoSync, boolean diffContent) {
 		BCLib.LOGGER.info("Registered Config " + modID+"."+group+" ("+autoSync+")");
 		this.keeper = new ConfigKeeper(modID, group);
 		this.registerEntries();
@@ -33,16 +42,22 @@ public abstract class Config {
 
 		if (autoSync) {
 			final String uid = "CONFIG_" + modID + "_" + group;
-			final DataExchange.AutoSyncID aid = new DataExchange.AutoSyncID(BCLib.MOD_ID, uid);
-			DataExchangeAPI.addAutoSyncFile(aid.modID, aid.uniqueID, keeper.getConfigFile());
+			final AutoSyncID aid = new AutoSyncID(BCLib.MOD_ID, uid);
+			DataExchangeAPI.addAutoSyncFile(aid.modID, aid.uniqueID, keeper.getConfigFile(), this::compareForSync );
 			autoSyncConfigs.put(aid, this);
 		}
+	}
+	
+	private boolean compareForSync(FileHash fileHash, FileHash fileHash1, FileContentWrapper content) {
+		ByteArrayInputStream inputStream = content.getInputStream();
+		final JsonObject other = JsonFactory.getJsonObject(inputStream);
+		return this.keeper.compareAndUpdateForSync(other);
 	}
 	
 	public void saveChanges() {
 		this.keeper.save();
 	}
-	public static void reloadSyncedConfig(DataExchange.AutoSyncID aid, File file){
+	public static void reloadSyncedConfig(AutoSyncID aid, File file){
 		Config cfg =  autoSyncConfigs.get(aid);
 		if (cfg!=null) {
 			cfg.reload();
