@@ -101,6 +101,8 @@ public class SendFiles extends DataHandler {
 	protected void runOnGameThread(Minecraft client, MinecraftServer server, boolean isClient) {
 		if (acceptFiles()) {
 			BCLib.LOGGER.info("Writing Files:");
+			
+			//TODO: Reject files that were not in the last RequestFiles.
 			for (Pair<AutoFileSyncEntry, byte[]> entry : receivedFiles) {
 				final AutoFileSyncEntry e = entry.first;
 				final byte[] data = entry.second;
