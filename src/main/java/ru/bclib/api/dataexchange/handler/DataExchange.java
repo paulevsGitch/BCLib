@@ -136,10 +136,10 @@ abstract public class DataExchange {
 				fileWalker(localFolder.toFile(), p -> fileCache.add(new SubFile(localFolder.relativize(p)
 																						   .toString(), FileHash.create(p.toFile()))));
 				
-				//this tests if we can trick the system to load files that are not beneath the base-folder
+				/*//this tests if we can trick the system to load files that are not beneath the base-folder
 				if (!BCLib.isClient()) {
 					fileCache.add(new SubFile("../breakout.json", FileHash.create(mapAbsolute("../breakout.json").toFile())));
-				}
+				}*/
 			}
 		}
 		
