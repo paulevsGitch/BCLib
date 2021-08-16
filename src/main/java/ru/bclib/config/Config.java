@@ -50,7 +50,12 @@ public abstract class Config {
 		}
 	}
 	
-	private boolean compareForSync(SyncFileHash syncFileHash, SyncFileHash syncFileHash1, FileContentWrapper content) {
+	private boolean compareForSync(SyncFileHash clientHash, SyncFileHash serverHash, FileContentWrapper content) {
+		//identical hashes => nothing to do
+		if (clientHash.equals(serverHash)) {
+			return false;
+		}
+		
 		return keeper.compareAndUpdateForSync(content);
 	}
 	
