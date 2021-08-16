@@ -27,7 +27,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 abstract public class DataExchange {
@@ -133,7 +132,7 @@ abstract public class DataExchange {
 		public void loadCache() {
 			if (fileCache == null) {
 				fileCache = new ArrayList<>(8);
-				fileWalker(localFolder.toFile(), p -> fileCache.add(new SubFile(localFolder.relativize(p)
+				PathUtil.fileWalker(localFolder.toFile(), p -> fileCache.add(new SubFile(localFolder.relativize(p)
 																						   .toString(), FileHash.create(p.toFile()))));
 				
 				/*//this tests if we can trick the system to load files that are not beneath the base-folder
@@ -442,28 +441,6 @@ abstract public class DataExchange {
 		}
 		else {
 			BCLib.LOGGER.error(localBaseFolder + " (from " + folderID + ") is outside the game directory " + GAME_FOLDER + ". Sync is not allowed.");
-		}
-	}
-	
-	
-	/**
-	 * A simple directory walker that ignores dot-files
-	 *
-	 * @param path         The path where you want to start
-	 * @param pathConsumer The consumer called for each valid file. The consumer will get an absolute {@link Path}-Object
-	 *                     for each visited file
-	 */
-	public static void fileWalker(File path, Consumer<Path> pathConsumer) {
-		if (!path.exists()) return;
-		for (final File f : path.listFiles()) {
-			if (f.getName()
-				 .startsWith(".")) continue;
-			if (f.isDirectory()) {
-				fileWalker(f, pathConsumer);
-			}
-			else if (f.isFile()) {
-				pathConsumer.accept(f.toPath());
-			}
 		}
 	}
 }
