@@ -79,6 +79,11 @@ public class HelloServer extends DataHandler {
 		String localBclibVersion = HelloClient.getBCLibVersion();
 		BCLib.LOGGER.info("Received Hello from Client. (server="+localBclibVersion+", client="+bclibVersion+")");
 
+		if (!server.isPublished()){
+			BCLib.LOGGER.info("Auto-Sync is disabled for Singleplayer worlds.");
+			return;
+		}
+		
 		if (Configs.MAIN_CONFIG.getBoolean(Configs.MAIN_SYNC_CATEGORY, "enabled", true)) {
 			reply(new HelloClient(), server);
 		} else {
