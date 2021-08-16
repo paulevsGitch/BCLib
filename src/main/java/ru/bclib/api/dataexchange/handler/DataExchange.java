@@ -31,6 +31,9 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 abstract public class DataExchange {
+	private final Path GAME_FOLDER = FabricLoader.getInstance()
+												 .getGameDir()
+												 .normalize();
 	public final static SyncFolderDescriptor SYNC_FOLDER = new SyncFolderDescriptor("BCLIB-SYNC", FabricLoader.getInstance()
 																											  .getGameDir()
 																											  .resolve("bclib-sync")
@@ -119,8 +122,8 @@ abstract public class DataExchange {
 			return folderID.hashCode();
 		}
 		
-		public int fileCount(){
-			return fileCache==null?0:fileCache.size();
+		public int fileCount() {
+			return fileCache == null ? 0 : fileCache.size();
 		}
 		
 		public void invalidateCache() {
@@ -134,7 +137,7 @@ abstract public class DataExchange {
 																						   .toString(), FileHash.create(p.toFile()))));
 				
 				//this tests if we can trick the system to load files that are not beneath the base-folder
-				if (!BCLib.isClient()){
+				if (!BCLib.isClient()) {
 					fileCache.add(new SubFile("../breakout.json", FileHash.create(mapAbsolute("../breakout.json").toFile())));
 				}
 			}
@@ -149,7 +152,7 @@ abstract public class DataExchange {
 			buf.writeInt(fileCache.size());
 			fileCache.forEach(fl -> {
 				BCLib.LOGGER.info("      - " + fl.relPath);
-				if (debugHashes){
+				if (debugHashes) {
 					BCLib.LOGGER.info("        " + fl.hash);
 				}
 				fl.serialize(buf);
@@ -183,7 +186,10 @@ abstract public class DataExchange {
 		
 		//Note: make sure loadCache was called before using this
 		boolean hasRelativeFile(String relFile) {
-			return fileCache.stream().filter(sf -> sf.equals(relFile)).findFirst().isPresent();
+			return fileCache.stream()
+							.filter(sf -> sf.equals(relFile))
+							.findFirst()
+							.isPresent();
 		}
 		
 		//Note: make sure loadCache was called before using this
@@ -192,8 +198,11 @@ abstract public class DataExchange {
 		}
 		
 		//Note: make sure loadCache was called before using this
-		SubFile getLocalSubFile(String relPath){
-			return fileCache.stream().filter(sf -> sf.relPath.equals(relPath)).findFirst().orElse(null);
+		SubFile getLocalSubFile(String relPath) {
+			return fileCache.stream()
+							.filter(sf -> sf.relPath.equals(relPath))
+							.findFirst()
+							.orElse(null);
 		}
 		
 		Stream<SubFile> relativeFilesStream() {
@@ -202,22 +211,24 @@ abstract public class DataExchange {
 		}
 		
 		public Path mapAbsolute(String relPath) {
-			return this.localFolder.resolve(relPath).normalize();
+			return this.localFolder.resolve(relPath)
+								   .normalize();
 		}
 		
 		public Path mapAbsolute(SubFile subFile) {
-			return this.localFolder.resolve(subFile.relPath).normalize();
+			return this.localFolder.resolve(subFile.relPath)
+								   .normalize();
 		}
 		
-		public boolean acceptChildElements(Path absPath){
+		public boolean acceptChildElements(Path absPath) {
 			return PathUtil.isChildOf(this.localFolder, absPath);
 		}
 		
-		public boolean acceptChildElements(SubFile subFile){
+		public boolean acceptChildElements(SubFile subFile) {
 			return acceptChildElements(mapAbsolute(subFile));
 		}
 		
-		public boolean discardChildElements(SubFile subFile){
+		public boolean discardChildElements(SubFile subFile) {
 			return !acceptChildElements(subFile);
 		}
 	}
@@ -280,12 +291,7 @@ abstract public class DataExchange {
 	protected void initClientside() {
 		if (client != null) return;
 		client = clientSupplier(this);
-        /*ClientLoginConnectionEvents.INIT.register((a, b) ->{
-            System.out.println("INIT");
-        });
-        ClientLoginConnectionEvents.QUERY_START.register((a, b) ->{
-            System.out.println("INIT");
-        });*/
+		
 		ClientPlayConnectionEvents.INIT.register(client::onPlayInit);
 		ClientPlayConnectionEvents.JOIN.register(client::onPlayReady);
 		ClientPlayConnectionEvents.DISCONNECT.register(client::onPlayDisconnect);
@@ -424,12 +430,18 @@ abstract public class DataExchange {
 	}
 	
 	protected void registerSyncFolder(String folderID, Path localBaseFolder, boolean removeAdditionalFiles) {
-		final SyncFolderDescriptor desc = new SyncFolderDescriptor(folderID, localBaseFolder, removeAdditionalFiles);
-		if (this.syncFolderDescriptions.contains(desc)) {
-			BCLib.LOGGER.warning("Tried to override Folder Sync '" + folderID + "' again.");
+		localBaseFolder = localBaseFolder.normalize();
+		if (PathUtil.isChildOf(GAME_FOLDER, localBaseFolder)) {
+			final SyncFolderDescriptor desc = new SyncFolderDescriptor(folderID, localBaseFolder, removeAdditionalFiles);
+			if (this.syncFolderDescriptions.contains(desc)) {
+				BCLib.LOGGER.warning("Tried to override Folder Sync '" + folderID + "' again.");
+			}
+			else {
+				this.syncFolderDescriptions.add(desc);
+			}
 		}
 		else {
-			this.syncFolderDescriptions.add(desc);
+			BCLib.LOGGER.error(localBaseFolder + " (from " + folderID + ") is outside the game directory " + GAME_FOLDER + ". Sync is not allowed.");
 		}
 	}
 	
