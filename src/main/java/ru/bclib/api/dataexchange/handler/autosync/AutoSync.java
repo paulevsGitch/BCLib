@@ -29,43 +29,39 @@ public class AutoSync {
 	}
 	
 	@Environment(EnvType.CLIENT)
-	public static class ClientConfig {
-		@Environment(EnvType.CLIENT)
-		static boolean shouldClientConfigPrintDebugHashes() {
+	static class ClientConfig {
+		public static boolean shouldPrintDebugHashes() {
 			return Configs.CLIENT_CONFIG.getBoolean(MAIN_SYNC_CATEGORY, "debugHashes", true);
 		}
 		
-		@Environment(EnvType.CLIENT)
-		static boolean isClientConfigAllowingAutoSync() {
+		public static boolean isAllowingAutoSync() {
 			return Configs.CLIENT_CONFIG.getBoolean(MAIN_SYNC_CATEGORY, "enabled", true);
 		}
 		
-		@Environment(EnvType.CLIENT)
-		static boolean isClientConfigAcceptingFiles() {
-			return Configs.CLIENT_CONFIG.getBoolean(MAIN_SYNC_CATEGORY, "acceptFiles", true) && isClientConfigAllowingAutoSync();
+		public static boolean isAcceptingFiles() {
+			return Configs.CLIENT_CONFIG.getBoolean(MAIN_SYNC_CATEGORY, "acceptFiles", true) && isAllowingAutoSync();
 		}
 		
-		@Environment(EnvType.CLIENT)
-		static boolean isClientConfigAcceptingFolders() {
-			return Configs.CLIENT_CONFIG.getBoolean(MAIN_SYNC_CATEGORY, "acceptFolders", true) && isClientConfigAllowingAutoSync();
+		public static boolean isAcceptingFolders() {
+			return Configs.CLIENT_CONFIG.getBoolean(MAIN_SYNC_CATEGORY, "acceptFolders", true) && isAllowingAutoSync();
 		}
 	}
 	
-	public static class Config {
-		static boolean isAllowingAutoSync() {
+	static class Config {
+		public static boolean isAllowingAutoSync() {
 			return Configs.MAIN_CONFIG.getBoolean(MAIN_SYNC_CATEGORY, "enabled", true);
 		}
 		
-		static boolean isOfferingFiles() {
-			return Configs.MAIN_CONFIG.getBoolean(MAIN_SYNC_CATEGORY, "offerFiles", true) && ClientConfig.isClientConfigAllowingAutoSync();
+		public static boolean isOfferingFiles() {
+			return Configs.MAIN_CONFIG.getBoolean(MAIN_SYNC_CATEGORY, "offerFiles", true) && isAllowingAutoSync();
 		}
 		
-		static boolean isOfferingFolders() {
-			return Configs.MAIN_CONFIG.getBoolean(MAIN_SYNC_CATEGORY, "offerFolders", true) && ClientConfig.isClientConfigAllowingAutoSync();
+		public static boolean isOfferingFolders() {
+			return Configs.MAIN_CONFIG.getBoolean(MAIN_SYNC_CATEGORY, "offerFolders", true) && isAllowingAutoSync();
 		}
 		
-		static boolean isOfferingMods() {
-			return Configs.MAIN_CONFIG.getBoolean(MAIN_SYNC_CATEGORY, "offerMods", true) && ClientConfig.isClientConfigAllowingAutoSync();
+		public static boolean isOfferingMods() {
+			return Configs.MAIN_CONFIG.getBoolean(MAIN_SYNC_CATEGORY, "offerMods", true) && isAllowingAutoSync();
 		}
 	}
 	
