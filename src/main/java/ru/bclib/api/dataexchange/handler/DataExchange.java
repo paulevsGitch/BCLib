@@ -30,9 +30,7 @@ import java.util.function.BiConsumer;
 import java.util.stream.Stream;
 
 abstract public class DataExchange {
-	private final Path GAME_FOLDER = FabricLoader.getInstance()
-												 .getGameDir()
-												 .normalize();
+	
 	public final static SyncFolderDescriptor SYNC_FOLDER = new SyncFolderDescriptor("BCLIB-SYNC", FabricLoader.getInstance()
 																											  .getGameDir()
 																											  .resolve("bclib-sync")
@@ -430,7 +428,7 @@ abstract public class DataExchange {
 	
 	protected void registerSyncFolder(String folderID, Path localBaseFolder, boolean removeAdditionalFiles) {
 		localBaseFolder = localBaseFolder.normalize();
-		if (PathUtil.isChildOf(GAME_FOLDER, localBaseFolder)) {
+		if (PathUtil.isChildOf(PathUtil.GAME_FOLDER, localBaseFolder)) {
 			final SyncFolderDescriptor desc = new SyncFolderDescriptor(folderID, localBaseFolder, removeAdditionalFiles);
 			if (this.syncFolderDescriptions.contains(desc)) {
 				BCLib.LOGGER.warning("Tried to override Folder Sync '" + folderID + "' again.");
@@ -440,7 +438,7 @@ abstract public class DataExchange {
 			}
 		}
 		else {
-			BCLib.LOGGER.error(localBaseFolder + " (from " + folderID + ") is outside the game directory " + GAME_FOLDER + ". Sync is not allowed.");
+			BCLib.LOGGER.error(localBaseFolder + " (from " + folderID + ") is outside the game directory " + PathUtil.GAME_FOLDER + ". Sync is not allowed.");
 		}
 	}
 }
