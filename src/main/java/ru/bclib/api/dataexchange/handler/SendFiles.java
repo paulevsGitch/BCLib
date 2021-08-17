@@ -39,7 +39,18 @@ public class SendFiles extends DataHandler {
 	}
 
 	public static boolean acceptFiles() {
-		return Configs.CLIENT_CONFIG.getBoolean(Configs.MAIN_SYNC_CATEGORY, "acceptFiles", true);
+		return Configs.CLIENT_CONFIG.getBoolean(Configs.MAIN_SYNC_CATEGORY, "acceptFiles", true)
+			&& Configs.CLIENT_CONFIG.getBoolean(Configs.MAIN_SYNC_CATEGORY, "enabled", true);
+	}
+	
+	@Override
+	protected boolean prepareData(boolean isClient) {
+		if (!Configs.MAIN_CONFIG.getBoolean(Configs.MAIN_SYNC_CATEGORY, "enabled", true)) {
+			BCLib.LOGGER.info("Auto-Sync was disabled on the server.");
+			return false;
+		}
+		
+		return true;
 	}
 	
 	@Override

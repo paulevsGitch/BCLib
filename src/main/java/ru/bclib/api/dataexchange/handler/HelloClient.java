@@ -281,6 +281,10 @@ public class HelloClient extends DataHandler {
 	
 	@Override
 	protected void runOnGameThread(Minecraft client, MinecraftServer server, boolean isClient) {
+		if (!Configs.CLIENT_CONFIG.getBoolean(Configs.MAIN_SYNC_CATEGORY, "enabled", true)) {
+			BCLib.LOGGER.info("Auto-Sync was disabled on the client.");
+			return;
+		}
 		final String localBclibVersion = getBCLibVersion();
 		BCLib.LOGGER.info("Received Hello from Server. (client=" + localBclibVersion + ", server=" + bclibVersion + ")");
 		

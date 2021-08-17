@@ -8,6 +8,7 @@ import net.minecraft.server.MinecraftServer;
 import ru.bclib.BCLib;
 import ru.bclib.api.dataexchange.DataHandler;
 import ru.bclib.api.dataexchange.DataHandlerDescriptor;
+import ru.bclib.config.Configs;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +27,15 @@ public class RequestFiles extends DataHandler {
 	public RequestFiles(List<AutoSyncID> files) {
 		super(DESCRIPTOR.IDENTIFIER, false);
 		this.files = files;
+	}
+	
+	@Override
+	protected boolean prepareData(boolean isClient) {
+		if (!Configs.CLIENT_CONFIG.getBoolean(Configs.MAIN_SYNC_CATEGORY, "enabled", true)) {
+			BCLib.LOGGER.info("Auto-Sync was disabled on the client.");
+			return false;
+		}
+		return true;
 	}
 	
 	@Override
@@ -59,6 +69,11 @@ public class RequestFiles extends DataHandler {
 	
 	@Override
 	protected void runOnGameThread(Minecraft client, MinecraftServer server, boolean isClient) {
+		if (!Configs.MAIN_CONFIG.getBoolean(Configs.MAIN_SYNC_CATEGORY, "enabled", true)) {
+			BCLib.LOGGER.info("Auto-Sync was disabled on the server.");
+			return;
+		}
+		
 		List<AutoFileSyncEntry> syncEntries = files
 				.stream().map(asid -> AutoFileSyncEntry.findMatching(asid))
 				.filter(e -> e!=null)
