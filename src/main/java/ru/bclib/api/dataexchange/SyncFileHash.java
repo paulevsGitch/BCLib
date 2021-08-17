@@ -1,8 +1,8 @@
 package ru.bclib.api.dataexchange;
 
 import net.minecraft.network.FriendlyByteBuf;
-import ru.bclib.api.dataexchange.handler.AutoSyncID;
-import ru.bclib.api.dataexchange.handler.DataExchange;
+import ru.bclib.api.dataexchange.handler.autosync.AutoSync.NeedTransferPredicate;
+import ru.bclib.api.dataexchange.handler.autosync.AutoSyncID;
 
 import java.io.File;
 import java.util.Objects;
@@ -36,7 +36,7 @@ public class SyncFileHash extends AutoSyncID {
     }
 
    
-    final static DataExchange.NeedTransferPredicate NEED_TRANSFER = (clientHash, serverHash, content)-> !clientHash.equals(serverHash);
+    final static NeedTransferPredicate NEED_TRANSFER = (clientHash, serverHash, content)-> !clientHash.equals(serverHash);
     
     @Override
     public String toString() {

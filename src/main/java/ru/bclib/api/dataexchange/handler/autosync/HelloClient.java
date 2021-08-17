@@ -1,10 +1,8 @@
-package ru.bclib.api.dataexchange.handler;
+package ru.bclib.api.dataexchange.handler.autosync;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
-import net.fabricmc.loader.api.FabricLoader;
-import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.FriendlyByteBuf;
@@ -14,13 +12,15 @@ import ru.bclib.BCLib;
 import ru.bclib.api.dataexchange.DataExchangeAPI;
 import ru.bclib.api.dataexchange.DataHandler;
 import ru.bclib.api.dataexchange.DataHandlerDescriptor;
-import ru.bclib.api.dataexchange.handler.AutoSyncID.WithContentOverride;
-import ru.bclib.api.dataexchange.handler.DataExchange.SyncFolderDescriptor;
-import ru.bclib.api.dataexchange.handler.DataExchange.SyncFolderDescriptor.SubFile;
+import ru.bclib.api.dataexchange.handler.DataExchange;
+import ru.bclib.api.dataexchange.handler.autosync.AutoSync.ClientConfig;
+import ru.bclib.api.dataexchange.handler.autosync.AutoSync.Config;
+import ru.bclib.api.dataexchange.handler.autosync.AutoSyncID.WithContentOverride;
+import ru.bclib.api.dataexchange.handler.autosync.SyncFolderDescriptor.SubFile;
 import ru.bclib.api.datafixer.DataFixerAPI;
-import ru.bclib.config.Configs;
 import ru.bclib.gui.screens.SyncFilesScreen;
 import ru.bclib.gui.screens.WarnBCLibVersionMismatch;
+import ru.bclib.util.PathUtil;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -28,7 +28,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -44,36 +43,18 @@ public class HelloClient extends DataHandler {
 		super(DESCRIPTOR.IDENTIFIER, true);
 	}
 	
-	public static ModContainer getModContainer(String modID) {
-		Optional<ModContainer> optional = FabricLoader.getInstance()
-													  .getModContainer(modID);
-		return optional.orElse(null);
-	}
-	
-	public static String getModVersion(String modID) {
-		Optional<ModContainer> optional = FabricLoader.getInstance()
-													  .getModContainer(modID);
-		if (optional.isPresent()) {
-			ModContainer modContainer = optional.get();
-			return modContainer.getMetadata()
-							   .getVersion()
-							   .toString();
-		}
-		return "0.0.0";
-	}
-	
 	static String getBCLibVersion() {
-		return getModVersion(BCLib.MOD_ID);
+		return PathUtil.getModVersion(BCLib.MOD_ID);
 	}
 	
 	@Override
 	protected boolean prepareData(boolean isClient) {
-		if (!Configs.MAIN_CONFIG.getBoolean(Configs.MAIN_SYNC_CATEGORY, "enabled", true)) {
+		if (!Config.isAllowingAutoSync()) {
 			BCLib.LOGGER.info("Auto-Sync was disabled on the server.");
 			return false;
 		}
 		
-		DataExchange.getInstance().loadSyncFolder();
+		AutoSync.loadSyncFolder();
 		return true;
 	}
 	
@@ -86,12 +67,12 @@ public class HelloClient extends DataHandler {
 		//write BCLibVersion (=protocol version)
 		buf.writeInt(DataFixerAPI.getModVersion(vbclib));
 		
-		if (Configs.MAIN_CONFIG.getBoolean(Configs.MAIN_SYNC_CATEGORY, "offerMods", true)) {
+		if (Config.isOfferingMods()) {
 			//write Plugin Versions
 			buf.writeInt(mods.size());
 			for (String modID : mods) {
 				writeString(buf, modID);
-				final String ver = getModVersion(modID);
+				final String ver = PathUtil.getModVersion(modID);
 				buf.writeInt(DataFixerAPI.getModVersion(ver));
 				BCLib.LOGGER.info("    - Listing Mod " + modID + " v" + ver);
 			}
@@ -101,9 +82,9 @@ public class HelloClient extends DataHandler {
 			buf.writeInt(0);
 		}
 		
-		if (Configs.MAIN_CONFIG.getBoolean(Configs.MAIN_SYNC_CATEGORY, "offerFiles", true)) {
+		if (Config.isOfferingFiles()) {
 			//do only include files that exist on the server
-			final List<AutoFileSyncEntry> existingAutoSyncFiles = DataExchange.getInstance()
+			final List<AutoFileSyncEntry> existingAutoSyncFiles = AutoSync
 																			  .getAutoSyncFiles()
 																			  .stream()
 																			  .filter(e -> e.fileName.exists())
@@ -121,9 +102,9 @@ public class HelloClient extends DataHandler {
 			buf.writeInt(0);
 		}
 		
-		if (Configs.MAIN_CONFIG.getBoolean(Configs.MAIN_SYNC_CATEGORY, "offersSyncFolders", true)) {
-			buf.writeInt(((DataExchange) DataExchange.getInstance()).syncFolderDescriptions.size());
-			((DataExchange) DataExchange.getInstance()).syncFolderDescriptions.forEach(desc -> {
+		if (Config.isOfferingFolders()) {
+			buf.writeInt(AutoSync.syncFolderDescriptions.size());
+			AutoSync.syncFolderDescriptions.forEach(desc -> {
 				BCLib.LOGGER.info("    - Offering Folder " + desc.localFolder + " (allowDelete=" + desc.removeAdditionalFiles + ")");
 				desc.serialize(buf);
 			});
@@ -132,12 +113,11 @@ public class HelloClient extends DataHandler {
 			BCLib.LOGGER.info("Server will not offer Sync Folders.");
 			buf.writeInt(0);
 		}
-		Configs.MAIN_CONFIG.saveChanges();
 	}
 	
 	String bclibVersion = "0.0.0";
 	Map<String, String> modVersion = new HashMap<>();
-	List<DataExchange.AutoSyncTriple> autoSyncedFiles = null;
+	List<AutoSync.AutoSyncTriple> autoSyncedFiles = null;
 	List<SyncFolderDescriptor> autoSynFolders = null;
 	
 	@Override
@@ -159,7 +139,7 @@ public class HelloClient extends DataHandler {
 		autoSyncedFiles = new ArrayList<>(count);
 		for (int i = 0; i < count; i++) {
 			//System.out.println("Deserializing ");
-			DataExchange.AutoSyncTriple t = AutoFileSyncEntry.deserializeAndMatch(buf);
+			AutoSync.AutoSyncTriple t = AutoFileSyncEntry.deserializeAndMatch(buf);
 			autoSyncedFiles.add(t);
 			//System.out.println(t.first);
 		}
@@ -177,7 +157,7 @@ public class HelloClient extends DataHandler {
 	}
 	
 	private void processAutoSyncFolder(final List<AutoSyncID> filesToRequest, final List<AutoSyncID.ForDirectFileRequest> filesToRemove) {
-		if (!Configs.CLIENT_CONFIG.getBoolean(Configs.MAIN_SYNC_CATEGORY, "syncFolders", true)) {
+		if (!ClientConfig.isClientConfigAcceptingFolders()) {
 			return;
 		}
 		
@@ -187,7 +167,7 @@ public class HelloClient extends DataHandler {
 		
 		autoSynFolders.forEach(desc -> {
 			//desc contains the fileCache sent from the server, load the local version to get hold of the actual file cache on the client
-			SyncFolderDescriptor localDescriptor = DataExchange.getSyncFolderDescriptor(desc.folderID);
+			SyncFolderDescriptor localDescriptor = AutoSync.getSyncFolderDescriptor(desc.folderID);
 			if (localDescriptor != null) {
 				BCLib.LOGGER.info("    - " + desc.folderID + " (" + desc.localFolder + ", allowRemove=" + desc.removeAdditionalFiles + ")");
 				localDescriptor.invalidateCache();
@@ -220,7 +200,8 @@ public class HelloClient extends DataHandler {
 							if (!localSubFile.hash.equals(subFile.hash)) {
 								BCLib.LOGGER.info("       * " + subFile.relPath + " (changed)");
 								filesToRequest.add(new AutoSyncID.ForDirectFileRequest(desc.folderID, new File(subFile.relPath)));
-							} else {
+							}
+							else {
 								BCLib.LOGGER.info("       * " + subFile.relPath);
 							}
 						}
@@ -241,7 +222,7 @@ public class HelloClient extends DataHandler {
 	}
 	
 	private void processSingleFileSync(final List<AutoSyncID> filesToRequest) {
-		final boolean debugHashes = Configs.CLIENT_CONFIG.getBoolean(Configs.MAIN_SYNC_CATEGORY, "debugHashes", false);
+		final boolean debugHashes = ClientConfig.shouldClientConfigPrintDebugHashes();
 		
 		if (autoSyncedFiles.size() > 0) {
 			BCLib.LOGGER.info("Files offered by Server:");
@@ -251,7 +232,7 @@ public class HelloClient extends DataHandler {
 		//Single files need to be registered for sync on both client and server
 		//There are no restrictions to the target folder, but the client decides the final
 		//location.
-		for (DataExchange.AutoSyncTriple e : autoSyncedFiles) {
+		for (AutoSync.AutoSyncTriple e : autoSyncedFiles) {
 			String actionString = "";
 			FileContentWrapper contentWrapper = new FileContentWrapper(e.serverContent);
 			if (e.localMatch == null) {
@@ -281,7 +262,7 @@ public class HelloClient extends DataHandler {
 	
 	@Override
 	protected void runOnGameThread(Minecraft client, MinecraftServer server, boolean isClient) {
-		if (!Configs.CLIENT_CONFIG.getBoolean(Configs.MAIN_SYNC_CATEGORY, "enabled", true)) {
+		if (!ClientConfig.isClientConfigAllowingAutoSync()) {
 			BCLib.LOGGER.info("Auto-Sync was disabled on the client.");
 			return;
 		}
@@ -297,7 +278,7 @@ public class HelloClient extends DataHandler {
 		final List<AutoSyncID.ForDirectFileRequest> filesToRemove = new ArrayList<>(2);
 		
 		for (Entry<String, String> e : modVersion.entrySet()) {
-			String ver = getModVersion(e.getKey());
+			String ver = PathUtil.getModVersion(e.getKey());
 			BCLib.LOGGER.info("    - " + e.getKey() + " (client=" + ver + ", server=" + ver + ")");
 		}
 		
@@ -308,7 +289,7 @@ public class HelloClient extends DataHandler {
 		//Both client and server need to know about the folder you want to sync
 		//Files can only get placed within that folder
 		
-		if ((filesToRequest.size() > 0 || filesToRemove.size() > 0) && SendFiles.acceptFiles()) {
+		if ((filesToRequest.size() > 0 || filesToRemove.size() > 0) && ClientConfig.isClientConfigAcceptingFiles()) {
 			showDownloadConfigs(client, filesToRequest, filesToRemove);
 			return;
 		}

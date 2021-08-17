@@ -1,6 +1,7 @@
 package ru.bclib.util;
 
 import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.fabricmc.loader.metadata.ModMetadataParser;
 import net.fabricmc.loader.metadata.ParseMetadataException;
@@ -15,6 +16,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.jar.JarFile;
 
@@ -126,5 +128,23 @@ public class PathUtil {
 		}));
 		
 		return mods;
+	}
+	
+	public static String getModVersion(String modID) {
+		Optional<ModContainer> optional = FabricLoader.getInstance()
+													  .getModContainer(modID);
+		if (optional.isPresent()) {
+			ModContainer modContainer = optional.get();
+			return modContainer.getMetadata()
+							   .getVersion()
+							   .toString();
+		}
+		return "0.0.0";
+	}
+	
+	public static ModContainer getModContainer(String modID) {
+		Optional<ModContainer> optional = FabricLoader.getInstance()
+													  .getModContainer(modID);
+		return optional.orElse(null);
 	}
 }

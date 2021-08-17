@@ -1,4 +1,4 @@
-package ru.bclib.api.dataexchange.handler;
+package ru.bclib.api.dataexchange.handler.autosync;
 
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.client.Minecraft;
@@ -8,7 +8,8 @@ import net.minecraft.server.MinecraftServer;
 import ru.bclib.BCLib;
 import ru.bclib.api.dataexchange.DataHandler;
 import ru.bclib.api.dataexchange.DataHandlerDescriptor;
-import ru.bclib.config.Configs;
+import ru.bclib.api.dataexchange.handler.autosync.AutoSync.ClientConfig;
+import ru.bclib.api.dataexchange.handler.autosync.AutoSync.Config;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +21,8 @@ public class RequestFiles extends DataHandler {
 	static String currentToken = "";
 	
 	protected List<AutoSyncID> files;
-	private RequestFiles(){
+	
+	private RequestFiles() {
 		this(null);
 	}
 	
@@ -31,7 +33,7 @@ public class RequestFiles extends DataHandler {
 	
 	@Override
 	protected boolean prepareData(boolean isClient) {
-		if (!Configs.CLIENT_CONFIG.getBoolean(Configs.MAIN_SYNC_CATEGORY, "enabled", true)) {
+		if (!ClientConfig.isClientConfigAllowingAutoSync()) {
 			BCLib.LOGGER.info("Auto-Sync was disabled on the client.");
 			return false;
 		}
@@ -42,15 +44,16 @@ public class RequestFiles extends DataHandler {
 	protected void serializeData(FriendlyByteBuf buf, boolean isClient) {
 		newToken();
 		writeString(buf, currentToken);
-
+		
 		buf.writeInt(files.size());
 		
-		for (AutoSyncID a : files){
+		for (AutoSyncID a : files) {
 			a.serializeData(buf);
 		}
 	}
-
+	
 	String receivedToken = "";
+	
 	@Override
 	protected void deserializeFromIncomingData(FriendlyByteBuf buf, PacketSender responseSender, boolean fromClient) {
 		receivedToken = readString(buf);
@@ -58,7 +61,7 @@ public class RequestFiles extends DataHandler {
 		files = new ArrayList<>(size);
 		
 		BCLib.LOGGER.info("Client requested " + size + " Files:");
-		for (int i=0; i<size; i++){
+		for (int i = 0; i < size; i++) {
 			AutoSyncID asid = AutoSyncID.deserializeData(buf);
 			files.add(asid);
 			BCLib.LOGGER.info("    - " + asid);
@@ -69,23 +72,24 @@ public class RequestFiles extends DataHandler {
 	
 	@Override
 	protected void runOnGameThread(Minecraft client, MinecraftServer server, boolean isClient) {
-		if (!Configs.MAIN_CONFIG.getBoolean(Configs.MAIN_SYNC_CATEGORY, "enabled", true)) {
+		if (!Config.isAllowingAutoSync()) {
 			BCLib.LOGGER.info("Auto-Sync was disabled on the server.");
 			return;
 		}
 		
-		List<AutoFileSyncEntry> syncEntries = files
-				.stream().map(asid -> AutoFileSyncEntry.findMatching(asid))
-				.filter(e -> e!=null)
-				.collect(Collectors.toList());
-
+		List<AutoFileSyncEntry> syncEntries = files.stream()
+												   .map(asid -> AutoFileSyncEntry.findMatching(asid))
+												   .filter(e -> e != null)
+												   .collect(Collectors.toList());
+		
 		reply(new SendFiles(syncEntries, receivedToken), server);
 	}
-
-	public static void newToken(){
-		currentToken =  UUID.randomUUID().toString();
+	
+	public static void newToken() {
+		currentToken = UUID.randomUUID()
+						   .toString();
 	}
-
+	
 	static {
 		newToken();
 	}

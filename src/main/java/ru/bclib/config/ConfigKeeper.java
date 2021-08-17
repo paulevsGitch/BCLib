@@ -6,7 +6,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.util.GsonHelper;
 import org.jetbrains.annotations.Nullable;
-import ru.bclib.api.dataexchange.handler.FileContentWrapper;
+import ru.bclib.api.dataexchange.handler.autosync.FileContentWrapper;
 import ru.bclib.util.JsonFactory;
 import ru.bclib.util.Pair;
 

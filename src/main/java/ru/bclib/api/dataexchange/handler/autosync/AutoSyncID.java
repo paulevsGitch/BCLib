@@ -1,4 +1,4 @@
-package ru.bclib.api.dataexchange.handler;
+package ru.bclib.api.dataexchange.handler.autosync;
 
 import net.minecraft.network.FriendlyByteBuf;
 import org.jetbrains.annotations.NotNull;

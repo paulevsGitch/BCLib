@@ -1,4 +1,4 @@
-package ru.bclib.api.dataexchange.handler;
+package ru.bclib.api.dataexchange.handler.autosync;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -11,7 +11,9 @@ import net.minecraft.server.MinecraftServer;
 import ru.bclib.BCLib;
 import ru.bclib.api.dataexchange.DataHandler;
 import ru.bclib.api.dataexchange.DataHandlerDescriptor;
-import ru.bclib.config.Configs;
+import ru.bclib.api.dataexchange.handler.DataExchange;
+import ru.bclib.api.dataexchange.handler.autosync.AutoSync.ClientConfig;
+import ru.bclib.api.dataexchange.handler.autosync.AutoSync.Config;
 import ru.bclib.gui.screens.ConfirmRestartScreen;
 import ru.bclib.util.Pair;
 import ru.bclib.util.Triple;
@@ -26,26 +28,23 @@ import java.util.stream.Collectors;
 
 public class SendFiles extends DataHandler {
 	public static DataHandlerDescriptor DESCRIPTOR = new DataHandlerDescriptor(new ResourceLocation(BCLib.MOD_ID, "send_files"), SendFiles::new, false, false);
-
+	
 	protected List<AutoFileSyncEntry> files;
 	private String token = "";
-	public SendFiles(){
+	
+	public SendFiles() {
 		this(null, "");
 	}
+	
 	public SendFiles(List<AutoFileSyncEntry> files, String token) {
 		super(DESCRIPTOR.IDENTIFIER, true);
 		this.files = files;
 		this.token = token;
 	}
-
-	public static boolean acceptFiles() {
-		return Configs.CLIENT_CONFIG.getBoolean(Configs.MAIN_SYNC_CATEGORY, "acceptFiles", true)
-			&& Configs.CLIENT_CONFIG.getBoolean(Configs.MAIN_SYNC_CATEGORY, "enabled", true);
-	}
 	
 	@Override
 	protected boolean prepareData(boolean isClient) {
-		if (!Configs.MAIN_CONFIG.getBoolean(Configs.MAIN_SYNC_CATEGORY, "enabled", true)) {
+		if (!Config.isAllowingAutoSync()) {
 			BCLib.LOGGER.info("Auto-Sync was disabled on the server.");
 			return false;
 		}
@@ -55,7 +54,9 @@ public class SendFiles extends DataHandler {
 	
 	@Override
 	protected void serializeData(FriendlyByteBuf buf, boolean isClient) {
-		List<AutoFileSyncEntry> existingFiles = files.stream().filter(e -> e.fileName.exists()).collect(Collectors.toList());
+		List<AutoFileSyncEntry> existingFiles = files.stream()
+													 .filter(e -> e.fileName.exists())
+													 .collect(Collectors.toList());
 		/*
 		//this will try to send a file that was not registered or requested by the client
 		existingFiles.add(new AutoFileSyncEntry("none", new File("D:\\MinecraftPlugins\\BetterNether\\run\\server.properties"),true,(a, b, content) -> {
@@ -72,18 +73,19 @@ public class SendFiles extends DataHandler {
 		
 		writeString(buf, token);
 		buf.writeInt(existingFiles.size());
-
+		
 		BCLib.LOGGER.info("Sending " + existingFiles.size() + " Files to Client:");
 		for (AutoFileSyncEntry entry : existingFiles) {
 			int length = entry.serializeContent(buf);
 			BCLib.LOGGER.info("    - " + entry + " (" + length + " Bytes)");
 		}
 	}
-
+	
 	private List<Pair<AutoFileSyncEntry, byte[]>> receivedFiles;
+	
 	@Override
 	protected void deserializeFromIncomingData(FriendlyByteBuf buf, PacketSender responseSender, boolean fromClient) {
-		if (acceptFiles()) {
+		if (ClientConfig.isClientConfigAcceptingFiles()) {
 			token = readString(buf);
 			if (!token.equals(RequestFiles.currentToken)) {
 				RequestFiles.newToken();
@@ -92,7 +94,7 @@ public class SendFiles extends DataHandler {
 				return;
 			}
 			RequestFiles.newToken();
-
+			
 			int size = buf.readInt();
 			receivedFiles = new ArrayList<>(size);
 			BCLib.LOGGER.info("Server sent " + size + " Files:");
@@ -101,7 +103,8 @@ public class SendFiles extends DataHandler {
 				if (p.first != null) {
 					receivedFiles.add(p);
 					BCLib.LOGGER.info("    - " + p.first + " (" + p.second.length + " Bytes)");
-				} else {
+				}
+				else {
 					BCLib.LOGGER.error("   - Failed to receive File " + p.third + ", possibly sent from a Mod that is not installed on the client.");
 				}
 			}
@@ -110,7 +113,7 @@ public class SendFiles extends DataHandler {
 	
 	@Override
 	protected void runOnGameThread(Minecraft client, MinecraftServer server, boolean isClient) {
-		if (acceptFiles()) {
+		if (ClientConfig.isClientConfigAcceptingFiles()) {
 			BCLib.LOGGER.info("Writing Files:");
 			
 			//TODO: Reject files that were not in the last RequestFiles.
@@ -120,7 +123,7 @@ public class SendFiles extends DataHandler {
 				
 				writeSyncedFile(e, data, e.fileName);
 			}
-
+			
 			showConfirmRestart(client);
 		}
 	}
@@ -130,23 +133,25 @@ public class SendFiles extends DataHandler {
 		BCLib.LOGGER.info("    - Writing " + path + " (" + data.length + " Bytes)");
 		try {
 			final File parentFile = path.getParent()
-								  .toFile();
-			if (!parentFile.exists()){
+										.toFile();
+			if (!parentFile.exists()) {
 				parentFile.mkdirs();
 			}
 			Files.write(path, data);
-			DataExchange.didReceiveFile(e, fileName);
-		} catch (IOException ioException) {
+			AutoSync.didReceiveFile(e, fileName);
+		}
+		catch (IOException ioException) {
 			BCLib.LOGGER.error("    --> Writing " + fileName + " failed: " + ioException);
 		}
 	}
 	
 	@Environment(EnvType.CLIENT)
-	protected void showConfirmRestart(Minecraft client){
+	protected void showConfirmRestart(Minecraft client) {
 		client.setScreen(new ConfirmRestartScreen(() -> {
-			Minecraft.getInstance().setScreen((Screen)null);
+			Minecraft.getInstance()
+					 .setScreen((Screen) null);
 			client.stop();
 		}));
-
+		
 	}
 }

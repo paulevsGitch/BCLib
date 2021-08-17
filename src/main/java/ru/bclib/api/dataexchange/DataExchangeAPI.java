@@ -4,7 +4,9 @@ import com.google.common.collect.Lists;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.network.FriendlyByteBuf;
-import ru.bclib.api.dataexchange.handler.AutoSyncID;
+import ru.bclib.api.dataexchange.handler.autosync.AutoSync;
+import ru.bclib.api.dataexchange.handler.autosync.AutoSync.NeedTransferPredicate;
+import ru.bclib.api.dataexchange.handler.autosync.AutoSyncID;
 import ru.bclib.api.dataexchange.handler.DataExchange;
 import ru.bclib.config.Config;
 
@@ -98,7 +100,7 @@ public class DataExchangeAPI extends DataExchange {
 	 * @param fileName The name of the File
 	 */
 	public static void addAutoSyncFile(String modID, File fileName) {
-		getInstance().addAutoSyncFileData(modID, fileName, false, SyncFileHash.NEED_TRANSFER);
+		AutoSync.addAutoSyncFileData(modID, fileName, false, SyncFileHash.NEED_TRANSFER);
 	}
 	
 	/**
@@ -113,7 +115,7 @@ public class DataExchangeAPI extends DataExchange {
 	 * @param fileName The name of the File
 	 */
 	public static void addAutoSyncFile(String modID, String uniqueID, File fileName) {
-		getInstance().addAutoSyncFileData(modID, uniqueID, fileName, false, SyncFileHash.NEED_TRANSFER);
+		AutoSync.addAutoSyncFileData(modID, uniqueID, fileName, false, SyncFileHash.NEED_TRANSFER);
 	}
 	
 	/**
@@ -131,7 +133,7 @@ public class DataExchangeAPI extends DataExchange {
 	 * @param needTransfer If the predicate returns true, the file needs to get copied to the server.
 	 */
 	public static void addAutoSyncFile(String modID, File fileName, NeedTransferPredicate needTransfer) {
-		getInstance().addAutoSyncFileData(modID, fileName, true, needTransfer);
+		AutoSync.addAutoSyncFileData(modID, fileName, true, needTransfer);
 	}
 	
 	/**
@@ -151,7 +153,7 @@ public class DataExchangeAPI extends DataExchange {
 	 * @param needTransfer If the predicate returns true, the file needs to get copied to the server.
 	 */
 	public static void addAutoSyncFile(String modID, String uniqueID, File fileName, NeedTransferPredicate needTransfer) {
-		getInstance().addAutoSyncFileData(modID, uniqueID, fileName, true, needTransfer);
+		AutoSync.addAutoSyncFileData(modID, uniqueID, fileName, true, needTransfer);
 	}
 	
 	/**
@@ -163,7 +165,7 @@ public class DataExchangeAPI extends DataExchange {
 	 * @param callback A Function that receives the AutoSyncID as well as the Filename.
 	 */
 	public static void addOnWriteCallback(BiConsumer<AutoSyncID, File> callback) {
-		onWriteCallbacks.add(callback);
+		AutoSync.addOnWriteCallback(callback);
 	}
 	
 	/**
@@ -175,7 +177,7 @@ public class DataExchangeAPI extends DataExchange {
 	 * @return The path to the sync-folder
 	 */
 	public static File getModSyncFolder(String modID) {
-		File fl = SYNC_FOLDER.localFolder.resolve(modID.replace(".", "-")
+		File fl = AutoSync.SYNC_FOLDER.localFolder.resolve(modID.replace(".", "-")
 													   .replace(":", "-")
 													   .replace("\\", "-")
 													   .replace("/", "-"))

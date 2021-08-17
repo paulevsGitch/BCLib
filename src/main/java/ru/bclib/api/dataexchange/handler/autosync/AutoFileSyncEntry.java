@@ -1,10 +1,10 @@
-package ru.bclib.api.dataexchange.handler;
+package ru.bclib.api.dataexchange.handler.autosync;
 
 import net.minecraft.network.FriendlyByteBuf;
 import ru.bclib.api.dataexchange.DataHandler;
 import ru.bclib.api.dataexchange.SyncFileHash;
-import ru.bclib.api.dataexchange.handler.DataExchange.SyncFolderDescriptor;
-import ru.bclib.api.dataexchange.handler.DataExchange.SyncFolderDescriptor.SubFile;
+import ru.bclib.api.dataexchange.handler.autosync.AutoSync.NeedTransferPredicate;
+import ru.bclib.api.dataexchange.handler.autosync.SyncFolderDescriptor.SubFile;
 import ru.bclib.util.Pair;
 import ru.bclib.util.Triple;
 
@@ -14,7 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 class AutoFileSyncEntry extends AutoSyncID {
-	static class ForDirectFileRequest extends  AutoFileSyncEntry {
+	static class ForDirectFileRequest extends AutoFileSyncEntry {
 		final File relFile;
 		
 		ForDirectFileRequest(String syncID, File relFile, File absFile) {
@@ -30,10 +30,10 @@ class AutoFileSyncEntry extends AutoSyncID {
 			return res;
 		}
 		
-		static AutoFileSyncEntry.ForDirectFileRequest finishDeserializeContent(String syncID, FriendlyByteBuf buf){
+		static AutoFileSyncEntry.ForDirectFileRequest finishDeserializeContent(String syncID, FriendlyByteBuf buf) {
 			final String relFile = DataHandler.readString(buf);
-			SyncFolderDescriptor desc = DataExchange.getSyncFolderDescriptor(syncID);
-			if (desc!=null) {
+			SyncFolderDescriptor desc = AutoSync.getSyncFolderDescriptor(syncID);
+			if (desc != null) {
 				//ensures that the file is not above the base-folder
 				if (desc.acceptChildElements(desc.mapAbsolute(relFile))) {
 					return new AutoFileSyncEntry.ForDirectFileRequest(syncID, new File(relFile), desc.localFolder.resolve(relFile)
@@ -49,16 +49,17 @@ class AutoFileSyncEntry extends AutoSyncID {
 			return uniqueID + " - " + relFile;
 		}
 	}
-	public final DataExchange.NeedTransferPredicate needTransfer;
+	
+	public final NeedTransferPredicate needTransfer;
 	public final File fileName;
 	public final boolean requestContent;
 	private SyncFileHash hash;
 	
-	AutoFileSyncEntry(String modID, File fileName, boolean requestContent, DataExchange.NeedTransferPredicate needTransfer) {
+	AutoFileSyncEntry(String modID, File fileName, boolean requestContent, NeedTransferPredicate needTransfer) {
 		this(modID, fileName.getName(), fileName, requestContent, needTransfer);
 	}
 	
-	AutoFileSyncEntry(String modID, String uniqueID, File fileName, boolean requestContent, DataExchange.NeedTransferPredicate needTransfer) {
+	AutoFileSyncEntry(String modID, String uniqueID, File fileName, boolean requestContent, NeedTransferPredicate needTransfer) {
 		super(modID, uniqueID);
 		this.needTransfer = needTransfer;
 		this.fileName = fileName;
@@ -97,9 +98,10 @@ class AutoFileSyncEntry extends AutoSyncID {
 		byte[] data = deserializeFileContent(buf);
 		
 		AutoFileSyncEntry entry;
-		if (AutoSyncID.ForDirectFileRequest.MOD_ID.equals(modID)){
+		if (AutoSyncID.ForDirectFileRequest.MOD_ID.equals(modID)) {
 			entry = AutoFileSyncEntry.ForDirectFileRequest.finishDeserializeContent(uniqueID, buf);
-		} else {
+		}
+		else {
 			entry = AutoFileSyncEntry.findMatching(modID, uniqueID);
 		}
 		return new Triple<>(entry, data, new AutoSyncID(modID, uniqueID));
@@ -115,10 +117,10 @@ class AutoFileSyncEntry extends AutoSyncID {
 		}
 	}
 	
-	public static DataExchange.AutoSyncTriple deserializeAndMatch(FriendlyByteBuf buf) {
+	public static AutoSync.AutoSyncTriple deserializeAndMatch(FriendlyByteBuf buf) {
 		Pair<SyncFileHash, byte[]> e = deserialize(buf);
 		AutoFileSyncEntry match = findMatching(e.first);
-		return new DataExchange.AutoSyncTriple(e.first, e.second, match);
+		return new AutoSync.AutoSyncTriple(e.first, e.second, match);
 	}
 	
 	public static Pair<SyncFileHash, byte[]> deserialize(FriendlyByteBuf buf) {
@@ -154,15 +156,13 @@ class AutoFileSyncEntry extends AutoSyncID {
 	public static AutoFileSyncEntry findMatching(AutoSyncID aid) {
 		if (aid instanceof AutoSyncID.ForDirectFileRequest) {
 			AutoSyncID.ForDirectFileRequest freq = (AutoSyncID.ForDirectFileRequest) aid;
-			SyncFolderDescriptor desc = DataExchange.getSyncFolderDescriptor(freq.uniqueID);
+			SyncFolderDescriptor desc = AutoSync.getSyncFolderDescriptor(freq.uniqueID);
 			if (desc != null) {
 				SubFile subFile = desc.getLocalSubFile(freq.relFile.toString());
 				if (subFile != null) {
-					final File absPath = desc
-						.localFolder
-						.resolve(subFile.relPath)
-						.normalize()
-						.toFile();
+					final File absPath = desc.localFolder.resolve(subFile.relPath)
+														 .normalize()
+														 .toFile();
 					return new AutoFileSyncEntry.ForDirectFileRequest(freq.uniqueID, new File(subFile.relPath), absPath);
 				}
 			}
@@ -172,11 +172,10 @@ class AutoFileSyncEntry extends AutoSyncID {
 	}
 	
 	public static AutoFileSyncEntry findMatching(String modID, String uniqueID) {
-		return DataExchange.getInstance()
-						   .getAutoSyncFiles()
-						   .stream()
-						   .filter(asf -> asf.modID.equals(modID) && asf.uniqueID.equals(uniqueID))
-						   .findFirst()
-						   .orElse(null);
+		return AutoSync.getAutoSyncFiles()
+					   .stream()
+					   .filter(asf -> asf.modID.equals(modID) && asf.uniqueID.equals(uniqueID))
+					   .findFirst()
+					   .orElse(null);
 	}
 }

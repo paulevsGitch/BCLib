@@ -4,255 +4,17 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
-import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.network.FriendlyByteBuf;
-import org.jetbrains.annotations.NotNull;
-import ru.bclib.BCLib;
 import ru.bclib.api.dataexchange.ConnectorClientside;
 import ru.bclib.api.dataexchange.ConnectorServerside;
 import ru.bclib.api.dataexchange.DataExchangeAPI;
 import ru.bclib.api.dataexchange.DataHandler;
 import ru.bclib.api.dataexchange.DataHandlerDescriptor;
-import ru.bclib.api.dataexchange.FileHash;
-import ru.bclib.api.dataexchange.SyncFileHash;
-import ru.bclib.api.dataexchange.handler.AutoSyncID.ForDirectFileRequest;
-import ru.bclib.config.Configs;
-import ru.bclib.util.PathUtil;
 
-import java.io.File;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-import java.util.function.BiConsumer;
-import java.util.stream.Stream;
 
 abstract public class DataExchange {
 	
-	public final static SyncFolderDescriptor SYNC_FOLDER = new SyncFolderDescriptor("BCLIB-SYNC", FabricLoader.getInstance()
-																											  .getGameDir()
-																											  .resolve("bclib-sync")
-																											  .normalize()
-																											  .toAbsolutePath(), true);
-	final List<SyncFolderDescriptor> syncFolderDescriptions = Arrays.asList(SYNC_FOLDER);
-	
-	public static class SyncFolderDescriptor {
-		static class SubFile {
-			public final String relPath;
-			public final FileHash hash;
-			
-			
-			SubFile(String relPath, FileHash hash) {
-				this.relPath = relPath;
-				this.hash = hash;
-			}
-			
-			@Override
-			public String toString() {
-				return relPath;
-			}
-			
-			public void serialize(FriendlyByteBuf buf) {
-				DataHandler.writeString(buf, relPath);
-				hash.serialize(buf);
-			}
-			
-			public static SubFile deserialize(FriendlyByteBuf buf) {
-				final String relPath = DataHandler.readString(buf);
-				FileHash hash = FileHash.deserialize(buf);
-				return new SubFile(relPath, hash);
-			}
-			
-			@Override
-			public boolean equals(Object o) {
-				if (this == o) return true;
-				if (o instanceof String) return relPath.equals(o);
-				if (!(o instanceof SubFile)) return false;
-				SubFile subFile = (SubFile) o;
-				return relPath.equals(subFile.relPath);
-			}
-			
-			@Override
-			public int hashCode() {
-				return relPath.hashCode();
-			}
-		}
-		
-		@NotNull
-		public final String folderID;
-		public final boolean removeAdditionalFiles;
-		@NotNull
-		public final Path localFolder;
-		
-		private List<SubFile> fileCache;
-		
-		SyncFolderDescriptor(String folderID, Path localFolder, boolean removeAdditionalFiles) {
-			this.removeAdditionalFiles = removeAdditionalFiles;
-			this.folderID = folderID;
-			this.localFolder = localFolder;
-			fileCache = null;
-		}
-		
-		@Override
-		public String toString() {
-			return "SyncFolderDescriptor{" + "folderID='" + folderID + '\'' + ", removeAdditionalFiles=" + removeAdditionalFiles + ", localFolder=" + localFolder + ", files=" + (fileCache == null ? "?" : fileCache.size()) + "}";
-		}
-		
-		@Override
-		public boolean equals(Object o) {
-			if (this == o) return true;
-			if (o instanceof String) {
-				return folderID.equals(o);
-			}
-			if (o instanceof AutoSyncID.ForDirectFileRequest) {
-				return folderID.equals(((ForDirectFileRequest) o).uniqueID);
-			}
-			if (!(o instanceof SyncFolderDescriptor)) return false;
-			SyncFolderDescriptor that = (SyncFolderDescriptor) o;
-			return folderID.equals(that.folderID);
-		}
-		
-		@Override
-		public int hashCode() {
-			return folderID.hashCode();
-		}
-		
-		public int fileCount() {
-			return fileCache == null ? 0 : fileCache.size();
-		}
-		
-		public void invalidateCache() {
-			fileCache = null;
-		}
-		
-		public void loadCache() {
-			if (fileCache == null) {
-				fileCache = new ArrayList<>(8);
-				PathUtil.fileWalker(localFolder.toFile(), p -> fileCache.add(new SubFile(localFolder.relativize(p)
-																						   .toString(), FileHash.create(p.toFile()))));
-				
-				/*//this tests if we can trick the system to load files that are not beneath the base-folder
-				if (!BCLib.isClient()) {
-					fileCache.add(new SubFile("../breakout.json", FileHash.create(mapAbsolute("../breakout.json").toFile())));
-				}*/
-			}
-		}
-		
-		public void serialize(FriendlyByteBuf buf) {
-			final boolean debugHashes = Configs.CLIENT_CONFIG.getBoolean(Configs.MAIN_SYNC_CATEGORY, "debugHashes", false);
-			loadCache();
-			
-			DataHandler.writeString(buf, folderID);
-			buf.writeBoolean(removeAdditionalFiles);
-			buf.writeInt(fileCache.size());
-			fileCache.forEach(fl -> {
-				BCLib.LOGGER.info("      - " + fl.relPath);
-				if (debugHashes) {
-					BCLib.LOGGER.info("        " + fl.hash);
-				}
-				fl.serialize(buf);
-			});
-		}
-		
-		public static SyncFolderDescriptor deserialize(FriendlyByteBuf buf) {
-			final String folderID = DataHandler.readString(buf);
-			final boolean remAddFiles = buf.readBoolean();
-			final int count = buf.readInt();
-			SyncFolderDescriptor localDescriptor = DataExchange.getInstance()
-															   .getSyncFolderDescriptor(folderID);
-			
-			final SyncFolderDescriptor desc;
-			if (localDescriptor != null) {
-				desc = new SyncFolderDescriptor(folderID, localDescriptor.localFolder, remAddFiles);
-				desc.fileCache = new ArrayList<>(count);
-			}
-			else {
-				BCLib.LOGGER.warning(BCLib.isClient() ? "Client" : "Server" + " does not know Sync-Folder ID '" + folderID + "'");
-				desc = null;
-			}
-			
-			for (int i = 0; i < count; i++) {
-				SubFile relPath = SubFile.deserialize(buf);
-				if (desc != null) desc.fileCache.add(relPath);
-			}
-			
-			return desc;
-		}
-		
-		//Note: make sure loadCache was called before using this
-		boolean hasRelativeFile(String relFile) {
-			return fileCache.stream()
-							.filter(sf -> sf.equals(relFile))
-							.findFirst()
-							.isPresent();
-		}
-		
-		//Note: make sure loadCache was called before using this
-		boolean hasRelativeFile(SubFile subFile) {
-			return hasRelativeFile(subFile.relPath);
-		}
-		
-		//Note: make sure loadCache was called before using this
-		SubFile getLocalSubFile(String relPath) {
-			return fileCache.stream()
-							.filter(sf -> sf.relPath.equals(relPath))
-							.findFirst()
-							.orElse(null);
-		}
-		
-		Stream<SubFile> relativeFilesStream() {
-			loadCache();
-			return fileCache.stream();
-		}
-		
-		public Path mapAbsolute(String relPath) {
-			return this.localFolder.resolve(relPath)
-								   .normalize();
-		}
-		
-		public Path mapAbsolute(SubFile subFile) {
-			return this.localFolder.resolve(subFile.relPath)
-								   .normalize();
-		}
-		
-		public boolean acceptChildElements(Path absPath) {
-			return PathUtil.isChildOf(this.localFolder, absPath);
-		}
-		
-		public boolean acceptChildElements(SubFile subFile) {
-			return acceptChildElements(mapAbsolute(subFile));
-		}
-		
-		public boolean discardChildElements(SubFile subFile) {
-			return !acceptChildElements(subFile);
-		}
-	}
-	
-	@FunctionalInterface
-	public interface NeedTransferPredicate {
-		public boolean test(SyncFileHash clientHash, SyncFileHash serverHash, FileContentWrapper content);
-	}
-	
-	protected final static List<BiConsumer<AutoSyncID, File>> onWriteCallbacks = new ArrayList<>(2);
-	
-	final static class AutoSyncTriple {
-		public final SyncFileHash serverHash;
-		public final byte[] serverContent;
-		public final AutoFileSyncEntry localMatch;
-		
-		public AutoSyncTriple(SyncFileHash serverHash, byte[] serverContent, AutoFileSyncEntry localMatch) {
-			this.serverHash = serverHash;
-			this.serverContent = serverContent;
-			this.localMatch = localMatch;
-		}
-		
-		@Override
-		public String toString() {
-			return serverHash.modID + "." + serverHash.uniqueID;
-		}
-	}
 	
 	private static DataExchangeAPI instance;
 	
@@ -266,7 +28,7 @@ abstract public class DataExchange {
 	protected ConnectorServerside server;
 	protected ConnectorClientside client;
 	protected final Set<DataHandlerDescriptor> descriptors;
-	private final List<AutoFileSyncEntry> autoSyncFiles = new ArrayList<>(4);
+	
 	
 	private boolean didLoadSyncFolder = false;
 	
@@ -280,9 +42,6 @@ abstract public class DataExchange {
 	
 	public Set<DataHandlerDescriptor> getDescriptors() { return descriptors; }
 	
-	public List<AutoFileSyncEntry> getAutoSyncFiles() {
-		return autoSyncFiles;
-	}
 	
 	@Environment(EnvType.CLIENT)
 	protected void initClientside() {
@@ -344,101 +103,6 @@ abstract public class DataExchange {
 		});
 	}
 	
-	/**
-	 * Registers a File for automatic client syncing.
-	 *
-	 * @param modID          The ID of the calling Mod
-	 * @param needTransfer   If the predicate returns true, the file needs to get copied to the server.
-	 * @param fileName       The name of the File
-	 * @param requestContent When {@code true} the content of the file is requested for comparison. This will copy the
-	 *                       entire file from the client to the server.
-	 *                       <p>
-	 *                       You should only use this option, if you need to compare parts of the file in order to decide
-	 *                       If the File needs to be copied. Normally using the {@link SyncFileHash}
-	 *                       for comparison is sufficient.
-	 */
-	protected void addAutoSyncFileData(String modID, File fileName, boolean requestContent, NeedTransferPredicate needTransfer) {
-		autoSyncFiles.add(new AutoFileSyncEntry(modID, fileName, requestContent, needTransfer));
-	}
 	
-	/**
-	 * Registers a File for automatic client syncing.
-	 *
-	 * @param modID          The ID of the calling Mod
-	 * @param uniqueID       A unique Identifier for the File. (see {@link SyncFileHash#uniqueID} for
-	 *                       Details
-	 * @param needTransfer   If the predicate returns true, the file needs to get copied to the server.
-	 * @param fileName       The name of the File
-	 * @param requestContent When {@code true} the content of the file is requested for comparison. This will copy the
-	 *                       entire file from the client to the server.
-	 *                       <p>
-	 *                       You should only use this option, if you need to compare parts of the file in order to decide
-	 *                       If the File needs to be copied. Normally using the {@link SyncFileHash}
-	 *                       for comparison is sufficient.
-	 */
-	protected void addAutoSyncFileData(String modID, String uniqueID, File fileName, boolean requestContent, NeedTransferPredicate needTransfer) {
-		autoSyncFiles.add(new AutoFileSyncEntry(modID, uniqueID, fileName, requestContent, needTransfer));
-	}
 	
-	/**
-	 * Called when {@code SendFiles} received a File on the Client and wrote it to the FileSystem.
-	 * <p>
-	 * This is the place where reload Code should go.
-	 *
-	 * @param aid  The ID of the received File
-	 * @param file The location of the FIle on the client
-	 */
-	static void didReceiveFile(AutoSyncID aid, File file) {
-		onWriteCallbacks.forEach(fkt -> fkt.accept(aid, file));
-	}
-	
-	private List<String> syncFolderContent;
-	
-	protected List<String> getSyncFolderContent() {
-		if (syncFolderContent == null) {
-			return new ArrayList<>(0);
-		}
-		return syncFolderContent;
-	}
-	
-	//we call this from HelloServer to prepare transfer
-	protected void loadSyncFolder() {
-		if (Configs.MAIN_CONFIG.getBoolean(Configs.MAIN_SYNC_CATEGORY, "offersSyncFolders", true)) {
-			syncFolderDescriptions.forEach(desc -> desc.loadCache());
-		}
-	}
-	
-	protected static SyncFolderDescriptor getSyncFolderDescriptor(String folderID) {
-		return ((DataExchange) getInstance()).syncFolderDescriptions.stream()
-																	.filter(d -> d.equals(folderID))
-																	.findFirst()
-																	.orElse(null);
-	}
-	
-	protected static Path localBasePathForFolderID(String folderID) {
-		final SyncFolderDescriptor desc = getSyncFolderDescriptor(folderID);
-		if (desc != null) {
-			return desc.localFolder;
-		}
-		else {
-			BCLib.LOGGER.warning("Unknown Sync-Folder ID '" + folderID + "'");
-			return null;
-		}
-	}
-	
-	protected void registerSyncFolder(String folderID, Path localBaseFolder, boolean removeAdditionalFiles) {
-		localBaseFolder = localBaseFolder.normalize();
-		if (PathUtil.isChildOf(PathUtil.GAME_FOLDER, localBaseFolder)) {
-			final SyncFolderDescriptor desc = new SyncFolderDescriptor(folderID, localBaseFolder, removeAdditionalFiles);
-			if (this.syncFolderDescriptions.contains(desc)) {
-				BCLib.LOGGER.warning("Tried to override Folder Sync '" + folderID + "' again.");
-			}
-			else {
-				this.syncFolderDescriptions.add(desc);
-			}
-		}
-		else {
-			BCLib.LOGGER.error(localBaseFolder + " (from " + folderID + ") is outside the game directory " + PathUtil.GAME_FOLDER + ". Sync is not allowed.");
-		}
-	}
 }
