@@ -44,6 +44,12 @@ public class HelloClient extends DataHandler {
 		super(DESCRIPTOR.IDENTIFIER, true);
 	}
 	
+	public static ModContainer getModContainer(String modID) {
+		Optional<ModContainer> optional = FabricLoader.getInstance()
+													  .getModContainer(modID);
+		return optional.orElse(null);
+	}
+	
 	public static String getModVersion(String modID) {
 		Optional<ModContainer> optional = FabricLoader.getInstance()
 													  .getModContainer(modID);
@@ -61,7 +67,18 @@ public class HelloClient extends DataHandler {
 	}
 	
 	@Override
-	protected void serializeData(FriendlyByteBuf buf) {
+	protected boolean prepareData(boolean isClient) {
+		if (!Configs.MAIN_CONFIG.getBoolean(Configs.MAIN_SYNC_CATEGORY, "enabled", true)) {
+			BCLib.LOGGER.info("Auto-Sync was disabled on the server.");
+			return false;
+		}
+		
+		DataExchange.getInstance().loadSyncFolder();
+		return true;
+	}
+	
+	@Override
+	protected void serializeData(FriendlyByteBuf buf, boolean isClient) {
 		final String vbclib = getBCLibVersion();
 		BCLib.LOGGER.info("Sending Hello to Client. (server=" + vbclib + ")");
 		final List<String> mods = DataExchangeAPI.registeredMods();

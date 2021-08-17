@@ -43,7 +43,7 @@ public class SendFiles extends DataHandler {
 	}
 	
 	@Override
-	protected void serializeData(FriendlyByteBuf buf) {
+	protected void serializeData(FriendlyByteBuf buf, boolean isClient) {
 		List<AutoFileSyncEntry> existingFiles = files.stream().filter(e -> e.fileName.exists()).collect(Collectors.toList());
 		/*
 		//this will try to send a file that was not registered or requested by the client

@@ -29,7 +29,7 @@ public class RequestFiles extends DataHandler {
 	}
 	
 	@Override
-	protected void serializeData(FriendlyByteBuf buf) {
+	protected void serializeData(FriendlyByteBuf buf, boolean isClient) {
 		newToken();
 		writeString(buf, currentToken);
 

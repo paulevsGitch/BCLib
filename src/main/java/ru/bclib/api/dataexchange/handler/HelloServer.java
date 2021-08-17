@@ -62,9 +62,19 @@ public class HelloServer extends DataHandler {
 	public HelloServer() {
 		super(DESCRIPTOR.IDENTIFIER, false);
 	}
-
+	
+	
 	@Override
-	protected void serializeData(FriendlyByteBuf buf) {
+	protected boolean prepareData(boolean isClient) {
+		if (!Configs.CLIENT_CONFIG.getBoolean(Configs.MAIN_SYNC_CATEGORY, "enabled", true)) {
+			BCLib.LOGGER.info("Auto-Sync was disabled on the client.");
+			return false;
+		}
+		return true;
+	}
+	
+	@Override
+	protected void serializeData(FriendlyByteBuf buf, boolean isClient) {
 		BCLib.LOGGER.info("Sending hello to server.");
 		buf.writeInt(DataFixerAPI.getModVersion(HelloClient.getBCLibVersion()));
 	}
@@ -84,12 +94,6 @@ public class HelloServer extends DataHandler {
 			return;
 		}
 		
-		if (Configs.MAIN_CONFIG.getBoolean(Configs.MAIN_SYNC_CATEGORY, "enabled", true)) {
-			reply(new HelloClient(), server);
-		} else {
-			BCLib.LOGGER.info("Auto-Sync was disabled on the server.");
-		}
-		
-		DataExchange.getInstance().loadSyncFolder();
+		reply(new HelloClient(), server);
 	}
 }

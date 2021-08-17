@@ -25,9 +25,14 @@ public abstract class DataHandler {
 			super(identifier, originatesOnServer);
 		}
 		
-		protected void serializeData(FriendlyByteBuf buf) {
+		@Override
+		protected boolean prepareData(boolean isClient){ return true; }
+		
+		@Override
+		protected void serializeData(FriendlyByteBuf buf, boolean isClient) {
 		}
 		
+		@Override
 		protected void deserializeFromIncomingData(FriendlyByteBuf buf, PacketSender responseSender, boolean isClient){
 		}
 	}
@@ -62,7 +67,8 @@ public abstract class DataHandler {
 		server.execute(() -> runOnGameThread(null, server, false));
 	}
 
-	abstract protected void serializeData(FriendlyByteBuf buf) ;
+	protected boolean prepareData(boolean isClient){ return true; }
+	abstract protected void serializeData(FriendlyByteBuf buf, boolean isClient) ;
 	abstract protected void deserializeFromIncomingData(FriendlyByteBuf buf, PacketSender responseSender, boolean isClient);
 	abstract protected void runOnGameThread(Minecraft client, MinecraftServer server, boolean isClient);
 
@@ -73,25 +79,31 @@ public abstract class DataHandler {
 	}
 	
 	void sendToClient(MinecraftServer server){
-		FriendlyByteBuf buf = PacketByteBufs.create();
-		serializeData(buf);
-		
-		for (ServerPlayer player : PlayerLookup.all(server)) {
-			ServerPlayNetworking.send(player, this.identifier, buf);
+		if (prepareData(false)) {
+			FriendlyByteBuf buf = PacketByteBufs.create();
+			serializeData(buf, false);
+			
+			for (ServerPlayer player : PlayerLookup.all(server)) {
+				ServerPlayNetworking.send(player, this.identifier, buf);
+			}
 		}
 	}
 	
 	void sendToClient(MinecraftServer server, ServerPlayer player){
-		FriendlyByteBuf buf = PacketByteBufs.create();
-		serializeData(buf);
-		ServerPlayNetworking.send(player, this.identifier, buf);
+		if (prepareData(false)) {
+			FriendlyByteBuf buf = PacketByteBufs.create();
+			serializeData(buf, false);
+			ServerPlayNetworking.send(player, this.identifier, buf);
+		}
 	}
 	
 	@Environment(EnvType.CLIENT)
 	void sendToServer(Minecraft client){
-		FriendlyByteBuf buf = PacketByteBufs.create();
-		serializeData(buf);
-		ClientPlayNetworking.send(identifier, buf);
+		if (prepareData(true)) {
+			FriendlyByteBuf buf = PacketByteBufs.create();
+			serializeData(buf, true);
+			ClientPlayNetworking.send(identifier, buf);
+		}
 	}
 	
 	@Override
