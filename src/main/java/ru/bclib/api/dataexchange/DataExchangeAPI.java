@@ -43,6 +43,15 @@ public class DataExchangeAPI extends DataExchange {
 	}
 	
 	/**
+	 * Register a mod dependency to participate in the DataExchange.
+	 *
+	 * @param modID - {@link String} modID.
+	 */
+	public static void registerModDependency(String modID) {
+		registerMod(modID);
+	}
+	
+	/**
 	 * Returns the IDs of all registered Mods.
 	 *
 	 * @return List of modIDs
@@ -79,12 +88,12 @@ public class DataExchangeAPI extends DataExchange {
 	 * Depending on what the result of {@link DataHandler#getOriginatesOnServer()}, the Data is sent from the server
 	 * to the client (if {@code true}) or the other way around.
 	 * <p>
-	 * The method {@link DataHandler#serializeData(FriendlyByteBuf)} is called just before the data is sent. You should
+	 * The method {@link DataHandler#serializeData(FriendlyByteBuf, boolean)} is called just before the data is sent. You should
 	 * use this method to add the Data you need to the communication.
 	 *
 	 * @param h The Data that you want to send
 	 */
-	public static void send(DataHandler h) {
+	public static void send(BaseDataHandler h) {
 		if (h.getOriginatesOnServer()) {
 			DataExchangeAPI.getInstance().server.sendToClient(h);
 		}

@@ -5,14 +5,14 @@ import net.minecraft.resources.ResourceLocation;
 import java.util.function.Supplier;
 
 public class DataHandlerDescriptor {
-	public DataHandlerDescriptor(ResourceLocation identifier, Supplier<DataHandler> instancer){
+	public DataHandlerDescriptor(ResourceLocation identifier, Supplier<BaseDataHandler> instancer){
 		this(identifier, instancer, instancer, false, false);
 	}
 	
-	public DataHandlerDescriptor(ResourceLocation identifier, Supplier<DataHandler> instancer, boolean sendOnJoin, boolean sendBeforeEnter){
+	public DataHandlerDescriptor(ResourceLocation identifier, Supplier<BaseDataHandler> instancer, boolean sendOnJoin, boolean sendBeforeEnter){
 		this(identifier, instancer, instancer, sendOnJoin, sendBeforeEnter);
 	}
-	public DataHandlerDescriptor(ResourceLocation identifier, Supplier<DataHandler> receiv_instancer, Supplier<DataHandler> join_instancer, boolean sendOnJoin, boolean sendBeforeEnter){
+	public DataHandlerDescriptor(ResourceLocation identifier, Supplier<BaseDataHandler> receiv_instancer, Supplier<BaseDataHandler> join_instancer, boolean sendOnJoin, boolean sendBeforeEnter){
 		this.INSTANCE = receiv_instancer;
 		this.JOIN_INSTANCE = join_instancer;
 		this.IDENTIFIER = identifier;
@@ -24,6 +24,6 @@ public class DataHandlerDescriptor {
 	public final boolean sendOnJoin;
 	public final boolean sendBeforeEnter;
 	public final ResourceLocation IDENTIFIER;
-	public final Supplier<DataHandler> INSTANCE;
-	public final Supplier<DataHandler> JOIN_INSTANCE;
+	public final Supplier<BaseDataHandler> INSTANCE;
+	public final Supplier<BaseDataHandler> JOIN_INSTANCE;
 }

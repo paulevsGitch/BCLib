@@ -1,7 +1,8 @@
 package ru.bclib.api.dataexchange.handler.autosync;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
-import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
@@ -56,38 +57,40 @@ import java.io.File;
  * 	</tr>
  * </table>
  */
-public class HelloServer extends DataHandler {
+public class HelloServer extends DataHandler.FromClient {
 	public static DataHandlerDescriptor DESCRIPTOR = new DataHandlerDescriptor(new ResourceLocation(BCLib.MOD_ID, "hello_server"), HelloServer::new, true, false);
 	
 	protected String bclibVersion = "0.0.0";
 	
 	public HelloServer() {
-		super(DESCRIPTOR.IDENTIFIER, false);
+		super(DESCRIPTOR.IDENTIFIER);
 	}
 	
 	
+	@Environment(EnvType.CLIENT)
 	@Override
-	protected boolean prepareData(boolean isClient) {
-		if (!ClientConfig.isClientConfigAllowingAutoSync()) {
+	protected boolean prepareDataOnClient() {
+		if (!ClientConfig.isAllowingAutoSync()) {
 			BCLib.LOGGER.info("Auto-Sync was disabled on the client.");
 			return false;
 		}
 		return true;
 	}
 	
+	@Environment(EnvType.CLIENT)
 	@Override
-	protected void serializeData(FriendlyByteBuf buf, boolean isClient) {
+	protected void serializeDataOnClient(FriendlyByteBuf buf) {
 		BCLib.LOGGER.info("Sending hello to server.");
 		buf.writeInt(DataFixerAPI.getModVersion(HelloClient.getBCLibVersion()));
 	}
 	
 	@Override
-	protected void deserializeFromIncomingData(FriendlyByteBuf buf, PacketSender responseSender, boolean fromClient) {
+	protected void deserializeIncomingDataOnServer(FriendlyByteBuf buf, PacketSender responseSender) {
 		bclibVersion = DataFixerAPI.getModVersion(buf.readInt());
 	}
 	
 	@Override
-	protected void runOnGameThread(Minecraft client, MinecraftServer server, boolean isClient) {
+	protected void runOnServerGameThread(MinecraftServer server) {
 		if (!Config.isAllowingAutoSync()) {
 			BCLib.LOGGER.info("Auto-Sync was disabled on the server.");
 			return;

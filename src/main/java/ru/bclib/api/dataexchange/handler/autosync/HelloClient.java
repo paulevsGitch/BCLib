@@ -7,12 +7,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.MinecraftServer;
 import ru.bclib.BCLib;
 import ru.bclib.api.dataexchange.DataExchangeAPI;
 import ru.bclib.api.dataexchange.DataHandler;
 import ru.bclib.api.dataexchange.DataHandlerDescriptor;
-import ru.bclib.api.dataexchange.handler.DataExchange;
 import ru.bclib.api.dataexchange.handler.autosync.AutoSync.ClientConfig;
 import ru.bclib.api.dataexchange.handler.autosync.AutoSync.Config;
 import ru.bclib.api.dataexchange.handler.autosync.AutoSyncID.WithContentOverride;
@@ -36,11 +34,11 @@ import java.util.stream.Collectors;
  * <p>
  * For Details refer to {@link HelloServer}
  */
-public class HelloClient extends DataHandler {
+public class HelloClient extends DataHandler.FromServer {
 	public static DataHandlerDescriptor DESCRIPTOR = new DataHandlerDescriptor(new ResourceLocation(BCLib.MOD_ID, "hello_client"), HelloClient::new, false, false);
 	
 	public HelloClient() {
-		super(DESCRIPTOR.IDENTIFIER, true);
+		super(DESCRIPTOR.IDENTIFIER);
 	}
 	
 	static String getBCLibVersion() {
@@ -48,7 +46,7 @@ public class HelloClient extends DataHandler {
 	}
 	
 	@Override
-	protected boolean prepareData(boolean isClient) {
+	protected boolean prepareDataOnServer() {
 		if (!Config.isAllowingAutoSync()) {
 			BCLib.LOGGER.info("Auto-Sync was disabled on the server.");
 			return false;
@@ -59,7 +57,7 @@ public class HelloClient extends DataHandler {
 	}
 	
 	@Override
-	protected void serializeData(FriendlyByteBuf buf, boolean isClient) {
+	protected void serializeDataOnServer(FriendlyByteBuf buf) {
 		final String vbclib = getBCLibVersion();
 		BCLib.LOGGER.info("Sending Hello to Client. (server=" + vbclib + ")");
 		final List<String> mods = DataExchangeAPI.registeredMods();
@@ -120,8 +118,9 @@ public class HelloClient extends DataHandler {
 	List<AutoSync.AutoSyncTriple> autoSyncedFiles = null;
 	List<SyncFolderDescriptor> autoSynFolders = null;
 	
+	@Environment(EnvType.CLIENT)
 	@Override
-	protected void deserializeFromIncomingData(FriendlyByteBuf buf, PacketSender responseSender, boolean fromClient) {
+	protected void deserializeIncomingDataOnClient(FriendlyByteBuf buf, PacketSender responseSender) {
 		//read BCLibVersion (=protocol version)
 		bclibVersion = DataFixerAPI.getModVersion(buf.readInt());
 		
@@ -156,8 +155,9 @@ public class HelloClient extends DataHandler {
 		}
 	}
 	
+	@Environment(EnvType.CLIENT)
 	private void processAutoSyncFolder(final List<AutoSyncID> filesToRequest, final List<AutoSyncID.ForDirectFileRequest> filesToRemove) {
-		if (!ClientConfig.isClientConfigAcceptingFolders()) {
+		if (!ClientConfig.isAcceptingFolders()) {
 			return;
 		}
 		
@@ -221,8 +221,9 @@ public class HelloClient extends DataHandler {
 		});
 	}
 	
+	@Environment(EnvType.CLIENT)
 	private void processSingleFileSync(final List<AutoSyncID> filesToRequest) {
-		final boolean debugHashes = ClientConfig.shouldClientConfigPrintDebugHashes();
+		final boolean debugHashes = ClientConfig.shouldPrintDebugHashes();
 		
 		if (autoSyncedFiles.size() > 0) {
 			BCLib.LOGGER.info("Files offered by Server:");
@@ -260,9 +261,10 @@ public class HelloClient extends DataHandler {
 	}
 	
 	
+	@Environment(EnvType.CLIENT)
 	@Override
-	protected void runOnGameThread(Minecraft client, MinecraftServer server, boolean isClient) {
-		if (!ClientConfig.isClientConfigAllowingAutoSync()) {
+	protected void runOnClientGameThread(Minecraft client) {
+		if (!ClientConfig.isAllowingAutoSync()) {
 			BCLib.LOGGER.info("Auto-Sync was disabled on the client.");
 			return;
 		}
@@ -289,7 +291,7 @@ public class HelloClient extends DataHandler {
 		//Both client and server need to know about the folder you want to sync
 		//Files can only get placed within that folder
 		
-		if ((filesToRequest.size() > 0 || filesToRemove.size() > 0) && ClientConfig.isClientConfigAcceptingFiles()) {
+		if ((filesToRequest.size() > 0 || filesToRemove.size() > 0) && ClientConfig.isAcceptingFiles()) {
 			showDownloadConfigs(client, filesToRequest, filesToRemove);
 			return;
 		}

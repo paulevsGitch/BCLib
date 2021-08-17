@@ -4,6 +4,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
+import ru.bclib.api.dataexchange.BaseDataHandler;
 import ru.bclib.api.dataexchange.ConnectorClientside;
 import ru.bclib.api.dataexchange.ConnectorServerside;
 import ru.bclib.api.dataexchange.DataExchangeAPI;
@@ -95,7 +96,7 @@ abstract public class DataExchange {
 	public static void sendOnEnter() {
 		getInstance().descriptors.forEach((desc) -> {
 			if (desc.sendBeforeEnter) {
-				DataHandler h = desc.JOIN_INSTANCE.get();
+				BaseDataHandler h = desc.JOIN_INSTANCE.get();
 				if (!h.getOriginatesOnServer()) {
 					getInstance().client.sendToServer(h);
 				}

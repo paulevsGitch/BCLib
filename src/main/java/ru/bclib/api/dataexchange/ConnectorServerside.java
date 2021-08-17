@@ -39,7 +39,7 @@ public class ConnectorServerside extends Connector {
 	public void onPlayReady(ServerGamePacketListenerImpl handler, PacketSender sender, MinecraftServer server){
 		for(DataHandlerDescriptor desc : getDescriptors()){
 			if (desc.sendOnJoin){
-				DataHandler h = desc.JOIN_INSTANCE.get();
+				BaseDataHandler h = desc.JOIN_INSTANCE.get();
 				if (h.getOriginatesOnServer()) {
 					h.sendToClient(server, handler.player);
 				}
@@ -54,11 +54,11 @@ public class ConnectorServerside extends Connector {
 	}
 	
 	void receiveFromClient(DataHandlerDescriptor desc, MinecraftServer server, ServerPlayer player, ServerGamePacketListenerImpl handler, FriendlyByteBuf buf, PacketSender responseSender){
-		DataHandler h = desc.INSTANCE.get();
+		BaseDataHandler h = desc.INSTANCE.get();
 		h.receiveFromClient(server, player, handler, buf, responseSender);
 	}
 	
-	public void sendToClient(DataHandler h){
+	public void sendToClient(BaseDataHandler h){
 		if (server==null){
 			throw new RuntimeException("[internal error] Server not initialized yet!");
 		}

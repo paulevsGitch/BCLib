@@ -7,11 +7,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.MinecraftServer;
 import ru.bclib.BCLib;
 import ru.bclib.api.dataexchange.DataHandler;
 import ru.bclib.api.dataexchange.DataHandlerDescriptor;
-import ru.bclib.api.dataexchange.handler.DataExchange;
 import ru.bclib.api.dataexchange.handler.autosync.AutoSync.ClientConfig;
 import ru.bclib.api.dataexchange.handler.autosync.AutoSync.Config;
 import ru.bclib.gui.screens.ConfirmRestartScreen;
@@ -26,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class SendFiles extends DataHandler {
+public class SendFiles extends DataHandler.FromServer {
 	public static DataHandlerDescriptor DESCRIPTOR = new DataHandlerDescriptor(new ResourceLocation(BCLib.MOD_ID, "send_files"), SendFiles::new, false, false);
 	
 	protected List<AutoFileSyncEntry> files;
@@ -37,13 +35,13 @@ public class SendFiles extends DataHandler {
 	}
 	
 	public SendFiles(List<AutoFileSyncEntry> files, String token) {
-		super(DESCRIPTOR.IDENTIFIER, true);
+		super(DESCRIPTOR.IDENTIFIER);
 		this.files = files;
 		this.token = token;
 	}
 	
 	@Override
-	protected boolean prepareData(boolean isClient) {
+	protected boolean prepareDataOnServer() {
 		if (!Config.isAllowingAutoSync()) {
 			BCLib.LOGGER.info("Auto-Sync was disabled on the server.");
 			return false;
@@ -53,7 +51,7 @@ public class SendFiles extends DataHandler {
 	}
 	
 	@Override
-	protected void serializeData(FriendlyByteBuf buf, boolean isClient) {
+	protected void serializeDataOnServer(FriendlyByteBuf buf) {
 		List<AutoFileSyncEntry> existingFiles = files.stream()
 													 .filter(e -> e.fileName.exists())
 													 .collect(Collectors.toList());
@@ -83,9 +81,10 @@ public class SendFiles extends DataHandler {
 	
 	private List<Pair<AutoFileSyncEntry, byte[]>> receivedFiles;
 	
+	@Environment(EnvType.CLIENT)
 	@Override
-	protected void deserializeFromIncomingData(FriendlyByteBuf buf, PacketSender responseSender, boolean fromClient) {
-		if (ClientConfig.isClientConfigAcceptingFiles()) {
+	protected void deserializeIncomingDataOnClient(FriendlyByteBuf buf, PacketSender responseSender) {
+		if (ClientConfig.isAcceptingFiles()) {
 			token = readString(buf);
 			if (!token.equals(RequestFiles.currentToken)) {
 				RequestFiles.newToken();
@@ -111,9 +110,10 @@ public class SendFiles extends DataHandler {
 		}
 	}
 	
+	@Environment(EnvType.CLIENT)
 	@Override
-	protected void runOnGameThread(Minecraft client, MinecraftServer server, boolean isClient) {
-		if (ClientConfig.isClientConfigAcceptingFiles()) {
+	protected void runOnClientGameThread(Minecraft client) {
+		if (ClientConfig.isAcceptingFiles()) {
 			BCLib.LOGGER.info("Writing Files:");
 			
 			//TODO: Reject files that were not in the last RequestFiles.
@@ -128,6 +128,7 @@ public class SendFiles extends DataHandler {
 		}
 	}
 	
+	@Environment(EnvType.CLIENT)
 	public static void writeSyncedFile(AutoSyncID e, byte[] data, File fileName) {
 		Path path = fileName.toPath();
 		BCLib.LOGGER.info("    - Writing " + path + " (" + data.length + " Bytes)");
