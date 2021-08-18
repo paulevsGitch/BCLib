@@ -4,11 +4,13 @@ import com.google.common.collect.Lists;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.network.FriendlyByteBuf;
+import ru.bclib.BCLib;
 import ru.bclib.api.dataexchange.handler.autosync.AutoSync;
 import ru.bclib.api.dataexchange.handler.autosync.AutoSync.NeedTransferPredicate;
 import ru.bclib.api.dataexchange.handler.autosync.AutoSyncID;
 import ru.bclib.api.dataexchange.handler.DataExchange;
 import ru.bclib.config.Config;
+import ru.bclib.util.ModUtil;
 
 import java.io.File;
 import java.util.List;
@@ -48,7 +50,11 @@ public class DataExchangeAPI extends DataExchange {
 	 * @param modID - {@link String} modID.
 	 */
 	public static void registerModDependency(String modID) {
-		registerMod(modID);
+		if (ModUtil.getModInfo(modID, false) != null) {
+			registerMod(modID);
+		} else {
+			BCLib.LOGGER.info("Mod Dependency '" + modID + "' not found. This is probably OK.");
+		}
 	}
 	
 	/**
