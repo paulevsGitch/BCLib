@@ -260,6 +260,14 @@ public class HelloClient extends DataHandler.FromServer {
 		}
 	}
 	
+	@Environment(EnvType.CLIENT)
+	private void processModFileSync(final List<AutoSyncID> filesToRequest) {
+		for (Entry<String, String> e : modVersion.entrySet()) {
+			String ver = PathUtil.getModVersion(e.getKey());
+			BCLib.LOGGER.info("    - " + e.getKey() + " (client=" + ver + ", server=" + ver + ")");
+		}
+	}
+	
 	
 	@Environment(EnvType.CLIENT)
 	@Override
@@ -279,11 +287,9 @@ public class HelloClient extends DataHandler.FromServer {
 		final List<AutoSyncID> filesToRequest = new ArrayList<>(2);
 		final List<AutoSyncID.ForDirectFileRequest> filesToRemove = new ArrayList<>(2);
 		
-		for (Entry<String, String> e : modVersion.entrySet()) {
-			String ver = PathUtil.getModVersion(e.getKey());
-			BCLib.LOGGER.info("    - " + e.getKey() + " (client=" + ver + ", server=" + ver + ")");
-		}
 		
+		
+		processModFileSync(filesToRequest);
 		processSingleFileSync(filesToRequest);
 		processAutoSyncFolder(filesToRequest, filesToRemove);
 		

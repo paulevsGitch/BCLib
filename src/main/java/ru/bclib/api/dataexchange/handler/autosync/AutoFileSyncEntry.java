@@ -1,11 +1,14 @@
 package ru.bclib.api.dataexchange.handler.autosync;
 
 import net.minecraft.network.FriendlyByteBuf;
+import ru.bclib.BCLib;
 import ru.bclib.api.dataexchange.DataHandler;
 import ru.bclib.api.dataexchange.SyncFileHash;
 import ru.bclib.api.dataexchange.handler.autosync.AutoSync.NeedTransferPredicate;
 import ru.bclib.api.dataexchange.handler.autosync.SyncFolderDescriptor.SubFile;
 import ru.bclib.util.Pair;
+import ru.bclib.util.PathUtil;
+import ru.bclib.util.PathUtil.ModInfo;
 import ru.bclib.util.Triple;
 
 import java.io.File;
@@ -47,6 +50,38 @@ class AutoFileSyncEntry extends AutoSyncID {
 		@Override
 		public String toString() {
 			return uniqueID + " - " + relFile;
+		}
+	}
+	
+	static class ForModFileRequest extends AutoFileSyncEntry {
+		public static Path getLocalPathForID(String modID){
+			ModInfo mi = PathUtil.getModInfo(modID);
+			if (mi!=null){
+				return mi.jarPath;
+			}
+			return null;
+		}
+		
+		ForModFileRequest(String modID) {
+			super(modID, AutoSyncID.ForModFileRequest.UNIQUE_ID, getLocalPathForID(modID).toFile(), false, (a, b, c) -> false);
+			if (this.fileName == null){
+				BCLib.LOGGER.error("Unknown mod '"+modID+"'.");
+			}
+		}
+		
+		@Override
+		public int serializeContent(FriendlyByteBuf buf) {
+			final int res = super.serializeContent(buf);
+			return res;
+		}
+		
+		static AutoFileSyncEntry.ForModFileRequest finishDeserializeContent(String modID, FriendlyByteBuf buf) {
+			return new AutoFileSyncEntry.ForModFileRequest(modID);
+		}
+		
+		@Override
+		public String toString() {
+			return modID;
 		}
 	}
 	
@@ -100,6 +135,9 @@ class AutoFileSyncEntry extends AutoSyncID {
 		AutoFileSyncEntry entry;
 		if (AutoSyncID.ForDirectFileRequest.MOD_ID.equals(modID)) {
 			entry = AutoFileSyncEntry.ForDirectFileRequest.finishDeserializeContent(uniqueID, buf);
+		}
+		else if (AutoSyncID.ForModFileRequest.UNIQUE_ID.equals(uniqueID)) {
+			entry = AutoFileSyncEntry.ForModFileRequest.finishDeserializeContent(uniqueID, buf);
 		}
 		else {
 			entry = AutoFileSyncEntry.findMatching(modID, uniqueID);

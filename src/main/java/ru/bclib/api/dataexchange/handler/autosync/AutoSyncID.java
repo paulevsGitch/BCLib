@@ -39,6 +39,24 @@ public class AutoSyncID {
 			return new ForDirectFileRequest(uniqueID, fl);
 		}
 	}
+	
+	static class ForModFileRequest extends AutoSyncID {
+		public final static String UNIQUE_ID = "bclib::MOD";
+		
+		ForModFileRequest(String modID) {
+			super(modID, ForModFileRequest.UNIQUE_ID);
+		}
+		
+		@Override
+		void serializeData(FriendlyByteBuf buf) {
+			super.serializeData(buf);
+		}
+		
+		static ForModFileRequest finishDeserialize(String modID, String uniqueID, FriendlyByteBuf buf){
+			return new ForModFileRequest(modID);
+		}
+	}
+	
 	/**
 	 * A Unique ID for the referenced File.
 	 * <p>
@@ -91,7 +109,9 @@ public class AutoSyncID {
 		
 		if (ForDirectFileRequest.MOD_ID.equals(modID)){
 			return ForDirectFileRequest.finishDeserialize(modID, uID, buf);
-		} else {
+		} else if (ForModFileRequest.UNIQUE_ID.equals(uID)){
+			return ForModFileRequest.finishDeserialize(modID, uID, buf);
+		} else{
 			return new AutoSyncID(modID, uID);
 		}
 	}

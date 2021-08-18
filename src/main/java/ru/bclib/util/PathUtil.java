@@ -84,7 +84,22 @@ public class PathUtil {
 		}
 	}
 	
-	private static Map<String, ModMetadata> mods;
+	public static class ModInfo {
+		public final ModMetadata metadata;
+		public final Path jarPath;
+		
+		ModInfo(ModMetadata metadata, Path jarPath) {
+			this.metadata = metadata;
+			this.jarPath = jarPath;
+		}
+		
+		@Override
+		public String toString() {
+			return "ModInfo{" + "id=" + metadata.getId()+ "version=" + metadata.getVersion() + "jarPath=" + jarPath + '}';
+		}
+	}
+	
+	private static Map<String, ModInfo> mods;
 	
 	/**
 	 * Unloads the cache of available mods created from {@link #getMods()}
@@ -100,9 +115,9 @@ public class PathUtil {
 	 * calling {@link #invalidateCachedMods()}
 	 * <p>
 	 * An error message is printed if a mod fails to load, but the parsing will continue.
-	 * @return A map of all found mods. (key=ModID, value={@link ModMetadata})
+	 * @return A map of all found mods. (key=ModID, value={@link ModInfo})
 	 */
-	public static Map<String, ModMetadata> getMods() {
+	public static Map<String, ModInfo> getMods() {
 		if (mods!=null) return mods;
 		
 		mods = new HashMap<>();
@@ -116,7 +131,7 @@ public class PathUtil {
 					Path modMetaFile = fs.getPath("fabric.mod.json");
 					
 					ModMetadata mc = ModMetadataParser.parseMetadata(logger, modMetaFile);
-					mods.put(mc.getId(), mc);
+					mods.put(mc.getId(), new ModInfo(mc, file));
 				}
 				catch (ParseMetadataException e) {
 					BCLib.LOGGER.error(e.getMessage());
@@ -130,6 +145,26 @@ public class PathUtil {
 		return mods;
 	}
 	
+	/**
+	 * Returns the {@link ModInfo} or {@code null} if the mod was not found.
+	 * <p>
+	 * The call will also return null if the mode-Version in the jar-File is not the same
+	 * as the version of the loaded Mod.
+	 * @param modID The mod ID to query
+	 * @return A {@link ModInfo}-Object for the querried Mod.
+	 */
+	public static ModInfo getModInfo(String modID){
+		getMods();
+		final ModInfo mi = mods.get(modID);
+		if (!getModVersion(modID).equals(mi.metadata.getVersion())) return null;
+		return mi;
+	}
+	
+	/**
+	 * Local Mod Version for the queried Mod
+	 * @param modID The mod ID to query
+	 * @return The version of the locally installed Mod
+	 */
 	public static String getModVersion(String modID) {
 		Optional<ModContainer> optional = FabricLoader.getInstance()
 													  .getModContainer(modID);
@@ -140,11 +175,5 @@ public class PathUtil {
 							   .toString();
 		}
 		return "0.0.0";
-	}
-	
-	public static ModContainer getModContainer(String modID) {
-		Optional<ModContainer> optional = FabricLoader.getInstance()
-													  .getModContainer(modID);
-		return optional.orElse(null);
 	}
 }
