@@ -263,8 +263,14 @@ public class HelloClient extends DataHandler.FromServer {
 	@Environment(EnvType.CLIENT)
 	private void processModFileSync(final List<AutoSyncID> filesToRequest) {
 		for (Entry<String, String> e : modVersion.entrySet()) {
-			String ver = PathUtil.getModVersion(e.getKey());
-			BCLib.LOGGER.info("    - " + e.getKey() + " (client=" + ver + ", server=" + ver + ")");
+			final String localVersion = PathUtil.getModVersion(e.getKey());
+			final String serverVersion = e.getValue();
+			final boolean requestMod = !serverVersion.equals(localVersion);
+			
+			BCLib.LOGGER.info("    - " + e.getKey() + " (client=" + localVersion + ", server=" + serverVersion + (requestMod?", requesting":"") +")");
+			if (requestMod){
+				filesToRequest.add(new AutoSyncID.ForModFileRequest(e.getKey(), serverVersion));
+			}
 		}
 	}
 	
