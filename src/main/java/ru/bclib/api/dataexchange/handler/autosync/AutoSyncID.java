@@ -18,6 +18,11 @@ public class AutoSyncID {
 			this.contentWrapper = contentWrapper;
 			this.localFile = localFile;
 		}
+		
+		@Override
+		public String toString() {
+			return super.toString() + " (Content override)";
+		}
 	}
 	
 	static class ForDirectFileRequest extends AutoSyncID {
@@ -39,6 +44,11 @@ public class AutoSyncID {
 			final File fl = new File(DataHandler.readString(buf));
 			return new ForDirectFileRequest(uniqueID, fl);
 		}
+		
+		@Override
+		public String toString() {
+			return super.uniqueID + " (" + this.relFile + ")";
+		}
 	}
 	
 	static class ForModFileRequest extends AutoSyncID {
@@ -58,6 +68,11 @@ public class AutoSyncID {
 		static ForModFileRequest finishDeserialize(String modID, String uniqueID, FriendlyByteBuf buf){
 			final String version = DataFixerAPI.getModVersion(buf.readInt());
 			return new ForModFileRequest(modID, version);
+		}
+		
+		@Override
+		public String toString() {
+			return super.modID + " (v" + this.version + ")";
 		}
 	}
 	

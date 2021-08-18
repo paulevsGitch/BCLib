@@ -14,6 +14,7 @@ import ru.bclib.api.dataexchange.handler.autosync.AutoSync.ClientConfig;
 import ru.bclib.api.dataexchange.handler.autosync.AutoSync.Config;
 import ru.bclib.gui.screens.ConfirmRestartScreen;
 import ru.bclib.util.Pair;
+import ru.bclib.util.PathUtil;
 import ru.bclib.util.Triple;
 
 import java.io.File;
@@ -75,7 +76,7 @@ public class SendFiles extends DataHandler.FromServer {
 		BCLib.LOGGER.info("Sending " + existingFiles.size() + " Files to Client:");
 		for (AutoFileSyncEntry entry : existingFiles) {
 			int length = entry.serializeContent(buf);
-			BCLib.LOGGER.info("    - " + entry + " (" + length + " Bytes)");
+			BCLib.LOGGER.info("    - " + entry + " (" + PathUtil.humanReadableFileSize(length) + ")");
 		}
 	}
 	
@@ -101,7 +102,7 @@ public class SendFiles extends DataHandler.FromServer {
 				Triple<AutoFileSyncEntry, byte[], AutoSyncID> p = AutoFileSyncEntry.deserializeContent(buf);
 				if (p.first != null) {
 					receivedFiles.add(p);
-					BCLib.LOGGER.info("    - " + p.first + " (" + p.second.length + " Bytes)");
+					BCLib.LOGGER.info("    - " + p.first + " (" + PathUtil.humanReadableFileSize(p.second.length) + ")");
 				}
 				else {
 					BCLib.LOGGER.error("   - Failed to receive File " + p.third + ", possibly sent from a Mod that is not installed on the client.");
@@ -128,10 +129,36 @@ public class SendFiles extends DataHandler.FromServer {
 		}
 	}
 	
+	
 	@Environment(EnvType.CLIENT)
 	public static void writeSyncedFile(AutoSyncID e, byte[] data, File fileName) {
-		Path path = fileName.toPath();
-		BCLib.LOGGER.info("    - Writing " + path + " (" + data.length + " Bytes)");
+		if (!PathUtil.MOD_BAK_FOLDER.toFile().exists()){
+			PathUtil.MOD_BAK_FOLDER.toFile().mkdirs();
+		}
+		
+		Path path = fileName!=null?fileName.toPath():null;
+		Path removeAfter = null;
+		if (e instanceof  AutoFileSyncEntry.ForModFileRequest){
+			AutoFileSyncEntry.ForModFileRequest mase = (AutoFileSyncEntry.ForModFileRequest)e;
+			removeAfter = path;
+			int count = 0;
+			String name = "bclib_synced_" + mase.modID + "_" + mase.version.replace(".", "_") + ".jar";
+			do {
+				if (path != null) {
+					//move to the same directory as the existing Mod
+					path = path.getParent()
+							   .resolve(name);
+				}
+				else {
+					//move to the default mode location
+					path = PathUtil.MOD_FOLDER.resolve(name);
+				}
+				count++;
+				name = "bclib_synced_" + mase.modID + "_" + mase.version.replace(".", "_") + "__" + String.format("%03d", count) + ".jar";
+			} while (path.toFile().exists());
+		}
+		
+		BCLib.LOGGER.info("    - Writing " + path + " (" + PathUtil.humanReadableFileSize(data.length) + ")");
 		try {
 			final File parentFile = path.getParent()
 										.toFile();
@@ -139,7 +166,23 @@ public class SendFiles extends DataHandler.FromServer {
 				parentFile.mkdirs();
 			}
 			Files.write(path, data);
+			if (removeAfter != null){
+				final String bakFileName = removeAfter.toFile().getName();
+				String collisionFreeName = bakFileName;
+				Path targetPath;
+				int count = 0;
+				do {
+					targetPath = PathUtil.MOD_BAK_FOLDER.resolve(collisionFreeName);
+					count++;
+					collisionFreeName = String.format("%03d", count) + "_" + bakFileName;
+				} while (targetPath.toFile().exists());
+				
+				BCLib.LOGGER.info("    - Moving " + removeAfter + " to " +targetPath);
+				removeAfter.toFile().renameTo(targetPath.toFile());
+			}
 			AutoSync.didReceiveFile(e, fileName);
+			
+			
 		}
 		catch (IOException ioException) {
 			BCLib.LOGGER.error("    --> Writing " + fileName + " failed: " + ioException);

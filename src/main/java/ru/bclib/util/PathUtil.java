@@ -30,6 +30,9 @@ public class PathUtil {
 													  .resolve("mods")
 													  .normalize();
 	
+	public final static Path MOD_BAK_FOLDER = MOD_FOLDER.resolve("_bclib_deactivated")
+														.normalize();
+	
 	/**
 	 * Tests if a path is a child-path.
 	 * <p>
@@ -95,7 +98,13 @@ public class PathUtil {
 		
 		@Override
 		public String toString() {
-			return "ModInfo{" + "id=" + metadata.getId()+ "version=" + metadata.getVersion() + "jarPath=" + jarPath + '}';
+			return "ModInfo{" + "id=" + metadata.getId() + ", version=" + metadata.getVersion() + ", jarPath=" + jarPath + '}';
+		}
+		
+		public String getVersion() {
+			if (metadata == null) return "0.0.0";
+			return metadata.getVersion()
+						   .toString();
 		}
 	}
 	
@@ -115,10 +124,11 @@ public class PathUtil {
 	 * calling {@link #invalidateCachedMods()}
 	 * <p>
 	 * An error message is printed if a mod fails to load, but the parsing will continue.
+	 *
 	 * @return A map of all found mods. (key=ModID, value={@link ModInfo})
 	 */
 	public static Map<String, ModInfo> getMods() {
-		if (mods!=null) return mods;
+		if (mods != null) return mods;
 		
 		mods = new HashMap<>();
 		org.apache.logging.log4j.Logger logger = LogManager.getFormatterLogger("BCLib|ModLoader");
@@ -150,18 +160,24 @@ public class PathUtil {
 	 * <p>
 	 * The call will also return null if the mode-Version in the jar-File is not the same
 	 * as the version of the loaded Mod.
+	 *
 	 * @param modID The mod ID to query
 	 * @return A {@link ModInfo}-Object for the querried Mod.
 	 */
-	public static ModInfo getModInfo(String modID){
+	public static ModInfo getModInfo(String modID) {
+		return getModInfo(modID, true);
+	}
+	
+	public static ModInfo getModInfo(String modID, boolean matchVersion) {
 		getMods();
 		final ModInfo mi = mods.get(modID);
-		if (!getModVersion(modID).equals(mi.metadata.getVersion())) return null;
+		if (mi == null || !getModVersion(modID).equals(mi.getVersion())) return null;
 		return mi;
 	}
 	
 	/**
 	 * Local Mod Version for the queried Mod
+	 *
 	 * @param modID The mod ID to query
 	 * @return The version of the locally installed Mod
 	 */
@@ -175,5 +191,29 @@ public class PathUtil {
 							   .toString();
 		}
 		return "0.0.0";
+	}
+	
+	/**
+	 * Creates a human readable File-Size
+	 *
+	 * @param size Filesize in bytes
+	 * @return A Human readable String
+	 */
+	public static String humanReadableFileSize(long size) {
+		final int threshold = 2;
+		final int factor = 1024;
+		if (size < 0) return "? Byte";
+		if (size < factor * threshold) {
+			return size + " Byte";
+		}
+		char[] units = {'K', 'M', 'G', 'T', 'P'};
+		int unitIndex = 0;
+		double fSize = size;
+		do {
+			unitIndex++;
+			fSize /= 1024;
+		} while (fSize > factor * threshold && unitIndex < units.length);
+		
+		return String.format("%.1f %ciB", fSize, units[unitIndex - 1]);
 	}
 }

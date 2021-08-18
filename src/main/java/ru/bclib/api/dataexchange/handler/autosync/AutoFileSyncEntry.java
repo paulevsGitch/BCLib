@@ -6,6 +6,7 @@ import ru.bclib.api.dataexchange.DataHandler;
 import ru.bclib.api.dataexchange.SyncFileHash;
 import ru.bclib.api.dataexchange.handler.autosync.AutoSync.NeedTransferPredicate;
 import ru.bclib.api.dataexchange.handler.autosync.SyncFolderDescriptor.SubFile;
+import ru.bclib.api.datafixer.DataFixerAPI;
 import ru.bclib.util.Pair;
 import ru.bclib.util.PathUtil;
 import ru.bclib.util.PathUtil.ModInfo;
@@ -54,34 +55,41 @@ class AutoFileSyncEntry extends AutoSyncID {
 	}
 	
 	static class ForModFileRequest extends AutoFileSyncEntry {
-		public static Path getLocalPathForID(String modID){
-			ModInfo mi = PathUtil.getModInfo(modID);
+		public static File getLocalPathForID(String modID, boolean matchLocalVersion){
+			ModInfo mi = PathUtil.getModInfo(modID, matchLocalVersion);
 			if (mi!=null){
-				return mi.jarPath;
+				return mi.jarPath.toFile();
 			}
 			return null;
 		}
 		
-		ForModFileRequest(String modID) {
-			super(modID, AutoSyncID.ForModFileRequest.UNIQUE_ID, getLocalPathForID(modID).toFile(), false, (a, b, c) -> false);
-			if (this.fileName == null){
+		public final String version;
+		ForModFileRequest(String modID, boolean matchLocalVersion, String version) {
+			super(modID, AutoSyncID.ForModFileRequest.UNIQUE_ID, getLocalPathForID(modID, matchLocalVersion), false, (a, b, c) -> false);
+			if (this.fileName == null && matchLocalVersion){
 				BCLib.LOGGER.error("Unknown mod '"+modID+"'.");
 			}
+			if (version==null)
+				this.version = PathUtil.getModVersion(modID);
+			else
+				this.version = version;
 		}
 		
 		@Override
 		public int serializeContent(FriendlyByteBuf buf) {
 			final int res = super.serializeContent(buf);
+			buf.writeInt(DataFixerAPI.getModVersion(version));
 			return res;
 		}
 		
 		static AutoFileSyncEntry.ForModFileRequest finishDeserializeContent(String modID, FriendlyByteBuf buf) {
-			return new AutoFileSyncEntry.ForModFileRequest(modID);
+			final String version = DataFixerAPI.getModVersion(buf.readInt());
+			return new AutoFileSyncEntry.ForModFileRequest(modID, false, version);
 		}
 		
 		@Override
 		public String toString() {
-			return modID;
+			return "Mod " + modID + " (v" + version + ")";
 		}
 	}
 	
@@ -137,7 +145,7 @@ class AutoFileSyncEntry extends AutoSyncID {
 			entry = AutoFileSyncEntry.ForDirectFileRequest.finishDeserializeContent(uniqueID, buf);
 		}
 		else if (AutoSyncID.ForModFileRequest.UNIQUE_ID.equals(uniqueID)) {
-			entry = AutoFileSyncEntry.ForModFileRequest.finishDeserializeContent(uniqueID, buf);
+			entry = AutoFileSyncEntry.ForModFileRequest.finishDeserializeContent(modID, buf);
 		}
 		else {
 			entry = AutoFileSyncEntry.findMatching(modID, uniqueID);
@@ -205,6 +213,9 @@ class AutoFileSyncEntry extends AutoSyncID {
 				}
 			}
 			return null;
+		} else if (aid instanceof AutoSyncID.ForModFileRequest) {
+			AutoSyncID.ForModFileRequest mreq = (AutoSyncID.ForModFileRequest) aid;
+			return new AutoFileSyncEntry.ForModFileRequest(mreq.modID, true, null);
 		}
 		return findMatching(aid.modID, aid.uniqueID);
 	}

@@ -18,9 +18,13 @@ import ru.bclib.api.dataexchange.handler.autosync.SyncFolderDescriptor.SubFile;
 import ru.bclib.api.datafixer.DataFixerAPI;
 import ru.bclib.gui.screens.SyncFilesScreen;
 import ru.bclib.gui.screens.WarnBCLibVersionMismatch;
+import ru.bclib.util.Pair;
 import ru.bclib.util.PathUtil;
+import ru.bclib.util.PathUtil.ModInfo;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -69,10 +73,23 @@ public class HelloClient extends DataHandler.FromServer {
 			//write Plugin Versions
 			buf.writeInt(mods.size());
 			for (String modID : mods) {
-				writeString(buf, modID);
 				final String ver = PathUtil.getModVersion(modID);
+				final ModInfo mi = PathUtil.getModInfo(modID);
+				int size = 0;
+				if (mi!=null) {
+					try {
+						size = (int)Files.size(mi.jarPath);
+					}
+					catch (IOException e) {
+						BCLib.LOGGER.error("Unable to get File Size: " + e.getMessage());
+					}
+				}
+				
+				writeString(buf, modID);
 				buf.writeInt(DataFixerAPI.getModVersion(ver));
-				BCLib.LOGGER.info("    - Listing Mod " + modID + " v" + ver);
+				buf.writeInt(size);
+				
+				BCLib.LOGGER.info("    - Listing Mod " + modID + " v" + ver + " ("+PathUtil.humanReadableFileSize(size)+")");
 			}
 		}
 		else {
@@ -114,7 +131,7 @@ public class HelloClient extends DataHandler.FromServer {
 	}
 	
 	String bclibVersion = "0.0.0";
-	Map<String, String> modVersion = new HashMap<>();
+	Map<String, Pair<String, Integer>> modVersion = new HashMap<>();
 	List<AutoSync.AutoSyncTriple> autoSyncedFiles = null;
 	List<SyncFolderDescriptor> autoSynFolders = null;
 	
@@ -123,14 +140,23 @@ public class HelloClient extends DataHandler.FromServer {
 	protected void deserializeIncomingDataOnClient(FriendlyByteBuf buf, PacketSender responseSender) {
 		//read BCLibVersion (=protocol version)
 		bclibVersion = DataFixerAPI.getModVersion(buf.readInt());
+		final boolean protocolVersion_0_4_1 = DataFixerAPI.isLargerOrEqualVersion(bclibVersion, "0.4.1");
+		
 		
 		//read Plugin Versions
 		modVersion = new HashMap<>();
 		int count = buf.readInt();
 		for (int i = 0; i < count; i++) {
-			String id = readString(buf);
-			String version = DataFixerAPI.getModVersion(buf.readInt());
-			modVersion.put(id, version);
+			final String id = readString(buf);
+			final String version = DataFixerAPI.getModVersion(buf.readInt());
+			final int size;
+			//since v0.4.1 we also send the size of the mod-File
+			if (protocolVersion_0_4_1) {
+				size = buf.readInt();
+			} else {
+				size = 0;
+			}
+			modVersion.put(id, new Pair<>(version, size));
 		}
 		
 		//read config Data
@@ -146,7 +172,7 @@ public class HelloClient extends DataHandler.FromServer {
 		
 		autoSynFolders = new ArrayList<>(1);
 		//since v0.4.1 we also send the sync folders
-		if (DataFixerAPI.isLargerOrEqualVersion(bclibVersion, "0.4.1")) {
+		if (protocolVersion_0_4_1) {
 			final int folderCount = buf.readInt();
 			for (int i = 0; i < folderCount; i++) {
 				SyncFolderDescriptor desc = SyncFolderDescriptor.deserialize(buf);
@@ -262,14 +288,14 @@ public class HelloClient extends DataHandler.FromServer {
 	
 	@Environment(EnvType.CLIENT)
 	private void processModFileSync(final List<AutoSyncID> filesToRequest) {
-		for (Entry<String, String> e : modVersion.entrySet()) {
+		for (Entry<String, Pair<String, Integer>> e : modVersion.entrySet()) {
 			final String localVersion = PathUtil.getModVersion(e.getKey());
-			final String serverVersion = e.getValue();
-			final boolean requestMod = !serverVersion.equals(localVersion);
+			final Pair<String, Integer> serverInfo = e.getValue();
+			final boolean requestMod = !serverInfo.first.equals(localVersion) && serverInfo.second>0;
 			
-			BCLib.LOGGER.info("    - " + e.getKey() + " (client=" + localVersion + ", server=" + serverVersion + (requestMod?", requesting":"") +")");
+			BCLib.LOGGER.info("    - " + e.getKey() + " (client=" + localVersion + ", server=" + serverInfo.first  + ", size=" + PathUtil.humanReadableFileSize(serverInfo.second) + (requestMod?", requesting":"") +")");
 			if (requestMod){
-				filesToRequest.add(new AutoSyncID.ForModFileRequest(e.getKey(), serverVersion));
+				filesToRequest.add(new AutoSyncID.ForModFileRequest(e.getKey(), serverInfo.first));
 			}
 		}
 	}
