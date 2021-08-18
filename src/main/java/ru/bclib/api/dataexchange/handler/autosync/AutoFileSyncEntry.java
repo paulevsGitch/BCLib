@@ -6,10 +6,9 @@ import ru.bclib.api.dataexchange.DataHandler;
 import ru.bclib.api.dataexchange.SyncFileHash;
 import ru.bclib.api.dataexchange.handler.autosync.AutoSync.NeedTransferPredicate;
 import ru.bclib.api.dataexchange.handler.autosync.SyncFolderDescriptor.SubFile;
-import ru.bclib.api.datafixer.DataFixerAPI;
+import ru.bclib.util.ModUtil;
 import ru.bclib.util.Pair;
-import ru.bclib.util.PathUtil;
-import ru.bclib.util.PathUtil.ModInfo;
+import ru.bclib.util.ModUtil.ModInfo;
 import ru.bclib.util.Triple;
 
 import java.io.File;
@@ -56,7 +55,7 @@ class AutoFileSyncEntry extends AutoSyncID {
 	
 	static class ForModFileRequest extends AutoFileSyncEntry {
 		public static File getLocalPathForID(String modID, boolean matchLocalVersion){
-			ModInfo mi = PathUtil.getModInfo(modID, matchLocalVersion);
+			ModInfo mi = ModUtil.getModInfo(modID, matchLocalVersion);
 			if (mi!=null){
 				return mi.jarPath.toFile();
 			}
@@ -70,7 +69,7 @@ class AutoFileSyncEntry extends AutoSyncID {
 				BCLib.LOGGER.error("Unknown mod '"+modID+"'.");
 			}
 			if (version==null)
-				this.version = PathUtil.getModVersion(modID);
+				this.version = ModUtil.getModVersion(modID);
 			else
 				this.version = version;
 		}
@@ -78,12 +77,12 @@ class AutoFileSyncEntry extends AutoSyncID {
 		@Override
 		public int serializeContent(FriendlyByteBuf buf) {
 			final int res = super.serializeContent(buf);
-			buf.writeInt(DataFixerAPI.getModVersion(version));
+			buf.writeInt(ModUtil.convertModVersion(version));
 			return res;
 		}
 		
 		static AutoFileSyncEntry.ForModFileRequest finishDeserializeContent(String modID, FriendlyByteBuf buf) {
-			final String version = DataFixerAPI.getModVersion(buf.readInt());
+			final String version = ModUtil.convertModVersion(buf.readInt());
 			return new AutoFileSyncEntry.ForModFileRequest(modID, false, version);
 		}
 		

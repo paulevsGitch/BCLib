@@ -2,6 +2,7 @@ package ru.bclib.api.datafixer;
 
 import net.minecraft.nbt.CompoundTag;
 import org.jetbrains.annotations.NotNull;
+import ru.bclib.util.ModUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -90,7 +91,7 @@ public abstract class Patch {
 		}
 		
 		this.version = version;
-		this.level = DataFixerAPI.getModVersion(version);
+		this.level = ModUtil.convertModVersion(version);
 		if (!ALL.stream()
 				.filter(p -> p.modID
 							  .equals(modID))

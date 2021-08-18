@@ -9,6 +9,7 @@ import net.minecraft.nbt.NbtIo;
 import net.minecraft.world.level.storage.LevelStorageSource.LevelStorageAccess;
 import ru.bclib.BCLib;
 import ru.bclib.api.datafixer.DataFixerAPI;
+import ru.bclib.util.ModUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -143,6 +144,6 @@ public class WorldDataAPI {
 	 * @return {@code int} mod version.
 	 */
 	public static int getIntModVersion(String modID) {
-		return DataFixerAPI.getModVersion(getModVersion(modID));
+		return ModUtil.convertModVersion(getModVersion(modID));
 	}
 }

@@ -7,6 +7,7 @@ import net.minecraft.nbt.Tag;
 import org.jetbrains.annotations.NotNull;
 import ru.bclib.BCLib;
 import ru.bclib.api.WorldDataAPI;
+import ru.bclib.util.ModUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -133,7 +134,7 @@ public class MigrationProfile {
 	}
 	
 	public int currentPatchLevel(@NotNull String modID) {
-		return DataFixerAPI.getModVersion(currentPatchVersion(modID));
+		return ModUtil.convertModVersion(currentPatchVersion(modID));
 	}
 	
 	public boolean hasAnyFixes() {

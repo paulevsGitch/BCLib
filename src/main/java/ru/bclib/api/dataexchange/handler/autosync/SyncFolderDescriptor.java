@@ -140,7 +140,7 @@ public class SyncFolderDescriptor {
 		
 		final SyncFolderDescriptor desc;
 		if (localDescriptor != null) {
-			desc = new SyncFolderDescriptor(folderID, localDescriptor.localFolder, remAddFiles);
+			desc = new SyncFolderDescriptor(folderID, localDescriptor.localFolder, localDescriptor.removeAdditionalFiles && remAddFiles);
 			desc.fileCache = new ArrayList<>(count);
 		}
 		else {

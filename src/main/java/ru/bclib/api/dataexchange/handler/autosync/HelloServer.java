@@ -12,7 +12,7 @@ import ru.bclib.api.dataexchange.DataHandler;
 import ru.bclib.api.dataexchange.DataHandlerDescriptor;
 import ru.bclib.api.dataexchange.handler.autosync.AutoSync.ClientConfig;
 import ru.bclib.api.dataexchange.handler.autosync.AutoSync.Config;
-import ru.bclib.api.datafixer.DataFixerAPI;
+import ru.bclib.util.ModUtil;
 
 import java.io.File;
 
@@ -81,12 +81,12 @@ public class HelloServer extends DataHandler.FromClient {
 	@Override
 	protected void serializeDataOnClient(FriendlyByteBuf buf) {
 		BCLib.LOGGER.info("Sending hello to server.");
-		buf.writeInt(DataFixerAPI.getModVersion(HelloClient.getBCLibVersion()));
+		buf.writeInt(ModUtil.convertModVersion(HelloClient.getBCLibVersion()));
 	}
 	
 	@Override
 	protected void deserializeIncomingDataOnServer(FriendlyByteBuf buf, PacketSender responseSender) {
-		bclibVersion = DataFixerAPI.getModVersion(buf.readInt());
+		bclibVersion = ModUtil.convertModVersion(buf.readInt());
 	}
 	
 	@Override

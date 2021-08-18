@@ -15,12 +15,12 @@ import ru.bclib.api.dataexchange.handler.autosync.AutoSync.ClientConfig;
 import ru.bclib.api.dataexchange.handler.autosync.AutoSync.Config;
 import ru.bclib.api.dataexchange.handler.autosync.AutoSyncID.WithContentOverride;
 import ru.bclib.api.dataexchange.handler.autosync.SyncFolderDescriptor.SubFile;
-import ru.bclib.api.datafixer.DataFixerAPI;
 import ru.bclib.gui.screens.SyncFilesScreen;
 import ru.bclib.gui.screens.WarnBCLibVersionMismatch;
+import ru.bclib.util.ModUtil;
 import ru.bclib.util.Pair;
 import ru.bclib.util.PathUtil;
-import ru.bclib.util.PathUtil.ModInfo;
+import ru.bclib.util.ModUtil.ModInfo;
 
 import java.io.File;
 import java.io.IOException;
@@ -46,7 +46,7 @@ public class HelloClient extends DataHandler.FromServer {
 	}
 	
 	static String getBCLibVersion() {
-		return PathUtil.getModVersion(BCLib.MOD_ID);
+		return ModUtil.getModVersion(BCLib.MOD_ID);
 	}
 	
 	@Override
@@ -67,14 +67,14 @@ public class HelloClient extends DataHandler.FromServer {
 		final List<String> mods = DataExchangeAPI.registeredMods();
 		
 		//write BCLibVersion (=protocol version)
-		buf.writeInt(DataFixerAPI.getModVersion(vbclib));
+		buf.writeInt(ModUtil.convertModVersion(vbclib));
 		
 		if (Config.isOfferingMods()) {
 			//write Plugin Versions
 			buf.writeInt(mods.size());
 			for (String modID : mods) {
-				final String ver = PathUtil.getModVersion(modID);
-				final ModInfo mi = PathUtil.getModInfo(modID);
+				final String ver = ModUtil.getModVersion(modID);
+				final ModInfo mi = ModUtil.getModInfo(modID);
 				int size = 0;
 				if (mi!=null) {
 					try {
@@ -86,7 +86,7 @@ public class HelloClient extends DataHandler.FromServer {
 				}
 				
 				writeString(buf, modID);
-				buf.writeInt(DataFixerAPI.getModVersion(ver));
+				buf.writeInt(ModUtil.convertModVersion(ver));
 				buf.writeInt(size);
 				
 				BCLib.LOGGER.info("    - Listing Mod " + modID + " v" + ver + " ("+PathUtil.humanReadableFileSize(size)+")");
@@ -139,8 +139,8 @@ public class HelloClient extends DataHandler.FromServer {
 	@Override
 	protected void deserializeIncomingDataOnClient(FriendlyByteBuf buf, PacketSender responseSender) {
 		//read BCLibVersion (=protocol version)
-		bclibVersion = DataFixerAPI.getModVersion(buf.readInt());
-		final boolean protocolVersion_0_4_1 = DataFixerAPI.isLargerOrEqualVersion(bclibVersion, "0.4.1");
+		bclibVersion = ModUtil.convertModVersion(buf.readInt());
+		final boolean protocolVersion_0_4_1 = ModUtil.isLargerOrEqualVersion(bclibVersion, "0.4.1");
 		
 		
 		//read Plugin Versions
@@ -148,7 +148,7 @@ public class HelloClient extends DataHandler.FromServer {
 		int count = buf.readInt();
 		for (int i = 0; i < count; i++) {
 			final String id = readString(buf);
-			final String version = DataFixerAPI.getModVersion(buf.readInt());
+			final String version = ModUtil.convertModVersion(buf.readInt());
 			final int size;
 			//since v0.4.1 we also send the size of the mod-File
 			if (protocolVersion_0_4_1) {
@@ -289,7 +289,7 @@ public class HelloClient extends DataHandler.FromServer {
 	@Environment(EnvType.CLIENT)
 	private void processModFileSync(final List<AutoSyncID> filesToRequest) {
 		for (Entry<String, Pair<String, Integer>> e : modVersion.entrySet()) {
-			final String localVersion = PathUtil.getModVersion(e.getKey());
+			final String localVersion = ModUtil.getModVersion(e.getKey());
 			final Pair<String, Integer> serverInfo = e.getValue();
 			final boolean requestMod = !serverInfo.first.equals(localVersion) && serverInfo.second>0;
 			

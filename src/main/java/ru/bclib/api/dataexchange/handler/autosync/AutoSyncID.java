@@ -3,7 +3,7 @@ package ru.bclib.api.dataexchange.handler.autosync;
 import net.minecraft.network.FriendlyByteBuf;
 import org.jetbrains.annotations.NotNull;
 import ru.bclib.api.dataexchange.DataHandler;
-import ru.bclib.api.datafixer.DataFixerAPI;
+import ru.bclib.util.ModUtil;
 
 import java.io.File;
 import java.util.Objects;
@@ -62,11 +62,11 @@ public class AutoSyncID {
 		@Override
 		void serializeData(FriendlyByteBuf buf) {
 			super.serializeData(buf);
-			buf.writeInt(DataFixerAPI.getModVersion(version));
+			buf.writeInt(ModUtil.convertModVersion(version));
 		}
 		
 		static ForModFileRequest finishDeserialize(String modID, String uniqueID, FriendlyByteBuf buf){
-			final String version = DataFixerAPI.getModVersion(buf.readInt());
+			final String version = ModUtil.convertModVersion(buf.readInt());
 			return new ForModFileRequest(modID, version);
 		}
 		
