@@ -7,11 +7,10 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
 import ru.bclib.gui.gridlayout.GridLayout.Alignment;
 import ru.bclib.gui.gridlayout.GridRow;
-import ru.bclib.gui.gridlayout.GridScreen;
 
 
 @Environment(EnvType.CLIENT)
-public class ConfirmRestartScreen extends GridScreen {
+public class ConfirmRestartScreen extends BCLibScreen {
     private final Component description;
     private final ConfirmRestartScreen.Listener listener;
 
@@ -20,9 +19,9 @@ public class ConfirmRestartScreen extends GridScreen {
     }
 
     public ConfirmRestartScreen(ConfirmRestartScreen.Listener listener, Component message) {
-        super(new TranslatableComponent("bclib.datafixer.confirmrestart.title"));
+        super(new TranslatableComponent("title.bclib.confirmrestart"));
 
-        this.description = message==null?new TranslatableComponent("bclib.datafixer.confirmrestart.message"):message;
+        this.description = message==null?new TranslatableComponent("message.bclib.confirmrestart"):message;
         this.listener = listener;
     }
 
