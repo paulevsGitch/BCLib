@@ -50,7 +50,7 @@ public class DataExchangeAPI extends DataExchange {
 	 * @param modID - {@link String} modID.
 	 */
 	public static void registerModDependency(String modID) {
-		if (ModUtil.getModInfo(modID, false) != null) {
+		if (ModUtil.getModInfo(modID, false) != null && !"0.0.0".equals(ModUtil.getModVersion(modID))) {
 			registerMod(modID);
 		} else {
 			BCLib.LOGGER.info("Mod Dependency '" + modID + "' not found. This is probably OK.");

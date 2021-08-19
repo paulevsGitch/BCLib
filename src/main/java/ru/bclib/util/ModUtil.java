@@ -104,6 +104,11 @@ public class ModUtil {
 							   .getVersion()
 							   .toString();
 		}
+		
+		//not found in loaded mods, lets check the local mods folder
+		final ModInfo mi = getModInfo(modID, false);
+		if (mi!=null) return mi.getVersion();
+		
 		return "0.0.0";
 	}
 	
