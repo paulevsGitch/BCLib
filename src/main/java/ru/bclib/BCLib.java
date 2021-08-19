@@ -39,14 +39,19 @@ public class BCLib implements ModInitializer {
 		TagAPI.init();
 		CraftingRecipes.init();
 		WorldDataAPI.registerModCache(MOD_ID);
+		
 		DataExchangeAPI.registerMod(MOD_ID);
-		DataFixerAPI.registerPatch(() -> new BCLibPatch());
+		//this will offer modMenu to clients if installed in the server
+		DataExchangeAPI.registerModDependency("modmenu");
+		
 		DataExchangeAPI.registerDescriptors(List.of(
 				HelloClient.DESCRIPTOR,
 				HelloServer.DESCRIPTOR,
 				RequestFiles.DESCRIPTOR,
 				SendFiles.DESCRIPTOR
 		));
+		
+		DataFixerAPI.registerPatch(() -> new BCLibPatch());
 
 		Configs.save();
 	}
