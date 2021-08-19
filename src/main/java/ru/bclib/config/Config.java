@@ -33,7 +33,10 @@ public abstract class Config {
 	}
 	
 	protected Config(String modID, String group, boolean autoSync, boolean diffContent) {
-		BCLib.LOGGER.info("Registered Config " + modID + "." + group + " (" + autoSync + ")");
+		if (autoSync) {
+			BCLib.LOGGER.info("Config " + modID + "." + group + " to auto sync (contentDiff = " + diffContent + ")");
+		}
+		
 		this.keeper = new ConfigKeeper(modID, group);
 		this.registerEntries();
 		this.autoSync = autoSync;
