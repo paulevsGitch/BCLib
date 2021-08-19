@@ -85,7 +85,7 @@ public class ModUtil {
 	public static ModInfo getModInfo(String modID, boolean matchVersion) {
 		getMods();
 		final ModInfo mi = mods.get(modID);
-		if (mi == null || !getModVersion(modID).equals(mi.getVersion())) return null;
+		if (mi == null || (matchVersion && !getModVersion(modID).equals(mi.getVersion()))) return null;
 		return mi;
 	}
 	

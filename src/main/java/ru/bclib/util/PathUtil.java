@@ -1,24 +1,10 @@
 package ru.bclib.util;
 
 import net.fabricmc.loader.api.FabricLoader;
-import net.fabricmc.loader.api.ModContainer;
-import net.fabricmc.loader.api.metadata.ModMetadata;
-import net.fabricmc.loader.metadata.ModMetadataParser;
-import net.fabricmc.loader.metadata.ParseMetadataException;
-import org.apache.logging.log4j.LogManager;
-import ru.bclib.BCLib;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.jar.JarFile;
 
 public class PathUtil {
 	public final static Path GAME_FOLDER = FabricLoader.getInstance()
@@ -79,7 +65,7 @@ public class PathUtil {
 			if (f.getName()
 				 .startsWith(".")) continue;
 			if (f.isDirectory()) {
-				fileWalker(f, pathConsumer);
+				if (recursive) fileWalker(f, pathConsumer);
 			}
 			else if (f.isFile()) {
 				pathConsumer.accept(f.toPath());
