@@ -3,8 +3,10 @@ package ru.bclib.gui.screens;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.Nullable;
 import ru.bclib.BCLib;
 import ru.bclib.gui.gridlayout.GridLayout.GridValueType;
 import ru.bclib.gui.gridlayout.GridLayout.VerticalAlignment;
@@ -19,14 +21,27 @@ abstract class BCLibScreen extends GridScreen {
 		super(title);
 	}
 	
+	public BCLibScreen(@Nullable Screen parent, Component title){
+		super(parent, title);
+	}
+	
 	public BCLibScreen(Component title, int topPadding, boolean centerVertically) {
-		super(title, topPadding, centerVertically);
+		super(title, topPadding, 20, centerVertically);
+	}
+	
+	public BCLibScreen(@Nullable Screen parent, Component title, int topPadding, boolean centerVertically) {
+		super(parent, title, topPadding,  centerVertically);
 	}
 	
 	public BCLibScreen(Component title, int topPadding, int sidePadding, boolean centerVertically) {
 		super(title, topPadding, sidePadding, centerVertically);
 	}
 	
+	public BCLibScreen(@Nullable Screen parent, Component title, int topPadding, int sidePadding, boolean centerVertically) {
+		super(parent, title, topPadding, sidePadding, centerVertically);
+	}
+		
+		
 	protected void addTitle(){
 		GridRow row = grid.addRow(VerticalAlignment.CENTER);
 		row.addFiller();

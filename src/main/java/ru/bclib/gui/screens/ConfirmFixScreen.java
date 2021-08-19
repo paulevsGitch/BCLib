@@ -14,16 +14,12 @@ import ru.bclib.gui.gridlayout.GridRow;
 
 @Environment(EnvType.CLIENT)
 public class ConfirmFixScreen extends BCLibScreen {
-	
-	@Nullable
-	private final Screen lastScreen;
 	protected final ConfirmFixScreen.Listener listener;
 	private final Component description;
 	protected int id;
 	
-	public ConfirmFixScreen(@Nullable Screen screen, ConfirmFixScreen.Listener listener) {
-		super(new TranslatableComponent("bclib.datafixer.backupWarning.title"));
-		this.lastScreen = screen;
+	public ConfirmFixScreen(@Nullable Screen parent, ConfirmFixScreen.Listener listener) {
+		super(parent, new TranslatableComponent("bclib.datafixer.backupWarning.title"));
 		this.listener = listener;
 		
 		this.description = new TranslatableComponent("bclib.datafixer.backupWarning.message");
@@ -48,7 +44,7 @@ public class ConfirmFixScreen extends BCLibScreen {
 		row = grid.addRow();
 		row.addFiller();
 		row.addButton(CommonComponents.GUI_CANCEL, BUTTON_HEIGHT, this.font, (button) -> {
-			this.minecraft.setScreen(this.lastScreen);
+			onClose();
 		});
 		row.addSpacer();
 		row.addButton(CommonComponents.GUI_PROCEED, BUTTON_HEIGHT, this.font, (button) -> {
@@ -58,16 +54,7 @@ public class ConfirmFixScreen extends BCLibScreen {
 	}
 	
 	public boolean shouldCloseOnEsc() {
-		return false;
-	}
-	
-	public boolean keyPressed(int i, int j, int k) {
-		if (i == 256) {
-			this.minecraft.setScreen(this.lastScreen);
-			return true;
-		} else {
-			return super.keyPressed(i, j, k);
-		}
+		return true;
 	}
 	
 	@Environment(EnvType.CLIENT)

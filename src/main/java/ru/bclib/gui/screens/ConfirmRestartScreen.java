@@ -34,7 +34,7 @@ public class ConfirmRestartScreen extends BCLibScreen {
         
         GridRow row = grid.addRow();
         row.addFiller();
-        row.addButton(CommonComponents.GUI_PROCEED, BUTTON_HEIGHT, (button) -> {
+        row.addButton(CommonComponents.GUI_PROCEED, BUTTON_HEIGHT, font, (button) -> {
             listener.proceed();
         });
         row.addFiller();

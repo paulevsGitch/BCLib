@@ -9,6 +9,7 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import org.jetbrains.annotations.Nullable;
 import ru.bclib.gui.gridlayout.GridLayout.Alignment;
 
 
@@ -18,21 +19,41 @@ public abstract class GridScreen extends Screen {
 	public final int topPadding;
 	public final int sidePadding;
 	public final boolean centerVertically;
+	@Nullable
+	public final Screen parent;
 	
 	public GridScreen(Component title) {
-		this(title, 0, true);
+		this(null, title);
+	}
+	
+	public GridScreen(@Nullable Screen parent, Component title){
+		this(parent, title, 0, true);
 	}
 	
 	public GridScreen(Component title, int topPadding, boolean centerVertically) {
-		this(title, topPadding, 20, centerVertically);
+		this(null, title, topPadding, 20, centerVertically);
+	}
+	
+	public GridScreen(@Nullable Screen parent, Component title, int topPadding, boolean centerVertically) {
+		this(parent, title, topPadding, 20, centerVertically);
 	}
 	
 	public GridScreen(Component title, int topPadding, int sidePadding, boolean centerVertically) {
+		this(null, title, topPadding, sidePadding, centerVertically);
+	}
+	
+	public GridScreen(@Nullable Screen parent, Component title, int topPadding, int sidePadding, boolean centerVertically) {
 		super(title);
 		
+		this.parent = parent;
 		this.topPadding = topPadding;
 		this.sidePadding = sidePadding;
 		this.centerVertically = centerVertically;
+	}
+	
+	@Override
+	public void onClose() {
+		this.minecraft.setScreen(parent);
 	}
 	
 	public Font getFont(){
