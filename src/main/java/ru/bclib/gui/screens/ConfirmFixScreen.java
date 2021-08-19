@@ -7,15 +7,14 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
-import ru.bclib.BCLib;
-import ru.bclib.gui.GridScreen;
+import ru.bclib.gui.gridlayout.GridCheckboxCell;
+import ru.bclib.gui.gridlayout.GridLayout.Alignment;
+import ru.bclib.gui.gridlayout.GridRow;
 
 @Environment(EnvType.CLIENT)
-public class ConfirmFixScreen extends GridScreen {
-	static final ResourceLocation BCLIB_LOGO_LOCATION = new ResourceLocation(BCLib.MOD_ID,
-		"icon.png");
+public class ConfirmFixScreen extends BCLibScreen {
+	
 	@Nullable
 	private final Screen lastScreen;
 	protected final ConfirmFixScreen.Listener listener;
@@ -23,7 +22,7 @@ public class ConfirmFixScreen extends GridScreen {
 	protected int id;
 	
 	public ConfirmFixScreen(@Nullable Screen screen, ConfirmFixScreen.Listener listener) {
-		super(30, new TranslatableComponent("bclib.datafixer.backupWarning.title"));
+		super(new TranslatableComponent("bclib.datafixer.backupWarning.title"));
 		this.lastScreen = screen;
 		this.listener = listener;
 		
@@ -33,27 +32,29 @@ public class ConfirmFixScreen extends GridScreen {
 	protected void initLayout() {
 		final int BUTTON_HEIGHT = 20;
 		
-		grid.addMessageRow(this.description, 25);
+		grid.addRow().addMessage(this.description, this.font, Alignment.CENTER);
+		grid.addSpacerRow();
 		
-		grid.startRow();
-		grid.addButton( BUTTON_HEIGHT, new TranslatableComponent("bclib.datafixer.backupWarning.backup"), (button) -> {
-			this.listener.proceed(true, true);
-		});
+		GridRow row = grid.addRow();
+		GridCheckboxCell backup = row.addCheckbox(new TranslatableComponent("bclib.datafixer.backupWarning.backup"), true, BUTTON_HEIGHT, this.font);
 		
-		grid.startRow();
-		grid.addButton( BUTTON_HEIGHT, CommonComponents.GUI_CANCEL, (button) -> {
+		grid.addSpacerRow(10);
+		
+		row = grid.addRow();
+		GridCheckboxCell fix = row.addCheckbox(new TranslatableComponent("bclib.datafixer.backupWarning.fix"), true, BUTTON_HEIGHT, this.font);
+		
+		grid.addSpacerRow(20);
+		
+		row = grid.addRow();
+		row.addFiller();
+		row.addButton(CommonComponents.GUI_CANCEL, BUTTON_HEIGHT, this.font, (button) -> {
 			this.minecraft.setScreen(this.lastScreen);
 		});
-		grid.addButton(0.5f, BUTTON_HEIGHT, new TranslatableComponent("bclib.datafixer.backupWarning.continue"), (button) -> {
-			this.listener.proceed(false, true);
+		row.addSpacer();
+		row.addButton(CommonComponents.GUI_PROCEED, BUTTON_HEIGHT, this.font, (button) -> {
+			this.listener.proceed(backup.isChecked(), fix.isChecked());
 		});
-		
-		grid.startRow();
-		grid.addButton(0.5f, BUTTON_HEIGHT, new TranslatableComponent("bclib.datafixer.backupWarning.nofixes"), (button) -> {
-			this.listener.proceed(false, false);
-		});
-		
-		grid.endRow();
+		row.addFiller();
 	}
 	
 	public boolean shouldCloseOnEsc() {

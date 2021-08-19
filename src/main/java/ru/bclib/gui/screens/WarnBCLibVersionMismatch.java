@@ -5,14 +5,16 @@ import net.fabricmc.api.Environment;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
-import ru.bclib.gui.GridScreen;
+import ru.bclib.gui.gridlayout.GridLayout.Alignment;
+import ru.bclib.gui.gridlayout.GridRow;
+import ru.bclib.gui.gridlayout.GridScreen;
 
 @Environment(EnvType.CLIENT)
 public class WarnBCLibVersionMismatch extends GridScreen {
 	private final Component description;
 	private final Listener listener;
 	public WarnBCLibVersionMismatch(Listener listener) {
-		super(30, new TranslatableComponent("bclib.datafixer.bclibmissmatch.title"));
+		super(new TranslatableComponent("bclib.datafixer.bclibmissmatch.title"));
 		
 		this.description = new TranslatableComponent("bclib.datafixer.bclibmissmatch.message");
 		this.listener = listener;
@@ -21,18 +23,18 @@ public class WarnBCLibVersionMismatch extends GridScreen {
 	protected void initLayout() {
 		final int BUTTON_HEIGHT = 20;
 		
-		grid.addMessageRow(this.description, 25);
+		grid.addRow().addMessage(this.description, this.font, Alignment.CENTER);
 		
-		grid.startRow();
-		grid.addButton( BUTTON_HEIGHT, CommonComponents.GUI_NO, (button) -> {
+		GridRow row = grid.addRow();
+		row.addFiller();
+		row.addButton(CommonComponents.GUI_NO, BUTTON_HEIGHT, this.font, (button) -> {
 			listener.proceed(false);
 		});
-		grid.addButton( BUTTON_HEIGHT, CommonComponents.GUI_YES, (button) -> {
+		row.addSpacer();
+		row.addButton(CommonComponents.GUI_YES, BUTTON_HEIGHT, this.font, (button) -> {
 			listener.proceed(true);
 		});
-		
-		grid.endRow();
-		grid.recenterVertically();
+		row.addFiller();
 	}
 	
 	public boolean shouldCloseOnEsc() {
