@@ -25,7 +25,8 @@
 		],
 		"server": [
 			"ru.bclib.server.BCLibServer"
-		]
+		],
+        "modmenu": [ "ru.bclib.integration.ModMenuIntegration::entrypointObject" ]
 	},
 	"mixins": [
 		"bclib.mixins.common.json",
@@ -35,5 +36,12 @@
 		"fabricloader": ">=0.11.6",
 		"fabric": ">=0.36.0",
 		"minecraft": ">=1.17.1"
-	}
+	},    
+    "custom":{
+        "modmenu":{
+            "links":{
+                "title.link.bclib.discord":"https://discord.gg/kYuATbYbKW"
+            }
+        }
+    }
 }

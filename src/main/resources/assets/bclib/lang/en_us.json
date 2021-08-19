@@ -14,5 +14,7 @@
 	"message.bclib.syncfiles.folders": "Synchronize Folders and Files",
 	"message.bclib.syncfiles.delete": "Delete unneeded",
 	"title.bclib.confirmrestart": "Restart Required",
-	"message.bclib.confirmrestart": "The requested files were processed. You need o restart Minecraft now."
+	"message.bclib.confirmrestart": "The requested content was synchronized. You need to restart Minecraft now.",
+	"title.link.bclib.discord": "Discord",
+    "title.bclib.modmenu.main": "BCLib Settings"
 }
