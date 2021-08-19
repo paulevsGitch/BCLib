@@ -3,6 +3,7 @@ package ru.bclib.api.dataexchange.handler.autosync;
 import net.minecraft.network.FriendlyByteBuf;
 import org.jetbrains.annotations.NotNull;
 import ru.bclib.api.dataexchange.DataHandler;
+import ru.bclib.config.Config;
 import ru.bclib.util.ModUtil;
 
 import java.io.File;
@@ -133,5 +134,9 @@ public class AutoSyncID {
 		} else{
 			return new AutoSyncID(modID, uID);
 		}
+	}
+	
+	public boolean isConfigFile(){
+		return this.uniqueID.startsWith(Config.CONFIG_SYNC_PREFIX);
 	}
 }

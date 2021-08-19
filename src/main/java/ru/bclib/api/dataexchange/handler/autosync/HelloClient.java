@@ -330,7 +330,7 @@ public class HelloClient extends DataHandler.FromServer {
 		//Files can only get placed within that folder
 		
 		if ((filesToRequest.size() > 0 || filesToRemove.size() > 0) && ClientConfig.isAcceptingFiles()) {
-			showDownloadConfigs(client, filesToRequest, filesToRemove);
+			showSyncFilesScreen(client, filesToRequest, filesToRemove);
 			return;
 		}
 	}
@@ -350,38 +350,65 @@ public class HelloClient extends DataHandler.FromServer {
 	}
 	
 	@Environment(EnvType.CLIENT)
-	protected void showDownloadConfigs(Minecraft client, List<AutoSyncID> files, final List<AutoSyncID.ForDirectFileRequest> filesToRemove) {
-		client.setScreen(new SyncFilesScreen((download) -> {
+	protected void showSyncFilesScreen(Minecraft client, List<AutoSyncID> files, final List<AutoSyncID.ForDirectFileRequest> filesToRemove) {
+		int configFiles = 0;
+		int singleFiles = 0;
+		int folderFiles = 0;
+		int modFiles = 0;
+		
+		for (AutoSyncID aid : files){
+			if (aid.isConfigFile()){
+				configFiles++;
+			} else if (aid instanceof AutoSyncID.ForModFileRequest){
+				modFiles++;
+			} else if (aid instanceof AutoSyncID.ForDirectFileRequest){
+				folderFiles++;
+			} else {
+				singleFiles++;
+			}
+		}
+		
+		client.setScreen(new SyncFilesScreen(modFiles, configFiles, singleFiles, folderFiles, filesToRemove.size(), (downloadMods, downloadConfigs, downloadFiles, removeFiles) -> {
 			Minecraft.getInstance()
 					 .setScreen((Screen) null);
-			if (download) {
+			if (downloadMods || downloadConfigs || downloadFiles) {
 				BCLib.LOGGER.info("Updating local Files:");
 				List<AutoSyncID.WithContentOverride> localChanges = new ArrayList<>(files.toArray().length);
 				List<AutoSyncID> requestFiles = new ArrayList<>(files.toArray().length);
 				
 				files.forEach(aid -> {
-					if (aid instanceof WithContentOverride) {
-						final WithContentOverride aidc = (WithContentOverride) aid;
-						BCLib.LOGGER.info("    - " + aid + " (updating Content)");
-						
-						SendFiles.writeSyncedFile(aid, aidc.contentWrapper.getRawContent(), aidc.localFile);
+					if (aid.isConfigFile() && downloadConfigs){
+						processOfferedFile(requestFiles, aid);
+					} else if (aid instanceof AutoSyncID.ForModFileRequest && downloadMods){
+						processOfferedFile(requestFiles, aid);
+					} else if (downloadFiles){
+						processOfferedFile(requestFiles, aid);
 					}
-					else {
-						requestFiles.add(aid);
-						BCLib.LOGGER.info("    - " + aid + " (requesting)");
-					}
-				});
-				
-				filesToRemove.forEach(aid -> {
-					BCLib.LOGGER.info("    - " + aid.relFile + " (removing)");
-					
-					aid.relFile.delete();
 				});
 				
 				requestFileDownloads(requestFiles);
 			}
+			if (removeFiles) {
+				filesToRemove.forEach(aid -> {
+					BCLib.LOGGER.info("    - " + aid.relFile + " (removing)");
+					aid.relFile.delete();
+				});
+			}
 		}));
 		
+	}
+	
+	private void processOfferedFile(List<AutoSyncID> requestFiles, AutoSyncID aid) {
+		if (aid instanceof WithContentOverride) {
+			final WithContentOverride aidc = (WithContentOverride) aid;
+			BCLib.LOGGER.info("    - " + aid + " (updating Content)");
+			
+			SendFiles.writeSyncedFile(aid, aidc.contentWrapper.getRawContent(), aidc.localFile);
+		}
+		else {
+			requestFiles.add(aid);
+			BCLib.LOGGER.info("    - " + aid + " (requesting)");
+		}
 	}
 	
 	private void requestBCLibDownload(Consumer<Boolean> whenFinished) {

@@ -28,7 +28,7 @@ abstract class BCLibScreen extends GridScreen {
 	}
 	
 	protected void addTitle(){
-		GridRow row = grid.addRow(VerticalAlignment.BOTTOM);
+		GridRow row = grid.addRow(VerticalAlignment.CENTER);
 		row.addFiller();
 		row.addImage(BCLIB_LOGO_LOCATION, 24, GridValueType.CONSTANT, 24, 512, 512);
 		row.addSpacer(4);

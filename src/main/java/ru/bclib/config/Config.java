@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public abstract class Config {
+	public static final String CONFIG_SYNC_PREFIX = "CONFIG_";
 	protected final static Map<AutoSyncID, Config> autoSyncConfigs = new HashMap<>();
 	protected final ConfigKeeper keeper;
 	protected final boolean autoSync;
@@ -33,16 +34,12 @@ public abstract class Config {
 	}
 	
 	protected Config(String modID, String group, boolean autoSync, boolean diffContent) {
-		if (autoSync) {
-			BCLib.LOGGER.info("Added Config " + modID + "." + group + " to auto sync (contentDiff = " + diffContent + ")");
-		}
-		
 		this.keeper = new ConfigKeeper(modID, group);
 		this.registerEntries();
 		this.autoSync = autoSync;
 		
 		if (autoSync) {
-			final String uid = "CONFIG_" + modID + "_" + group;
+			final String uid = CONFIG_SYNC_PREFIX + modID + "_" + group;
 			final AutoSyncID aid = new AutoSyncID(BCLib.MOD_ID, uid);
 			if (diffContent)
 				DataExchangeAPI.addAutoSyncFile(aid.modID, aid.uniqueID, keeper.getConfigFile(),this::compareForSync);
@@ -50,6 +47,7 @@ public abstract class Config {
 				DataExchangeAPI.addAutoSyncFile(aid.modID, aid.uniqueID, keeper.getConfigFile());
 			
 			autoSyncConfigs.put(aid, this);
+			BCLib.LOGGER.info("Added Config " + modID + "." + group + " to auto sync (" + (diffContent?"content diff":"file hash") + ")");
 		}
 	}
 	

@@ -10,8 +10,9 @@
 	"title.bclib.syncfiles": "Mismatching Data",
 	"message.bclib.syncfiles": "Some Content on the Server does not match the versions on the client.\nDo you want to replace the selected content with the data from the server?",
 	"message.bclib.syncfiles.mods": "Synchronize Mods",
-	"message.bclib.syncfiles.files": "Synchronize Configs",
-	"message.bclib.syncfiles.folder": "Synchronize Folders",
+	"message.bclib.syncfiles.configs": "Synchronize Configs",
+	"message.bclib.syncfiles.folders": "Synchronize Folders and Files",
+	"message.bclib.syncfiles.delete": "Delete unneeded",
 	"title.bclib.confirmrestart": "Restart Required",
 	"message.bclib.confirmrestart": "The requested files were processed. You need o restart Minecraft now."
 }
