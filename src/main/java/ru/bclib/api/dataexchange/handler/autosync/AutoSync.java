@@ -6,6 +6,8 @@ import net.fabricmc.loader.api.FabricLoader;
 import ru.bclib.BCLib;
 import ru.bclib.api.dataexchange.SyncFileHash;
 import ru.bclib.config.Configs;
+import ru.bclib.config.NamedPathConfig;
+import ru.bclib.config.NamedPathConfig.ConfigToken.Bool;
 import ru.bclib.util.PathUtil;
 
 import java.io.File;
@@ -29,43 +31,63 @@ public class AutoSync {
 	}
 	
 	@Environment(EnvType.CLIENT)
-	static class ClientConfig {
-		public static boolean shouldPrintDebugHashes() {
-			return Configs.CLIENT_CONFIG.getBoolean(SYNC_CATEGORY, "debugHashes", true);
+	public static class ClientConfig extends NamedPathConfig{
+		public static final ConfigToken.Bool DEBUG_HASHES = new Bool(true, SYNC_CATEGORY, "debugHashes");
+		public static final ConfigToken.Bool ENABLED = new Bool(true, SYNC_CATEGORY, "enabled");
+		public static final ConfigToken.Bool ACCEPT_CONFIGS = new Bool(true, "acceptConfigs", "enabled");
+		public static final ConfigToken.Bool ACCEPT_FILES = new Bool(true, "acceptFiles", "enabled");
+		public static final ConfigToken.Bool ACCEPT_MODS = new Bool(true, "acceptMods", "enabled");
+		
+		public ClientConfig(){
+			super(BCLib.MOD_ID, "client", false);
 		}
 		
-		public static boolean isAllowingAutoSync() {
-			return Configs.CLIENT_CONFIG.getBoolean(SYNC_CATEGORY, "enabled", true);
+		public boolean shouldPrintDebugHashes() {
+			return get(DEBUG_HASHES);
 		}
 		
-		public static boolean isAcceptingMods() {
-			return Configs.CLIENT_CONFIG.getBoolean(SYNC_CATEGORY, "acceptMods", true) && isAllowingAutoSync();
+		public boolean isAllowingAutoSync() {
+			return get(ENABLED);
 		}
 		
-		public static boolean isAcceptingConfigs() {
-			return Configs.CLIENT_CONFIG.getBoolean(SYNC_CATEGORY, "acceptConfigs", true) && isAllowingAutoSync();
+		public boolean isAcceptingMods() {
+			return get(ACCEPT_MODS) && isAllowingAutoSync();
 		}
 		
-		public static boolean isAcceptingFiles() {
-			return Configs.CLIENT_CONFIG.getBoolean(SYNC_CATEGORY, "acceptFolders", true) && isAllowingAutoSync();
+		public  boolean isAcceptingConfigs() {
+			return get(ACCEPT_CONFIGS) && isAllowingAutoSync();
+		}
+		
+		public  boolean isAcceptingFiles() {
+			return get(ACCEPT_FILES) && isAllowingAutoSync();
 		}
 	}
 	
-	static class Config {
-		public static boolean isAllowingAutoSync() {
-			return Configs.SERVER_CONFIG.getBoolean(SYNC_CATEGORY, "enabled", true);
+	public static class ServerConfig extends NamedPathConfig {
+		public static final ConfigToken.Bool ENABLED = new Bool(true, SYNC_CATEGORY, "enabled");
+		public static final ConfigToken.Bool OFFER_CONFIGS = new Bool(true, "offerConfigs", "enabled");
+		public static final ConfigToken.Bool OFFER_FILES = new Bool(true, "offerFiles", "enabled");
+		public static final ConfigToken.Bool OFFER_MODS = new Bool(true, "offerMods", "enabled");
+		
+		
+		public ServerConfig(){
+			super(BCLib.MOD_ID, "server", false);
 		}
 		
-		public static boolean isOfferingConfigs() {
-			return Configs.SERVER_CONFIG.getBoolean(SYNC_CATEGORY, "offerConfigs", true) && isAllowingAutoSync();
+		public boolean isAllowingAutoSync() {
+			return get(ENABLED);
 		}
 		
-		public static boolean isOfferingFiles() {
-			return Configs.SERVER_CONFIG.getBoolean(SYNC_CATEGORY, "offerFolders", true) && isAllowingAutoSync();
+		public boolean isOfferingConfigs() {
+			return get(OFFER_CONFIGS) && isAllowingAutoSync();
 		}
 		
-		public static boolean isOfferingMods() {
-			return Configs.SERVER_CONFIG.getBoolean(SYNC_CATEGORY, "offerMods", true) && isAllowingAutoSync();
+		public boolean isOfferingFiles() {
+			return get(OFFER_FILES) && isAllowingAutoSync();
+		}
+		
+		public boolean isOfferingMods() {
+			return get(OFFER_MODS) && isAllowingAutoSync();
 		}
 	}
 	
@@ -120,7 +142,11 @@ public class AutoSync {
 	 *                       for comparison is sufficient.
 	 */
 	public static void addAutoSyncFileData(String modID, File fileName, boolean requestContent, NeedTransferPredicate needTransfer) {
-		autoSyncFiles.add(new AutoFileSyncEntry(modID, fileName, requestContent, needTransfer));
+		if (!PathUtil.isChildOf(PathUtil.GAME_FOLDER, fileName.toPath())){
+			BCLib.LOGGER.error(fileName + " is outside of Game Folder " + PathUtil.GAME_FOLDER);
+		} else {
+			autoSyncFiles.add(new AutoFileSyncEntry(modID, fileName, requestContent, needTransfer));
+		}
 	}
 	
 	/**
@@ -139,7 +165,11 @@ public class AutoSync {
 	 *                       for comparison is sufficient.
 	 */
 	public static void addAutoSyncFileData(String modID, String uniqueID, File fileName, boolean requestContent, NeedTransferPredicate needTransfer) {
-		autoSyncFiles.add(new AutoFileSyncEntry(modID, uniqueID, fileName, requestContent, needTransfer));
+		if (!PathUtil.isChildOf(PathUtil.GAME_FOLDER, fileName.toPath())){
+			BCLib.LOGGER.error(fileName + " is outside of Game Folder " + PathUtil.GAME_FOLDER);
+		} else {
+			autoSyncFiles.add(new AutoFileSyncEntry(modID, uniqueID, fileName, requestContent, needTransfer));
+		}
 	}
 	
 	/**

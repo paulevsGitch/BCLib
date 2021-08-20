@@ -11,10 +11,9 @@ import ru.bclib.BCLib;
 import ru.bclib.api.dataexchange.DataExchangeAPI;
 import ru.bclib.api.dataexchange.DataHandler;
 import ru.bclib.api.dataexchange.DataHandlerDescriptor;
-import ru.bclib.api.dataexchange.handler.autosync.AutoSync.ClientConfig;
-import ru.bclib.api.dataexchange.handler.autosync.AutoSync.Config;
 import ru.bclib.api.dataexchange.handler.autosync.AutoSyncID.WithContentOverride;
 import ru.bclib.api.dataexchange.handler.autosync.SyncFolderDescriptor.SubFile;
+import ru.bclib.config.Configs;
 import ru.bclib.gui.screens.SyncFilesScreen;
 import ru.bclib.gui.screens.WarnBCLibVersionMismatch;
 import ru.bclib.util.ModUtil;
@@ -51,7 +50,7 @@ public class HelloClient extends DataHandler.FromServer {
 	
 	@Override
 	protected boolean prepareDataOnServer() {
-		if (!Config.isAllowingAutoSync()) {
+		if (!Configs.SERVER_CONFIG.isAllowingAutoSync()) {
 			BCLib.LOGGER.info("Auto-Sync was disabled on the server.");
 			return false;
 		}
@@ -69,16 +68,16 @@ public class HelloClient extends DataHandler.FromServer {
 		//write BCLibVersion (=protocol version)
 		buf.writeInt(ModUtil.convertModVersion(vbclib));
 		
-		if (Config.isOfferingMods()) {
+		if (Configs.SERVER_CONFIG.isOfferingMods()) {
 			//write Plugin Versions
 			buf.writeInt(mods.size());
 			for (String modID : mods) {
 				final String ver = ModUtil.getModVersion(modID);
 				final ModInfo mi = ModUtil.getModInfo(modID);
 				int size = 0;
-				if (mi!=null) {
+				if (mi != null) {
 					try {
-						size = (int)Files.size(mi.jarPath);
+						size = (int) Files.size(mi.jarPath);
 					}
 					catch (IOException e) {
 						BCLib.LOGGER.error("Unable to get File Size: " + e.getMessage());
@@ -89,7 +88,7 @@ public class HelloClient extends DataHandler.FromServer {
 				buf.writeInt(ModUtil.convertModVersion(ver));
 				buf.writeInt(size);
 				
-				BCLib.LOGGER.info("    - Listing Mod " + modID + " v" + ver + " ("+PathUtil.humanReadableFileSize(size)+")");
+				BCLib.LOGGER.info("    - Listing Mod " + modID + " v" + ver + " (" + PathUtil.humanReadableFileSize(size) + ")");
 			}
 		}
 		else {
@@ -97,20 +96,19 @@ public class HelloClient extends DataHandler.FromServer {
 			buf.writeInt(0);
 		}
 		
-		if (Config.isOfferingFiles() || Config.isOfferingConfigs()) {
+		if (Configs.SERVER_CONFIG.isOfferingFiles() || Configs.SERVER_CONFIG.isOfferingConfigs()) {
 			//do only include files that exist on the server
-			final List<AutoFileSyncEntry> existingAutoSyncFiles = AutoSync
-																	  .getAutoSyncFiles()
-																	  .stream()
-																	  .filter(e -> e.fileName.exists())
-																	  .filter(e -> (e.isConfigFile() && Config.isOfferingConfigs()) || (e instanceof AutoFileSyncEntry.ForDirectFileRequest && Config.isOfferingFiles()))
-																	  .collect(Collectors.toList());
+			final List<AutoFileSyncEntry> existingAutoSyncFiles = AutoSync.getAutoSyncFiles()
+																		  .stream()
+																		  .filter(e -> e.fileName.exists())
+																		  .filter(e -> (e.isConfigFile() && Configs.SERVER_CONFIG.isOfferingConfigs()) || (e instanceof AutoFileSyncEntry.ForDirectFileRequest && Configs.SERVER_CONFIG.isOfferingFiles()))
+																		  .collect(Collectors.toList());
 			
 			//send config Data
 			buf.writeInt(existingAutoSyncFiles.size());
 			for (AutoFileSyncEntry entry : existingAutoSyncFiles) {
 				entry.serialize(buf);
-				BCLib.LOGGER.info("    - Offering " + (entry.isConfigFile()?"Config ":"File ") + entry);
+				BCLib.LOGGER.info("    - Offering " + (entry.isConfigFile() ? "Config " : "File ") + entry);
 			}
 		}
 		else {
@@ -118,7 +116,7 @@ public class HelloClient extends DataHandler.FromServer {
 			buf.writeInt(0);
 		}
 		
-		if (Config.isOfferingFiles()) {
+		if (Configs.SERVER_CONFIG.isOfferingFiles()) {
 			buf.writeInt(AutoSync.syncFolderDescriptions.size());
 			AutoSync.syncFolderDescriptions.forEach(desc -> {
 				BCLib.LOGGER.info("    - Offering Folder " + desc.localFolder + " (allowDelete=" + desc.removeAdditionalFiles + ")");
@@ -154,7 +152,8 @@ public class HelloClient extends DataHandler.FromServer {
 			//since v0.4.1 we also send the size of the mod-File
 			if (protocolVersion_0_4_1) {
 				size = buf.readInt();
-			} else {
+			}
+			else {
 				size = 0;
 			}
 			modVersion.put(id, new Pair<>(version, size));
@@ -184,7 +183,7 @@ public class HelloClient extends DataHandler.FromServer {
 	
 	@Environment(EnvType.CLIENT)
 	private void processAutoSyncFolder(final List<AutoSyncID> filesToRequest, final List<AutoSyncID.ForDirectFileRequest> filesToRemove) {
-		if (!ClientConfig.isAcceptingFiles()) {
+		if (!Configs.CLIENT_CONFIG.isAcceptingFiles()) {
 			return;
 		}
 		
@@ -250,7 +249,7 @@ public class HelloClient extends DataHandler.FromServer {
 	
 	@Environment(EnvType.CLIENT)
 	private void processSingleFileSync(final List<AutoSyncID> filesToRequest) {
-		final boolean debugHashes = ClientConfig.shouldPrintDebugHashes();
+		final boolean debugHashes = Configs.CLIENT_CONFIG.shouldPrintDebugHashes();
 		
 		if (autoSyncedFiles.size() > 0) {
 			BCLib.LOGGER.info("Files offered by Server:");
@@ -292,10 +291,10 @@ public class HelloClient extends DataHandler.FromServer {
 		for (Entry<String, Pair<String, Integer>> e : modVersion.entrySet()) {
 			final String localVersion = ModUtil.getModVersion(e.getKey());
 			final Pair<String, Integer> serverInfo = e.getValue();
-			final boolean requestMod = !serverInfo.first.equals(localVersion) && serverInfo.second>0;
+			final boolean requestMod = !serverInfo.first.equals(localVersion) && serverInfo.second > 0;
 			
-			BCLib.LOGGER.info("    - " + e.getKey() + " (client=" + localVersion + ", server=" + serverInfo.first  + ", size=" + PathUtil.humanReadableFileSize(serverInfo.second) + (requestMod?", requesting":"") +")");
-			if (requestMod){
+			BCLib.LOGGER.info("    - " + e.getKey() + " (client=" + localVersion + ", server=" + serverInfo.first + ", size=" + PathUtil.humanReadableFileSize(serverInfo.second) + (requestMod ? ", requesting" : "") + ")");
+			if (requestMod) {
 				filesToRequest.add(new AutoSyncID.ForModFileRequest(e.getKey(), serverInfo.first));
 			}
 		}
@@ -305,7 +304,7 @@ public class HelloClient extends DataHandler.FromServer {
 	@Environment(EnvType.CLIENT)
 	@Override
 	protected void runOnClientGameThread(Minecraft client) {
-		if (!ClientConfig.isAllowingAutoSync()) {
+		if (!Configs.CLIENT_CONFIG.isAllowingAutoSync()) {
 			BCLib.LOGGER.info("Auto-Sync was disabled on the client.");
 			return;
 		}
@@ -321,7 +320,6 @@ public class HelloClient extends DataHandler.FromServer {
 		final List<AutoSyncID.ForDirectFileRequest> filesToRemove = new ArrayList<>(2);
 		
 		
-		
 		processModFileSync(filesToRequest);
 		processSingleFileSync(filesToRequest);
 		processAutoSyncFolder(filesToRequest, filesToRemove);
@@ -330,10 +328,7 @@ public class HelloClient extends DataHandler.FromServer {
 		//Both client and server need to know about the folder you want to sync
 		//Files can only get placed within that folder
 		
-		if (
-			(filesToRequest.size() > 0 || filesToRemove.size() > 0)
-			&& (ClientConfig.isAcceptingMods() || ClientConfig.isAcceptingConfigs() || ClientConfig.isAcceptingFiles())
-		) {
+		if ((filesToRequest.size() > 0 || filesToRemove.size() > 0) && ( Configs.CLIENT_CONFIG.isAcceptingMods() ||  Configs.CLIENT_CONFIG.isAcceptingConfigs() ||  Configs.CLIENT_CONFIG.isAcceptingFiles())) {
 			showSyncFilesScreen(client, filesToRequest, filesToRemove);
 			return;
 		}
@@ -360,14 +355,17 @@ public class HelloClient extends DataHandler.FromServer {
 		int folderFiles = 0;
 		int modFiles = 0;
 		
-		for (AutoSyncID aid : files){
-			if (aid.isConfigFile()){
+		for (AutoSyncID aid : files) {
+			if (aid.isConfigFile()) {
 				configFiles++;
-			} else if (aid instanceof AutoSyncID.ForModFileRequest){
+			}
+			else if (aid instanceof AutoSyncID.ForModFileRequest) {
 				modFiles++;
-			} else if (aid instanceof AutoSyncID.ForDirectFileRequest){
+			}
+			else if (aid instanceof AutoSyncID.ForDirectFileRequest) {
 				folderFiles++;
-			} else {
+			}
+			else {
 				singleFiles++;
 			}
 		}
@@ -381,11 +379,13 @@ public class HelloClient extends DataHandler.FromServer {
 				List<AutoSyncID> requestFiles = new ArrayList<>(files.toArray().length);
 				
 				files.forEach(aid -> {
-					if (aid.isConfigFile() && downloadConfigs){
+					if (aid.isConfigFile() && downloadConfigs) {
 						processOfferedFile(requestFiles, aid);
-					} else if (aid instanceof AutoSyncID.ForModFileRequest && downloadMods){
+					}
+					else if (aid instanceof AutoSyncID.ForModFileRequest && downloadMods) {
 						processOfferedFile(requestFiles, aid);
-					} else if (downloadFiles){
+					}
+					else if (downloadFiles) {
 						processOfferedFile(requestFiles, aid);
 					}
 				});

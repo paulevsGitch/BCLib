@@ -10,7 +10,7 @@ import ru.bclib.BCLib;
 import ru.bclib.api.dataexchange.DataHandler;
 import ru.bclib.api.dataexchange.DataHandlerDescriptor;
 import ru.bclib.api.dataexchange.handler.autosync.AutoSync.ClientConfig;
-import ru.bclib.api.dataexchange.handler.autosync.AutoSync.Config;
+import ru.bclib.config.Configs;
 import ru.bclib.gui.screens.ConfirmRestartScreen;
 import ru.bclib.util.Pair;
 import ru.bclib.util.PathUtil;
@@ -42,7 +42,7 @@ public class SendFiles extends DataHandler.FromServer {
 	
 	@Override
 	protected boolean prepareDataOnServer() {
-		if (!Config.isAllowingAutoSync()) {
+		if (!Configs.SERVER_CONFIG.isAllowingAutoSync()) {
 			BCLib.LOGGER.info("Auto-Sync was disabled on the server.");
 			return false;
 		}
@@ -84,7 +84,7 @@ public class SendFiles extends DataHandler.FromServer {
 	@Environment(EnvType.CLIENT)
 	@Override
 	protected void deserializeIncomingDataOnClient(FriendlyByteBuf buf, PacketSender responseSender) {
-		if (ClientConfig.isAcceptingConfigs() || ClientConfig.isAcceptingFiles() || ClientConfig.isAcceptingMods()) {
+		if ( Configs.CLIENT_CONFIG.isAcceptingConfigs() ||  Configs.CLIENT_CONFIG.isAcceptingFiles() ||  Configs.CLIENT_CONFIG.isAcceptingMods()) {
 			token = readString(buf);
 			if (!token.equals(RequestFiles.currentToken)) {
 				RequestFiles.newToken();
@@ -101,13 +101,13 @@ public class SendFiles extends DataHandler.FromServer {
 				Triple<AutoFileSyncEntry, byte[], AutoSyncID> p = AutoFileSyncEntry.deserializeContent(buf);
 				if (p.first != null) {
 					final String type;
-					if (p.first.isConfigFile() && ClientConfig.isAcceptingConfigs()) {
+					if (p.first.isConfigFile() &&  Configs.CLIENT_CONFIG.isAcceptingConfigs()) {
 						receivedFiles.add(p);
 						type = "Accepted Config ";
-					} else if (p.first instanceof  AutoFileSyncEntry.ForModFileRequest && ClientConfig.isAcceptingMods()){
+					} else if (p.first instanceof  AutoFileSyncEntry.ForModFileRequest &&  Configs.CLIENT_CONFIG.isAcceptingMods()){
 						receivedFiles.add(p);
 						type = "Accepted Mod ";
-					} else if (ClientConfig.isAcceptingFiles()){
+					} else if ( Configs.CLIENT_CONFIG.isAcceptingFiles()){
 						receivedFiles.add(p);
 						type = "Accepted File ";
 					} else {
@@ -125,7 +125,7 @@ public class SendFiles extends DataHandler.FromServer {
 	@Environment(EnvType.CLIENT)
 	@Override
 	protected void runOnClientGameThread(Minecraft client) {
-		if (ClientConfig.isAcceptingConfigs() || ClientConfig.isAcceptingFiles() || ClientConfig.isAcceptingMods()) {
+		if ( Configs.CLIENT_CONFIG.isAcceptingConfigs() ||  Configs.CLIENT_CONFIG.isAcceptingFiles() ||  Configs.CLIENT_CONFIG.isAcceptingMods()) {
 			BCLib.LOGGER.info("Writing Files:");
 			
 			//TODO: Reject files that were not in the last RequestFiles.
@@ -143,6 +143,11 @@ public class SendFiles extends DataHandler.FromServer {
 	
 	@Environment(EnvType.CLIENT)
 	static void writeSyncedFile(AutoSyncID e, byte[] data, File fileName) {
+		if (!PathUtil.isChildOf(PathUtil.GAME_FOLDER, fileName.toPath())){
+			BCLib.LOGGER.error(fileName + " is not within game folder " + PathUtil.GAME_FOLDER);
+			return;
+		}
+		
 		if (!PathUtil.MOD_BAK_FOLDER.toFile().exists()){
 			PathUtil.MOD_BAK_FOLDER.toFile().mkdirs();
 		}
