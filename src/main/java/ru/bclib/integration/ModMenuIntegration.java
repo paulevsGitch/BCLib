@@ -11,16 +11,15 @@ import java.lang.reflect.Proxy;
 import java.util.Map;
 
 class ModMenuScreenFactoryImpl {
-	static class ScreenFactoryInvocationHandler implements InvocationHandler {
-		private final ModMenuScreenFactory act;
-		
-		public ScreenFactoryInvocationHandler(ModMenuScreenFactory act) {
-			this.act = act;
-		}
-		
+	record ScreenFactoryInvocationHandler(ModMenuScreenFactory act) implements InvocationHandler {
 		@Override
 		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-			return act.create((Screen)args[0]);
+			return switch (method.getName()) {
+				case "toString" -> "";
+				case "equals" -> false;
+				case "hashCode" -> 0;
+				default -> act.create((Screen) args[0]);
+			};
 		}
 	}
 	
@@ -31,6 +30,7 @@ class ModMenuScreenFactoryImpl {
 		}
 		catch (ClassNotFoundException e) {
 			e.printStackTrace();
+			return null;
 		}
 		
 		Object o = Proxy.newProxyInstance(
@@ -73,7 +73,7 @@ public abstract class ModMenuIntegration {
 	 * @return A Proxy that conforms to the ModMenu spec
 	 */
 	public static ModMenuApiMarker createEntrypoint(ModMenuIntegration target) {
-		Class<?> iModMenuAPI = null;
+		Class<?> iModMenuAPI;
 		//Class<?> iModMenuAPIMarker = null;
 		try {
 			iModMenuAPI = Class.forName("com.terraformersmc.modmenu.api.ModMenuApi");
@@ -81,7 +81,7 @@ public abstract class ModMenuIntegration {
 		}
 		catch (ClassNotFoundException e) {
 			e.printStackTrace();
-			return (ModMenuApiMarker)new Object();
+			return null;
 		}
 		
 		Object o = Proxy.newProxyInstance(
@@ -108,7 +108,7 @@ public abstract class ModMenuIntegration {
 	
 	/**
 	 * A Helper class to make a BCLib-Factory conform to the ModMenu-Factory Interface.
-	 * @param factory
+	 * @param factory A BCLib-Type Factory, ie. {@code GridScreen::new }
 	 * @return A ModMenu Factory for a Screen
 	 */
 	final protected ModMenuScreenFactory createFactory(ModMenuScreenFactory factory){
@@ -156,28 +156,21 @@ public abstract class ModMenuIntegration {
 	 * The Interface matches {@code com.terraformersmc.modmenu.api.ConfigScreenFactory}
 	 */
 	@FunctionalInterface
-	public static interface ModMenuScreenFactory  {
+	public interface ModMenuScreenFactory  {
 		Screen create(Screen parent);
 	}
 	
-	static class BCLibModMenuInvocationHandler implements InvocationHandler {
-		private final ModMenuIntegration target;
-		
-		public BCLibModMenuInvocationHandler(ModMenuIntegration target) {
-			this.target = target;
-		}
-		
+	record BCLibModMenuInvocationHandler(ModMenuIntegration target) implements InvocationHandler {
 		@Override
 		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-			if ("getModConfigScreenFactory".equals(method.getName())){
-				return target.getModConfigScreenFactory();
-			} else if ("getProvidedConfigScreenFactories".equals(method.getName())){
-				return target.getProvidedConfigScreenFactories();
-			} else if ("toString".equals(method.getName())){
-				return target.toString();
-			} else {
-				return null;
-			}
+			return switch (method.getName()) {
+				case "getModConfigScreenFactory" -> target.getModConfigScreenFactory();
+				case "getProvidedConfigScreenFactories" -> target.getProvidedConfigScreenFactories();
+				case "toString" -> target.toString();
+				case "equals" -> target.equals(args[0]);
+				case "hashCode" -> target.hashCode();
+				default -> null;
+			};
 		}
 	}
 }
