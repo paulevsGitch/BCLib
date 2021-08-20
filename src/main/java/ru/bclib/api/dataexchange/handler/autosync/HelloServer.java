@@ -10,8 +10,7 @@ import ru.bclib.BCLib;
 import ru.bclib.api.dataexchange.DataExchangeAPI;
 import ru.bclib.api.dataexchange.DataHandler;
 import ru.bclib.api.dataexchange.DataHandlerDescriptor;
-import ru.bclib.api.dataexchange.handler.autosync.AutoSync.ClientConfig;
-import ru.bclib.api.dataexchange.handler.autosync.AutoSync.Config;
+import ru.bclib.config.Configs;
 import ru.bclib.util.ModUtil;
 
 import java.io.File;
@@ -70,7 +69,7 @@ public class HelloServer extends DataHandler.FromClient {
 	@Environment(EnvType.CLIENT)
 	@Override
 	protected boolean prepareDataOnClient() {
-		if (!ClientConfig.isAllowingAutoSync()) {
+		if (! Configs.CLIENT_CONFIG.isAllowingAutoSync()) {
 			BCLib.LOGGER.info("Auto-Sync was disabled on the client.");
 			return false;
 		}
@@ -91,7 +90,7 @@ public class HelloServer extends DataHandler.FromClient {
 	
 	@Override
 	protected void runOnServerGameThread(MinecraftServer server) {
-		if (!Config.isAllowingAutoSync()) {
+		if (!Configs.SERVER_CONFIG.isAllowingAutoSync()) {
 			BCLib.LOGGER.info("Auto-Sync was disabled on the server.");
 			return;
 		}

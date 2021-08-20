@@ -22,11 +22,11 @@ public class PathConfig extends Config {
 	@Override
 	protected void registerEntries() {}
 	
-	protected ConfigKey createKey(String category, String key) {
+	protected static ConfigKey createKey(String category, String key) {
 		return new ConfigKey(key, category.split("\\."));
 	}
 	
-	protected ConfigKey createKey(String key) {
+	protected static ConfigKey createKey(String key) {
 		return createKey("", key);
 	}
 	

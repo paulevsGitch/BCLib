@@ -6,10 +6,10 @@ import ru.bclib.api.dataexchange.DataHandler;
 import ru.bclib.api.dataexchange.SyncFileHash;
 import ru.bclib.api.dataexchange.handler.autosync.AutoSync.NeedTransferPredicate;
 import ru.bclib.api.dataexchange.handler.autosync.SyncFolderDescriptor.SubFile;
-import ru.bclib.config.Config;
 import ru.bclib.util.ModUtil;
-import ru.bclib.util.Pair;
 import ru.bclib.util.ModUtil.ModInfo;
+import ru.bclib.util.Pair;
+import ru.bclib.util.PathUtil;
 import ru.bclib.util.Triple;
 
 import java.io.File;
@@ -182,6 +182,12 @@ class AutoFileSyncEntry extends AutoSyncID {
 	}
 	
 	private int serializeFileContent(FriendlyByteBuf buf) {
+		if (!PathUtil.isChildOf(PathUtil.GAME_FOLDER, fileName.toPath())){
+			BCLib.LOGGER.error(fileName + " is not within game folder " + PathUtil.GAME_FOLDER + ". Pretending it does not exist.");
+			buf.writeInt(0);
+			return 0;
+		}
+		
 		byte[] content = getContent();
 		buf.writeInt(content.length);
 		buf.writeByteArray(content);
