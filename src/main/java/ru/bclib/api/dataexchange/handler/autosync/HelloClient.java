@@ -97,27 +97,28 @@ public class HelloClient extends DataHandler.FromServer {
 			buf.writeInt(0);
 		}
 		
-		if (Config.isOfferingFiles()) {
+		if (Config.isOfferingFiles() || Config.isOfferingConfigs()) {
 			//do only include files that exist on the server
 			final List<AutoFileSyncEntry> existingAutoSyncFiles = AutoSync
-																			  .getAutoSyncFiles()
-																			  .stream()
-																			  .filter(e -> e.fileName.exists())
-																			  .collect(Collectors.toList());
+																	  .getAutoSyncFiles()
+																	  .stream()
+																	  .filter(e -> e.fileName.exists())
+																	  .filter(e -> (e.isConfigFile() && Config.isOfferingConfigs()) || (e instanceof AutoFileSyncEntry.ForDirectFileRequest && Config.isOfferingFiles()))
+																	  .collect(Collectors.toList());
 			
 			//send config Data
 			buf.writeInt(existingAutoSyncFiles.size());
 			for (AutoFileSyncEntry entry : existingAutoSyncFiles) {
 				entry.serialize(buf);
-				BCLib.LOGGER.info("    - Offering File " + entry);
+				BCLib.LOGGER.info("    - Offering " + (entry.isConfigFile()?"Config ":"File ") + entry);
 			}
 		}
 		else {
-			BCLib.LOGGER.info("Server will not offer Files.");
+			BCLib.LOGGER.info("Server will neither offer Files nor Configs.");
 			buf.writeInt(0);
 		}
 		
-		if (Config.isOfferingFolders()) {
+		if (Config.isOfferingFiles()) {
 			buf.writeInt(AutoSync.syncFolderDescriptions.size());
 			AutoSync.syncFolderDescriptions.forEach(desc -> {
 				BCLib.LOGGER.info("    - Offering Folder " + desc.localFolder + " (allowDelete=" + desc.removeAdditionalFiles + ")");
@@ -183,7 +184,7 @@ public class HelloClient extends DataHandler.FromServer {
 	
 	@Environment(EnvType.CLIENT)
 	private void processAutoSyncFolder(final List<AutoSyncID> filesToRequest, final List<AutoSyncID.ForDirectFileRequest> filesToRemove) {
-		if (!ClientConfig.isAcceptingFolders()) {
+		if (!ClientConfig.isAcceptingFiles()) {
 			return;
 		}
 		
@@ -329,7 +330,10 @@ public class HelloClient extends DataHandler.FromServer {
 		//Both client and server need to know about the folder you want to sync
 		//Files can only get placed within that folder
 		
-		if ((filesToRequest.size() > 0 || filesToRemove.size() > 0) && ClientConfig.isAcceptingFiles()) {
+		if (
+			(filesToRequest.size() > 0 || filesToRemove.size() > 0)
+			&& (ClientConfig.isAcceptingMods() || ClientConfig.isAcceptingConfigs() || ClientConfig.isAcceptingFiles())
+		) {
 			showSyncFilesScreen(client, filesToRequest, filesToRemove);
 			return;
 		}

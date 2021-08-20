@@ -4,7 +4,6 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import ru.bclib.BCLib;
@@ -29,7 +28,7 @@ public class SendFiles extends DataHandler.FromServer {
 	public static DataHandlerDescriptor DESCRIPTOR = new DataHandlerDescriptor(new ResourceLocation(BCLib.MOD_ID, "send_files"), SendFiles::new, false, false);
 	
 	protected List<AutoFileSyncEntry> files;
-	private String token = "";
+	private String token;
 	
 	public SendFiles() {
 		this(null, "");
@@ -85,7 +84,7 @@ public class SendFiles extends DataHandler.FromServer {
 	@Environment(EnvType.CLIENT)
 	@Override
 	protected void deserializeIncomingDataOnClient(FriendlyByteBuf buf, PacketSender responseSender) {
-		if (ClientConfig.isAcceptingFiles()) {
+		if (ClientConfig.isAcceptingConfigs() || ClientConfig.isAcceptingFiles() || ClientConfig.isAcceptingMods()) {
 			token = readString(buf);
 			if (!token.equals(RequestFiles.currentToken)) {
 				RequestFiles.newToken();
@@ -101,8 +100,20 @@ public class SendFiles extends DataHandler.FromServer {
 			for (int i = 0; i < size; i++) {
 				Triple<AutoFileSyncEntry, byte[], AutoSyncID> p = AutoFileSyncEntry.deserializeContent(buf);
 				if (p.first != null) {
-					receivedFiles.add(p);
-					BCLib.LOGGER.info("    - " + p.first + " (" + PathUtil.humanReadableFileSize(p.second.length) + ")");
+					final String type;
+					if (p.first.isConfigFile() && ClientConfig.isAcceptingConfigs()) {
+						receivedFiles.add(p);
+						type = "Accepted Config ";
+					} else if (p.first instanceof  AutoFileSyncEntry.ForModFileRequest && ClientConfig.isAcceptingMods()){
+						receivedFiles.add(p);
+						type = "Accepted Mod ";
+					} else if (ClientConfig.isAcceptingFiles()){
+						receivedFiles.add(p);
+						type = "Accepted File ";
+					} else {
+						type = "Ignoring ";
+					}
+					BCLib.LOGGER.info("    - " + type  + p.first + " (" + PathUtil.humanReadableFileSize(p.second.length) + ")");
 				}
 				else {
 					BCLib.LOGGER.error("   - Failed to receive File " + p.third + ", possibly sent from a Mod that is not installed on the client.");
@@ -114,7 +125,7 @@ public class SendFiles extends DataHandler.FromServer {
 	@Environment(EnvType.CLIENT)
 	@Override
 	protected void runOnClientGameThread(Minecraft client) {
-		if (ClientConfig.isAcceptingFiles()) {
+		if (ClientConfig.isAcceptingConfigs() || ClientConfig.isAcceptingFiles() || ClientConfig.isAcceptingMods()) {
 			BCLib.LOGGER.info("Writing Files:");
 			
 			//TODO: Reject files that were not in the last RequestFiles.
@@ -131,15 +142,14 @@ public class SendFiles extends DataHandler.FromServer {
 	
 	
 	@Environment(EnvType.CLIENT)
-	public static void writeSyncedFile(AutoSyncID e, byte[] data, File fileName) {
+	static void writeSyncedFile(AutoSyncID e, byte[] data, File fileName) {
 		if (!PathUtil.MOD_BAK_FOLDER.toFile().exists()){
 			PathUtil.MOD_BAK_FOLDER.toFile().mkdirs();
 		}
 		
 		Path path = fileName!=null?fileName.toPath():null;
 		Path removeAfter = null;
-		if (e instanceof  AutoFileSyncEntry.ForModFileRequest){
-			AutoFileSyncEntry.ForModFileRequest mase = (AutoFileSyncEntry.ForModFileRequest)e;
+		if (e instanceof AutoFileSyncEntry.ForModFileRequest mase){
 			removeAfter = path;
 			int count = 0;
 			String name = "bclib_synced_" + mase.modID + "_" + mase.version.replace(".", "_") + ".jar";
@@ -193,7 +203,7 @@ public class SendFiles extends DataHandler.FromServer {
 	protected void showConfirmRestart(Minecraft client) {
 		client.setScreen(new ConfirmRestartScreen(() -> {
 			Minecraft.getInstance()
-					 .setScreen((Screen) null);
+					 .setScreen(null);
 			client.stop();
 		}));
 		

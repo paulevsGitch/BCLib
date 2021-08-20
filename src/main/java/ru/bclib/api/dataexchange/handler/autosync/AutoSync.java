@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.function.BiConsumer;
 
 public class AutoSync {
-	public static final String MAIN_SYNC_CATEGORY = "client_sync";
+	public static final String SYNC_CATEGORY = "auto_sync";
 	public final static SyncFolderDescriptor SYNC_FOLDER = new SyncFolderDescriptor("BCLIB-SYNC", FabricLoader.getInstance()
 																											  .getGameDir()
 																											  .resolve("bclib-sync")
@@ -31,37 +31,41 @@ public class AutoSync {
 	@Environment(EnvType.CLIENT)
 	static class ClientConfig {
 		public static boolean shouldPrintDebugHashes() {
-			return Configs.CLIENT_CONFIG.getBoolean(MAIN_SYNC_CATEGORY, "debugHashes", true);
+			return Configs.CLIENT_CONFIG.getBoolean(SYNC_CATEGORY, "debugHashes", true);
 		}
 		
 		public static boolean isAllowingAutoSync() {
-			return Configs.CLIENT_CONFIG.getBoolean(MAIN_SYNC_CATEGORY, "enabled", true);
+			return Configs.CLIENT_CONFIG.getBoolean(SYNC_CATEGORY, "enabled", true);
+		}
+		
+		public static boolean isAcceptingMods() {
+			return Configs.CLIENT_CONFIG.getBoolean(SYNC_CATEGORY, "acceptMods", true) && isAllowingAutoSync();
+		}
+		
+		public static boolean isAcceptingConfigs() {
+			return Configs.CLIENT_CONFIG.getBoolean(SYNC_CATEGORY, "acceptConfigs", true) && isAllowingAutoSync();
 		}
 		
 		public static boolean isAcceptingFiles() {
-			return Configs.CLIENT_CONFIG.getBoolean(MAIN_SYNC_CATEGORY, "acceptFiles", true) && isAllowingAutoSync();
-		}
-		
-		public static boolean isAcceptingFolders() {
-			return Configs.CLIENT_CONFIG.getBoolean(MAIN_SYNC_CATEGORY, "acceptFolders", true) && isAllowingAutoSync();
+			return Configs.CLIENT_CONFIG.getBoolean(SYNC_CATEGORY, "acceptFolders", true) && isAllowingAutoSync();
 		}
 	}
 	
 	static class Config {
 		public static boolean isAllowingAutoSync() {
-			return Configs.MAIN_CONFIG.getBoolean(MAIN_SYNC_CATEGORY, "enabled", true);
+			return Configs.SERVER_CONFIG.getBoolean(SYNC_CATEGORY, "enabled", true);
+		}
+		
+		public static boolean isOfferingConfigs() {
+			return Configs.SERVER_CONFIG.getBoolean(SYNC_CATEGORY, "offerConfigs", true) && isAllowingAutoSync();
 		}
 		
 		public static boolean isOfferingFiles() {
-			return Configs.MAIN_CONFIG.getBoolean(MAIN_SYNC_CATEGORY, "offerFiles", true) && isAllowingAutoSync();
-		}
-		
-		public static boolean isOfferingFolders() {
-			return Configs.MAIN_CONFIG.getBoolean(MAIN_SYNC_CATEGORY, "offerFolders", true) && isAllowingAutoSync();
+			return Configs.SERVER_CONFIG.getBoolean(SYNC_CATEGORY, "offerFolders", true) && isAllowingAutoSync();
 		}
 		
 		public static boolean isOfferingMods() {
-			return Configs.MAIN_CONFIG.getBoolean(MAIN_SYNC_CATEGORY, "offerMods", true) && isAllowingAutoSync();
+			return Configs.SERVER_CONFIG.getBoolean(SYNC_CATEGORY, "offerMods", true) && isAllowingAutoSync();
 		}
 	}
 	
@@ -165,7 +169,7 @@ public class AutoSync {
 	
 	//we call this from HelloServer to prepare transfer
 	protected static void loadSyncFolder() {
-		if (Configs.MAIN_CONFIG.getBoolean(AutoSync.MAIN_SYNC_CATEGORY, "offersSyncFolders", true)) {
+		if (Configs.MAIN_CONFIG.getBoolean(AutoSync.SYNC_CATEGORY, "offersSyncFolders", true)) {
 			syncFolderDescriptions.forEach(desc -> desc.loadCache());
 		}
 	}

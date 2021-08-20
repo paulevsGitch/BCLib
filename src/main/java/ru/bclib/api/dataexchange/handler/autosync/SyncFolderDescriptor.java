@@ -117,7 +117,7 @@ public class SyncFolderDescriptor {
 	}
 	
 	public void serialize(FriendlyByteBuf buf) {
-		final boolean debugHashes = Configs.CLIENT_CONFIG.getBoolean(AutoSync.MAIN_SYNC_CATEGORY, "debugHashes", false);
+		final boolean debugHashes = Configs.CLIENT_CONFIG.getBoolean(AutoSync.SYNC_CATEGORY, "debugHashes", false);
 		loadCache();
 		
 		DataHandler.writeString(buf, folderID);
