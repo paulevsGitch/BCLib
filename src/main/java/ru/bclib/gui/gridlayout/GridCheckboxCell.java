@@ -31,13 +31,20 @@ public class GridCheckboxCell extends GridCell{
 	private boolean checked;
 	
 	GridCheckboxCell(Component text, boolean checked, float alpha, double width, GridValueType widthType, double height) {
+		this(text, checked, alpha, width, widthType, height, null);
+	}
+	
+	GridCheckboxCell(Component text, boolean checked, float alpha, double width, GridValueType widthType, double height, Consumer<Boolean> onChange) {
 		super(width, height, widthType, null, null);
 		
 		this.componentPlacer = (transform) -> {
 			Checkbox cb = new SignalingCheckBox(transform.left, transform.top, transform.width, transform.height,
 				text,
 				checked,
-				(state)-> this.checked = state
+				(state)-> {
+					this.checked = state;
+					if (onChange!=null) onChange.accept(state);
+				}
 			);
 			cb.setAlpha(alpha);
 			return cb;

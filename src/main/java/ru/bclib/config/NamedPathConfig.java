@@ -2,6 +2,10 @@ package ru.bclib.config;
 
 import net.minecraft.resources.ResourceLocation;
 import ru.bclib.BCLib;
+import ru.bclib.config.NamedPathConfig.ConfigToken.Bool;
+import ru.bclib.config.NamedPathConfig.ConfigToken.Float;
+import ru.bclib.config.NamedPathConfig.ConfigToken.Int;
+import ru.bclib.config.NamedPathConfig.ConfigToken.Str;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -74,12 +78,19 @@ public class NamedPathConfig extends PathConfig{
 	}
 	
 	private void set(ConfigToken what, Object value) {
-		BCLib.LOGGER.error("Accessing " + what + " as general type is not supported.");
+		if (what instanceof Bool) set(what, (boolean)value);
+		else if (what instanceof Int) set(what, (int)value);
+		else if (what instanceof Float) set(what, (float)value);
+		else if (what instanceof Str) set(what, (String)value);
+		else BCLib.LOGGER.error("Accessing " + what + " as general type is not supported.");
 	}
 	
 	private Object get(ConfigToken what){
-		BCLib.LOGGER.error("Accessing " + what + " as general type is not supported.");
-		return null;
+		if (what instanceof Bool) return get((Bool)what);
+		else if (what instanceof Int) return get((Int)what);
+		else if (what instanceof Float) return get((Float)what);
+		else if (what instanceof Str) return get((Str)what);
+		else return null;
 	}
 	
 	public void set(ConfigToken.Int what, int value) {

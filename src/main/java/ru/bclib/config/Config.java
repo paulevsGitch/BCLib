@@ -22,6 +22,7 @@ public abstract class Config {
 	protected final static Map<AutoSyncID, Config> autoSyncConfigs = new HashMap<>();
 	protected final ConfigKeeper keeper;
 	protected final boolean autoSync;
+	public final String configID;
 	
 	protected abstract void registerEntries();
 	
@@ -34,12 +35,13 @@ public abstract class Config {
 	}
 	
 	protected Config(String modID, String group, boolean autoSync, boolean diffContent) {
+		configID = modID + "." + group;
 		this.keeper = new ConfigKeeper(modID, group);
 		this.registerEntries();
 		this.autoSync = autoSync;
 		
 		if (autoSync) {
-			final String uid = CONFIG_SYNC_PREFIX + modID + "_" + group;
+			final String uid = CONFIG_SYNC_PREFIX + configID;
 			final AutoSyncID aid = new AutoSyncID(BCLib.MOD_ID, uid);
 			if (diffContent)
 				DataExchangeAPI.addAutoSyncFile(aid.modID, aid.uniqueID, keeper.getConfigFile(),this::compareForSync);
@@ -47,7 +49,7 @@ public abstract class Config {
 				DataExchangeAPI.addAutoSyncFile(aid.modID, aid.uniqueID, keeper.getConfigFile());
 			
 			autoSyncConfigs.put(aid, this);
-			BCLib.LOGGER.info("Added Config " + modID + "." + group + " to auto sync (" + (diffContent?"content diff":"file hash") + ")");
+			BCLib.LOGGER.info("Added Config " + configID + " to auto sync (" + (diffContent?"content diff":"file hash") + ")");
 		}
 	}
 	

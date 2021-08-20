@@ -32,11 +32,13 @@ public class AutoSync {
 	
 	@Environment(EnvType.CLIENT)
 	public static class ClientConfig extends NamedPathConfig{
-		public static final ConfigToken.Bool DEBUG_HASHES = new Bool(true, SYNC_CATEGORY, "debugHashes");
-		public static final ConfigToken.Bool ENABLED = new Bool(true, SYNC_CATEGORY, "enabled");
-		public static final ConfigToken.Bool ACCEPT_CONFIGS = new Bool(true, "acceptConfigs", "enabled");
-		public static final ConfigToken.Bool ACCEPT_FILES = new Bool(true, "acceptFiles", "enabled");
-		public static final ConfigToken.Bool ACCEPT_MODS = new Bool(true, "acceptMods", "enabled");
+		public static final ConfigToken.Bool ENABLED = new Bool(true, "enabled", SYNC_CATEGORY);
+		public static final ConfigToken.Bool ACCEPT_CONFIGS = new Bool(true,"acceptConfigs", SYNC_CATEGORY);
+		public static final ConfigToken.Bool ACCEPT_FILES = new Bool(true,"acceptFiles", SYNC_CATEGORY);
+		public static final ConfigToken.Bool ACCEPT_MODS = new Bool(true,"acceptMods", SYNC_CATEGORY);
+		public static final ConfigToken.Bool SYNC_MOD_FOLDER = new Bool(false, "syncModFolder", SYNC_CATEGORY);
+		public static final ConfigToken.Bool DEBUG_HASHES = new Bool(true, "debugHashes", SYNC_CATEGORY);
+		
 		
 		public ClientConfig(){
 			super(BCLib.MOD_ID, "client", false);
@@ -64,10 +66,10 @@ public class AutoSync {
 	}
 	
 	public static class ServerConfig extends NamedPathConfig {
-		public static final ConfigToken.Bool ENABLED = new Bool(true, SYNC_CATEGORY, "enabled");
-		public static final ConfigToken.Bool OFFER_CONFIGS = new Bool(true, "offerConfigs", "enabled");
-		public static final ConfigToken.Bool OFFER_FILES = new Bool(true, "offerFiles", "enabled");
-		public static final ConfigToken.Bool OFFER_MODS = new Bool(true, "offerMods", "enabled");
+		public static final ConfigToken.Bool ENABLED = new Bool(true, "enabled", SYNC_CATEGORY);
+		public static final ConfigToken.Bool OFFER_CONFIGS = new Bool(true,"offerConfigs", SYNC_CATEGORY);
+		public static final ConfigToken.Bool OFFER_FILES = new Bool(true,"offerFiles", SYNC_CATEGORY);
+		public static final ConfigToken.Bool OFFER_MODS = new Bool(true,"offerMods", SYNC_CATEGORY);
 		
 		
 		public ServerConfig(){

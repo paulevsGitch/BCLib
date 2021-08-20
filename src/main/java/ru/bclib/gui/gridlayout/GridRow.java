@@ -14,6 +14,7 @@ import ru.bclib.gui.gridlayout.GridLayout.VerticalAlignment;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 @Environment(EnvType.CLIENT)
@@ -86,6 +87,13 @@ public class GridRow extends GridContainer {
 		return cell;
 	}
 	
+	public GridCheckboxCell addCheckbox(Component text, boolean checked, Font font, Consumer<Boolean> onChange){
+		final int width = font.width(text.getVisualOrderText()) + 24 + 2 * 12;
+		
+		GridCheckboxCell cell = new GridCheckboxCell(text, checked, 1.0f, width, widthType, 20, onChange);
+		this.cells.add(cell);
+		return cell;
+	}
 	
 	public GridCheckboxCell addCheckbox(Component text, boolean checked, int height) {
 		return addCheckbox(text, checked, 1.0f, height);

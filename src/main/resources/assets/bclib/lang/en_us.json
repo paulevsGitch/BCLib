@@ -16,5 +16,12 @@
 	"title.bclib.confirmrestart": "Restart Required",
 	"message.bclib.confirmrestart": "The requested content was synchronized. You need to restart Minecraft now.",
 	"title.link.bclib.discord": "Discord",
-    "title.bclib.modmenu.main": "BCLib Settings"
+    "title.bclib.modmenu.main": "BCLib Settings",
+	
+	"title.config.bclib.client.auto_sync.enabled": "Enable Auto-Sync",
+	"title.config.bclib.client.auto_sync.acceptConfigs": "Accept incoming Confog Files",
+	"title.config.bclib.client.auto_sync.acceptFiles": "Accept incoming Files",
+	"title.config.bclib.client.auto_sync.acceptMods": "Accept incoming Mods",
+	"title.config.bclib.client.auto_sync.syncModFolder": "Sync entire Mod-Folder from Server",
+	"title.config.bclib.client.auto_sync.debugHashes": "Print Debug-Hashes to Log"
 }

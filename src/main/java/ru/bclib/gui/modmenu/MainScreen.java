@@ -19,12 +19,14 @@ public class MainScreen extends GridScreen{
 	}
 	
 	protected TranslatableComponent getComponent(NamedPathConfig config, ConfigToken.Bool token, String type){
-		String path = "";
+		StringBuilder path = new StringBuilder();
 		for (String p : token.getPath()){
-			path += "." + p;
+			path.append(".")
+				.append(p);
 			
 		}
-		return new TranslatableComponent(type + ".config." + path );
+		path.append(".").append(token.getEntry());
+		return new TranslatableComponent(type + ".config." + config.configID + path );
 	}
 	
 	protected void addRow(GridColumn grid, NamedPathConfig config, ConfigToken token){
@@ -37,21 +39,26 @@ public class MainScreen extends GridScreen{
 	
 	protected void addRow(GridColumn grid, NamedPathConfig config, ConfigToken.Bool token){
 		GridRow row = grid.addRow();
-		row.addCheckbox(getComponent(config, token, "title"), config.get(token), 20);
-		
+		row.addCheckbox(getComponent(config, token, "title"), config.get(token), font, (state)-> config.set(token, state));
 	}
+	
+	@Override
+	public boolean shouldCloseOnEsc() {
+		return false;
+	}
+	
 	@Override
 	protected void initLayout() {
 		final int BUTTON_HEIGHT = 20;
-		grid.addSpacerRow(20);
 		
 		Configs.CLIENT_CONFIG.getAllOptions().forEach(o -> addRow(grid, Configs.CLIENT_CONFIG, o));
 		
+		grid.addSpacerRow(15);
 		GridRow row = grid.addRow();
 		row.addFiller();
-		row.addButton(CommonComponents.GUI_BACK, BUTTON_HEIGHT, font, (button)->{
+		row.addButton(CommonComponents.GUI_DONE, BUTTON_HEIGHT, font, (button)->{
+			Configs.CLIENT_CONFIG.saveChanges();
 			onClose();
 		});
-		row.addFiller();
 	}
 }
