@@ -92,6 +92,9 @@ public abstract class ModMenuIntegration {
 		return (ModMenuApiMarker)o;
 	}
 	
+	/**
+	 * The factory passed to {@link #ModMenuIntegration(ModMenuScreenFactory)}
+	 */
 	protected final ModMenuScreenFactory screenFactory;
 	
 	/**
