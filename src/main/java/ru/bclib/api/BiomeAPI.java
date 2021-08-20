@@ -308,4 +308,12 @@ public class BiomeAPI {
 	public static boolean isDatapackBiome(ResourceLocation biomeID) {
 		return getFromRegistry(biomeID) == null;
 	}
+	
+	public static boolean isNetherBiome(ResourceLocation biomeID) {
+		return NETHER_BIOME_PICKER.getBiomes().contains(biomeID);
+	}
+	
+	public static boolean isEndBiome(ResourceLocation biomeID) {
+		return END_LAND_BIOME_PICKER.getBiomes().contains(biomeID) || END_VOID_BIOME_PICKER.getBiomes().contains(biomeID);
+	}
 }

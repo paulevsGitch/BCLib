@@ -53,7 +53,7 @@ class ModMenuScreenFactoryImpl {
  * the {@link #createEntrypoint(ModMenuIntegration)}-Method.
  * <p>
  * Example:
- * <pre>{@code public class ModMenu extends ModMenuIntegration {
+ * <pre>{@code public class} ModMenu extends ModMenuIntegration {
  *     public static final ModMenuApiMarker entrypointObject = createEntrypoint(new EntryPoint());
  *
  * 	    public EntryPoint() {
