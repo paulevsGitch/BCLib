@@ -1,4 +1,4 @@
-package ru.bclib.gui.screens.ModMenu;
+package ru.bclib.gui.modmenu;
 
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
