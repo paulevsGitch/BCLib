@@ -29,11 +29,6 @@ public abstract class RecipeManagerMixin {
 	@Shadow
 	private Map<RecipeType<?>, Map<ResourceLocation, Recipe<?>>> recipes;
 	
-	@Inject(method = "apply", at = @At(value = "RETURN"))
-	private void be_apply(Map<ResourceLocation, JsonElement> map, ResourceManager resourceManager, ProfilerFiller profiler, CallbackInfo info) {
-		recipes = BCLRecipeManager.getMap(recipes);
-	}
-	
 	@Shadow
 	private <C extends Container, T extends Recipe<C>> Map<ResourceLocation, Recipe<C>> byType(RecipeType<T> type) {
 		return null;
