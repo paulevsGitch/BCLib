@@ -18,9 +18,9 @@ import ru.bclib.api.dataexchange.handler.autosync.SyncFolderDescriptor.SubFile;
 import ru.bclib.gui.screens.SyncFilesScreen;
 import ru.bclib.gui.screens.WarnBCLibVersionMismatch;
 import ru.bclib.util.ModUtil;
+import ru.bclib.util.ModUtil.ModInfo;
 import ru.bclib.util.Pair;
 import ru.bclib.util.PathUtil;
-import ru.bclib.util.ModUtil.ModInfo;
 
 import java.io.File;
 import java.io.IOException;

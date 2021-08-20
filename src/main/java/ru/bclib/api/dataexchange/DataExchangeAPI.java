@@ -5,10 +5,10 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.network.FriendlyByteBuf;
 import ru.bclib.BCLib;
+import ru.bclib.api.dataexchange.handler.DataExchange;
 import ru.bclib.api.dataexchange.handler.autosync.AutoSync;
 import ru.bclib.api.dataexchange.handler.autosync.AutoSync.NeedTransferPredicate;
 import ru.bclib.api.dataexchange.handler.autosync.AutoSyncID;
-import ru.bclib.api.dataexchange.handler.DataExchange;
 import ru.bclib.config.Config;
 import ru.bclib.util.ModUtil;
 

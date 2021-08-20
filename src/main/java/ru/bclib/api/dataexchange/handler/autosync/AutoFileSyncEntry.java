@@ -6,10 +6,9 @@ import ru.bclib.api.dataexchange.DataHandler;
 import ru.bclib.api.dataexchange.SyncFileHash;
 import ru.bclib.api.dataexchange.handler.autosync.AutoSync.NeedTransferPredicate;
 import ru.bclib.api.dataexchange.handler.autosync.SyncFolderDescriptor.SubFile;
-import ru.bclib.config.Config;
 import ru.bclib.util.ModUtil;
-import ru.bclib.util.Pair;
 import ru.bclib.util.ModUtil.ModInfo;
+import ru.bclib.util.Pair;
 import ru.bclib.util.Triple;
 
 import java.io.File;

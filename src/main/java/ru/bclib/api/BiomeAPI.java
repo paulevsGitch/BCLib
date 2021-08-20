@@ -310,10 +310,14 @@ public class BiomeAPI {
 	}
 	
 	public static boolean isNetherBiome(ResourceLocation biomeID) {
-		return NETHER_BIOME_PICKER.getBiomes().contains(biomeID);
+		return pickerHasBiome(NETHER_BIOME_PICKER, biomeID);
 	}
 	
 	public static boolean isEndBiome(ResourceLocation biomeID) {
-		return END_LAND_BIOME_PICKER.getBiomes().contains(biomeID) || END_VOID_BIOME_PICKER.getBiomes().contains(biomeID);
+		return pickerHasBiome(END_LAND_BIOME_PICKER, biomeID) || pickerHasBiome(END_VOID_BIOME_PICKER, biomeID);
+	}
+	
+	private static boolean pickerHasBiome(BiomePicker picker, ResourceLocation key) {
+		return picker.getBiomes().stream().filter(biome -> biome.getID().equals(key)).findFirst().isPresent();
 	}
 }
