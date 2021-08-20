@@ -9,7 +9,6 @@ import net.minecraft.resources.ResourceLocation;
 import ru.bclib.BCLib;
 import ru.bclib.api.dataexchange.DataHandler;
 import ru.bclib.api.dataexchange.DataHandlerDescriptor;
-import ru.bclib.api.dataexchange.handler.autosync.AutoSync.ClientConfig;
 import ru.bclib.config.Configs;
 import ru.bclib.gui.screens.ConfirmRestartScreen;
 import ru.bclib.util.Pair;
