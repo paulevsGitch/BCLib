@@ -28,13 +28,11 @@ public class NamedPathConfig extends PathConfig{
 			public Bool(boolean def, String entry, ResourceLocation path) { super(entry, path); this.defaultValue=def;}
 		}
 		
-		
 		public static class Str extends ConfigToken{
 			public final String defaultValue;
 			public Str(String def, String entry, String... path) { super(entry, path); this.defaultValue=def;}
 			public Str(String def, String entry, ResourceLocation path) { super(entry, path); this.defaultValue=def;}
 		}
-		
 		ConfigToken(String entry, String... path) { super(entry, path); }
 		ConfigToken(String entry, ResourceLocation path) { super(entry, path); }
 	}
@@ -54,7 +52,7 @@ public class NamedPathConfig extends PathConfig{
 		onInit();
 	}
 	
-	List<ConfigToken> getAllOptions(){
+	public List<ConfigToken> getAllOptions(){
 		List<ConfigToken> res = new LinkedList<>();
 		for (Field fl : this.getClass().getDeclaredFields()){
 			int modifiers = fl.getModifiers();

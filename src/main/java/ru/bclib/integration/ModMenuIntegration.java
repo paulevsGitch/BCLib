@@ -53,13 +53,13 @@ class ModMenuScreenFactoryImpl {
  * the {@link #createEntrypoint(ModMenuIntegration)}-Method.
  * <p>
  * Example:
- * <pre>{@code public class} ModMenu extends ModMenuIntegration {
+ * <pre>{@code public class ModMenu extends ModMenuIntegration {
  *     public static final ModMenuApiMarker entrypointObject = createEntrypoint(new EntryPoint());
  *
  * 	    public EntryPoint() {
  * 		    super(GridScreen::new);
  *      }
- * }</pre>
+ * }}</pre>
  * You'd also need to add the ModMenu-Entrypoint to your <i>fabric.mod.json</i>:
  * <pre>"entrypoints": {
  * 	    ...
