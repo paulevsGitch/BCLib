@@ -4,6 +4,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.TranslatableComponent;
 import org.jetbrains.annotations.Nullable;
+import ru.bclib.config.ConfigKeeper.BooleanEntry;
 import ru.bclib.config.Configs;
 import ru.bclib.config.NamedPathConfig;
 import ru.bclib.config.NamedPathConfig.ConfigTokenDescription;
@@ -35,7 +36,7 @@ public class MainScreen extends GridScreen{
 	
 	@SuppressWarnings("unchecked")
 	protected <T>void addRow(GridColumn grid, NamedPathConfig config, ConfigTokenDescription<T> option){
-		if (Boolean.class.isAssignableFrom(option.token.type)) {
+		if (BooleanEntry.class.isAssignableFrom(option.token.type)) {
 			addCheckbox(grid, config, (ConfigTokenDescription<Boolean>)option);
 		}
 		
