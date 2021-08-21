@@ -4,6 +4,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.loader.api.FabricLoader;
 import ru.bclib.BCLib;
+import ru.bclib.api.dataexchange.DataExchangeAPI;
 import ru.bclib.api.dataexchange.SyncFileHash;
 import ru.bclib.config.ConfigUI;
 import ru.bclib.config.Configs;
@@ -208,11 +209,21 @@ public class AutoSync {
 		return syncFolderContent;
 	}
 	
-	//we call this from HelloServer to prepare transfer
+	private static boolean didRegisterAdditionalMods = false;
+	//we call this from HelloClient on the Srérver to prepare transfer
 	protected static void loadSyncFolder() {
-		if (Configs.MAIN_CONFIG.getBoolean(AutoSync.SYNC_CATEGORY, "offersSyncFolders", true)) {
+		if (Configs.SERVER_CONFIG.isOfferingFiles()) {
 			syncFolderDescriptions.forEach(desc -> desc.loadCache());
 		}
+		
+		if (!didRegisterAdditionalMods && Configs.SERVER_CONFIG.isOfferingMods()){
+			didRegisterAdditionalMods = true;
+			List<String> modIDs = Configs.SERVER_CONFIG.get(ServerConfig.ADDITIONAL_MODS);
+			if (modIDs != null){
+				modIDs.stream().forEach(modID -> DataExchangeAPI.registerModDependency(modID));
+			}
+		}
+		
 	}
 	
 	protected static SyncFolderDescriptor getSyncFolderDescriptor(String folderID) {

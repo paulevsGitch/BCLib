@@ -241,6 +241,7 @@ public class NamedPathConfig extends PathConfig{
 	public void set(ConfigToken<List<String>> what, List<String> value) {
 		this.setStringArray(what, value);
 	}
+	
 	private List<String> _getStringArray(ConfigToken<List<String>> what){
 		return this.getStringArray(what, what.defaultValue);
 	}
