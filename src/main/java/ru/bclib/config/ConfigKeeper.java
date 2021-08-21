@@ -2,6 +2,7 @@ package ru.bclib.config;
 
 import com.google.common.collect.Maps;
 import com.google.common.reflect.TypeToken;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.util.GsonHelper;
@@ -14,6 +15,8 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.OutputStream;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -293,7 +296,51 @@ public final class ConfigKeeper {
 		public void toJson(String value) {
 			this.location.addProperty(key, value);
 		}
+	}
+	
+	public static abstract class ArrayEntry<T> extends Entry<List<T>> {
+		public ArrayEntry(List<T> defaultValue) {
+			super(defaultValue);
+		}
 		
+		protected abstract T getValue(JsonElement element);
+		protected abstract void add(JsonArray array, T element);
+		
+		private JsonArray toArray(List<T> input){
+			final JsonArray array = new JsonArray();
+			input.forEach(s -> add(array, s));
+			return array;
+		}
+		
+		@Override
+		public List<T> fromJson() {
+			final JsonArray resArray = GsonHelper.getAsJsonArray(location, key, toArray(defaultValue));
+			final List<T> res = new ArrayList<>(resArray.size());
+			resArray.forEach(e -> res.add(getValue(e)));
+			
+			return res;
+		}
+		
+		@Override
+		public void toJson(List<T> value) {
+			this.location.add(key, toArray(value));
+		}
+	}
+	
+	public static class StringArrayEntry extends ArrayEntry<String> {
+		
+		public StringArrayEntry(List<String> defaultValue) {
+			super(defaultValue);
+		}
+		
+		@Override
+		protected String getValue(JsonElement el){
+			return el.getAsString();
+		}
+		
+		protected void add(JsonArray array, String el){
+			array.add(el);
+		}
 	}
 	
 	public static class EnumEntry<T extends Enum<T>> extends Entry<T> {

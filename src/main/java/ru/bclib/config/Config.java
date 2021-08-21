@@ -11,11 +11,13 @@ import ru.bclib.config.ConfigKeeper.Entry;
 import ru.bclib.config.ConfigKeeper.FloatEntry;
 import ru.bclib.config.ConfigKeeper.IntegerEntry;
 import ru.bclib.config.ConfigKeeper.RangeEntry;
+import ru.bclib.config.ConfigKeeper.StringArrayEntry;
 import ru.bclib.config.ConfigKeeper.StringEntry;
-import ru.bclib.config.NamedPathConfig.ConfigToken;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public abstract class Config {
@@ -201,6 +203,33 @@ public abstract class Config {
 	protected boolean setBoolean(ConfigKey key, boolean value) {
 		try {
 			BooleanEntry entry = keeper.getEntry(key, BooleanEntry.class);
+			if (entry == null) return false;
+			entry.setValue(value);
+			return true;
+		}
+		catch (NullPointerException ex) {
+			BCLib.LOGGER.catching(ex);
+		}
+		return false;
+	}
+	
+	protected List<String> getStringArray(ConfigKey key, List<String> defaultValue) {
+		List<String> str = keeper.getValue(key, StringArrayEntry.class);
+		if (str == null) {
+			StringArrayEntry entry = keeper.registerEntry(key, new StringArrayEntry(defaultValue));
+			return entry.getValue();
+		}
+		return str != null ? str : defaultValue;
+	}
+	
+	protected List<String> getStringArray(ConfigKey key) {
+		List<String> str = keeper.getValue(key, StringArrayEntry.class);
+		return str != null ? str : new ArrayList<>(0);
+	}
+	
+	protected boolean setStringArray(ConfigKey key, List<String> value) {
+		try {
+			StringArrayEntry entry = keeper.getEntry(key, StringArrayEntry.class);
 			if (entry == null) return false;
 			entry.setValue(value);
 			return true;
