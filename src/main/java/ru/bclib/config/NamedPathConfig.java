@@ -2,6 +2,11 @@ package ru.bclib.config;
 
 import net.minecraft.resources.ResourceLocation;
 import ru.bclib.BCLib;
+import ru.bclib.config.ConfigKeeper.BooleanEntry;
+import ru.bclib.config.ConfigKeeper.FloatEntry;
+import ru.bclib.config.ConfigKeeper.IntegerEntry;
+import ru.bclib.config.ConfigKeeper.StringArrayEntry;
+import ru.bclib.config.ConfigKeeper.StringEntry;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -49,46 +54,67 @@ public class NamedPathConfig extends PathConfig{
 	public static class DependendConfigToken<T> extends ConfigToken<T>{
 		protected final Predicate<NamedPathConfig> dependenciesTrue;
 		
-		public DependendConfigToken(T defaultValue, String entry, ResourceLocation path, Predicate<NamedPathConfig> dependenciesTrue) {
-			this(defaultValue, entry, new String[]{path.getNamespace(), path.getPath()}, dependenciesTrue);
+		protected DependendConfigToken(Class<?> type, T defaultValue, String entry, ResourceLocation path, Predicate<NamedPathConfig> dependenciesTrue) {
+			this(type, defaultValue, entry, new String[]{path.getNamespace(), path.getPath()}, dependenciesTrue);
 		}
 		
-		public DependendConfigToken(T defaultValue, String entry, String path, Predicate<NamedPathConfig> dependenciesTrue) {
-			super(defaultValue, entry, path);
+		protected DependendConfigToken(Class<?> type, T defaultValue, String entry, String path, Predicate<NamedPathConfig> dependenciesTrue) {
+			super(type, defaultValue, entry, path);
 			this.dependenciesTrue = dependenciesTrue;
 		}
 		
-		public DependendConfigToken(T defaultValue, String entry, String[] path, Predicate<NamedPathConfig> dependenciesTrue) {
-			super(defaultValue, entry, path);
+		protected DependendConfigToken(Class<?> type, T defaultValue, String entry, String[] path, Predicate<NamedPathConfig> dependenciesTrue) {
+			super(type, defaultValue, entry, path);
 			this.dependenciesTrue = dependenciesTrue;
 		}
 		
 		public boolean dependenciesTrue(NamedPathConfig config){
 			return dependenciesTrue.test(config);
 		}
+		
+		public static DependendConfigToken<Boolean> Boolean(boolean defaultValue, String entry, String path, Predicate<NamedPathConfig> dependenciesTrue) {
+			return new DependendConfigToken<Boolean>(BooleanEntry.class, defaultValue, entry, path, dependenciesTrue);
+		}
 	}
 	
 	public static class ConfigToken <T> extends ConfigKey{
 		public final T defaultValue;
-		public final Class<T> type;
+		public final Class<?> type;
 		
-		public ConfigToken(T defaultValue, String entry, ResourceLocation path) {
-			this(defaultValue, entry, path.getNamespace(), path.getPath());
+		protected ConfigToken(Class<?> type, T defaultValue, String entry, ResourceLocation path) {
+			this(type, defaultValue, entry, path.getNamespace(), path.getPath());
 		}
 		
 		@SuppressWarnings("unchecked")
-		public ConfigToken(T defaultValue, String entry, String... path) {
+		protected ConfigToken(Class<?> type, T defaultValue, String entry, String... path) {
 			super(entry, path);
 			this.defaultValue = defaultValue;
 			
-			if (defaultValue == null){
-				BCLib.LOGGER.error("[Internal Error] defaultValue should not be null (" +this.getEntry() +")");
-			}
-			this.type = defaultValue!=null?(Class<T>)defaultValue.getClass():(Class<T>)Object.class;
+			this.type = type;
 		}
 		
 		public boolean dependenciesTrue(NamedPathConfig config){
 			return true;
+		}
+		
+		public static ConfigToken<Boolean> Boolean(boolean defaultValue, String entry, String path) {
+			return new ConfigToken<Boolean>(BooleanEntry.class, defaultValue, entry, path);
+		}
+		
+		public static ConfigToken<Integer> Int(int defaultValue, String entry, String path) {
+			return new ConfigToken<Integer>(IntegerEntry.class, defaultValue, entry, path);
+		}
+		
+		public static ConfigToken<Float> Float(float defaultValue, String entry, String path) {
+			return new ConfigToken<Float>(FloatEntry.class, defaultValue, entry, path);
+		}
+		
+		public static ConfigToken<String> String(String defaultValue, String entry, String path) {
+			return new ConfigToken<String>(StringEntry.class, defaultValue, entry, path);
+		}
+		
+		public static ConfigToken<List<String>> StringArray(List<String> defaultValue, String entry, String path) {
+			return new ConfigToken<List<String>>(StringArrayEntry.class, defaultValue, entry, path);
 		}
 	}
 	
@@ -157,17 +183,20 @@ public class NamedPathConfig extends PathConfig{
 	@SuppressWarnings("unchecked")
 	private <T> T _get(ConfigToken<T> what, boolean raw){
 		//TODO: Check if we can make config fully Generic to avoid runtime type checks...
-		if (Boolean.class.isAssignableFrom(what.type)){
+		if (BooleanEntry.class.isAssignableFrom(what.type)){
 			return (T)_getBoolean((ConfigToken<Boolean>)what, raw);
 		}
-		if (Integer.class.isAssignableFrom(what.type)){
+		if (IntegerEntry.class.isAssignableFrom(what.type)){
 			return (T)_getInt((ConfigToken<Integer>)what);
 		}
-		if (Float.class.isAssignableFrom(what.type)){
+		if (FloatEntry.class.isAssignableFrom(what.type)){
 			return (T)_getFloat((ConfigToken<Float>)what);
 		}
-		if (String.class.isAssignableFrom(what.type)){
+		if (StringEntry.class.isAssignableFrom(what.type)){
 			return (T)_getString((ConfigToken<String>)what);
+		}
+		if (StringArrayEntry.class.isAssignableFrom(what.type)){
+			return (T)_getStringArray((ConfigToken<List<String>>)what);
 		}
 		return this._get(what);
 	}
@@ -207,6 +236,13 @@ public class NamedPathConfig extends PathConfig{
 	}
 	private String _getString(ConfigToken<String> what){
 		return this.getString(what, what.defaultValue);
+	}
+	
+	public void set(ConfigToken<List<String>> what, List<String> value) {
+		this.setStringArray(what, value);
+	}
+	private List<String> _getStringArray(ConfigToken<List<String>> what){
+		return this.getStringArray(what, what.defaultValue);
 	}
 	
 	

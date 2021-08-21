@@ -32,15 +32,15 @@ public class AutoSync {
 	
 	@Environment(EnvType.CLIENT)
 	public static class ClientConfig extends NamedPathConfig{
-		public static final ConfigToken<Boolean> ENABLED = new ConfigToken<Boolean>(true, "enabled", SYNC_CATEGORY);
+		public static final ConfigToken<Boolean> ENABLED = ConfigToken.Boolean(true, "enabled", SYNC_CATEGORY);
 		@ConfigUI(leftPadding =8)
-		public static final ConfigToken<Boolean> ACCEPT_CONFIGS = new DependendConfigToken<Boolean>(true,"acceptConfigs", SYNC_CATEGORY, (config)->config.get(ENABLED));
+		public static final DependendConfigToken<Boolean> ACCEPT_CONFIGS = DependendConfigToken.Boolean(true,"acceptConfigs", SYNC_CATEGORY, (config)->config.get(ENABLED));
 		@ConfigUI(leftPadding =8)
-		public static final ConfigToken<Boolean> ACCEPT_FILES = new DependendConfigToken<Boolean>(true,"acceptFiles", SYNC_CATEGORY, (config)->config.get(ENABLED));
+		public static final DependendConfigToken<Boolean> ACCEPT_FILES = DependendConfigToken.Boolean(true,"acceptFiles", SYNC_CATEGORY, (config)->config.get(ENABLED));
 		@ConfigUI(leftPadding =8)
-		public static final ConfigToken<Boolean> ACCEPT_MODS = new DependendConfigToken<Boolean>(true,"acceptMods", SYNC_CATEGORY, (config)->config.get(ENABLED));
+		public static final DependendConfigToken<Boolean> ACCEPT_MODS = DependendConfigToken.Boolean(true,"acceptMods", SYNC_CATEGORY, (config)->config.get(ENABLED));
 		@ConfigUI(topPadding = 12)
-		public static final ConfigToken<Boolean> DEBUG_HASHES = new ConfigToken<Boolean>(true, "debugHashes", SYNC_CATEGORY);
+		public static final ConfigToken<Boolean> DEBUG_HASHES = ConfigToken.Boolean(true, "debugHashes", SYNC_CATEGORY);
 		
 		
 		public ClientConfig(){
@@ -56,23 +56,25 @@ public class AutoSync {
 		}
 		
 		public boolean isAcceptingMods() {
-			return get(ACCEPT_MODS) && isAllowingAutoSync();
+			return get(ACCEPT_MODS) /*&& isAllowingAutoSync()*/;
 		}
 		
 		public  boolean isAcceptingConfigs() {
-			return get(ACCEPT_CONFIGS) && isAllowingAutoSync();
+			return get(ACCEPT_CONFIGS) /*&& isAllowingAutoSync()*/;
 		}
 		
 		public  boolean isAcceptingFiles() {
-			return get(ACCEPT_FILES) && isAllowingAutoSync();
+			return get(ACCEPT_FILES) /*&& isAllowingAutoSync()*/;
 		}
 	}
 	
 	public static class ServerConfig extends NamedPathConfig {
-		public static final ConfigToken<Boolean> ENABLED = new ConfigToken<Boolean>(true, "enabled", SYNC_CATEGORY);
-		public static final ConfigToken<Boolean> OFFER_CONFIGS = new ConfigToken<Boolean>(true,"offerConfigs", SYNC_CATEGORY);
-		public static final ConfigToken<Boolean> OFFER_FILES = new ConfigToken<Boolean>(true,"offerFiles", SYNC_CATEGORY);
-		public static final ConfigToken<Boolean> OFFER_MODS = new ConfigToken<Boolean>(true,"offerMods", SYNC_CATEGORY);
+		public static final ConfigToken<Boolean> ENABLED = ConfigToken.Boolean(true, "enabled", SYNC_CATEGORY);
+		public static final DependendConfigToken<Boolean> OFFER_CONFIGS = DependendConfigToken.Boolean(true,"offerConfigs", SYNC_CATEGORY, (config)->config.get(ENABLED));
+		public static final DependendConfigToken<Boolean> OFFER_FILES = DependendConfigToken.Boolean(true,"offerFiles", SYNC_CATEGORY, (config)->config.get(ENABLED));
+		public static final DependendConfigToken<Boolean> OFFER_MODS = DependendConfigToken.Boolean(true,"offerMods", SYNC_CATEGORY, (config)->config.get(ENABLED));
+		
+		public static final ConfigToken<List<String>> ADDITIONAL_MODS = ConfigToken.StringArray(new ArrayList<>(0),"additionalMods", SYNC_CATEGORY);
 		
 		
 		public ServerConfig(){
@@ -84,15 +86,19 @@ public class AutoSync {
 		}
 		
 		public boolean isOfferingConfigs() {
-			return get(OFFER_CONFIGS) && isAllowingAutoSync();
+			return get(OFFER_CONFIGS) /*&& isAllowingAutoSync()*/;
 		}
 		
 		public boolean isOfferingFiles() {
-			return get(OFFER_FILES) && isAllowingAutoSync();
+			return get(OFFER_FILES) /*&& isAllowingAutoSync()*/;
 		}
 		
 		public boolean isOfferingMods() {
-			return get(OFFER_MODS) && isAllowingAutoSync();
+			return get(OFFER_MODS) /*&& isAllowingAutoSync()*/;
+		}
+		
+		public String[] additionalModsForSync() {
+			return new String[0];
 		}
 	}
 	
