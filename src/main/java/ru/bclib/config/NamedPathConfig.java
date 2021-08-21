@@ -11,34 +11,48 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Predicate;
 
 public class NamedPathConfig extends PathConfig{
-	public abstract static class ConfigToken extends ConfigKey{
-		public static class Int extends ConfigToken{
-			public final int defaultValue;
-			public Int(int def, String entry, String... path) { super(entry, path); this.defaultValue=def;}
-			public Int(int def, String entry, ResourceLocation path) { super(entry, path); this.defaultValue=def;}
+	public abstract static class ConfigToken <T> extends ConfigKey{
+		public static class Int extends ConfigToken<Integer>{
+			public Int(int def, String entry, ResourceLocation path) { this(def, entry, path.getNamespace(), path.getPath());}
+			public Int(int def, String entry, String... path) { super(def, entry, path);}
+			
 		}
 		
-		public static class Float extends ConfigToken{
-			public final float defaultValue;
-			public Float(float def, String entry, String... path) { super(entry, path); this.defaultValue=def;}
-			public Float(float def, String entry, ResourceLocation path) { super(entry, path); this.defaultValue=def;}
+		public static class Float extends ConfigToken<java.lang.Float>{
+			public Float(float def, String entry, ResourceLocation path) { this(def, entry, path.getNamespace(), path.getPath());}
+			public Float(float def, String entry, String... path) { super(def, entry, path); }
 		}
 		
-		public static class Bool extends ConfigToken{
-			public final boolean defaultValue;
-			public Bool(boolean def, String entry, String... path) { super(entry, path); this.defaultValue=def;}
-			public Bool(boolean def, String entry, ResourceLocation path) { super(entry, path); this.defaultValue=def;}
+		public static class Bool extends ConfigToken<Boolean>{
+			public Bool(boolean def, String entry, ResourceLocation path) { this(def, entry, path.getNamespace(), path.getPath());}
+			public Bool(boolean def, String entry, String... path) { super(def, entry, path); }
 		}
 		
-		public static class Str extends ConfigToken{
-			public final String defaultValue;
-			public Str(String def, String entry, String... path) { super(entry, path); this.defaultValue=def;}
-			public Str(String def, String entry, ResourceLocation path) { super(entry, path); this.defaultValue=def;}
+		public static class Str extends ConfigToken<String>{
+			public Str(String def, String entry, ResourceLocation path) { this(def, entry, path.getNamespace(), path.getPath());}
+			public Str(String def, String entry, String... path) { super(def, entry, path); }
 		}
-		ConfigToken(String entry, String... path) { super(entry, path); }
-		ConfigToken(String entry, ResourceLocation path) { super(entry, path); }
+		
+		public static final Predicate<NamedPathConfig> ALWAYS_ENABLED = (config) -> true;
+		
+		public final T defaultValue;
+		protected final Predicate<NamedPathConfig> enabled;
+		
+		ConfigToken(T defaultValue, String entry, ResourceLocation path) { this(defaultValue, entry, path.getNamespace(), path.getPath()); }
+		ConfigToken(T defaultValue, String entry, String... path) { this(defaultValue, ALWAYS_ENABLED, entry, path); }
+		
+		ConfigToken(T defaultValue, String entry, ResourceLocation path, Predicate<NamedPathConfig> enabled) { this(defaultValue, enabled, entry, path.getNamespace(), path.getPath()); }
+		ConfigToken(T defaultValue, String entry, String path, Predicate<NamedPathConfig> enabled) { this(defaultValue, enabled, entry, path); }
+		ConfigToken(T defaultValue, String entry, String[] path, Predicate<NamedPathConfig> enabled) { this(defaultValue, enabled, entry, path); }
+		private ConfigToken(T defaultValue, Predicate<NamedPathConfig> enabled, String entry, String... path) {
+			super(entry, path);
+			this.enabled = enabled;
+			this.defaultValue = defaultValue
+		}
+		
 	}
 	
 	public NamedPathConfig(String modID, String group, boolean autoSync, boolean diffContent) {
