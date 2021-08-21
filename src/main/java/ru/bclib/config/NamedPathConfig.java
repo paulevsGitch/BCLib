@@ -162,7 +162,7 @@ public class NamedPathConfig extends PathConfig{
 	 *
 	 * @param what The Option you want to get
 	 * @param <T> The Type of the Option
-	 * @return The Value of the Option (without checking the {@link DependendConfigToken)):
+	 * @return The Value of the Option (without checking the {@link DependendConfigToken}):
 	 */
 	public <T> T getRaw(ConfigToken<T> what){
 		return _get(what, true);
