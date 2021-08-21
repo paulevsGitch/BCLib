@@ -142,7 +142,7 @@ public class SendFiles extends DataHandler.FromServer {
 	
 	@Environment(EnvType.CLIENT)
 	static void writeSyncedFile(AutoSyncID e, byte[] data, File fileName) {
-		if (!PathUtil.isChildOf(PathUtil.GAME_FOLDER, fileName.toPath())){
+		if (fileName!=null && !PathUtil.isChildOf(PathUtil.GAME_FOLDER, fileName.toPath())){
 			BCLib.LOGGER.error(fileName + " is not within game folder " + PathUtil.GAME_FOLDER);
 			return;
 		}

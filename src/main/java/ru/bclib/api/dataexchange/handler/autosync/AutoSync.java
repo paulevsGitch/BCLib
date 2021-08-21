@@ -1,7 +1,5 @@
 package ru.bclib.api.dataexchange.handler.autosync;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.fabricmc.loader.api.FabricLoader;
 import ru.bclib.BCLib;
 import ru.bclib.api.dataexchange.DataExchangeAPI;
@@ -31,7 +29,6 @@ public class AutoSync {
 		public boolean test(SyncFileHash clientHash, SyncFileHash serverHash, FileContentWrapper content);
 	}
 	
-	@Environment(EnvType.CLIENT)
 	public static class ClientConfig extends NamedPathConfig{
 		public static final ConfigToken<Boolean> ENABLED = ConfigToken.Boolean(true, "enabled", SYNC_CATEGORY);
 		@ConfigUI(leftPadding =8)

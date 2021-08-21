@@ -42,34 +42,32 @@ public class SyncFilesScreen extends BCLibScreen {
 		
 		
 		final GridCheckboxCell mods;
-		if (hasMods) {
-			row = grid.addRow();
-			mods = row.addCheckbox(new TranslatableComponent("message.bclib.syncfiles.mods"), true, BUTTON_HEIGHT, this.font);
-			grid.addSpacerRow();
-		} else mods=null;
+		row = grid.addRow();
+		mods = row.addCheckbox(new TranslatableComponent("message.bclib.syncfiles.mods"), hasMods, BUTTON_HEIGHT, this.font);
+		mods.setEnabled(hasMods);
+		grid.addSpacerRow();
+	
 		
 		final GridCheckboxCell configs;
-		if (hasConfigFiles) {
-			row = grid.addRow();
-			configs = row.addCheckbox(new TranslatableComponent("message.bclib.syncfiles.configs"), true, BUTTON_HEIGHT, this.font);
-			grid.addSpacerRow();
-		} else configs = null;
+		row = grid.addRow();
+		configs = row.addCheckbox(new TranslatableComponent("message.bclib.syncfiles.configs"), hasConfigFiles, BUTTON_HEIGHT, this.font);
+		configs.setEnabled(hasConfigFiles);
+		
+		grid.addSpacerRow();
 		
 		row = grid.addRow();
 		
 		final GridCheckboxCell folder;
-		if (hasFiles) {
-			folder = row.addCheckbox(new TranslatableComponent("message.bclib.syncfiles.folders"), true, BUTTON_HEIGHT, this.font);
-			row.addSpacer();
-		} else folder = null;
+		folder = row.addCheckbox(new TranslatableComponent("message.bclib.syncfiles.folders"), hasFiles, BUTTON_HEIGHT, this.font);
+		folder.setEnabled(hasFiles);
+		row.addSpacer();
 		
 		GridCheckboxCell delete;
-		if (shouldDelete) {
-			delete = row.addCheckbox(new TranslatableComponent("message.bclib.syncfiles.delete"), true, BUTTON_HEIGHT, this.font);
-		} else delete = null;
+		delete = row.addCheckbox(new TranslatableComponent("message.bclib.syncfiles.delete"), shouldDelete, BUTTON_HEIGHT, this.font);
+		delete.setEnabled(shouldDelete);
+		
 		
 		grid.addSpacerRow(30);
-		
 		row = grid.addRow();
 		row.addFiller();
 		row.addButton(CommonComponents.GUI_NO, BUTTON_HEIGHT, this.font, (button) -> {
@@ -78,10 +76,10 @@ public class SyncFilesScreen extends BCLibScreen {
 		row.addSpacer();
 		row.addButton(CommonComponents.GUI_YES, BUTTON_HEIGHT, this.font, (button) -> {
 			listener.proceed(
-				mods!=null && mods.isChecked(),
-				configs!=null && configs.isChecked(),
-				folder != null && folder.isChecked(),
-				delete !=null && delete.isChecked()
+				mods.isChecked(),
+				configs.isChecked(),
+				folder.isChecked(),
+				delete.isChecked()
 			);
 		});
 		row.addFiller();

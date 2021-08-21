@@ -30,6 +30,8 @@ public class PathUtil {
 	 */
 	public static boolean isChildOf(Path parent, Path child) {
 		if (child == null || parent == null) return false;
+		parent = parent.toAbsolutePath().normalize();
+		child = child.toAbsolutePath().normalize();
 		
 		final int pCount = parent.getNameCount();
 		final int cCount = child.getNameCount();
