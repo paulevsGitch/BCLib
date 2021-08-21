@@ -38,7 +38,7 @@ public class AutoSync {
 		@ConfigUI(leftPadding =8)
 		public static final DependendConfigToken<Boolean> ACCEPT_MODS = DependendConfigToken.Boolean(true,"acceptMods", SYNC_CATEGORY, (config)->config.get(ENABLED));
 		@ConfigUI(topPadding = 12)
-		public static final ConfigToken<Boolean> DEBUG_HASHES = ConfigToken.Boolean(true, "debugHashes", SYNC_CATEGORY);
+		public static final ConfigToken<Boolean> DEBUG_HASHES = ConfigToken.Boolean(false, "debugHashes", SYNC_CATEGORY);
 		
 		
 		public ClientConfig(){
