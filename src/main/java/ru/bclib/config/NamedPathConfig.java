@@ -2,10 +2,6 @@ package ru.bclib.config;
 
 import net.minecraft.resources.ResourceLocation;
 import ru.bclib.BCLib;
-import ru.bclib.config.NamedPathConfig.ConfigToken.Bool;
-import ru.bclib.config.NamedPathConfig.ConfigToken.Float;
-import ru.bclib.config.NamedPathConfig.ConfigToken.Int;
-import ru.bclib.config.NamedPathConfig.ConfigToken.Str;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -14,45 +10,86 @@ import java.util.List;
 import java.util.function.Predicate;
 
 public class NamedPathConfig extends PathConfig{
-	public abstract static class ConfigToken <T> extends ConfigKey{
-		public static class Int extends ConfigToken<Integer>{
-			public Int(int def, String entry, ResourceLocation path) { this(def, entry, path.getNamespace(), path.getPath());}
-			public Int(int def, String entry, String... path) { super(def, entry, path);}
+	public static  class ConfigTokenDescription<T> {
+		public final ConfigToken<T> token;
+		public final String internalName;
+		public final Boolean hidden;
+		public final int leftPadding;
+		public final int topPadding;
+		
+		@SuppressWarnings("unchecked")
+		ConfigTokenDescription(Field fl) throws IllegalAccessException{
+			token = (ConfigToken<T>) fl.get(null);
+			internalName = fl.getName();
+			
+			ConfigUI ui = fl.getAnnotation(ConfigUI.class);
+			if (ui!=null) {
+				this.hidden = ui.hide();
+				leftPadding = ui.leftPadding();
+				topPadding = ui.topPadding();
+			} else {
+				this.hidden = false;
+				this.leftPadding = 0;
+				topPadding = 0;
+			}
 			
 		}
 		
-		public static class Float extends ConfigToken<java.lang.Float>{
-			public Float(float def, String entry, ResourceLocation path) { this(def, entry, path.getNamespace(), path.getPath());}
-			public Float(float def, String entry, String... path) { super(def, entry, path); }
+		public String getPath(){
+			StringBuilder path = new StringBuilder();
+			for (String p : token.getPath()){
+				path.append(".")
+					.append(p);
+				
+			}
+			path.append(".").append(token.getEntry());
+			return path.toString();
+		}
+	}
+	public static class DependendConfigToken<T> extends ConfigToken<T>{
+		protected final Predicate<NamedPathConfig> dependenciesTrue;
+		
+		public DependendConfigToken(T defaultValue, String entry, ResourceLocation path, Predicate<NamedPathConfig> dependenciesTrue) {
+			this(defaultValue, entry, new String[]{path.getNamespace(), path.getPath()}, dependenciesTrue);
 		}
 		
-		public static class Bool extends ConfigToken<Boolean>{
-			public Bool(boolean def, String entry, ResourceLocation path) { this(def, entry, path.getNamespace(), path.getPath());}
-			public Bool(boolean def, String entry, String... path) { super(def, entry, path); }
+		public DependendConfigToken(T defaultValue, String entry, String path, Predicate<NamedPathConfig> dependenciesTrue) {
+			super(defaultValue, entry, path);
+			this.dependenciesTrue = dependenciesTrue;
 		}
 		
-		public static class Str extends ConfigToken<String>{
-			public Str(String def, String entry, ResourceLocation path) { this(def, entry, path.getNamespace(), path.getPath());}
-			public Str(String def, String entry, String... path) { super(def, entry, path); }
+		public DependendConfigToken(T defaultValue, String entry, String[] path, Predicate<NamedPathConfig> dependenciesTrue) {
+			super(defaultValue, entry, path);
+			this.dependenciesTrue = dependenciesTrue;
 		}
 		
-		public static final Predicate<NamedPathConfig> ALWAYS_ENABLED = (config) -> true;
-		
+		public boolean dependenciesTrue(NamedPathConfig config){
+			return dependenciesTrue.test(config);
+		}
+	}
+	
+	public static class ConfigToken <T> extends ConfigKey{
 		public final T defaultValue;
-		protected final Predicate<NamedPathConfig> enabled;
+		public final Class<T> type;
 		
-		ConfigToken(T defaultValue, String entry, ResourceLocation path) { this(defaultValue, entry, path.getNamespace(), path.getPath()); }
-		ConfigToken(T defaultValue, String entry, String... path) { this(defaultValue, ALWAYS_ENABLED, entry, path); }
-		
-		ConfigToken(T defaultValue, String entry, ResourceLocation path, Predicate<NamedPathConfig> enabled) { this(defaultValue, enabled, entry, path.getNamespace(), path.getPath()); }
-		ConfigToken(T defaultValue, String entry, String path, Predicate<NamedPathConfig> enabled) { this(defaultValue, enabled, entry, path); }
-		ConfigToken(T defaultValue, String entry, String[] path, Predicate<NamedPathConfig> enabled) { this(defaultValue, enabled, entry, path); }
-		private ConfigToken(T defaultValue, Predicate<NamedPathConfig> enabled, String entry, String... path) {
-			super(entry, path);
-			this.enabled = enabled;
-			this.defaultValue = defaultValue
+		public ConfigToken(T defaultValue, String entry, ResourceLocation path) {
+			this(defaultValue, entry, path.getNamespace(), path.getPath());
 		}
 		
+		@SuppressWarnings("unchecked")
+		public ConfigToken(T defaultValue, String entry, String... path) {
+			super(entry, path);
+			this.defaultValue = defaultValue;
+			
+			if (defaultValue == null){
+				BCLib.LOGGER.error("[Internal Error] defaultValue should not be null (" +this.getEntry() +")");
+			}
+			this.type = defaultValue!=null?(Class<T>)defaultValue.getClass():(Class<T>)Object.class;
+		}
+		
+		public boolean dependenciesTrue(NamedPathConfig config){
+			return true;
+		}
 	}
 	
 	public NamedPathConfig(String modID, String group, boolean autoSync, boolean diffContent) {
@@ -70,13 +107,13 @@ public class NamedPathConfig extends PathConfig{
 		onInit();
 	}
 	
-	public List<ConfigToken> getAllOptions(){
-		List<ConfigToken> res = new LinkedList<>();
+	public List<ConfigTokenDescription<?>> getAllOptions(){
+		List<ConfigTokenDescription<?>> res = new LinkedList<>();
 		for (Field fl : this.getClass().getDeclaredFields()){
 			int modifiers = fl.getModifiers();
 			if (Modifier.isPublic(modifiers) && Modifier.isStatic(modifiers) && ConfigToken.class.isAssignableFrom(fl.getType())) {
 				try {
-					res.add((ConfigToken) fl.get(null));
+					res.add(new ConfigTokenDescription<>(fl));
 				}
 				catch (IllegalAccessException e) {
 					BCLib.LOGGER.error("Could not access " + fl);
@@ -87,55 +124,90 @@ public class NamedPathConfig extends PathConfig{
 	}
 	
 	protected void onInit(){
-		getAllOptions().forEach(e -> get(e));
+		getAllOptions().forEach(e -> get(e.token));
 		this.saveChanges();
 	}
 	
-	private void set(ConfigToken what, Object value) {
-		if (what instanceof Bool) set(what, (boolean)value);
-		else if (what instanceof Int) set(what, (int)value);
-		else if (what instanceof Float) set(what, (float)value);
-		else if (what instanceof Str) set(what, (String)value);
-		else BCLib.LOGGER.error("Accessing " + what + " as general type is not supported.");
+	/**
+	 * The value without any check of {@link DependendConfigToken}
+	 * <p>
+	 * In most cases you probably want to use {@link #get(ConfigToken)}, we use this Method if we
+	 * present the actual value of the Settings from the Config File without any additional processing.
+	 *
+	 * @param what The Option you want to get
+	 * @param <T> The Type of the Option
+	 * @return The Value of the Option (without checking the {@link DependendConfigToken)):
+	 */
+	public <T> T getRaw(ConfigToken<T> what){
+		return _get(what, true);
 	}
 	
-	private Object get(ConfigToken what){
-		if (what instanceof Bool) return get((Bool)what);
-		else if (what instanceof Int) return get((Int)what);
-		else if (what instanceof Float) return get((Float)what);
-		else if (what instanceof Str) return get((Str)what);
-		else return null;
+	/**
+	 * The value of an Option
+	 * @param what he Option you want to get
+	 * @param <T> The Type of the Option
+	 * @return The Value of the Option. If this option is a {@link DependendConfigToken}, the returned value
+	 * may not be the value from the config File. For Example, on a {@link Boolean}-Type the result is always false
+	 * if {@link DependendConfigToken#dependenciesTrue} returns {@code false}.
+	 */
+	public <T> T get(ConfigToken<T> what){
+		return _get(what, false);
 	}
 	
-	public void set(ConfigToken.Int what, int value) {
-		this.setInt(what, value);
+	@SuppressWarnings("unchecked")
+	private <T> T _get(ConfigToken<T> what, boolean raw){
+		//TODO: Check if we can make config fully Generic to avoid runtime type checks...
+		if (Boolean.class.isAssignableFrom(what.type)){
+			return (T)_getBoolean((ConfigToken<Boolean>)what, raw);
+		}
+		if (Integer.class.isAssignableFrom(what.type)){
+			return (T)_getInt((ConfigToken<Integer>)what);
+		}
+		if (Float.class.isAssignableFrom(what.type)){
+			return (T)_getFloat((ConfigToken<Float>)what);
+		}
+		if (String.class.isAssignableFrom(what.type)){
+			return (T)_getString((ConfigToken<String>)what);
+		}
+		return this._get(what);
 	}
 	
-	public int get(ConfigToken.Int what){
-		return this.getInt(what, what.defaultValue);
+	private<T> T _get(ConfigToken<T> what){
+		BCLib.LOGGER.error(what + " has unsupported Type.");
+		return what.defaultValue;
 	}
 	
-	public void set(ConfigToken.Bool what, boolean value) {
+	public void set(ConfigToken<Boolean> what, boolean value) {
 		this.setBoolean(what, value);
 	}
-	
-	public boolean get(ConfigToken.Bool what){
+	private Boolean _getBoolean(ConfigToken<Boolean> what, boolean raw){
+		if (!raw && !what.dependenciesTrue(this)){
+			return false;
+		}
+		
 		return this.getBoolean(what, what.defaultValue);
 	}
 	
-	public void set(ConfigToken.Str what, String value) {
-		this.setString(what, value);
+	public void set(ConfigToken<Integer> what, int value) {
+		this.setInt(what, value);
+	}
+	private Integer _getInt(ConfigToken<Integer> what){
+		return this.getInt(what, what.defaultValue);
 	}
 	
-	public String get(ConfigToken.Str what){
+	public void set(ConfigToken<Float> what, float value) {
+		this.setFloat(what, value);
+	}
+	private Float _getFloat(ConfigToken<Float> what){
+		return this.getFloat(what, what.defaultValue);
+	}
+	
+	public void set(ConfigToken<String> what, String value) {
+		this.setString(what, value);
+	}
+	private String _getString(ConfigToken<String> what){
 		return this.getString(what, what.defaultValue);
 	}
 	
-	public void set(ConfigToken.Float what, float value) {
-		this.setFloat(what, value);
-	}
 	
-	public float get(ConfigToken.Float what){
-		return this.getFloat(what, what.defaultValue);
-	}
 }

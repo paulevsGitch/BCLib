@@ -27,8 +27,11 @@ class SignalingCheckBox extends Checkbox{
 }
 
 @Environment(EnvType.CLIENT)
-public class GridCheckboxCell extends GridCell{
+public class GridCheckboxCell extends GridCell implements GridWidgetWithEnabledState{
 	private boolean checked;
+	private Checkbox lastCheckbox;
+	private boolean enabled;
+	private final float alpha;
 	
 	GridCheckboxCell(Component text, boolean checked, float alpha, double width, GridValueType widthType, double height) {
 		this(text, checked, alpha, width, widthType, height, null);
@@ -36,7 +39,9 @@ public class GridCheckboxCell extends GridCell{
 	
 	GridCheckboxCell(Component text, boolean checked, float alpha, double width, GridValueType widthType, double height, Consumer<Boolean> onChange) {
 		super(width, height, widthType, null, null);
-		
+		lastCheckbox = null;
+		enabled = true;
+		this.alpha = alpha;
 		this.componentPlacer = (transform) -> {
 			Checkbox cb = new SignalingCheckBox(transform.left, transform.top, transform.width, transform.height,
 				text,
@@ -47,11 +52,26 @@ public class GridCheckboxCell extends GridCell{
 				}
 			);
 			cb.setAlpha(alpha);
+			lastCheckbox = cb;
+			setEnabled(enabled);
 			return cb;
 		};
+		
 	}
 	
 	public boolean isChecked(){
 		return checked;
+	}
+	
+	public boolean isEnabled() {
+		return enabled;
+	}
+	
+	public void setEnabled(boolean enabled) {
+		if (lastCheckbox!=null){
+			lastCheckbox.active = enabled;
+			lastCheckbox.setAlpha(enabled?alpha:(alpha *0.5f));
+		}
+		this.enabled = enabled;
 	}
 }

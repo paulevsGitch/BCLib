@@ -5,9 +5,9 @@ import net.fabricmc.api.Environment;
 import net.fabricmc.loader.api.FabricLoader;
 import ru.bclib.BCLib;
 import ru.bclib.api.dataexchange.SyncFileHash;
+import ru.bclib.config.ConfigUI;
 import ru.bclib.config.Configs;
 import ru.bclib.config.NamedPathConfig;
-import ru.bclib.config.NamedPathConfig.ConfigToken.Bool;
 import ru.bclib.util.PathUtil;
 
 import java.io.File;
@@ -32,12 +32,15 @@ public class AutoSync {
 	
 	@Environment(EnvType.CLIENT)
 	public static class ClientConfig extends NamedPathConfig{
-		public static final ConfigToken.Bool ENABLED = new Bool(true, "enabled", SYNC_CATEGORY);
-		public static final ConfigToken.Bool ACCEPT_CONFIGS = new Bool(true,"acceptConfigs", SYNC_CATEGORY);
-		public static final ConfigToken.Bool ACCEPT_FILES = new Bool(true,"acceptFiles", SYNC_CATEGORY);
-		public static final ConfigToken.Bool ACCEPT_MODS = new Bool(true,"acceptMods", SYNC_CATEGORY);
-		public static final ConfigToken.Bool SYNC_MOD_FOLDER = new Bool(false, "syncModFolder", SYNC_CATEGORY);
-		public static final ConfigToken.Bool DEBUG_HASHES = new Bool(true, "debugHashes", SYNC_CATEGORY);
+		public static final ConfigToken<Boolean> ENABLED = new ConfigToken<Boolean>(true, "enabled", SYNC_CATEGORY);
+		@ConfigUI(leftPadding =8)
+		public static final ConfigToken<Boolean> ACCEPT_CONFIGS = new DependendConfigToken<Boolean>(true,"acceptConfigs", SYNC_CATEGORY, (config)->config.get(ENABLED));
+		@ConfigUI(leftPadding =8)
+		public static final ConfigToken<Boolean> ACCEPT_FILES = new DependendConfigToken<Boolean>(true,"acceptFiles", SYNC_CATEGORY, (config)->config.get(ENABLED));
+		@ConfigUI(leftPadding =8)
+		public static final ConfigToken<Boolean> ACCEPT_MODS = new DependendConfigToken<Boolean>(true,"acceptMods", SYNC_CATEGORY, (config)->config.get(ENABLED));
+		@ConfigUI(topPadding = 12)
+		public static final ConfigToken<Boolean> DEBUG_HASHES = new ConfigToken<Boolean>(true, "debugHashes", SYNC_CATEGORY);
 		
 		
 		public ClientConfig(){
@@ -66,10 +69,10 @@ public class AutoSync {
 	}
 	
 	public static class ServerConfig extends NamedPathConfig {
-		public static final ConfigToken.Bool ENABLED = new Bool(true, "enabled", SYNC_CATEGORY);
-		public static final ConfigToken.Bool OFFER_CONFIGS = new Bool(true,"offerConfigs", SYNC_CATEGORY);
-		public static final ConfigToken.Bool OFFER_FILES = new Bool(true,"offerFiles", SYNC_CATEGORY);
-		public static final ConfigToken.Bool OFFER_MODS = new Bool(true,"offerMods", SYNC_CATEGORY);
+		public static final ConfigToken<Boolean> ENABLED = new ConfigToken<Boolean>(true, "enabled", SYNC_CATEGORY);
+		public static final ConfigToken<Boolean> OFFER_CONFIGS = new ConfigToken<Boolean>(true,"offerConfigs", SYNC_CATEGORY);
+		public static final ConfigToken<Boolean> OFFER_FILES = new ConfigToken<Boolean>(true,"offerFiles", SYNC_CATEGORY);
+		public static final ConfigToken<Boolean> OFFER_MODS = new ConfigToken<Boolean>(true,"offerMods", SYNC_CATEGORY);
 		
 		
 		public ServerConfig(){

@@ -12,6 +12,7 @@ import ru.bclib.config.ConfigKeeper.FloatEntry;
 import ru.bclib.config.ConfigKeeper.IntegerEntry;
 import ru.bclib.config.ConfigKeeper.RangeEntry;
 import ru.bclib.config.ConfigKeeper.StringEntry;
+import ru.bclib.config.NamedPathConfig.ConfigToken;
 
 import java.io.File;
 import java.util.HashMap;
@@ -209,6 +210,4 @@ public abstract class Config {
 		}
 		return false;
 	}
-	
-	
 }
