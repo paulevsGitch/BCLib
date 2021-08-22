@@ -17,6 +17,7 @@ import ru.bclib.recipes.CraftingRecipes;
 import ru.bclib.registry.BaseBlockEntities;
 import ru.bclib.registry.BaseRegistry;
 import ru.bclib.util.Logger;
+import ru.bclib.util.ModUtil;
 import ru.bclib.world.generator.BCLibEndBiomeSource;
 import ru.bclib.world.generator.BCLibNetherBiomeSource;
 import ru.bclib.world.generator.GeneratorOptions;
@@ -30,6 +31,7 @@ public class BCLib implements ModInitializer {
 	
 	@Override
 	public void onInitialize() {
+		ModUtil.convertModVersion("1.3.0-pre1-1.17.1");
 		BaseRegistry.register();
 		GeneratorOptions.init();
 		BaseBlockEntities.register();

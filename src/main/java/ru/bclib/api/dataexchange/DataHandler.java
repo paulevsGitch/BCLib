@@ -15,6 +15,9 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import ru.bclib.BCLib;
+import ru.bclib.api.dataexchange.handler.autosync.Chunker.FileChunkSender;
+
+import java.util.List;
 
 public abstract class DataHandler extends BaseDataHandler {
 	public abstract static class WithoutPayload extends DataHandler {
@@ -68,8 +71,13 @@ public abstract class DataHandler extends BaseDataHandler {
 			FriendlyByteBuf buf = PacketByteBufs.create();
 			serializeData(buf, false);
 			
-			for (ServerPlayer player : PlayerLookup.all(server)) {
-				ServerPlayNetworking.send(player, getIdentifier(), buf);
+			if (buf.readableBytes()>1024*1024) {
+				final FileChunkSender sender = new FileChunkSender(buf);
+				sender.sendChunks(PlayerLookup.all(server));
+			} else {
+				for (ServerPlayer player : PlayerLookup.all(server)) {
+					ServerPlayNetworking.send(player, getIdentifier(), buf);
+				}
 			}
 		}
 	}
@@ -79,7 +87,12 @@ public abstract class DataHandler extends BaseDataHandler {
 		if (prepareData(false)) {
 			FriendlyByteBuf buf = PacketByteBufs.create();
 			serializeData(buf, false);
-			ServerPlayNetworking.send(player, getIdentifier(), buf);
+			if (buf.readableBytes()>1024*1024) {
+				final FileChunkSender sender = new FileChunkSender(buf);
+				sender.sendChunks(List.of(player));
+			} else {
+				ServerPlayNetworking.send(player, getIdentifier(), buf);
+			}
 		}
 	}
 	

@@ -56,15 +56,9 @@ public abstract class MinecraftMixin {
 	@Final
 	private LevelStorageSource levelSource;
 	
-	@Shadow
-	public abstract void loadLevel(String string);
-	
-	private final String BCLIB_RECURSION = "$@BCLIB:";
-	
 	@Inject(method = "loadLevel", cancellable = true, at = @At("HEAD"))
 	private void bclib_callFixerOnLoad(String levelID, CallbackInfo ci) {
 		DataExchangeAPI.prepareServerside();
-		
 		
 		if (DataFixerAPI.fixData(this.levelSource, levelID, true, (appliedFixes) -> {
 			this.doLoadLevel(levelID, RegistryAccess.builtin(), Minecraft::loadDataPacks, Minecraft::loadWorldData, false, Minecraft.ExperimentalDialogType.BACKUP);
