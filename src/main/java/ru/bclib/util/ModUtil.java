@@ -2,6 +2,8 @@ package ru.bclib.util;
 
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
+import net.fabricmc.loader.api.SemanticVersion;
+import net.fabricmc.loader.api.Version;
 import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.fabricmc.loader.metadata.ModMetadataParser;
 import net.fabricmc.loader.metadata.ParseMetadataException;
@@ -100,14 +102,23 @@ public class ModUtil {
 													  .getModContainer(modID);
 		if (optional.isPresent()) {
 			ModContainer modContainer = optional.get();
-			return modContainer.getMetadata()
-							   .getVersion()
-							   .toString();
+			return ModInfo.versionToString(modContainer.getMetadata()
+													   .getVersion());
+			
 		}
 		
-		//not found in loaded mods, lets check the local mods folder
+		return getModVersionFromJar(modID);
+	}
+	
+	/**
+	 * Local Mod Version for the queried Mod from the Jar-File in the games mod-directory
+	 *
+	 * @param modID The mod ID to query
+	 * @return The version of the locally installed Mod
+	 */
+	public static String getModVersionFromJar(String modID) {
 		final ModInfo mi = getModInfo(modID, false);
-		if (mi!=null) return mi.getVersion();
+		if (mi != null) return mi.getVersion();
 		
 		return "0.0.0";
 	}
@@ -155,21 +166,23 @@ public class ModUtil {
 	
 	/**
 	 * {@code true} if the version v1 is larger than v2
+	 *
 	 * @param v1 A Version string
 	 * @param v2 Another Version string
 	 * @return v1 &gt; v2
 	 */
-	public static boolean isLargerVersion(String v1, String v2){
+	public static boolean isLargerVersion(String v1, String v2) {
 		return convertModVersion(v1) > convertModVersion(v2);
 	}
 	
 	/**
 	 * {@code true} if the version v1 is larger or equal v2
+	 *
 	 * @param v1 A Version string
 	 * @param v2 Another Version string
 	 * @return v1 &ge; v2
 	 */
-	public static boolean isLargerOrEqualVersion(String v1, String v2){
+	public static boolean isLargerOrEqualVersion(String v1, String v2) {
 		return convertModVersion(v1) >= convertModVersion(v2);
 	}
 	
@@ -182,6 +195,31 @@ public class ModUtil {
 			this.jarPath = jarPath;
 		}
 		
+		public static String versionToString(Version v) {
+			if (v instanceof SemanticVersion) {
+				return versionToString((SemanticVersion) v);
+			}
+			return convertModVersion(convertModVersion(v.toString()));
+		}
+		
+		public static String versionToString(SemanticVersion v) {
+			StringBuilder stringBuilder = new StringBuilder();
+			boolean first = true;
+			final int cCount = Math.min(v.getVersionComponentCount(), 3);
+			for (int i = 0; i < cCount; i++) {
+				if (first) {
+					first = false;
+				}
+				else {
+					stringBuilder.append('.');
+				}
+				
+				stringBuilder.append(v.getVersionComponent(i));
+			}
+			
+			return stringBuilder.toString();
+		}
+		
 		@Override
 		public String toString() {
 			return "ModInfo{" + "id=" + metadata.getId() + ", version=" + metadata.getVersion() + ", jarPath=" + jarPath + '}';
@@ -189,8 +227,7 @@ public class ModUtil {
 		
 		public String getVersion() {
 			if (metadata == null) return "0.0.0";
-			return metadata.getVersion()
-						   .toString();
+			return versionToString(metadata.getVersion());
 		}
 	}
 }
