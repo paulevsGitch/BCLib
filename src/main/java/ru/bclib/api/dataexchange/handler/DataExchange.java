@@ -4,6 +4,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
+import net.minecraft.resources.ResourceLocation;
 import ru.bclib.api.dataexchange.BaseDataHandler;
 import ru.bclib.api.dataexchange.ConnectorClientside;
 import ru.bclib.api.dataexchange.ConnectorServerside;
@@ -43,6 +44,9 @@ abstract public class DataExchange {
 	
 	public Set<DataHandlerDescriptor> getDescriptors() { return descriptors; }
 	
+	public static DataHandlerDescriptor getDescriptor(ResourceLocation identifier){
+		return getInstance().descriptors.stream().filter(d -> d.equals(identifier)).findFirst().orElse(null);
+	}
 	
 	@Environment(EnvType.CLIENT)
 	protected void initClientside() {

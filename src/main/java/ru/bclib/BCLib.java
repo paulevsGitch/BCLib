@@ -7,6 +7,7 @@ import net.minecraft.resources.ResourceLocation;
 import ru.bclib.api.TagAPI;
 import ru.bclib.api.WorldDataAPI;
 import ru.bclib.api.dataexchange.DataExchangeAPI;
+import ru.bclib.api.dataexchange.handler.autosync.Chunker;
 import ru.bclib.api.dataexchange.handler.autosync.HelloClient;
 import ru.bclib.api.dataexchange.handler.autosync.HelloServer;
 import ru.bclib.api.dataexchange.handler.autosync.RequestFiles;
@@ -47,7 +48,8 @@ public class BCLib implements ModInitializer {
 				HelloClient.DESCRIPTOR,
 				HelloServer.DESCRIPTOR,
 				RequestFiles.DESCRIPTOR,
-				SendFiles.DESCRIPTOR
+				SendFiles.DESCRIPTOR,
+				Chunker.DESCRIPTOR
 		));
 		
 		DataFixerAPI.registerPatch(() -> new BCLibPatch());

@@ -8,50 +8,59 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import ru.bclib.BCLib;
+import ru.bclib.api.dataexchange.BaseDataHandler;
 import ru.bclib.api.dataexchange.DataHandler;
 import ru.bclib.api.dataexchange.DataHandlerDescriptor;
+import ru.bclib.api.dataexchange.handler.DataExchange;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
 public class Chunker extends DataHandler.FromServer {
-	public static class FileChunkReceiver {
+	public static class PacketChunkReceiver {
 		@NotNull
 		public final UUID uuid;
 		public final int chunkCount;
 		@NotNull
 		private final FriendlyByteBuf networkedBuf;
+		@Nullable
+		private final DataHandlerDescriptor descriptor;
 		
-		private static List<FileChunkReceiver> active = new ArrayList<>(1);
-		private static FileChunkReceiver newReceiver(@NotNull UUID uuid, int chunkCount){
-			final FileChunkReceiver r = new FileChunkReceiver(uuid, chunkCount);
+		private static List<PacketChunkReceiver> active = new ArrayList<>(1);
+		private static PacketChunkReceiver newReceiver(@NotNull UUID uuid, int chunkCount, ResourceLocation origin){
+			DataHandlerDescriptor desc = DataExchange.getDescriptor(origin);
+			final PacketChunkReceiver r = new PacketChunkReceiver(uuid, chunkCount, desc);
 			active.add(r);
 			return r;
 		}
 		
-		private static FileChunkReceiver getOrCreate(@NotNull UUID uuid, int chunkCount){
-			return active.stream().filter(r -> r.uuid.equals(uuid)).findFirst().orElse(newReceiver(uuid, chunkCount));
+		private static PacketChunkReceiver getOrCreate(@NotNull UUID uuid, int chunkCount, ResourceLocation origin){
+			return active.stream().filter(r -> r.uuid.equals(uuid)).findFirst().orElse(newReceiver(uuid, chunkCount, origin));
 		}
 		
-		public static FileChunkReceiver get(@NotNull UUID uuid){
+		public static PacketChunkReceiver get(@NotNull UUID uuid){
 			return active.stream().filter(r -> r.uuid.equals(uuid)).findFirst().orElse(null);
 		}
 		
-		private FileChunkReceiver(@NotNull UUID uuid, int chunkCount){
+		private PacketChunkReceiver(@NotNull UUID uuid, int chunkCount, @Nullable DataHandlerDescriptor descriptor){
 			this.uuid = uuid;
 			this.chunkCount = chunkCount;
 			networkedBuf = PacketByteBufs.create();
+			this.descriptor = descriptor;
 		}
 		
 		@Override
 		public boolean equals(Object o) {
 			if (this == o) return true;
-			if (!(o instanceof FileChunkReceiver)) return false;
-			FileChunkReceiver that = (FileChunkReceiver) o;
+			if (!(o instanceof PacketChunkReceiver)) return false;
+			PacketChunkReceiver that = (PacketChunkReceiver) o;
 			return uuid.equals(that.uuid);
 		}
 		
@@ -61,32 +70,86 @@ public class Chunker extends DataHandler.FromServer {
 		}
 		
 		public boolean testFinished(){
+			if (incomingBuffer == null){
+				return true;
+			} if (lastReadSerial>=chunkCount-1){
+				onFinish();
+				return true;
+			}
 			return false;
 		}
 		
-		public void processReceived(FriendlyByteBuf buf, int serialNo, int size){
+		protected void addBuffer(FriendlyByteBuf input){
+			final int size = input.readableBytes();
+			final int cap = networkedBuf.capacity()-networkedBuf.writerIndex();
+			
+			if (cap < size){
+				networkedBuf.capacity(networkedBuf.writerIndex() + size);
+			}
+			input.readBytes(networkedBuf, size);
+			input.clear();
+		}
 		
+		protected void onFinish(){
+			incomingBuffer.clear();
+			incomingBuffer = null;
+			
+			final BaseDataHandler baseHandler = descriptor.INSTANCE.get();
+			if (baseHandler instanceof DataHandler.FromServer handler){
+				handler.receiveFromMemory(networkedBuf);
+			}
+		}
+		
+		Map<Integer, FriendlyByteBuf> incomingBuffer = new HashMap<>();
+		int lastReadSerial = -1;
+		public void processReceived(FriendlyByteBuf buf, int serialNo, int size){
+			if (lastReadSerial == serialNo-1){
+				addBuffer(buf);
+				lastReadSerial = serialNo;
+			} else {
+				//not sure if order is guaranteed by the underlying system!
+				boolean haveAll = true;
+				for (int nr = lastReadSerial+1; nr < serialNo-1; nr++){
+					if (incomingBuffer.get(nr) == null){
+						haveAll = false;
+						break;
+					}
+				}
+				
+				if (haveAll){
+					for (int nr = lastReadSerial+1; nr < serialNo-1; nr++){
+						addBuffer(incomingBuffer.get(nr));
+						incomingBuffer.put(nr, null);
+					}
+					addBuffer(buf);
+					lastReadSerial = serialNo;
+				} else {
+					incomingBuffer.put(serialNo, buf);
+				}
+			}
 		}
 	}
 	
-	public static class FileChunkSender {
+	public static class PacketChunkSender {
 		private final FriendlyByteBuf networkedBuf;
 		public final UUID uuid;
 		public final int chunkCount;
 		public final int size;
+		public final ResourceLocation origin;
 		
-		public FileChunkSender(FriendlyByteBuf buf){
+		public PacketChunkSender(FriendlyByteBuf buf, ResourceLocation origin){
 			networkedBuf = buf;
 			
 			size = buf.readableBytes();
 			chunkCount = (int)Math.ceil((double)size / MAX_PAYLOAD_SIZE);
 			uuid = UUID.randomUUID();
+			this.origin = origin;
 		}
 		
 		public void sendChunks(Collection<ServerPlayer> players){
-			BCLib.LOGGER.info("Sending Request in " + chunkCount + " File-Chunks");
-			for (int i=0; i<chunkCount; i++){
-				Chunker c = new Chunker(i, uuid, networkedBuf, chunkCount);
+			BCLib.LOGGER.info("Sending Request in " + chunkCount + " Packet-Chunks");
+			for (int i=-1; i<chunkCount; i++){
+				Chunker c = new Chunker(i, uuid, networkedBuf, chunkCount, origin);
 				FriendlyByteBuf buf = PacketByteBufs.create();
 				c.serializeDataOnServer(buf);
 				
@@ -107,13 +170,15 @@ public class Chunker extends DataHandler.FromServer {
 	private UUID uuid;
 	private int chunkCount;
 	private FriendlyByteBuf networkedBuf;
+	private ResourceLocation origin;
 	
-	protected Chunker(int serialNo, UUID uuid, FriendlyByteBuf networkedBuf, int chunkCount) {
+	protected Chunker(int serialNo, UUID uuid, FriendlyByteBuf networkedBuf, int chunkCount, ResourceLocation origin) {
 		super(DESCRIPTOR.IDENTIFIER);
 		this.serialNo = serialNo;
 		this.uuid = uuid;
 		this.networkedBuf = networkedBuf;
 		this.chunkCount = chunkCount;
+		this.origin = origin;
 	}
 	
 	protected Chunker(){
@@ -131,16 +196,17 @@ public class Chunker extends DataHandler.FromServer {
 		if (serialNo == -1){
 			//this is our header
 			buf.writeInt(chunkCount);
-			writeString(buf, SendFiles.DESCRIPTOR.IDENTIFIER.getNamespace());
-			writeString(buf, SendFiles.DESCRIPTOR.IDENTIFIER.getPath());
+			writeString(buf, origin.getNamespace());
+			writeString(buf, origin.getPath());
 		} else {
+			buf.capacity(MAX_PACKET_SIZE);
 			final int size = Math.min(MAX_PAYLOAD_SIZE, networkedBuf.readableBytes());
 			buf.writeInt(size);
 			networkedBuf.readBytes(buf, size);
 		}
 	}
 	
-	private FileChunkReceiver receiver;
+	private PacketChunkReceiver receiver;
 	
 	@Override
 	protected void deserializeIncomingDataOnClient(FriendlyByteBuf buf, PacketSender responseSender) {
@@ -152,16 +218,17 @@ public class Chunker extends DataHandler.FromServer {
 			chunkCount = buf.readInt();
 			final String namespace = readString(buf);
 			final String path = readString(buf);
-			BCLib.LOGGER.info("Receiving " + chunkCount + " + File-Chunks for " + namespace +"."+path);
+			ResourceLocation ident = new ResourceLocation(namespace, path);
+			BCLib.LOGGER.info("Receiving " + chunkCount + " + Packet-Chunks for " + ident);
 			
-			receiver = FileChunkReceiver.getOrCreate(uuid, chunkCount);
+			receiver = PacketChunkReceiver.getOrCreate(uuid, chunkCount, ident);
 		} else {
-			receiver = FileChunkReceiver.get(uuid);
+			receiver = PacketChunkReceiver.get(uuid);
 			if (receiver!=null) {
 				final int size = buf.readInt();
 				receiver.processReceived(buf, serialNo, size);
 			} else {
-				BCLib.LOGGER.error("Unknown File-Chunk Transfer for " + uuid);
+				BCLib.LOGGER.error("Unknown Packet-Chunk Transfer for " + uuid);
 			}
 		}
 	}
