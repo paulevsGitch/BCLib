@@ -17,6 +17,10 @@
 	"message.bclib.confirmrestart": "The requested content was synchronized. You need to restart Minecraft now.",
 	"title.link.bclib.discord": "Discord",
     "title.bclib.modmenu.main": "BCLib Settings",
+	"title.bclib.progress": "Progress",
+	"title.bclib.filesync.progress": "File Transfer",
+	"message.bclib.filesync.progress": "Syncing File-Content with Server",
+	"message.bclib.filesync.progress.stage.empty": "",
 	
 	"title.config.bclib.client.auto_sync.enabled": "Enable Auto-Sync",
 	"title.config.bclib.client.auto_sync.acceptConfigs": "Accept incoming Confog Files",

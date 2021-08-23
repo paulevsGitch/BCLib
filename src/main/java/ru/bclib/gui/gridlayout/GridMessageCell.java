@@ -11,41 +11,51 @@ import ru.bclib.gui.gridlayout.GridLayout.GridValueType;
 import java.util.List;
 
 @Environment(EnvType.CLIENT)
-class GridMessageCell extends GridCell {
+public class GridMessageCell extends GridCell {
 	private final Font font;
-	private final Component text;
-	private MultiLineLabel label;
+	private Component text;
+	private MultiLineLabel lastLabel;
+	private GridTransform lastTransform;
 	
 	GridMessageCell(double width, GridValueType widthType, Alignment contentAlignment, Font font, Component text) {
 		this(width, widthType, contentAlignment, font, text, GridLayout.COLOR_WHITE);
 	}
 	GridMessageCell(double width, GridValueType widthType, Alignment contentAlignment, Font font, Component text, int color) {
-		super(width, -1, widthType, null, (poseStack, transform, context) -> {
-			MultiLineLabel label = (MultiLineLabel) context;
-			if (contentAlignment == Alignment.CENTER) {
-				label.renderCentered(poseStack, transform.width / 2 + transform.left, transform.top, font.lineHeight, color);
-			}
-			else if (contentAlignment == Alignment.LEFT) {
-				label.renderLeftAligned(poseStack, transform.left, transform.top, font.lineHeight, color);
-			}
-		});
-		
+		super(width, -1, widthType, null, null);
 		this.font = font;
 		this.text = text;
+		
+		customRender = (poseStack, transform, context) -> {
+			//MultiLineLabel label = (MultiLineLabel) context;
+			if (contentAlignment == Alignment.CENTER) {
+				lastLabel.renderCentered(poseStack, transform.width / 2 + transform.left, transform.top, font.lineHeight, color);
+			}
+			else if (contentAlignment == Alignment.LEFT) {
+				lastLabel.renderLeftAligned(poseStack, transform.left, transform.top, font.lineHeight, color);
+			}
+		};
+	}
+	
+	public void setText(Component text){
+		this.text = text;
+		if (lastTransform!=null) {
+			create(lastTransform);
+		}
 	}
 	
 	private MultiLineLabel getLabel(GridTransform transform) {
-		return label;
+		return lastLabel;
 	}
 	
 	protected void create(GridTransform transform) {
-		this.label = MultiLineLabel.create(font, text, transform.width);
+		this.lastTransform = transform;
+		this.lastLabel = MultiLineLabel.create(font, text, transform.width);
 	}
 	
 	@Override
 	protected GridElement buildElementAt(int left, int top, int width, List<GridElement> collector) {
 		create(new GridTransform(left, top, width, 0));
-		int promptLines = this.label.getLineCount() + 1;
+		int promptLines = this.lastLabel.getLineCount() + 1;
 		int height = promptLines * 9;
 		
 		return new GridElement(left, top, width, height, this::getLabel, customRender);
