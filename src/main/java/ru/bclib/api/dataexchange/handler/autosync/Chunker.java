@@ -1,13 +1,10 @@
 package ru.bclib.api.dataexchange.handler.autosync;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ProgressListener;
-import ru.bclib.gui.screens.ProgressScreen;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -34,22 +31,6 @@ import java.util.UUID;
  * and assemble the original message from those chunks on the client.
  */
 public class Chunker extends DataHandler.FromServer {
-	private static ProgressScreen progressScreen;
-	
-	@Environment(EnvType.CLIENT)
-	public static void setProgressScreen(ProgressScreen scr){
-		progressScreen = scr;
-	}
-	
-	@Environment(EnvType.CLIENT)
-	public static ProgressScreen getProgressScreen(){
-		return progressScreen;
-	}
-	
-	@Environment(EnvType.CLIENT)
-	public static ProgressListener getProgressListener(){
-		return progressScreen;
-	}
 	
 	/**
 	 * Responsible for assembling the original ByteBuffer created by {@link PacketChunkSender} on the
@@ -101,7 +82,7 @@ public class Chunker extends DataHandler.FromServer {
 		}
 		
 		public boolean testFinished(){
-			ProgressListener listener = getProgressListener();
+			ProgressListener listener = ChunkerProgress.getProgressListener();
 			if (listener!=null){
 				listener.progressStagePercentage((100*receivedCount)/chunkCount);
 			}
