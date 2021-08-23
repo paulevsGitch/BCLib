@@ -1,18 +1,20 @@
 package ru.bclib.api.dataexchange;
 
 import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
 import java.util.function.Supplier;
 
 public class DataHandlerDescriptor {
-	public DataHandlerDescriptor(ResourceLocation identifier, Supplier<BaseDataHandler> instancer){
+	public DataHandlerDescriptor(@NotNull ResourceLocation identifier, @NotNull Supplier<BaseDataHandler> instancer){
 		this(identifier, instancer, instancer, false, false);
 	}
 	
-	public DataHandlerDescriptor(ResourceLocation identifier, Supplier<BaseDataHandler> instancer, boolean sendOnJoin, boolean sendBeforeEnter){
+	public DataHandlerDescriptor(@NotNull ResourceLocation identifier,@NotNull Supplier<BaseDataHandler> instancer, boolean sendOnJoin, boolean sendBeforeEnter){
 		this(identifier, instancer, instancer, sendOnJoin, sendBeforeEnter);
 	}
-	public DataHandlerDescriptor(ResourceLocation identifier, Supplier<BaseDataHandler> receiv_instancer, Supplier<BaseDataHandler> join_instancer, boolean sendOnJoin, boolean sendBeforeEnter){
+	public DataHandlerDescriptor(@NotNull ResourceLocation identifier, @NotNull Supplier<BaseDataHandler> receiv_instancer, @NotNull Supplier<BaseDataHandler> join_instancer, boolean sendOnJoin, boolean sendBeforeEnter){
 		this.INSTANCE = receiv_instancer;
 		this.JOIN_INSTANCE = join_instancer;
 		this.IDENTIFIER = identifier;
@@ -23,7 +25,25 @@ public class DataHandlerDescriptor {
 	
 	public final boolean sendOnJoin;
 	public final boolean sendBeforeEnter;
+	@NotNull
 	public final ResourceLocation IDENTIFIER;
+	@NotNull
 	public final Supplier<BaseDataHandler> INSTANCE;
+	@NotNull
 	public final Supplier<BaseDataHandler> JOIN_INSTANCE;
+	
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o instanceof  ResourceLocation){
+			return o.equals(IDENTIFIER);
+		}
+		if (!(o instanceof DataHandlerDescriptor that)) return false;
+		return IDENTIFIER.equals(that.IDENTIFIER);
+	}
+	
+	@Override
+	public int hashCode() {
+		return Objects.hash(IDENTIFIER);
+	}
 }

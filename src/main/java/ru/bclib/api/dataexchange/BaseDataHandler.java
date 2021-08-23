@@ -55,6 +55,7 @@ public abstract class BaseDataHandler {
 	@Environment(EnvType.CLIENT)
 	abstract void sendToServer(Minecraft client);
 	
+	protected boolean isBlocking() { return false; }
 	
 	@Override
 	public String toString() {

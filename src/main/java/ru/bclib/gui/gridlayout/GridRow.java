@@ -122,6 +122,10 @@ public class GridRow extends GridContainer {
 		return cell;
 	}
 	
+	public GridCustomRenderCell addCustomRender(GridCustomRenderCell cell) {
+		this.cells.add(cell);
+		return cell;
+	}
 	
 	public GridCell addImage(ResourceLocation location, int width, int height) {
 		return addImage(location, 1.0f, width, height);
@@ -170,48 +174,48 @@ public class GridRow extends GridContainer {
 	}
 	
 	
-	public GridCell addMessage(Component text, Font font, Alignment contentAlignment) {
+	public GridMessageCell addMessage(Component text, Font font, Alignment contentAlignment) {
 		return addMessage(text, font, GridLayout.COLOR_WHITE, contentAlignment);
 	}
 	
-	public GridCell addMessage(Component text, Font font, int color, Alignment contentAlignment) {
+	public GridMessageCell addMessage(Component text, Font font, int color, Alignment contentAlignment) {
 		return addMessage(text, 1.0, GridLayout.GridValueType.PERCENTAGE, font, color, contentAlignment);
 	}
 	
-	public GridCell addMessage(Component text, double width, GridValueType widthType, Font font, Alignment contentAlignment) {
+	public GridMessageCell addMessage(Component text, double width, GridValueType widthType, Font font, Alignment contentAlignment) {
 		return addMessage(text, width, widthType, font, GridLayout.COLOR_WHITE, contentAlignment);
 	}
 	
-	public GridCell addMessage(Component text, double width, GridValueType widthType, Font font, int color, Alignment contentAlignment) {
-		GridCell cell = new GridMessageCell(width, widthType, Alignment.LEFT, font, text, color);
+	public GridMessageCell addMessage(Component text, double width, GridValueType widthType, Font font, int color, Alignment contentAlignment) {
+		GridMessageCell cell = new GridMessageCell(width, widthType, contentAlignment, font, text, color);
 		this.cells.add(cell);
 		return cell;
 	}
 	
-	public GridCell addString(Component text, GridScreen parent) {
+	public GridStringCell addString(Component text, GridScreen parent) {
 		return this.addString(text, GridLayout.COLOR_WHITE, parent);
 	}
 	
-	public GridCell addString(Component text, int color, GridScreen parent) {
-		final int width = parent.getFont()
-								.width(text.getVisualOrderText());
+	
+	public GridStringCell addString(Component text, int color, GridScreen parent) {
+		final int width = parent.getWidth(text);
 		return this.addString(text, width, GridValueType.CONSTANT, GridLayout.COLOR_WHITE, Alignment.CENTER, parent);
 	}
 	
-	public GridCell addString(Component text, Alignment contentAlignment, GridScreen parent) {
+	public GridStringCell addString(Component text, Alignment contentAlignment, GridScreen parent) {
 		return this.addString(text, GridLayout.COLOR_WHITE, contentAlignment, parent);
 	}
 	
-	public GridCell addString(Component text, int color, Alignment contentAlignment, GridScreen parent) {
+	public GridStringCell addString(Component text, int color, Alignment contentAlignment, GridScreen parent) {
 		return this.addString(text, 1.0, GridLayout.GridValueType.PERCENTAGE, color, contentAlignment, parent);
 	}
 	
-	public GridCell addString(Component text, double width, GridValueType widthType, Alignment contentAlignment, GridScreen parent) {
+	public GridStringCell addString(Component text, double width, GridValueType widthType, Alignment contentAlignment, GridScreen parent) {
 		return addString(text, width, widthType, GridLayout.COLOR_WHITE, contentAlignment, parent);
 	}
 	
-	public GridCell addString(Component text, double width, GridValueType widthType, int color, Alignment contentAlignment, GridScreen parent) {
-		GridCell cell = new GridStringCell(width, widthType, parent.getFont().lineHeight, contentAlignment, parent, text, color);
+	public GridStringCell addString(Component text, double width, GridValueType widthType, int color, Alignment contentAlignment, GridScreen parent) {
+		GridStringCell cell = new GridStringCell(width, widthType, parent.getFont().lineHeight, contentAlignment, parent, text, color);
 		this.cells.add(cell);
 		return cell;
 	}

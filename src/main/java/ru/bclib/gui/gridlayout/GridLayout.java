@@ -86,6 +86,7 @@ public class GridLayout extends GridColumn {
 	public static final int COLOR_RED = 0x00FF0000;
 	public static final int COLOR_GREEN = 0x0000FF00;
 	public static final int COLOR_BLUE = 0x000000FF;
+	public static final int COLOR_GRAY = 0x007F7F7F;
 	
 	public final GridScreen screen;
 	public final int screenHeight;

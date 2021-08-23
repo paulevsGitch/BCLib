@@ -12,7 +12,7 @@ import java.util.function.Function;
 class GridCell extends GridCellDefinition {
 	public final float height;
 	Function<GridTransform, Object> componentPlacer;
-	final TriConsumer<PoseStack, GridTransform, Object> customRender;
+	TriConsumer<PoseStack, GridTransform, Object> customRender;
 	
 	GridCell(double width, double height, GridLayout.GridValueType widthType, Function<GridTransform, Object> componentPlacer, TriConsumer<PoseStack, GridTransform, Object> customRender) {
 		super(width, widthType);

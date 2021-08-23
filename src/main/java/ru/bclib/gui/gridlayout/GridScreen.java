@@ -96,4 +96,12 @@ public abstract class GridScreen extends Screen {
 		
 		super.render(poseStack, i, j, f);
 	}
+	
+	public static int getWidth(Component text, Font font) {
+		return font.width(text.getVisualOrderText());
+	}
+	
+	public int getWidth(Component text) {
+		return getWidth(text, getFont());
+	}
 }

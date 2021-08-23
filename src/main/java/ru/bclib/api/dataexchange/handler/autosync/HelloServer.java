@@ -65,7 +65,6 @@ public class HelloServer extends DataHandler.FromClient {
 		super(DESCRIPTOR.IDENTIFIER);
 	}
 	
-	
 	@Environment(EnvType.CLIENT)
 	@Override
 	protected boolean prepareDataOnClient() {
@@ -73,6 +72,7 @@ public class HelloServer extends DataHandler.FromClient {
 			BCLib.LOGGER.info("Auto-Sync was disabled on the client.");
 			return false;
 		}
+		
 		return true;
 	}
 	

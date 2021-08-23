@@ -7,6 +7,7 @@ import net.minecraft.resources.ResourceLocation;
 import ru.bclib.api.TagAPI;
 import ru.bclib.api.WorldDataAPI;
 import ru.bclib.api.dataexchange.DataExchangeAPI;
+import ru.bclib.api.dataexchange.handler.autosync.Chunker;
 import ru.bclib.api.dataexchange.handler.autosync.HelloClient;
 import ru.bclib.api.dataexchange.handler.autosync.HelloServer;
 import ru.bclib.api.dataexchange.handler.autosync.RequestFiles;
@@ -17,6 +18,7 @@ import ru.bclib.recipes.CraftingRecipes;
 import ru.bclib.registry.BaseBlockEntities;
 import ru.bclib.registry.BaseRegistry;
 import ru.bclib.util.Logger;
+import ru.bclib.util.ModUtil;
 import ru.bclib.world.generator.BCLibEndBiomeSource;
 import ru.bclib.world.generator.BCLibNetherBiomeSource;
 import ru.bclib.world.generator.GeneratorOptions;
@@ -30,6 +32,7 @@ public class BCLib implements ModInitializer {
 	
 	@Override
 	public void onInitialize() {
+		ModUtil.convertModVersion("1.3.0-pre1-1.17.1");
 		BaseRegistry.register();
 		GeneratorOptions.init();
 		BaseBlockEntities.register();
@@ -45,7 +48,8 @@ public class BCLib implements ModInitializer {
 				HelloClient.DESCRIPTOR,
 				HelloServer.DESCRIPTOR,
 				RequestFiles.DESCRIPTOR,
-				SendFiles.DESCRIPTOR
+				SendFiles.DESCRIPTOR,
+				Chunker.DESCRIPTOR
 		));
 		
 		DataFixerAPI.registerPatch(() -> new BCLibPatch());
