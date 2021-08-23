@@ -179,7 +179,10 @@ public class SendFiles extends DataHandler.FromServer {
 			if (!parentFile.exists()) {
 				parentFile.mkdirs();
 			}
-			Files.write(path, data);
+			//TODO: Disabled for testing. MUST BE ENABLED IN PRODUCTION!!!
+			if (!BCLib.isDevEnvironment()) {
+				Files.write(path, data);
+			}
 			if (removeAfter != null){
 				final String bakFileName = removeAfter.toFile().getName();
 				String collisionFreeName = bakFileName;

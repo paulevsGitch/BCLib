@@ -56,7 +56,10 @@ public abstract class DataHandler extends BaseDataHandler {
 	@Override
 	void receiveFromServer(Minecraft client, ClientPacketListener handler, FriendlyByteBuf buf, PacketSender responseSender) {
 		deserializeIncomingData(buf, responseSender, true);
-		client.execute(() -> runOnGameThread(client, null, true));
+		final Runnable runner = () -> runOnGameThread(client, null, true);
+		
+		if (isBlocking()) client.executeBlocking(runner);
+		else client.execute(runner);
 	}
 	
 	@Override
@@ -64,7 +67,10 @@ public abstract class DataHandler extends BaseDataHandler {
 		super.receiveFromClient(server, player, handler, buf, responseSender);
 		
 		deserializeIncomingData(buf, responseSender, false);
-		server.execute(() -> runOnGameThread(null, server, false));
+		final Runnable runner = () -> runOnGameThread(null, server, false);
+		
+		if (isBlocking()) server.executeBlocking(runner);
+		else server.execute(runner);
 	}
 	
 	@Override
@@ -156,7 +162,10 @@ public abstract class DataHandler extends BaseDataHandler {
 			super.receiveFromClient(server, player, handler, buf, responseSender);
 			
 			deserializeIncomingDataOnServer(buf, responseSender);
-			server.execute(() -> runOnServerGameThread(server));
+			final Runnable runner = () -> runOnServerGameThread(server);
+			
+			if (isBlocking()) server.executeBlocking(runner);
+			else server.execute(runner);
 		}
 		
 		@Override
@@ -220,7 +229,10 @@ public abstract class DataHandler extends BaseDataHandler {
 		@Override
 		final void receiveFromServer(Minecraft client, ClientPacketListener handler, FriendlyByteBuf buf, PacketSender responseSender) {
 			deserializeIncomingDataOnClient(buf, responseSender);
-			client.execute(() -> runOnClientGameThread(client));
+			final Runnable runner = () -> runOnClientGameThread(client);
+			
+			if (isBlocking()) client.executeBlocking(runner);
+			else client.execute(runner);
 		}
 		
 		@Override

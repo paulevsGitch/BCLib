@@ -1,9 +1,13 @@
 package ru.bclib.api.dataexchange.handler.autosync;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.client.Minecraft;
+import net.minecraft.util.ProgressListener;
+import ru.bclib.gui.screens.ProgressScreen;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -23,8 +27,35 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
+/**
+ * Used to seperate large data transfers into multiple smaller messages.
+ * <p>
+ * {@link DataHandler} will automatically convert larger messages into Chunks on the Server
+ * and assemble the original message from those chunks on the client.
+ */
 public class Chunker extends DataHandler.FromServer {
-	public static class PacketChunkReceiver {
+	private static ProgressScreen progressScreen;
+	
+	@Environment(EnvType.CLIENT)
+	public static void setProgressScreen(ProgressScreen scr){
+		progressScreen = scr;
+	}
+	
+	@Environment(EnvType.CLIENT)
+	public static ProgressScreen getProgressScreen(){
+		return progressScreen;
+	}
+	
+	@Environment(EnvType.CLIENT)
+	public static ProgressListener getProgressListener(){
+		return progressScreen;
+	}
+	
+	/**
+	 * Responsible for assembling the original ByteBuffer created by {@link PacketChunkSender} on the
+	 * receiving end. Automatically created from the header {@link Chunker}-Message (where the serialNo==-1)
+	 */
+	static class PacketChunkReceiver {
 		@NotNull
 		public final UUID uuid;
 		public final int chunkCount;
@@ -70,6 +101,10 @@ public class Chunker extends DataHandler.FromServer {
 		}
 		
 		public boolean testFinished(){
+			ProgressListener listener = getProgressListener();
+			if (listener!=null){
+				listener.progressStagePercentage((100*receivedCount)/chunkCount);
+			}
 			if (incomingBuffer == null){
 				return true;
 			} if (lastReadSerial>=chunkCount-1){
@@ -79,7 +114,7 @@ public class Chunker extends DataHandler.FromServer {
 			return false;
 		}
 		
-		protected void addBuffer(FriendlyByteBuf input){
+		private void addBuffer(FriendlyByteBuf input){
 			final int size = input.readableBytes();
 			final int cap = networkedBuf.capacity()-networkedBuf.writerIndex();
 			
@@ -102,7 +137,10 @@ public class Chunker extends DataHandler.FromServer {
 		
 		Map<Integer, FriendlyByteBuf> incomingBuffer = new HashMap<>();
 		int lastReadSerial = -1;
+		int receivedCount = 0;
 		public void processReceived(FriendlyByteBuf buf, int serialNo, int size){
+			receivedCount++;
+			
 			if (lastReadSerial == serialNo-1){
 				addBuffer(buf);
 				lastReadSerial = serialNo;
@@ -130,6 +168,10 @@ public class Chunker extends DataHandler.FromServer {
 		}
 	}
 	
+	/**
+	 * Responsible for splitting an outgoing ByteBuffer into several smaller Chunks and
+	 * send them as seperate messages to the {@link Chunker}-Channel
+	 */
 	public static class PacketChunkSender {
 		private final FriendlyByteBuf networkedBuf;
 		public final UUID uuid;
@@ -160,7 +202,9 @@ public class Chunker extends DataHandler.FromServer {
 		}
 	}
 	
-	private static final int HEADER_SIZE = 1 + 16 + 4 + 4; //header = version + UUID + serialNo + size
+	//header = version + UUID + serialNo + size, see serializeDataOnServer
+	private static final int HEADER_SIZE = 1 + 16 + 4 + 4;
+	
 	public static final int MAX_PACKET_SIZE = 1024*1024;
 	private static final int MAX_PAYLOAD_SIZE = MAX_PACKET_SIZE - HEADER_SIZE;
 	
@@ -188,17 +232,20 @@ public class Chunker extends DataHandler.FromServer {
 	
 	@Override
 	protected void serializeDataOnServer(FriendlyByteBuf buf) {
+		//Sending Header. Make sure to change HEADER_SIZE if you change this!
 		buf.writeByte(0);
 		buf.writeLong(uuid.getMostSignificantBits());
 		buf.writeLong(uuid.getLeastSignificantBits());
 		buf.writeInt(serialNo);
 		
+		//sending Payload
 		if (serialNo == -1){
-			//this is our header
+			//this is our header-Chunk that transports status information
 			buf.writeInt(chunkCount);
 			writeString(buf, origin.getNamespace());
 			writeString(buf, origin.getPath());
 		} else {
+			//this is an actual payload chunk
 			buf.capacity(MAX_PACKET_SIZE);
 			final int size = Math.min(MAX_PAYLOAD_SIZE, networkedBuf.readableBytes());
 			buf.writeInt(size);

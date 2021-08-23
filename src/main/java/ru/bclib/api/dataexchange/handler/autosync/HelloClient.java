@@ -6,6 +6,7 @@ import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import ru.bclib.BCLib;
 import ru.bclib.api.dataexchange.DataExchangeAPI;
@@ -14,6 +15,7 @@ import ru.bclib.api.dataexchange.DataHandlerDescriptor;
 import ru.bclib.api.dataexchange.handler.autosync.AutoSyncID.WithContentOverride;
 import ru.bclib.api.dataexchange.handler.autosync.SyncFolderDescriptor.SubFile;
 import ru.bclib.config.Configs;
+import ru.bclib.gui.screens.ProgressScreen;
 import ru.bclib.gui.screens.SyncFilesScreen;
 import ru.bclib.gui.screens.WarnBCLibVersionMismatch;
 import ru.bclib.util.ModUtil;
@@ -300,6 +302,10 @@ public class HelloClient extends DataHandler.FromServer {
 		}
 	}
 	
+	@Override
+	protected boolean isBlocking() {
+		return true;
+	}
 	
 	@Environment(EnvType.CLIENT)
 	@Override
@@ -371,8 +377,6 @@ public class HelloClient extends DataHandler.FromServer {
 		}
 		
 		client.setScreen(new SyncFilesScreen(modFiles, configFiles, singleFiles, folderFiles, filesToRemove.size(), (downloadMods, downloadConfigs, downloadFiles, removeFiles) -> {
-			Minecraft.getInstance()
-					 .setScreen((Screen) null);
 			if (downloadMods || downloadConfigs || downloadFiles) {
 				BCLib.LOGGER.info("Updating local Files:");
 				List<AutoSyncID.WithContentOverride> localChanges = new ArrayList<>(files.toArray().length);
@@ -398,6 +402,9 @@ public class HelloClient extends DataHandler.FromServer {
 					aid.relFile.delete();
 				});
 			}
+			
+			Minecraft.getInstance()
+					 .setScreen(Chunker.getProgressScreen());
 		}));
 		
 	}
@@ -422,6 +429,11 @@ public class HelloClient extends DataHandler.FromServer {
 	
 	private void requestFileDownloads(List<AutoSyncID> files) {
 		BCLib.LOGGER.info("Starting download of Files:" + files.size());
+		
+		final ProgressScreen progress = new ProgressScreen(null, new TranslatableComponent("title.bclib.filesync.progress"), new TranslatableComponent("message.bclib.filesync.progress"));
+		progress.progressStart(new TranslatableComponent("message.bclib.filesync.progress.stage.empty"));
+		Chunker.setProgressScreen(progress);
+		
 		DataExchangeAPI.send(new RequestFiles(files));
 	}
 }
