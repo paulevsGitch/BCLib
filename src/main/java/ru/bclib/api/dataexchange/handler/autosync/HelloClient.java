@@ -432,11 +432,11 @@ public class HelloClient extends DataHandler.FromServer {
 	@Environment(EnvType.CLIENT)
 	private void requestFileDownloads(List<AutoSyncID> files) {
 		BCLib.LOGGER.info("Starting download of Files:" + files.size());
-		
+
 		final ProgressScreen progress = new ProgressScreen(null, new TranslatableComponent("title.bclib.filesync.progress"), new TranslatableComponent("message.bclib.filesync.progress"));
 		progress.progressStart(new TranslatableComponent("message.bclib.filesync.progress.stage.empty"));
 		ChunkerProgress.setProgressScreen(progress);
-		
+
 		DataExchangeAPI.send(new RequestFiles(files));
 	}
 }

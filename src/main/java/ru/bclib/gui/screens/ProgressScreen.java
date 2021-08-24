@@ -151,7 +151,7 @@ public class ProgressScreen extends GridScreen implements ProgressListener {
 	@Override
 	public void progressStart(Component component) {
 		this.progressStage(component);
-		this.progressStagePercentage(30);
+		this.progressStagePercentage(0);
 	}
 	
 	@Override

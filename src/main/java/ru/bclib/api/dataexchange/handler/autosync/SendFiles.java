@@ -52,7 +52,7 @@ public class SendFiles extends DataHandler.FromServer {
 	@Override
 	protected void serializeDataOnServer(FriendlyByteBuf buf) {
 		List<AutoFileSyncEntry> existingFiles = files.stream()
-													 .filter(e -> e.fileName.exists())
+													 .filter(e -> e!=null &&e.fileName!=null && e.fileName.exists())
 													 .collect(Collectors.toList());
 		/*
 		//this will try to send a file that was not registered or requested by the client
