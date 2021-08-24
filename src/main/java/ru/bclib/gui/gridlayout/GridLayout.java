@@ -22,18 +22,19 @@ abstract class GridCellDefinition {
 		this.widthType = widthType;
 	}
 	
-	public final int calculateWidth(final int parentWidth){
+	public
+	int calculateWidth(final int parentWidth){
 		if (widthType == GridLayout.GridValueType.CONSTANT) {
 			return (int) this.width;
 		} else if (widthType == GridValueType.PERCENTAGE) {
 			return (int) (this.width * parentWidth);
-		} else {
+		}  else {
 			return 0;
 		}
 	}
 	
 	final GridElement buildElement(final int parentWidth, final int autoWidth, final float autoWidthSum, int left, final int top, final List<GridElement> collector) {
-		final int width = widthType == GridValueType.AUTO?(int)((this.width/autoWidthSum)*autoWidth):calculateWidth(parentWidth);
+		final int width = widthType == GridValueType.FILL ?(int)((this.width/autoWidthSum)*autoWidth):calculateWidth(parentWidth);
 		
 		final GridElement el = buildElementAt(left, top, width, collector);
 		if (collector!=null) {
@@ -82,11 +83,11 @@ abstract class GridContainer extends GridCellDefinition{
 
 @Environment(EnvType.CLIENT)
 public class GridLayout extends GridColumn {
-	public static final int COLOR_WHITE = 0x00FFFFFF;
-	public static final int COLOR_RED = 0x00FF0000;
-	public static final int COLOR_GREEN = 0x0000FF00;
-	public static final int COLOR_BLUE = 0x000000FF;
-	public static final int COLOR_GRAY = 0x007F7F7F;
+	public static final int COLOR_WHITE = 0xFFFFFFFF;
+	public static final int COLOR_RED = 0xFFFF0000;
+	public static final int COLOR_GREEN = 0xFF00FF00;
+	public static final int COLOR_BLUE = 0xFF0000FF;
+	public static final int COLOR_GRAY = 0xFF7F7F7F;
 	
 	public final GridScreen screen;
 	public final int screenHeight;
@@ -169,8 +170,27 @@ public class GridLayout extends GridColumn {
 	public static enum Alignment {
 		LEFT, CENTER, RIGHT
 	}
-	
+
+	/**
+	 * Determines how a measurement value is interpreted
+	 */
 	public static enum GridValueType {
-		CONSTANT, PERCENTAGE, AUTO;
+		/**
+		 * The value is a constant pixel size
+		 */
+		CONSTANT,
+		/**
+		 * The Value is relative to the parent size
+		 */
+		PERCENTAGE,
+		/**
+		 * The value will be set to fill up the remaining space (i.e. when this is applied to a width of a row element,
+		 * a {@link #FILL}-type may be used to right align (FILL - CONSTANT) or center (FILL - CONSTANT - FILL) elements.
+		 */
+		FILL,
+		/**
+		 * Calculate size based on child-elements
+		 */
+		INHERIT;
 	}
 }

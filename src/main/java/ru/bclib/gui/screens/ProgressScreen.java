@@ -109,7 +109,7 @@ public class ProgressScreen extends GridScreen implements ProgressListener {
 	private ProgressLogoRender progressImage;
 	private int currentProgress = 0;
 	public boolean shouldCloseOnEsc() {
-		return false;
+		return true;
 	}
 	
 	public Component getProgressComponent(){
@@ -131,7 +131,7 @@ public class ProgressScreen extends GridScreen implements ProgressListener {
 		row.addSpacer();
 		
 		int textWidth = Math.max(getWidth(description), getWidth(getProgressComponent(100)));
-		GridColumn textCol = row.addColumn(textWidth, GridValueType.CONSTANT);
+		GridColumn textCol = row.addColumn(0, GridValueType.INHERIT);
 		textCol.addRow().addString(description, this);
 		textCol.addSpacerRow();
 		progress = textCol.addRow().addString(getProgressComponent(), GridLayout.COLOR_GRAY, Alignment.LEFT, this);

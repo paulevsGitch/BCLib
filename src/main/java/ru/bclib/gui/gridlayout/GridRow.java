@@ -159,7 +159,7 @@ public class GridRow extends GridContainer {
 	}
 	
 	public GridColumn addFiller(float portion) {
-		GridColumn cell = new GridColumn(portion, GridValueType.AUTO);
+		GridColumn cell = new GridColumn(portion, GridValueType.FILL);
 		this.cells.add(cell);
 		return cell;
 	}
@@ -224,12 +224,21 @@ public class GridRow extends GridContainer {
 	protected GridElement buildElementAt(int inLeft, int top, int width, final List<GridElement> collector) {
 		int height = 0;
 		int left = inLeft;
+		if (widthType == GridValueType.INHERIT) {
+			final int originalWidth = width;
+			width = cells.stream()
+					.filter(row -> row.widthType == GridValueType.CONSTANT || row.widthType == GridValueType.INHERIT)
+					.map(row -> row.buildElement(0, 0, 1, 0, 0, null).width)
+					.reduce(0, (p, c) -> p+c);
+		}
+
+		final int inheritedWidth = width;
 		final int fixedWidth = cells.stream()
-									.filter(col -> col.widthType != GridValueType.AUTO)
-									.map(col -> col.calculateWidth(width))
+									.filter(col -> col.widthType != GridValueType.FILL)
+									.map(col -> col.calculateWidth(inheritedWidth))
 									.reduce(0, (p, c) -> p + c);
 		final float autoWidthSum = cells.stream()
-										.filter(col -> col.widthType == GridValueType.AUTO)
+										.filter(col -> col.widthType == GridValueType.FILL)
 										.map(col -> col.width)
 										.reduce(0.0f, (p, c) -> p + c);
 		final int autoWidth = width - fixedWidth;
