@@ -51,16 +51,17 @@ public class ModUtil {
 		PathUtil.fileWalker(PathUtil.MOD_FOLDER.toFile(), false, (file -> {
 			try {
 				URI uri = URI.create("jar:" + file.toUri());
-				
-				try (FileSystem fs = FileSystems.getFileSystem(uri)) {
-					final JarFile jarFile = new JarFile(file.toString());
-					Path modMetaFile = fs.getPath("fabric.mod.json");
-					
-					ModMetadata mc = ModMetadataParser.parseMetadata(logger, modMetaFile);
-					mods.put(mc.getId(), new ModInfo(mc, file));
-				}
-				catch (ParseMetadataException e) {
-					BCLib.LOGGER.error(e.getMessage());
+				FileSystem fs = FileSystems.getFileSystem(uri);
+				if (fs!=null) {
+					try {
+						Path modMetaFile = fs.getPath("fabric.mod.json");
+						if (modMetaFile != null) {
+							ModMetadata mc = ModMetadataParser.parseMetadata(logger, modMetaFile);
+							mods.put(mc.getId(), new ModInfo(mc, file));
+						}
+					} catch (ParseMetadataException e) {
+						BCLib.LOGGER.error(e.getMessage());
+					}
 				}
 			}
 			catch (IOException e) {
