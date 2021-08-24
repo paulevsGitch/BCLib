@@ -10,13 +10,13 @@ import ru.bclib.gui.gridlayout.GridRow;
 import ru.bclib.gui.gridlayout.GridScreen;
 
 @Environment(EnvType.CLIENT)
-public class WarnBCLibVersionMismatch extends GridScreen {
+public class WarnBCLibVersionMismatch extends BCLibScreen {
 	private final Component description;
 	private final Listener listener;
 	public WarnBCLibVersionMismatch(Listener listener) {
-		super(new TranslatableComponent("bclib.datafixer.bclibmissmatch.title"));
+		super(new TranslatableComponent("title.bclib.bclibmissmatch"));
 		
-		this.description = new TranslatableComponent("bclib.datafixer.bclibmissmatch.message");
+		this.description = new TranslatableComponent("message.bclib.bclibmissmatch");
 		this.listener = listener;
 	}
 	
@@ -24,7 +24,7 @@ public class WarnBCLibVersionMismatch extends GridScreen {
 		final int BUTTON_HEIGHT = 20;
 		
 		grid.addRow().addMessage(this.description, this.font, Alignment.CENTER);
-		
+		grid.addSpacerRow(20);
 		GridRow row = grid.addRow();
 		row.addFiller();
 		row.addButton(CommonComponents.GUI_NO, BUTTON_HEIGHT, this.font, (button) -> {

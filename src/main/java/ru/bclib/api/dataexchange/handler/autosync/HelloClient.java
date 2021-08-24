@@ -317,10 +317,10 @@ public class HelloClient extends DataHandler.FromServer {
 		final String localBclibVersion = getBCLibVersion();
 		BCLib.LOGGER.info("Received Hello from Server. (client=" + localBclibVersion + ", server=" + bclibVersion + ")");
 		
-		// if (DataFixerAPI.getModVersion(localBclibVersion) != DataFixerAPI.getModVersion(bclibVersion)){
-		// 	showBCLibError(client);
-		// 	return;
-		// }
+		if (ModUtil.convertModVersion(localBclibVersion) != ModUtil.convertModVersion(bclibVersion)){
+		 	showBCLibError(client);
+		 	return;
+		 }
 		
 		final List<AutoSyncID> filesToRequest = new ArrayList<>(2);
 		final List<AutoSyncID.ForDirectFileRequest> filesToRemove = new ArrayList<>(2);
@@ -344,12 +344,10 @@ public class HelloClient extends DataHandler.FromServer {
 	protected void showBCLibError(Minecraft client) {
 		BCLib.LOGGER.error("BCLib differs on client and server.");
 		client.setScreen(new WarnBCLibVersionMismatch((download) -> {
-			Minecraft.getInstance()
-					 .setScreen((Screen) null);
 			if (download) {
-				requestBCLibDownload((hadErrors) -> {
-					client.stop();
-				});
+				requestBCLibDownload();
+
+				this.onCloseSyncFilesScreen();
 			}
 		}));
 	}
@@ -426,9 +424,9 @@ public class HelloClient extends DataHandler.FromServer {
 		}
 	}
 	
-	private void requestBCLibDownload(Consumer<Boolean> whenFinished) {
+	private void requestBCLibDownload() {
 		BCLib.LOGGER.warning("Starting download of BCLib");
-		whenFinished.accept(true);
+		requestFileDownloads(List.of(new AutoSyncID.ForModFileRequest(BCLib.MOD_ID, bclibVersion)));
 	}
 	
 	@Environment(EnvType.CLIENT)

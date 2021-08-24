@@ -109,7 +109,7 @@ public class ProgressScreen extends GridScreen implements ProgressListener {
 	private ProgressLogoRender progressImage;
 	private int currentProgress = 0;
 	public boolean shouldCloseOnEsc() {
-		return true;
+		return false;
 	}
 	
 	public Component getProgressComponent(){
