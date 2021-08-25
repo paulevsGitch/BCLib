@@ -156,7 +156,8 @@ public class SendFiles extends DataHandler.FromServer {
 		if (e instanceof AutoFileSyncEntry.ForModFileRequest mase){
 			removeAfter = path;
 			int count = 0;
-			String name = "bclib_synced_" + mase.modID + "_" + mase.version.replace(".", "_") + ".jar";
+			final String prefix = "_bclib_synced";
+			String name = prefix + mase.modID + "_" + mase.version.replace(".", "_") + ".jar";
 			do {
 				if (path != null) {
 					//move to the same directory as the existing Mod
@@ -168,7 +169,7 @@ public class SendFiles extends DataHandler.FromServer {
 					path = PathUtil.MOD_FOLDER.resolve(name);
 				}
 				count++;
-				name = "bclib_synced_" + mase.modID + "_" + mase.version.replace(".", "_") + "__" + String.format("%03d", count) + ".jar";
+				name = prefix + mase.modID + "_" + mase.version.replace(".", "_") + "__" + String.format("%03d", count) + ".jar";
 			} while (path.toFile().exists());
 		}
 		

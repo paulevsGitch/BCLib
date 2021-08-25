@@ -2,12 +2,15 @@ package ru.bclib.gui.screens;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
+import ru.bclib.api.dataexchange.handler.autosync.HelloClient;
 import ru.bclib.gui.gridlayout.GridCheckboxCell;
 import ru.bclib.gui.gridlayout.GridLayout.Alignment;
 import ru.bclib.gui.gridlayout.GridRow;
+import ru.bclib.util.ModUtil;
 
 @Environment(EnvType.CLIENT)
 public class SyncFilesScreen extends BCLibScreen {
@@ -17,10 +20,11 @@ public class SyncFilesScreen extends BCLibScreen {
 	private final boolean hasFiles;
 	private final boolean hasMods;
 	private final boolean shouldDelete;
-	
-	public SyncFilesScreen(int modFiles, int configFiles, int singleFiles, int folderFiles, int deleteFiles, Listener listener) {
+	private final HelloClient.IServerModMap serverInfo;
+	public SyncFilesScreen(int modFiles, int configFiles, int singleFiles, int folderFiles, int deleteFiles, HelloClient.IServerModMap serverInfo, Listener listener) {
 		super(new TranslatableComponent("title.bclib.syncfiles"));
-		
+
+		this.serverInfo = serverInfo;
 		this.description = new TranslatableComponent("message.bclib.syncfiles");
 		this.listener = listener;
 		
@@ -45,6 +49,19 @@ public class SyncFilesScreen extends BCLibScreen {
 		row = grid.addRow();
 		mods = row.addCheckbox(new TranslatableComponent("message.bclib.syncfiles.mods"), hasMods, BUTTON_HEIGHT, this.font);
 		mods.setEnabled(hasMods);
+		if (hasMods) {
+			row.addSpacer();
+			row.addButton(new TranslatableComponent("title.bclib.more"), 20, font, (button)->{
+				ModListScreen scr = new ModListScreen(
+						this,
+						new TranslatableComponent("title.bclib.syncfiles.modlist"),
+						new TranslatableComponent("message.bclib.syncfiles.modlist"),
+						ModUtil.getMods(),
+						serverInfo
+						);
+				Minecraft.getInstance().setScreen(scr);
+			});
+		}
 		grid.addSpacerRow();
 	
 		

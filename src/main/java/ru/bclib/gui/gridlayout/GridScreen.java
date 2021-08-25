@@ -144,12 +144,11 @@ public abstract class GridScreen extends Screen {
 	}
 
 	public int getMaxScrollPos() {
-		return height-getScrollHeight();
+		return height - (getScrollHeight() + topPadding);
 	}
 
 	public boolean isScrollable() {
-		if (grid==null) return false;
-		return height<grid.getHeight();
+		return height<getScrollHeight();
 	}
 
 	public boolean isMouseOverScroller(double x, double y) {
@@ -166,7 +165,7 @@ public abstract class GridScreen extends Screen {
 		final int y1 = height;
 		final int y0 = 0;
 		final int yd = y1 - y0;
-		final int maxPosition = getScrollHeight();
+		final int maxPosition = getScrollHeight() + topPadding;
 
 		final int x0 = width-SCROLLER_WIDTH;
 		final int x1 = width;

@@ -40,6 +40,9 @@ import java.util.stream.Collectors;
  * For Details refer to {@link HelloServer}
  */
 public class HelloClient extends DataHandler.FromServer {
+	public interface IServerModMap extends Map<String, Pair<String, Integer>> {}
+	public static class ServerModMap extends HashMap<String, Pair<String, Integer>> implements IServerModMap {}
+
 	public static DataHandlerDescriptor DESCRIPTOR = new DataHandlerDescriptor(new ResourceLocation(BCLib.MOD_ID, "hello_client"), HelloClient::new, false, false);
 	
 	public HelloClient() {
@@ -132,7 +135,8 @@ public class HelloClient extends DataHandler.FromServer {
 	}
 	
 	String bclibVersion = "0.0.0";
-	Map<String, Pair<String, Integer>> modVersion = new HashMap<>();
+
+	IServerModMap modVersion = new ServerModMap();
 	List<AutoSync.AutoSyncTriple> autoSyncedFiles = null;
 	List<SyncFolderDescriptor> autoSynFolders = null;
 	
@@ -145,7 +149,7 @@ public class HelloClient extends DataHandler.FromServer {
 		
 		
 		//read Plugin Versions
-		modVersion = new HashMap<>();
+		modVersion = new ServerModMap();
 		int count = buf.readInt();
 		for (int i = 0; i < count; i++) {
 			final String id = readString(buf);
@@ -374,7 +378,7 @@ public class HelloClient extends DataHandler.FromServer {
 			}
 		}
 		
-		client.setScreen(new SyncFilesScreen(modFiles, configFiles, singleFiles, folderFiles, filesToRemove.size(), (downloadMods, downloadConfigs, downloadFiles, removeFiles) -> {
+		client.setScreen(new SyncFilesScreen(modFiles, configFiles, singleFiles, folderFiles, filesToRemove.size(), modVersion, (downloadMods, downloadConfigs, downloadFiles, removeFiles) -> {
 			if (downloadMods || downloadConfigs || downloadFiles) {
 				BCLib.LOGGER.info("Updating local Files:");
 				List<AutoSyncID.WithContentOverride> localChanges = new ArrayList<>(files.toArray().length);

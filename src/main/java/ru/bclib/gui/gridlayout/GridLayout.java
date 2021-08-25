@@ -134,7 +134,7 @@ public class GridLayout extends GridColumn {
 		GridElement el = this.buildElement((int)this.width, 0, 1, 0,0, elements);
 		this.height = el.height;
 		if (centerVertically && el.height + initialTopPadding < screenHeight) {
-			topPadding = (screenHeight - el.height - initialTopPadding) >> 1;
+			topPadding = (screenHeight - el.height) >> 1;
 		} else {
 			topPadding = initialTopPadding;
 		}

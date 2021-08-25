@@ -159,7 +159,7 @@ public class ModListScreen extends BCLibScreen {
         if (description != null) {
             grid.addSpacerRow();
             grid.addRow().addMessage(description, font, GridLayout.Alignment.CENTER);
-            grid.addSpacerRow(20);
+            grid.addSpacerRow(8);
         }
 
         GridRow row = grid.addRow();
@@ -167,7 +167,7 @@ public class ModListScreen extends BCLibScreen {
         GridColumn col = row.addColumn(200, GridLayout.GridValueType.CONSTANT);
         addModDesc(col, mods, serverInfo, this);
 
-        grid.addSpacerRow(10);
+        grid.addSpacerRow(8);
         row = grid.addRow();
         row.addFiller();
         row.addButton(CommonComponents.GUI_BACK, 20, font, (n)-> {
@@ -175,8 +175,6 @@ public class ModListScreen extends BCLibScreen {
             System.out.println("Closing");
         });
         row.addFiller();
-
-        grid.addSpacerRow(topPadding);
     }
 
 }
