@@ -13,7 +13,7 @@ import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.ProgressListener;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.chunk.storage.RegionFile;
 import net.minecraft.world.level.storage.LevelResource;
@@ -23,7 +23,9 @@ import org.jetbrains.annotations.NotNull;
 import ru.bclib.BCLib;
 import ru.bclib.api.WorldDataAPI;
 import ru.bclib.config.Configs;
+import ru.bclib.gui.screens.AtomicProgressListener;
 import ru.bclib.gui.screens.ConfirmFixScreen;
+import ru.bclib.gui.screens.ProgressScreen;
 import ru.bclib.util.Logger;
 
 import java.io.DataInputStream;
@@ -32,6 +34,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -149,41 +153,76 @@ public class DataFixerAPI {
 			WorldDataAPI.saveFile(BCLib.MOD_ID);
 		}
 	}
+
+	@Environment(EnvType.CLIENT)
+	private static AtomicProgressListener showProgressScreen(){
+		ProgressScreen ps = new ProgressScreen(Minecraft.getInstance().screen, new TranslatableComponent("title.bclib.datafixer.progress"), new TranslatableComponent("message.bclib.datafixer.progress"));
+		Minecraft.getInstance().setScreen(ps);
+		return ps;
+	}
 	
 	private static boolean fixData(File dir, String levelID, boolean showUI, Consumer<Boolean> onResume) {
 		MigrationProfile profile = loadProfileIfNeeded(dir);
-		
-		Consumer<Boolean> runFixes = (applyFixes) -> {
+
+		BiConsumer<Boolean, Boolean> runFixes = (createBackup, applyFixes) -> {
+			final AtomicProgressListener progress;
 			if (applyFixes) {
-				runDataFixes(dir, profile, new ProgressListener() {
-					private long timeStamp = Util.getMillis();
+				if (showUI) {
+					progress = showProgressScreen();
+				} else {
+					progress = new AtomicProgressListener() {
+						private long timeStamp = Util.getMillis();
+						private AtomicInteger counter = new AtomicInteger(0);
 
-					public void progressStartNoAbort(Component component) {
-					}
-
-					public void progressStart(Component component) {
-					}
-
-					public void progressStagePercentage(int i) {
-						if (Util.getMillis() - this.timeStamp >= 1000L) {
-							this.timeStamp = Util.getMillis();
-							BCLib.LOGGER.info((String) "Patching... {}%", (Object) i);
+						@Override
+						public void incAtomic(int maxProgress) {
+							int percentage = (100 * counter.incrementAndGet()) / maxProgress;
+							if (Util.getMillis() - this.timeStamp >= 1000L) {
+								this.timeStamp = Util.getMillis();
+								BCLib.LOGGER.info((String) "Patching... {}%", percentage);
+							}
 						}
-					}
 
-					public void stop() {
-					}
+						@Override
+						public void resetAtomic() {
+							counter = new AtomicInteger(0);
+						}
 
-					public void progressStage(Component component) {
-					}
-				});
+						public void stop() {
+						}
+
+						public void progressStage(Component component) {
+							BCLib.LOGGER.info((String) "Patcher Stage... {}%", component.getString());
+						}
+					};
+				}
 			} else {
-				//System.out.println("NO FIXES");
+				progress = null;
 			}
-			
-			//UI is asynchronous, so we need to send the callback now
-			if (profile != null && showUI) {
-				onResume.accept(applyFixes);
+
+			Runnable runner = () -> {
+				if (createBackup) {
+					EditWorldScreen.makeBackupAndShowToast(Minecraft.getInstance().getLevelSource(), levelID);
+				}
+
+				if (applyFixes) {
+					runDataFixes(dir, profile, progress);
+				}
+			};
+
+			if (showUI) {
+				Thread fixerThread = new Thread(() -> {
+					runner.run();
+
+					Minecraft.getInstance().execute(() -> {
+						if (profile != null && showUI) {
+							onResume.accept(applyFixes);
+						}
+					});
+				});
+				fixerThread.start();
+			} else {
+				runner.run();
 			}
 		};
 		
@@ -195,7 +234,7 @@ public class DataFixerAPI {
 				return true;
 			} else {
 				BCLib.LOGGER.warning("Applying Fixes on Level");
-				runFixes.accept(true);
+				runFixes.accept(false, true);
 			}
 		}
 		return false;
@@ -208,6 +247,8 @@ public class DataFixerAPI {
 		}
 		
 		MigrationProfile profile = getMigrationProfile();
+		//TODO: Remove on Production
+		if (!BCLib.isDevEnvironment())
 		profile.runPrePatches(levelBaseDir);
 		
 		if (!profile.hasAnyFixes()) {
@@ -226,46 +267,53 @@ public class DataFixerAPI {
 	}
 	
 	@Environment(EnvType.CLIENT)
-	static void showBackupWarning(String levelID, Consumer<Boolean> whenFinished){
-		Minecraft.getInstance().setScreen(new ConfirmFixScreen((Screen) null, (createBackup, applyFixes) -> {
-			if (createBackup) {
-				EditWorldScreen.makeBackupAndShowToast(Minecraft.getInstance().getLevelSource(), levelID);
-			}
-			
-			Minecraft.getInstance().setScreen((Screen)null);
-			whenFinished.accept(applyFixes);
-		}));
+	static void showBackupWarning(String levelID, BiConsumer<Boolean, Boolean> whenFinished){
+		Minecraft.getInstance().setScreen(new ConfirmFixScreen((Screen) null, whenFinished::accept));
 	}
 
-	private static void runDataFixes(File dir, MigrationProfile profile, ProgressListener progress) {
+	private static void runDataFixes(File dir, MigrationProfile profile, AtomicProgressListener progress) {
 		State state = new State();
-		
-		List<File> regions = getAllRegions(dir, null);
-		progress.progressStagePercentage(0);
-		int[] count = {0};
-		regions.parallelStream().forEach((file) -> {
-			fixRegion(profile, state, file);
-			count[0]++;
-			progress.progressStagePercentage((100 * count[0])/regions.size());
-		});
-		progress.stop();
+		progress.resetAtomic();
 
+		progress.progressStage(new TranslatableComponent("message.bclib.datafixer.progress.reading"));
 		List<File> players = getAllPlayers(dir);
-		players.parallelStream().forEach((file) -> fixPlayer(profile, state, file));
+		List<File> regions = getAllRegions(dir, null);
+		final int maxProgress = players.size()+regions.size()+4;
+		progress.incAtomic(maxProgress);
 
+		progress.progressStage(new TranslatableComponent("message.bclib.datafixer.progress.players"));
+		players.parallelStream().forEach((file) -> {
+			fixPlayer(profile, state, file);
+			progress.incAtomic(maxProgress);
+		});
+
+		progress.progressStage(new TranslatableComponent("message.bclib.datafixer.progress.level"));
 		fixLevel(profile, state, dir);
+		progress.incAtomic(maxProgress);
 
+		progress.progressStage(new TranslatableComponent("message.bclib.datafixer.progress.worlddata"));
 		try {
 			profile.patchWorldData();
 		} catch (PatchDidiFailException e){
 			state.didFail = true;
 			BCLib.LOGGER.error(e.getMessage());
 		}
+		progress.incAtomic(maxProgress);
+
+		progress.progressStage(new TranslatableComponent("message.bclib.datafixer.progress.regions"));
+		regions.parallelStream().forEach((file) -> {
+			fixRegion(profile, state, file);
+			progress.incAtomic(maxProgress);
+		});
 		
 		if (!state.didFail) {
+			progress.progressStage(new TranslatableComponent("message.bclib.datafixer.progress.saving"));
 			profile.markApplied();
 			WorldDataAPI.saveFile(BCLib.MOD_ID);
 		}
+		progress.incAtomic(maxProgress);
+
+		progress.stop();
 	}
 	
 	private static void fixLevel(MigrationProfile profile, State state, File levelBaseDir) {

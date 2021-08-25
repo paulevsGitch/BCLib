@@ -1,5 +1,6 @@
 package ru.bclib.api.datafixer;
 
+import net.fabricmc.loom.util.ModUtils;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtIo;
@@ -123,7 +124,7 @@ public class MigrationProfile {
 	
 	final public void markApplied() {
 		for (String modID : mods) {
-			DataFixerAPI.LOGGER.info("Updating Patch-Level for '{}' from {} to {}", modID, currentPatchLevel(modID), Patch.maxPatchLevel(modID));
+			DataFixerAPI.LOGGER.info("Updating Patch-Level for '{}' from {} to {}", modID, ModUtil.convertModVersion(currentPatchLevel(modID)), ModUtil.convertModVersion(Patch.maxPatchLevel(modID)));
 			config.putString(modID, Patch.maxPatchVersion(modID));
 		}
 	}

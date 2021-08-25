@@ -25,6 +25,8 @@ import ru.bclib.gui.gridlayout.GridScreen;
 import ru.bclib.gui.gridlayout.GridStringCell;
 import ru.bclib.gui.gridlayout.GridTransform;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 class ProgressLogoRender extends GridCustomRenderCell {
 	public static final int SIZE = 64;
 	public static final int LOGO_SIZE = 512;
@@ -95,12 +97,14 @@ class ProgressLogoRender extends GridCustomRenderCell {
 	}
 }
 
-public class ProgressScreen extends GridScreen implements ProgressListener {
+public class ProgressScreen extends GridScreen implements ProgressListener, AtomicProgressListener {
+
 	static final ResourceLocation BCLIB_LOGO_PIXELATED_LOCATION = new ResourceLocation(BCLib.MOD_ID, "iconpixelated.png");
 	public ProgressScreen(@Nullable Screen parent, Component title, Component description) {
 		super(parent, title, 20, false);
 		this.description = description;
 	}
+
 	
 	Component description;
 	private Component stageComponent;
@@ -108,6 +112,21 @@ public class ProgressScreen extends GridScreen implements ProgressListener {
 	private GridStringCell progress;
 	private ProgressLogoRender progressImage;
 	private int currentProgress = 0;
+	private AtomicInteger atomicCounter;
+
+	@Override
+	public void incAtomic(int maxProgress) {
+		if (atomicCounter!=null) {
+			progressStagePercentage((100*atomicCounter.incrementAndGet())/maxProgress);
+		}
+	}
+
+	@Override
+	public void resetAtomic() {
+		progressStagePercentage(0);
+		atomicCounter = new AtomicInteger(0);
+	}
+
 	public boolean shouldCloseOnEsc() {
 		return false;
 	}
@@ -165,7 +184,6 @@ public class ProgressScreen extends GridScreen implements ProgressListener {
 		if (i!=currentProgress) {
 			currentProgress = i;
 			if (progressImage!=null) progressImage.percentage = currentProgress / 100.0f;
-			BCLib.LOGGER.info("  -> progress: " + i + "%");
 			if (progress!=null) progress.setText(getProgressComponent());
 		}
 	}
@@ -173,14 +191,5 @@ public class ProgressScreen extends GridScreen implements ProgressListener {
 	@Override
 	public void stop() {
 	
-	}
-	
-	double time = 0;
-	@Override
-	public void render(PoseStack poseStack, int i, int j, float f) {
-		//time += 0.05;
-		//progressStagePercentage(((int)time)%100);
-		//progressStagePercentage(1);
-		super.render(poseStack, i, j, f);
 	}
 }
