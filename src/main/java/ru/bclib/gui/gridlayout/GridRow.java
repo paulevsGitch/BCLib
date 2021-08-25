@@ -199,7 +199,7 @@ public class GridRow extends GridContainer {
 	
 	public GridStringCell addString(Component text, int color, GridScreen parent) {
 		final int width = parent.getWidth(text);
-		return this.addString(text, width, GridValueType.CONSTANT, GridLayout.COLOR_WHITE, Alignment.CENTER, parent);
+		return this.addString(text, width, GridValueType.CONSTANT, color, Alignment.CENTER, parent);
 	}
 	
 	public GridStringCell addString(Component text, Alignment contentAlignment, GridScreen parent) {

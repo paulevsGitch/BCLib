@@ -5,6 +5,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.components.AbstractWidget;
 import ru.bclib.gui.gridlayout.GridLayout.GridValueType;
+import ru.bclib.util.Pair;
 import ru.bclib.util.TriConsumer;
 
 import java.util.LinkedList;
@@ -63,7 +64,7 @@ class GridElement extends GridTransform{
 	}
 	
 	GridTransform transformWithPadding(int leftPadding, int topPadding){
-		return new GridTransform(left + leftPadding, top +topPadding, width, height);
+		return new GridTransform(left + leftPadding, top + topPadding, width, height);
 	}
 }
 
@@ -84,8 +85,10 @@ abstract class GridContainer extends GridCellDefinition{
 @Environment(EnvType.CLIENT)
 public class GridLayout extends GridColumn {
 	public static final int COLOR_WHITE = 0xFFFFFFFF;
-	public static final int COLOR_RED = 0xFFFF0000;
+	public static final int COLOR_RED = 0xFFDB1F48;
+	public static final int COLOR_CYAN = 0xFF01949A;
 	public static final int COLOR_GREEN = 0xFF00FF00;
+	public static final int COLOR_YELLOW = 0xFFFAD02C;
 	public static final int COLOR_BLUE = 0xFF0000FF;
 	public static final int COLOR_GRAY = 0xFF7F7F7F;
 	
@@ -130,14 +133,15 @@ public class GridLayout extends GridColumn {
 		elements = new LinkedList<>();
 		GridElement el = this.buildElement((int)this.width, 0, 1, 0,0, elements);
 		this.height = el.height;
-		if (centerVertically) {
+		if (centerVertically && el.height + initialTopPadding < screenHeight) {
 			topPadding = (screenHeight - el.height - initialTopPadding) >> 1;
 		} else {
 			topPadding = initialTopPadding;
 		}
 		
 	}
-	
+
+	public List<Pair<AbstractWidget, Integer>> movableWidgets = new LinkedList<>();
 	public void finalizeLayout(){
 		buildLayout();
 		
@@ -145,11 +149,14 @@ public class GridLayout extends GridColumn {
 			.stream()
 			.filter(element -> element.componentPlacer!=null)
 			.forEach(element -> {
-				Object context = element.componentPlacer.apply(element.transformWithPadding(sidePadding, topPadding));
+				final GridTransform transform = element.transformWithPadding(sidePadding, topPadding);
+				final Object context = element.componentPlacer.apply(transform);
 				if (element.customRender != null){
 					element.renderContext = context;
 				} else if (context instanceof AbstractWidget) {
-					screen.addRenderableWidget((AbstractWidget) context);
+					final AbstractWidget widget = (AbstractWidget)context;
+					movableWidgets.add(new Pair(widget, widget.y));
+					screen.addRenderableWidget(widget);
 				}
 			});
 	}

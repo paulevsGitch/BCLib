@@ -47,23 +47,8 @@ abstract class BCLibScreen extends GridScreen {
 		row.addFiller();
 		row.addImage(BCLIB_LOGO_LOCATION, 24, GridValueType.CONSTANT, 24, 512, 512);
 		row.addSpacer(4);
-		row.addString(this.title, font.lineHeight,this);
+		row.addString(this.title, this);
 		row.addFiller();
 		grid.addSpacerRow(15);
-	}
-	
-	@Override
-	public void render(PoseStack poseStack, int i, int j, float f) {
-		this.renderDirtBackground(i);
-//
-//		RenderSystem.setShader(GameRenderer::getPositionTexShader);
-//		RenderSystem.setShaderTexture(0, BCLIB_LOGO_LOCATION);
-//		RenderSystem.enableBlend();
-//		RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-//		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0f);
-//		blit(poseStack, 0, 0, 32, 32, 0, 0, 512, 512, 512, 512);
-		
-		if (grid!=null) grid.render(poseStack);
-		super.renderScreen(poseStack, i, j, f);
 	}
 }
