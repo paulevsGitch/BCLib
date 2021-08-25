@@ -156,7 +156,7 @@ public class SendFiles extends DataHandler.FromServer {
 		if (e instanceof AutoFileSyncEntry.ForModFileRequest mase){
 			removeAfter = path;
 			int count = 0;
-			final String prefix = "_bclib_synced";
+			final String prefix = "_bclib_synced_";
 			String name = prefix + mase.modID + "_" + mase.version.replace(".", "_") + ".jar";
 			do {
 				if (path != null) {
