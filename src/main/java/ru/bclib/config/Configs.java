@@ -3,8 +3,6 @@ package ru.bclib.config;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import ru.bclib.BCLib;
-import ru.bclib.api.dataexchange.handler.autosync.AutoSync.ClientConfig;
-import ru.bclib.api.dataexchange.handler.autosync.AutoSync.ServerConfig;
 
 public class Configs {
 	// Client and Server-Config must be the first entries. They are not part of the Auto-Sync process

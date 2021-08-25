@@ -70,6 +70,11 @@ public abstract class GridScreen extends Screen {
 	public Font getFont(){
 		return this.font;
 	}
+
+	@Override
+	public boolean isPauseScreen() {
+		return true;
+	}
 	
 	@Override
 	public <T extends GuiEventListener & Widget & NarratableEntry> T addRenderableWidget(T guiEventListener) {

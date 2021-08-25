@@ -4,9 +4,8 @@ import net.fabricmc.loader.api.FabricLoader;
 import ru.bclib.BCLib;
 import ru.bclib.api.dataexchange.DataExchangeAPI;
 import ru.bclib.api.dataexchange.SyncFileHash;
-import ru.bclib.config.ConfigUI;
 import ru.bclib.config.Configs;
-import ru.bclib.config.NamedPathConfig;
+import ru.bclib.config.ServerConfig;
 import ru.bclib.util.PathUtil;
 
 import java.io.File;
@@ -28,78 +27,7 @@ public class AutoSync {
 	public interface NeedTransferPredicate {
 		public boolean test(SyncFileHash clientHash, SyncFileHash serverHash, FileContentWrapper content);
 	}
-	
-	public static class ClientConfig extends NamedPathConfig{
-		public static final ConfigToken<Boolean> ENABLED = ConfigToken.Boolean(true, "enabled", SYNC_CATEGORY);
-		@ConfigUI(leftPadding =8)
-		public static final DependendConfigToken<Boolean> ACCEPT_CONFIGS = DependendConfigToken.Boolean(true,"acceptConfigs", SYNC_CATEGORY, (config)->config.get(ENABLED));
-		@ConfigUI(leftPadding =8)
-		public static final DependendConfigToken<Boolean> ACCEPT_FILES = DependendConfigToken.Boolean(true,"acceptFiles", SYNC_CATEGORY, (config)->config.get(ENABLED));
-		@ConfigUI(leftPadding =8)
-		public static final DependendConfigToken<Boolean> ACCEPT_MODS = DependendConfigToken.Boolean(false,"acceptMods", SYNC_CATEGORY, (config)->config.get(ENABLED));
-		@ConfigUI(topPadding = 12)
-		public static final ConfigToken<Boolean> DEBUG_HASHES = ConfigToken.Boolean(false, "debugHashes", SYNC_CATEGORY);
-		
-		
-		public ClientConfig(){
-			super(BCLib.MOD_ID, "client", false);
-		}
-		
-		public boolean shouldPrintDebugHashes() {
-			return get(DEBUG_HASHES);
-		}
-		
-		public boolean isAllowingAutoSync() {
-			return get(ENABLED);
-		}
-		
-		public boolean isAcceptingMods() {
-			return get(ACCEPT_MODS) /*&& isAllowingAutoSync()*/;
-		}
-		
-		public  boolean isAcceptingConfigs() {
-			return get(ACCEPT_CONFIGS) /*&& isAllowingAutoSync()*/;
-		}
-		
-		public  boolean isAcceptingFiles() {
-			return get(ACCEPT_FILES) /*&& isAllowingAutoSync()*/;
-		}
-	}
-	
-	public static class ServerConfig extends NamedPathConfig {
-		public static final ConfigToken<Boolean> ENABLED = ConfigToken.Boolean(true, "enabled", SYNC_CATEGORY);
-		public static final DependendConfigToken<Boolean> OFFER_CONFIGS = DependendConfigToken.Boolean(true,"offerConfigs", SYNC_CATEGORY, (config)->config.get(ENABLED));
-		public static final DependendConfigToken<Boolean> OFFER_FILES = DependendConfigToken.Boolean(true,"offerFiles", SYNC_CATEGORY, (config)->config.get(ENABLED));
-		public static final DependendConfigToken<Boolean> OFFER_MODS = DependendConfigToken.Boolean(true,"offerMods", SYNC_CATEGORY, (config)->config.get(ENABLED));
-		
-		public static final ConfigToken<List<String>> ADDITIONAL_MODS = ConfigToken.StringArray(new ArrayList<>(0),"additionalMods", SYNC_CATEGORY);
-		
-		
-		public ServerConfig(){
-			super(BCLib.MOD_ID, "server", false);
-		}
-		
-		public boolean isAllowingAutoSync() {
-			return get(ENABLED);
-		}
-		
-		public boolean isOfferingConfigs() {
-			return get(OFFER_CONFIGS) /*&& isAllowingAutoSync()*/;
-		}
-		
-		public boolean isOfferingFiles() {
-			return get(OFFER_FILES) /*&& isAllowingAutoSync()*/;
-		}
-		
-		public boolean isOfferingMods() {
-			return get(OFFER_MODS) /*&& isAllowingAutoSync()*/;
-		}
-		
-		public String[] additionalModsForSync() {
-			return new String[0];
-		}
-	}
-	
+
 	final static class AutoSyncTriple {
 		public final SyncFileHash serverHash;
 		public final byte[] serverContent;

@@ -22,6 +22,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Environment(EnvType.CLIENT)
 public class ModListScreen extends BCLibScreen {
@@ -47,12 +48,29 @@ public class ModListScreen extends BCLibScreen {
         this.description = description;
     }
 
+    public static List<String> localMissing(HelloClient.IServerModMap serverInfo){
+        return serverInfo.keySet()
+                .stream()
+                .filter(modid -> !ModUtil.getMods().keySet().stream().filter(mod -> mod.equals(modid)).findFirst().isPresent()).collect(Collectors.toList());
+    }
+
+    public static List<String> serverMissing(HelloClient.IServerModMap serverInfo){
+        return ModUtil.getMods().entrySet()
+                .stream()
+                .filter(entry -> entry.getValue().metadata.getEnvironment() != ModEnvironment.CLIENT)
+                .map(entry -> entry.getKey())
+                .filter(modid -> !serverInfo.keySet().stream().filter(mod -> mod.equals(modid)).findFirst().isPresent()).collect(Collectors.toList());
+    }
+
+
     public static void addModDesc(GridColumn grid, java.util.List<ModUtil.ModInfo> mods, HelloClient.IServerModMap serverInfo, GridScreen parent) {
         final int STATE_OK = 0;
         final int STATE_MISSING = 1;
         final int STATE_SERVER_MISSING = 2;
         final int STATE_VERSION = 3;
         final int STATE_SERVER_MISSING_CLIENT_MOD = 4;
+        final int STATE_VERSION_NOT_OFFERED = 5;
+        final int STATE_MISSING_NOT_OFFERED = 6;
 
         List<Triple<String, Integer, String>> items = new LinkedList<>();
         if (serverInfo!=null) {
@@ -60,13 +78,16 @@ public class ModListScreen extends BCLibScreen {
                     .stream()
                     .filter(modid -> !mods.stream().filter(mod -> mod.metadata.getId().equals(modid)).findFirst().isPresent())
                     .forEach(modid -> {
-                        int size =  serverInfo.get(modid).second;
-                        String stateString = serverInfo.get(modid).first;
-                        if (size>0) {
-                            stateString = "Version: " + stateString + ", Size: " + PathUtil.humanReadableFileSize(size);
+                        HelloClient.OfferedModInfo nfo = serverInfo.get(modid);
+                        String stateString = nfo.version();
+                        if (nfo.size()>0) {
+                            stateString = "Version: " + stateString + ", Size: " + PathUtil.humanReadableFileSize(nfo.size());
+                        }
+                        if (nfo.canDownload()) {
+                            stateString += ", offered by server";
                         }
 
-                        items.add(new Triple<>(modid, STATE_MISSING, stateString));
+                        items.add(new Triple<>(modid, nfo.canDownload()?STATE_MISSING:STATE_MISSING_NOT_OFFERED, stateString));
                     });
         }
 
@@ -78,12 +99,12 @@ public class ModListScreen extends BCLibScreen {
                 final String modID = mod.metadata.getId();
 
 
-                Pair<String, Integer> data = serverInfo.get(modID);
+                HelloClient.OfferedModInfo data = serverInfo.get(modID);
                 if (data!=null) {
-                    final String modVer = data.first;
-                    final int size = data.second;
+                    final String modVer = data.version();
+                    final int size = data.size();
                     if (!modVer.equals(mod.getVersion())) {
-                        state = STATE_VERSION;
+                        state = data.canDownload()?STATE_VERSION:STATE_VERSION_NOT_OFFERED;
                         serverVersion = modVer;
                         serverSize = size;
                     }
@@ -119,10 +140,16 @@ public class ModListScreen extends BCLibScreen {
 
                     int color = GridLayout.COLOR_RED;
                     final String typeText;
-                    if (state==STATE_VERSION) {
+                    if (state==STATE_VERSION || state==STATE_VERSION_NOT_OFFERED) {
                         typeText = "[VERSION]";
-                    } else if (state==STATE_MISSING) {
+                        if (state == STATE_VERSION_NOT_OFFERED) {
+                            color = GridLayout.COLOR_YELLOW;
+                        }
+                    } else if (state==STATE_MISSING || state==STATE_MISSING_NOT_OFFERED) {
                         typeText = "[MISSING]";
+                        if (state == STATE_MISSING_NOT_OFFERED) {
+                            color = GridLayout.COLOR_YELLOW;
+                        }
                     } else if (state==STATE_SERVER_MISSING || state == STATE_SERVER_MISSING_CLIENT_MOD) {
                         typeText = "[NOT ON SERVER]";
                         if (state == STATE_SERVER_MISSING_CLIENT_MOD) {

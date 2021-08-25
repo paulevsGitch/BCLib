@@ -49,9 +49,9 @@ public class SyncFilesScreen extends BCLibScreen {
 		row = grid.addRow();
 		mods = row.addCheckbox(new TranslatableComponent("message.bclib.syncfiles.mods"), hasMods, BUTTON_HEIGHT, this.font);
 		mods.setEnabled(hasMods);
-		if (hasMods) {
+
 			row.addSpacer();
-			row.addButton(new TranslatableComponent("title.bclib.more"), 20, font, (button)->{
+			row.addButton(new TranslatableComponent("title.bclib.syncfiles.modInfo"), 20, font, (button)->{
 				ModListScreen scr = new ModListScreen(
 						this,
 						new TranslatableComponent("title.bclib.syncfiles.modlist"),
@@ -61,7 +61,7 @@ public class SyncFilesScreen extends BCLibScreen {
 						);
 				Minecraft.getInstance().setScreen(scr);
 			});
-		}
+
 		grid.addSpacerRow();
 	
 		

@@ -3,8 +3,8 @@ package ru.bclib.api.dataexchange.handler.autosync;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
+import net.fabricmc.loader.api.metadata.ModEnvironment;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
@@ -15,6 +15,7 @@ import ru.bclib.api.dataexchange.DataHandlerDescriptor;
 import ru.bclib.api.dataexchange.handler.autosync.AutoSyncID.WithContentOverride;
 import ru.bclib.api.dataexchange.handler.autosync.SyncFolderDescriptor.SubFile;
 import ru.bclib.config.Configs;
+import ru.bclib.gui.screens.ModListScreen;
 import ru.bclib.gui.screens.ProgressScreen;
 import ru.bclib.gui.screens.SyncFilesScreen;
 import ru.bclib.gui.screens.WarnBCLibVersionMismatch;
@@ -28,10 +29,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.function.Consumer;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -40,8 +42,10 @@ import java.util.stream.Collectors;
  * For Details refer to {@link HelloServer}
  */
 public class HelloClient extends DataHandler.FromServer {
-	public interface IServerModMap extends Map<String, Pair<String, Integer>> {}
-	public static class ServerModMap extends HashMap<String, Pair<String, Integer>> implements IServerModMap {}
+	public record OfferedModInfo(String version, int size, boolean canDownload) {
+	}
+	public interface IServerModMap extends Map<String, OfferedModInfo> {}
+	public static class ServerModMap extends HashMap<String, OfferedModInfo> implements IServerModMap {}
 
 	public static DataHandlerDescriptor DESCRIPTOR = new DataHandlerDescriptor(new ResourceLocation(BCLib.MOD_ID, "hello_client"), HelloClient::new, false, false);
 	
@@ -68,32 +72,49 @@ public class HelloClient extends DataHandler.FromServer {
 	protected void serializeDataOnServer(FriendlyByteBuf buf) {
 		final String vbclib = getBCLibVersion();
 		BCLib.LOGGER.info("Sending Hello to Client. (server=" + vbclib + ")");
-		final List<String> mods = DataExchangeAPI.registeredMods();
-		
+
 		//write BCLibVersion (=protocol version)
 		buf.writeInt(ModUtil.convertModVersion(vbclib));
 		
-		if (Configs.SERVER_CONFIG.isOfferingMods()) {
+		if (Configs.SERVER_CONFIG.isOfferingMods() || Configs.SERVER_CONFIG.isOfferingInfosForMods()) {
+			List<String> mods = DataExchangeAPI.registeredMods();
+			final List<String> inmods = mods;
+			if (Configs.SERVER_CONFIG.isOfferingAllMods() || Configs.SERVER_CONFIG.isOfferingInfosForMods()){
+				mods = new ArrayList<>(inmods.size());
+				mods.addAll(inmods);
+				mods.addAll(ModUtil
+						.getMods()
+						.entrySet()
+						.stream()
+						.filter(entry -> entry.getValue().metadata.getEnvironment()!= ModEnvironment.SERVER && !inmods.contains(entry.getKey()))
+						.map(entry -> entry.getKey())
+						.collect(Collectors.toList())
+				);
+			}
+
 			//write Plugin Versions
 			buf.writeInt(mods.size());
 			for (String modID : mods) {
 				final String ver = ModUtil.getModVersion(modID);
-				final ModInfo mi = ModUtil.getModInfo(modID);
 				int size = 0;
+
+				final ModInfo mi = ModUtil.getModInfo(modID);
 				if (mi != null) {
 					try {
 						size = (int) Files.size(mi.jarPath);
-					}
-					catch (IOException e) {
+					} catch (IOException e) {
 						BCLib.LOGGER.error("Unable to get File Size: " + e.getMessage());
 					}
 				}
+
 				
 				writeString(buf, modID);
 				buf.writeInt(ModUtil.convertModVersion(ver));
 				buf.writeInt(size);
+				final boolean canDownload = size>0 && Configs.SERVER_CONFIG.isOfferingMods() && (Configs.SERVER_CONFIG.isOfferingAllMods() || inmods.contains(modID));
+				buf.writeBoolean(canDownload);
 				
-				BCLib.LOGGER.info("    - Listing Mod " + modID + " v" + ver + " (" + PathUtil.humanReadableFileSize(size) + ")");
+				BCLib.LOGGER.info("    - Listing Mod " + modID + " v" + ver + " (size: " + PathUtil.humanReadableFileSize(size) + ", download="+canDownload+")");
 			}
 		}
 		else {
@@ -132,13 +153,18 @@ public class HelloClient extends DataHandler.FromServer {
 			BCLib.LOGGER.info("Server will not offer Sync Folders.");
 			buf.writeInt(0);
 		}
+
+		buf.writeBoolean(Configs.SERVER_CONFIG.isOfferingInfosForMods());
 	}
 	
 	String bclibVersion = "0.0.0";
 
+
+
 	IServerModMap modVersion = new ServerModMap();
 	List<AutoSync.AutoSyncTriple> autoSyncedFiles = null;
 	List<SyncFolderDescriptor> autoSynFolders = null;
+	boolean serverPublishedModInfo = false;
 	
 	@Environment(EnvType.CLIENT)
 	@Override
@@ -155,14 +181,17 @@ public class HelloClient extends DataHandler.FromServer {
 			final String id = readString(buf);
 			final String version = ModUtil.convertModVersion(buf.readInt());
 			final int size;
+			final boolean canDownload;
 			//since v0.4.1 we also send the size of the mod-File
 			if (protocolVersion_0_4_1) {
 				size = buf.readInt();
+				canDownload = buf.readBoolean();
 			}
 			else {
 				size = 0;
+				canDownload = true;
 			}
-			modVersion.put(id, new Pair<>(version, size));
+			modVersion.put(id, new OfferedModInfo(version, size, canDownload));
 		}
 		
 		//read config Data
@@ -184,6 +213,8 @@ public class HelloClient extends DataHandler.FromServer {
 				SyncFolderDescriptor desc = SyncFolderDescriptor.deserialize(buf);
 				autoSynFolders.add(desc);
 			}
+
+			serverPublishedModInfo = buf.readBoolean();
 		}
 	}
 	
@@ -291,19 +322,26 @@ public class HelloClient extends DataHandler.FromServer {
 			}
 		}
 	}
+
 	
 	@Environment(EnvType.CLIENT)
-	private void processModFileSync(final List<AutoSyncID> filesToRequest) {
-		for (Entry<String, Pair<String, Integer>> e : modVersion.entrySet()) {
+	private void processModFileSync(final List<AutoSyncID> filesToRequest, final Set<String> mismatchingMods) {
+		for (Entry<String, OfferedModInfo> e : modVersion.entrySet()) {
 			final String localVersion = ModUtil.getModVersion(e.getKey());
-			final Pair<String, Integer> serverInfo = e.getValue();
-			final boolean requestMod = !serverInfo.first.equals(localVersion) && serverInfo.second > 0;
+			final OfferedModInfo serverInfo = e.getValue();
+			final boolean requestMod = !serverInfo.version.equals(localVersion) && serverInfo.size > 0 && serverInfo.canDownload;
 			
-			BCLib.LOGGER.info("    - " + e.getKey() + " (client=" + localVersion + ", server=" + serverInfo.first + ", size=" + PathUtil.humanReadableFileSize(serverInfo.second) + (requestMod ? ", requesting" : "") + ")");
+			BCLib.LOGGER.info("    - " + e.getKey() + " (client=" + localVersion + ", server=" + serverInfo.version + ", size=" + PathUtil.humanReadableFileSize(serverInfo.size) + (requestMod ? ", requesting" : "") + (serverInfo.canDownload ? "" :", not offered")+ ")");
 			if (requestMod) {
-				filesToRequest.add(new AutoSyncID.ForModFileRequest(e.getKey(), serverInfo.first));
+				filesToRequest.add(new AutoSyncID.ForModFileRequest(e.getKey(), serverInfo.version));
+			}
+			if (!serverInfo.version.equals(localVersion)) {
+				mismatchingMods.add(e.getKey());
 			}
 		}
+
+		mismatchingMods.addAll(ModListScreen.localMissing(modVersion));
+		mismatchingMods.addAll(ModListScreen.serverMissing(modVersion));
 	}
 	
 	@Override
@@ -328,9 +366,10 @@ public class HelloClient extends DataHandler.FromServer {
 		
 		final List<AutoSyncID> filesToRequest = new ArrayList<>(2);
 		final List<AutoSyncID.ForDirectFileRequest> filesToRemove = new ArrayList<>(2);
+		final Set<String> mismatchingMods = new HashSet<>(2);
 		
 		
-		processModFileSync(filesToRequest);
+		processModFileSync(filesToRequest, mismatchingMods);
 		processSingleFileSync(filesToRequest);
 		processAutoSyncFolder(filesToRequest, filesToRemove);
 		
@@ -340,6 +379,9 @@ public class HelloClient extends DataHandler.FromServer {
 		
 		if ((filesToRequest.size() > 0 || filesToRemove.size() > 0) && ( Configs.CLIENT_CONFIG.isAcceptingMods() ||  Configs.CLIENT_CONFIG.isAcceptingConfigs() ||  Configs.CLIENT_CONFIG.isAcceptingFiles())) {
 			showSyncFilesScreen(client, filesToRequest, filesToRemove);
+			return;
+		} else if (serverPublishedModInfo && mismatchingMods.size()>0) {
+			client.setScreen(new ModListScreen(client.screen, new TranslatableComponent("title.bclib.modmissmatch"), new TranslatableComponent("message.bclib.modmissmatch"), ModUtil.getMods(), modVersion));
 			return;
 		}
 	}
