@@ -35,6 +35,7 @@
 	"title.bclib.modmissmatch": "Mod Version Conflict",
 	"message.bclib.modmissmatch": "Some Mods on this client do not match the version of Mods on the Server.\n\nMismatching Mods can result in odd game behavior or crashes. Please make sue that you use the same mods as the server.",
 
+	"message.bclib.datafixer.progress.waitbackup": "Waiting for Backup to finish. This may take a while!",
 	"message.bclib.datafixer.progress.reading": "Reading Data",
 	"message.bclib.datafixer.progress.players": "Fixing Players",
 	"message.bclib.datafixer.progress.level": "Applying Patches to level.dat",

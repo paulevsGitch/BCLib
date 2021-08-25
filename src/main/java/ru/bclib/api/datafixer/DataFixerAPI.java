@@ -202,6 +202,7 @@ public class DataFixerAPI {
 
 			Runnable runner = () -> {
 				if (createBackup) {
+					progress.progressStage(new TranslatableComponent("message.bclib.datafixer.progress.waitbackup"));
 					EditWorldScreen.makeBackupAndShowToast(Minecraft.getInstance().getLevelSource(), levelID);
 				}
 

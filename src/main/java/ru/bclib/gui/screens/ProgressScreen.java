@@ -44,44 +44,46 @@ class ProgressLogoRender extends GridCustomRenderCell {
 		RenderSystem.enableBlend();
 		RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
 		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0f);
+
+		final int yBarLocal = (int)(transform.height*percentage);
+		final int yBar = transform.top + yBarLocal;
 		
 		final float fScale = (float)(0.3*((Math.sin(time)+1.0)*0.5) + 0.7);
 		int height = (int)(transform.height*fScale);
 		int width = (int)(transform.width*fScale);
 		width -= ((transform.width-width)%2);
 		height -= ((transform.height-height)%2);
+
 		final int yOffset = (transform.height-height)/2;
 		final int xOffset = (transform.width-width)/2;
-		
-		final int yBarLocal = (int)(transform.height*percentage);
-		final int yBar = transform.top + yBarLocal;
-		
-		final float relativeY = ((float)(yBarLocal - yOffset)/height);
-		
-		final int uvTopLogo = (int)(relativeY * LOGO_SIZE);
-		final int uvTopPixelated = (int)(relativeY * PIXELATED_SIZE);
-		
-		if (uvTopLogo>0) {
+
+
+		final int yBarImage = Math.max(0, Math.min(height, yBarLocal - yOffset));
+		final float relativeY = ((float)yBarImage/height);
+
+		if (yBarImage>0) {
+			final int uvTopLogo = (int)(relativeY * LOGO_SIZE);
 			RenderSystem.setShaderTexture(0, BCLibScreen.BCLIB_LOGO_LOCATION);
 			GuiComponent.blit(poseStack,
-				xOffset + transform.left,
-				yOffset + transform.top,
-				width,
-				yBarLocal - yOffset,
-				0, 0, LOGO_SIZE, uvTopLogo,
-				LOGO_SIZE, LOGO_SIZE
+					xOffset + transform.left,
+					yOffset + transform.top,
+					width,
+					yBarImage,
+					0, 0, LOGO_SIZE, uvTopLogo,
+					LOGO_SIZE, LOGO_SIZE
 			);
 		}
-		
-		if (uvTopPixelated<PIXELATED_SIZE) {
+
+		if (yBarImage<height) {
+			final int uvTopPixelated = (int)(relativeY * PIXELATED_SIZE);
 			RenderSystem.setShaderTexture(0, ProgressScreen.BCLIB_LOGO_PIXELATED_LOCATION);
 			GuiComponent.blit(poseStack,
-				xOffset + transform.left,
-				yBar,
-				width,
-				height-(yBarLocal - yOffset),
-				0, uvTopPixelated, PIXELATED_SIZE, PIXELATED_SIZE-uvTopPixelated,
-				PIXELATED_SIZE, PIXELATED_SIZE
+					xOffset + transform.left,
+					yOffset + transform.top + yBarImage,
+					width,
+					height - yBarImage,
+					0, uvTopPixelated, PIXELATED_SIZE, PIXELATED_SIZE-uvTopPixelated,
+					PIXELATED_SIZE, PIXELATED_SIZE
 			);
 		}
 		
@@ -101,7 +103,7 @@ public class ProgressScreen extends GridScreen implements ProgressListener, Atom
 
 	static final ResourceLocation BCLIB_LOGO_PIXELATED_LOCATION = new ResourceLocation(BCLib.MOD_ID, "iconpixelated.png");
 	public ProgressScreen(@Nullable Screen parent, Component title, Component description) {
-		super(parent, title, 20, false);
+		super(parent, title, 20, true);
 		this.description = description;
 	}
 
@@ -128,7 +130,7 @@ public class ProgressScreen extends GridScreen implements ProgressListener, Atom
 	}
 
 	public boolean shouldCloseOnEsc() {
-		return false;
+		return true;
 	}
 	
 	public Component getProgressComponent(){
@@ -163,28 +165,28 @@ public class ProgressScreen extends GridScreen implements ProgressListener, Atom
 	}
 	
 	@Override
-	public void progressStartNoAbort(Component component) {
-		this.progressStage(component);
+	public void progressStartNoAbort(Component text) {
+		this.progressStage(text);
 	}
 	
 	@Override
-	public void progressStart(Component component) {
-		this.progressStage(component);
+	public void progressStart(Component text) {
+		this.progressStage(text);
 		this.progressStagePercentage(0);
 	}
 	
 	@Override
-	public void progressStage(Component component) {
-		stageComponent = component;
-		if (stage!=null) stage.setText(component);
+	public void progressStage(Component text) {
+		stageComponent = text;
+		if (stage!=null) stage.setText(text);
 	}
 	
 	@Override
-	public void progressStagePercentage(int i) {
-		if (i!=currentProgress) {
-			currentProgress = i;
+	public void progressStagePercentage(int progress) {
+		if (progress!=currentProgress) {
+			currentProgress = progress;
 			if (progressImage!=null) progressImage.percentage = currentProgress / 100.0f;
-			if (progress!=null) progress.setText(getProgressComponent());
+			if (this.progress !=null) this.progress.setText(getProgressComponent());
 		}
 	}
 	
