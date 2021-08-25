@@ -380,7 +380,7 @@ public class HelloClient extends DataHandler.FromServer {
 		if ((filesToRequest.size() > 0 || filesToRemove.size() > 0) && ( Configs.CLIENT_CONFIG.isAcceptingMods() ||  Configs.CLIENT_CONFIG.isAcceptingConfigs() ||  Configs.CLIENT_CONFIG.isAcceptingFiles())) {
 			showSyncFilesScreen(client, filesToRequest, filesToRemove);
 			return;
-		} else if (serverPublishedModInfo && mismatchingMods.size()>0) {
+		} else if (serverPublishedModInfo && mismatchingMods.size()>0 && Configs.CLIENT_CONFIG.isShowingModInfo()) {
 			client.setScreen(new ModListScreen(client.screen, new TranslatableComponent("title.bclib.modmissmatch"), new TranslatableComponent("message.bclib.modmissmatch"), ModUtil.getMods(), modVersion));
 			return;
 		}

@@ -11,6 +11,9 @@ public class ClientConfig extends NamedPathConfig {
     public static final DependendConfigToken<Boolean> ACCEPT_FILES = DependendConfigToken.Boolean(true, "acceptFiles", AutoSync.SYNC_CATEGORY, (config) -> config.get(ENABLED));
     @ConfigUI(leftPadding = 8)
     public static final DependendConfigToken<Boolean> ACCEPT_MODS = DependendConfigToken.Boolean(false, "acceptMods", AutoSync.SYNC_CATEGORY, (config) -> config.get(ENABLED));
+    @ConfigUI(leftPadding = 8)
+    public static final DependendConfigToken<Boolean> DISPLAY_MOD_INFO = DependendConfigToken.Boolean(true, "displayModInfo", AutoSync.SYNC_CATEGORY, (config) -> config.get(ENABLED));
+
     @ConfigUI(topPadding = 12)
     public static final ConfigToken<Boolean> DEBUG_HASHES = ConfigToken.Boolean(false, "debugHashes", AutoSync.SYNC_CATEGORY);
 
@@ -37,5 +40,9 @@ public class ClientConfig extends NamedPathConfig {
 
     public boolean isAcceptingFiles() {
         return get(ACCEPT_FILES) /*&& isAllowingAutoSync()*/;
+    }
+
+    public boolean isShowingModInfo() {
+        return get(DISPLAY_MOD_INFO) /*&& isAllowingAutoSync()*/;
     }
 }
