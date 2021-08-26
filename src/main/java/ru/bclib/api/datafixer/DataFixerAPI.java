@@ -248,8 +248,6 @@ public class DataFixerAPI {
 		}
 		
 		MigrationProfile profile = getMigrationProfile();
-		//TODO: Remove on Production
-		if (!BCLib.isDevEnvironment())
 		profile.runPrePatches(levelBaseDir);
 		
 		if (!profile.hasAnyFixes()) {
