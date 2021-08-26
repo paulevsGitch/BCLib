@@ -130,7 +130,7 @@ public class ProgressScreen extends GridScreen implements ProgressListener, Atom
 	}
 
 	public boolean shouldCloseOnEsc() {
-		return true;
+		return false;
 	}
 	
 	public Component getProgressComponent(){
