@@ -21,7 +21,6 @@ import ru.bclib.gui.screens.SyncFilesScreen;
 import ru.bclib.gui.screens.WarnBCLibVersionMismatch;
 import ru.bclib.util.ModUtil;
 import ru.bclib.util.ModUtil.ModInfo;
-import ru.bclib.util.Pair;
 import ru.bclib.util.PathUtil;
 
 import java.io.File;
@@ -300,8 +299,8 @@ public class HelloClient extends DataHandler.FromServer {
 			String actionString = "";
 			FileContentWrapper contentWrapper = new FileContentWrapper(e.serverContent);
 			if (e.localMatch == null) {
-				actionString = "(new, prepare update)";
-				filesToRequest.add(new AutoSyncID(e.serverHash.modID, e.serverHash.uniqueID));
+				actionString = "(unknown source -> omitting)";
+				//filesToRequest.add(new AutoSyncID(e.serverHash.modID, e.serverHash.uniqueID));
 			}
 			else if (e.localMatch.needTransfer.test(e.localMatch.getFileHash(), e.serverHash, contentWrapper)) {
 				actionString = "(prepare update)";
