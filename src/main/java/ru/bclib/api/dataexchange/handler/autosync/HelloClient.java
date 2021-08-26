@@ -6,6 +6,7 @@ import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.loader.api.metadata.ModEnvironment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import ru.bclib.BCLib;
@@ -380,7 +381,7 @@ public class HelloClient extends DataHandler.FromServer {
 			showSyncFilesScreen(client, filesToRequest, filesToRemove);
 			return;
 		} else if (serverPublishedModInfo && mismatchingMods.size()>0 && Configs.CLIENT_CONFIG.isShowingModInfo()) {
-			client.setScreen(new ModListScreen(client.screen, new TranslatableComponent("title.bclib.modmissmatch"), new TranslatableComponent("message.bclib.modmissmatch"), ModUtil.getMods(), modVersion));
+			client.setScreen(new ModListScreen(client.screen, new TranslatableComponent("title.bclib.modmissmatch"), new TranslatableComponent("message.bclib.modmissmatch"), CommonComponents.GUI_PROCEED, ModUtil.getMods(), modVersion));
 			return;
 		}
 	}

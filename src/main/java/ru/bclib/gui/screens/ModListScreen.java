@@ -13,7 +13,6 @@ import ru.bclib.gui.gridlayout.GridLayout;
 import ru.bclib.gui.gridlayout.GridRow;
 import ru.bclib.gui.gridlayout.GridScreen;
 import ru.bclib.util.ModUtil;
-import ru.bclib.util.Pair;
 import ru.bclib.util.PathUtil;
 import ru.bclib.util.Triple;
 
@@ -30,22 +29,32 @@ public class ModListScreen extends BCLibScreen {
     private final List<ModUtil.ModInfo> mods;
     private final HelloClient.IServerModMap serverInfo;
     private final Component description;
+    private final Component buttonTitle;
 
     private static List<ModUtil.ModInfo> extractModList(Map<String, ModUtil.ModInfo> mods){
         List<ModUtil.ModInfo> list = new LinkedList<ModUtil.ModInfo>();
         ModUtil.getMods().forEach((id, info) -> list.add(info));
         return list;
     }
-
+    
     public ModListScreen(Screen parent, Component title, Component description, Map<String, ModUtil.ModInfo> mods, HelloClient.IServerModMap serverInfo) {
-       this(parent, title, description, extractModList(mods), serverInfo);
+        this(parent, title, description, CommonComponents.GUI_BACK, mods, serverInfo);
+    }
+    
+    public ModListScreen(Screen parent, Component title, Component description, List<ModUtil.ModInfo> mods, HelloClient.IServerModMap serverInfo) {
+        this(parent, title, description, CommonComponents.GUI_BACK, mods, serverInfo);
+    }
+    
+    public ModListScreen(Screen parent, Component title, Component description, Component button, Map<String, ModUtil.ModInfo> mods, HelloClient.IServerModMap serverInfo) {
+       this(parent, title, description, button, extractModList(mods), serverInfo);
     }
 
-    public ModListScreen(Screen parent, Component title, Component description, List<ModUtil.ModInfo> mods, HelloClient.IServerModMap serverInfo) {
+    public ModListScreen(Screen parent, Component title, Component description, Component button, List<ModUtil.ModInfo> mods, HelloClient.IServerModMap serverInfo) {
         super(parent, title, 10, true);
         this.mods = mods;
         this.serverInfo = serverInfo;
         this.description = description;
+        this.buttonTitle = button;
     }
 
     public static List<String> localMissing(HelloClient.IServerModMap serverInfo){
@@ -197,7 +206,7 @@ public class ModListScreen extends BCLibScreen {
         grid.addSpacerRow(8);
         row = grid.addRow();
         row.addFiller();
-        row.addButton(CommonComponents.GUI_BACK, 20, font, (n)-> {
+        row.addButton(buttonTitle, 20, font, (n)-> {
             onClose();
             System.out.println("Closing");
         });
