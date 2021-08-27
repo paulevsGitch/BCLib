@@ -300,6 +300,10 @@ public class BCLBiomeDef {
 		return this;
 	}
 	
+	protected void addCustomToBuild(BiomeGenerationSettings.Builder generationSettings){
+	
+	}
+	
 	public Biome build() {
 		MobSpawnSettings.Builder spawnSettings = new MobSpawnSettings.Builder();
 		BiomeGenerationSettings.Builder generationSettings = new BiomeGenerationSettings.Builder();
@@ -320,6 +324,8 @@ public class BCLBiomeDef {
 		structures.forEach((structure) -> generationSettings.addStructureStart(structure));
 		features.forEach((info) -> generationSettings.addFeature(info.featureStep, info.feature));
 		carvers.forEach((info) -> generationSettings.addCarver(info.carverStep, info.carver));
+		
+		addCustomToBuild(generationSettings);
 		
 		effects.skyColor(0)
 			   .waterColor(waterColor)
