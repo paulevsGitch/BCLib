@@ -32,7 +32,6 @@ public class BCLib implements ModInitializer {
 	
 	@Override
 	public void onInitialize() {
-		ModUtil.convertModVersion("1.3.0-pre1-1.17.1");
 		BaseRegistry.register();
 		GeneratorOptions.init();
 		BaseBlockEntities.register();
