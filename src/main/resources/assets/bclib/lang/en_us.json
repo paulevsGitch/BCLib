@@ -1,7 +1,7 @@
 {
 	"message.bclib.anvil_damage": "§cDamage",
 	"bclib.datafixer.backupWarning.title": "Guardian detected an incompatible World",
-	"bclib.datafixer.backupWarning.message": "The Guardian detected, that the internals som installed Mods did change since this world was last played.\n\nWe can automatically change the world for you. If you continue without applying the changes the world may not load correct. Before you continue, you should create a Backup.",
+	"bclib.datafixer.backupWarning.message": "The Guardian detected, that the internals some installed Mods did change since this world was last played.\n\nWe can automatically change the world for you. If you continue without applying the changes the world may not load correct. Before you continue, you should create a Backup.",
 	"bclib.datafixer.backupWarning.backup": "Create Backup before applying Fixes",
 	"bclib.datafixer.backupWarning.nofixes": "Continue Without Fixes",
 	"bclib.datafixer.backupWarning.fix": "Apply Fixes",
