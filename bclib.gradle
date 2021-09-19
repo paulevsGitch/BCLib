@@ -23,8 +23,8 @@ repositories {
 	maven { url 'https://jitpack.io' }
 }
 
-minecraft {
-    accessWidener = file("src/main/resources/bclib.accesswidener")
+loom {
+    accessWidenerPath = file("src/main/resources/bclib.accesswidener")
 }
 
 dependencies {
