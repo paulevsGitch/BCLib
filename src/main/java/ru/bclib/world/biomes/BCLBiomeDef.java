@@ -341,8 +341,8 @@ public class BCLBiomeDef {
 		
 		return new Biome.BiomeBuilder().precipitation(precipitation)
 									   .biomeCategory(category)
-									   .depth(depth)
-									   .scale(0.2F)
+									   //.depth(depth) //TODO: No longer available in 1.18
+									   //.scale(0.2F)
 									   .temperature(temperature)
 									   .downfall(downfall)
 									   .specialEffects(effects.build())

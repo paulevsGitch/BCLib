@@ -9,6 +9,7 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biome.BiomeCategory;
 import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.biome.Biomes;
+import net.minecraft.world.level.biome.Climate;
 import net.minecraft.world.level.biome.TheEndBiomeSource;
 import net.minecraft.world.level.levelgen.WorldgenRandom;
 import net.minecraft.world.level.levelgen.synth.SimplexNoise;
@@ -46,7 +47,7 @@ public class BCLibEndBiomeSource extends BiomeSource {
 		BiomeAPI.END_LAND_BIOME_PICKER.clearMutables();
 		BiomeAPI.END_VOID_BIOME_PICKER.clearMutables();
 		
-		this.possibleBiomes.forEach(biome -> {
+		this.possibleBiomes().forEach(biome -> {
 			ResourceLocation key = biomeRegistry.getKey(biome);
 			if (!BiomeAPI.hasBiome(key)) {
 				BCLBiome bclBiome = new BCLBiome(key, biome, 1, 1);
@@ -98,7 +99,7 @@ public class BCLibEndBiomeSource extends BiomeSource {
 	}
 	
 	@Override
-	public Biome getNoiseBiome(int biomeX, int biomeY, int biomeZ) {
+	public Biome getNoiseBiome(int biomeX, int biomeY, int biomeZ, Climate.Sampler sampler) {
 		long i = (long) biomeX * (long) biomeX;
 		long j = (long) biomeZ * (long) biomeZ;
 		long check = GeneratorOptions.isFarEndBiomes() ? 65536L : 625L;

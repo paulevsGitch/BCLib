@@ -11,7 +11,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.biome.Biome.ClimateParameters;
+import net.minecraft.world.level.biome.Climate;
 import net.minecraft.world.level.biome.Biomes;
 import org.jetbrains.annotations.Nullable;
 import ru.bclib.util.MHelper;
@@ -95,11 +95,14 @@ public class BiomeAPI {
 		registerBiome(biome);
 		NETHER_BIOME_PICKER.addBiome(biome);
 		Random random = new Random(biome.getID().hashCode());
-		ClimateParameters parameters = new ClimateParameters(
+		//TODO: did they add depth and scale as two new params here???
+		Climate.ParameterPoint parameters = Climate.parameters(
 			MHelper.randRange(-1.5F, 1.5F, random),
 			MHelper.randRange(-1.5F, 1.5F, random),
 			MHelper.randRange(-1.5F, 1.5F, random),
 			MHelper.randRange(-1.5F, 1.5F, random),
+			0.0f,
+			0.0f,
 			random.nextFloat()
 		);
 		ResourceKey<Biome> key = BuiltinRegistries.BIOME.getResourceKey(biome.getBiome()).get();

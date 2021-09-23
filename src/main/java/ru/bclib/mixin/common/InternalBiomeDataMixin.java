@@ -4,6 +4,7 @@ import net.fabricmc.fabric.impl.biome.InternalBiomeData;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
+import net.minecraft.world.level.biome.Climate;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -34,7 +35,7 @@ public class InternalBiomeDataMixin {
 	}
 	
 	@Inject(method = "addNetherBiome", at = @At(value = "HEAD"))
-	private static void bclib_addNetherBiome(ResourceKey<Biome> biome, Biome.ClimateParameters spawnNoisePoint, CallbackInfo info) {
+	private static void bclib_addNetherBiome(ResourceKey<Biome> biome, Climate.ParameterPoint spawnNoisePoint, CallbackInfo info) {
 		FabricBiomesData.NETHER_BIOMES.add(biome);
 	}
 }

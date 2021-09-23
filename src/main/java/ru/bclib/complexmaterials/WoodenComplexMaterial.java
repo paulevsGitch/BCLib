@@ -75,7 +75,7 @@ public class WoodenComplexMaterial extends ComplexMaterial {
 	
 	@Override
 	protected FabricBlockSettings getBlockSettings() {
-		return FabricBlockSettings.copyOf(Blocks.OAK_PLANKS).materialColor(planksColor);
+		return FabricBlockSettings.copyOf(Blocks.OAK_PLANKS).mapColor(planksColor);
 	}
 	
 	@Override

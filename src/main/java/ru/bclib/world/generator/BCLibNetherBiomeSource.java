@@ -8,6 +8,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biome.BiomeCategory;
 import net.minecraft.world.level.biome.BiomeSource;
+import net.minecraft.world.level.biome.Climate;
 import ru.bclib.BCLib;
 import ru.bclib.api.BiomeAPI;
 import ru.bclib.world.biomes.BCLBiome;
@@ -35,7 +36,7 @@ public class BCLibNetherBiomeSource extends BiomeSource {
 		
 		BiomeAPI.NETHER_BIOME_PICKER.clearMutables();
 		
-		this.possibleBiomes.forEach(biome -> {
+		this.possibleBiomes().forEach(biome -> {
 			ResourceLocation key = biomeRegistry.getKey(biome);
 			if (!BiomeAPI.hasBiome(key)) {
 				BCLBiome bclBiome = new BCLBiome(key, biome, 1, 1);
@@ -76,7 +77,7 @@ public class BCLibNetherBiomeSource extends BiomeSource {
 	}
 	
 	@Override
-	public Biome getNoiseBiome(int biomeX, int biomeY, int biomeZ) {
+	public Biome getNoiseBiome(int biomeX, int biomeY, int biomeZ, Climate.Sampler sampler) {
 		if ((biomeX & 63) == 0 && (biomeZ & 63) == 0) {
 			biomeMap.clearCache();
 		}
