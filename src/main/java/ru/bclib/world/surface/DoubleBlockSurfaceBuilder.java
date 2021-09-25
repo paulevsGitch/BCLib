@@ -5,7 +5,7 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.chunk.BlockColumn;
 import net.minecraft.world.level.levelgen.surfacebuilders.ConfiguredSurfaceBuilder;
 import net.minecraft.world.level.levelgen.surfacebuilders.SurfaceBuilder;
 import net.minecraft.world.level.levelgen.surfacebuilders.SurfaceBuilderBaseConfiguration;
@@ -43,13 +43,13 @@ public class DoubleBlockSurfaceBuilder extends SurfaceBuilder<SurfaceBuilderBase
 		BlockState stone = Blocks.END_STONE.defaultBlockState();
 		return this.configured(new SurfaceBuilderBaseConfiguration(config1.getTopMaterial(), stone, stone));
 	}
-	
+
 	@Override
-	public void apply(Random random, ChunkAccess chunkAccess, Biome biome, int x, int z, int height, double noise, BlockState defaultBlock, BlockState defaultFluid, int l, int m, long seed, SurfaceBuilderBaseConfiguration surfaceBuilderConfiguration) {
+	public void apply(Random random, BlockColumn blockColumn, Biome biome, int x, int z, int height, double noise, BlockState defaultBlock, BlockState defaultFluid, int l, int m, long seed, SurfaceBuilderBaseConfiguration surfaceBuilderConfiguration) {
 		noise = NOISE.eval(x * 0.1, z * 0.1) + MHelper.randRange(-0.4, 0.4, random);
 		SurfaceBuilder.DEFAULT.apply(
 			random,
-			chunkAccess,
+			blockColumn,
 			biome,
 			x,
 			z,

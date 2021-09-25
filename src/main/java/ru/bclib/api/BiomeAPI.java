@@ -3,7 +3,9 @@ package ru.bclib.api;
 import com.google.common.collect.Maps;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.impl.biome.InternalBiomeData;
+import net.fabricmc.fabric.api.biome.v1.NetherBiomes;
+import net.fabricmc.fabric.impl.biome.NetherBiomeData;
+import net.fabricmc.fabric.impl.biome.TheEndBiomeData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.Registry;
 import net.minecraft.data.BuiltinRegistries;
@@ -11,8 +13,8 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.biome.Climate;
 import net.minecraft.world.level.biome.Biomes;
+import net.minecraft.world.level.biome.Climate;
 import org.jetbrains.annotations.Nullable;
 import ru.bclib.util.MHelper;
 import ru.bclib.world.biomes.BCLBiome;
@@ -106,7 +108,7 @@ public class BiomeAPI {
 			random.nextFloat()
 		);
 		ResourceKey<Biome> key = BuiltinRegistries.BIOME.getResourceKey(biome.getBiome()).get();
-		InternalBiomeData.addNetherBiome(key, parameters);
+		NetherBiomeData.addNetherBiome(key, parameters);
 		return biome;
 	}
 	
@@ -135,8 +137,8 @@ public class BiomeAPI {
 		END_LAND_BIOME_PICKER.addBiome(biome);
 		float weight = biome.getGenChance();
 		ResourceKey<Biome> key = BuiltinRegistries.BIOME.getResourceKey(biome.getBiome()).get();
-		InternalBiomeData.addEndBiomeReplacement(Biomes.END_HIGHLANDS, key, weight);
-		InternalBiomeData.addEndBiomeReplacement(Biomes.END_MIDLANDS, key, weight);
+		TheEndBiomeData.addEndBiomeReplacement(Biomes.END_HIGHLANDS, key, weight);
+		TheEndBiomeData.addEndBiomeReplacement(Biomes.END_MIDLANDS, key, weight);
 		return biome;
 	}
 	
@@ -180,7 +182,7 @@ public class BiomeAPI {
 		END_VOID_BIOME_PICKER.addBiome(biome);
 		float weight = biome.getGenChance();
 		ResourceKey<Biome> key = BuiltinRegistries.BIOME.getResourceKey(biome.getBiome()).get();
-		InternalBiomeData.addEndBiomeReplacement(Biomes.SMALL_END_ISLANDS, key, weight);
+		TheEndBiomeData.addEndBiomeReplacement(Biomes.SMALL_END_ISLANDS, key, weight);
 		return biome;
 	}
 	

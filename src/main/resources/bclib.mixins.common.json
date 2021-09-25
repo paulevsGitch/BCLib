@@ -5,7 +5,6 @@
 	"compatibilityLevel": "JAVA_16",
 	"mixins": [
 		"SimpleReloadableResourceManagerMixin",
-		"InternalBiomeDataMixin",
 		"ComposterBlockAccessor",
 		"PotionBrewingAccessor",
 		"RecipeManagerAccessor",
@@ -20,7 +19,9 @@
 		"AnvilMenuMixin",
 		"TagLoaderMixin",
 		"BiomeMixin",
-        "MainMixin"
+        "MainMixin",
+		"TheEndBiomeDataMixin",
+		"NetherBiomeDataMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

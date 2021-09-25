@@ -25,7 +25,7 @@ public class BCLStructureFeature {
 											   .register();
 		this.featureConfigured = this.structure.configured(NoneFeatureConfiguration.NONE);
 		BuiltinRegistries.register(BuiltinRegistries.CONFIGURED_STRUCTURE_FEATURE, id, this.featureConfigured);
-		FlatChunkGeneratorConfigAccessor.getStructureToFeatures().put(this.structure, this.featureConfigured);
+		FlatLevelGeneratorSettings.getStructureToFeatures().put(this.structure, this.featureConfigured);
 	}
 	
 	public StructureFeature<NoneFeatureConfiguration> getStructure() {
