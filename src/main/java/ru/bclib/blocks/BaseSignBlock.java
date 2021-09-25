@@ -181,13 +181,11 @@ public class BaseSignBlock extends SignBlock implements BlockModelProvider, Cust
 	
 	@Override
 	public boolean canPlaceLiquid(BlockGetter world, BlockPos pos, BlockState state, Fluid fluid) {
-		// TODO Auto-generated method stub
 		return super.canPlaceLiquid(world, pos, state, fluid);
 	}
 	
 	@Override
 	public boolean placeLiquid(LevelAccessor world, BlockPos pos, BlockState state, FluidState fluidState) {
-		// TODO Auto-generated method stub
 		return super.placeLiquid(world, pos, state, fluidState);
 	}
 	

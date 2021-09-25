@@ -9,7 +9,7 @@ import ru.bclib.api.datafixer.DataFixerAPI;
 
 @Mixin(Main.class)
 abstract public class MainMixin {
-	@ModifyArg(method="main", at=@At(value="INVOKE", target="Lnet/minecraft/server/MinecraftServer;convertFromRegionFormatIfNeeded(Lnet/minecraft/world/level/storage/LevelStorageSource$LevelStorageAccess;)V"))
+	@ModifyArg(method="main", at=@At(value="INVOKE_ASSIGN", target="Lnet/minecraft/world/level/storage/LevelStorageSource$LevelStorageAccess;getSummary()Lnet/minecraft/world/level/storage/LevelSummary;"))
 	private static LevelStorageSource.LevelStorageAccess bclib_callServerFix(LevelStorageSource.LevelStorageAccess session){
 		DataFixerAPI.fixData(session, false, (didFix)->{/* not called when showUI==false */});
 		return session;

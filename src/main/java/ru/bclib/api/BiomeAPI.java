@@ -97,7 +97,7 @@ public class BiomeAPI {
 		registerBiome(biome);
 		NETHER_BIOME_PICKER.addBiome(biome);
 		Random random = new Random(biome.getID().hashCode());
-		//TODO: did they add depth and scale as two new params here???
+		//TODO: (1.18) did they add depth and scale as two new params here???
 		Climate.ParameterPoint parameters = Climate.parameters(
 			MHelper.randRange(-1.5F, 1.5F, random),
 			MHelper.randRange(-1.5F, 1.5F, random),

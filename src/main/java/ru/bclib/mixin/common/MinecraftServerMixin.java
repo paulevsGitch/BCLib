@@ -49,15 +49,6 @@ public class MinecraftServerMixin {
         DataExchangeAPI.prepareServerside();
     }
 
-    @Inject(method = "convertFromRegionFormatIfNeeded", at = @At("HEAD"))
-    private static void bclib_applyPatches(LevelStorageSource.LevelStorageAccess session, CallbackInfo ci) {
-		
-		/*File levelPath = session.getLevelPath(LevelResource.ROOT).toFile();
-		WorldDataAPI.load(new File(levelPath, "data"));
-		DataFixerAPI.fixData(levelPath, session.getLevelId());*/
-    }
-
-
     @Inject(method = "reloadResources", at = @At(value = "RETURN"), cancellable = true)
     private void bclib_reloadResources(Collection<String> collection, CallbackInfoReturnable<CompletableFuture<Void>> info) {
         bclib_injectRecipes();

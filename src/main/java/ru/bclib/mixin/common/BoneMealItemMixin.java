@@ -29,7 +29,7 @@ public class BoneMealItemMixin {
 		Level world = context.getLevel();
 		BlockPos blockPos = context.getClickedPos();
 		if (!world.isClientSide) {
-			BlockPos offseted = blockPos.relative(context.getClickedFace());
+			//BlockPos offset = blockPos.relative(context.getClickedFace());
 			if (BonemealAPI.isTerrain(world.getBlockState(blockPos).getBlock())) {
 				boolean consume = false;
 				if (BonemealAPI.isSpreadableTerrain(world.getBlockState(blockPos).getBlock())) {

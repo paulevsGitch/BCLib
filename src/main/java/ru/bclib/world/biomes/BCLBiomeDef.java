@@ -321,8 +321,8 @@ public class BCLBiomeDef {
 		});
 		
 		generationSettings.surfaceBuilder(surface == null ? net.minecraft.data.worldgen.SurfaceBuilders.END : surface);
-		//TODO: Removed now. Seems to part of a registry step per biome now
-		structures.forEach((structure) -> generationSettings.addStructureStart(structure));
+		//TODO: (1.18) Removed now. Seems to part of a registry step per biome now
+		//structures.forEach((structure) -> generationSettings.addStructureStart(structure));
 		features.forEach((info) -> generationSettings.addFeature(info.featureStep, info.feature));
 		carvers.forEach((info) -> generationSettings.addCarver(info.carverStep, info.carver));
 		
