@@ -23,10 +23,6 @@ repositories {
 	maven { url 'https://jitpack.io' }
 }
 
-loom {
-    accessWidenerPath = file("src/main/resources/bclib.accesswidener")
-}
-
 dependencies {
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 	mappings minecraft.officialMojangMappings()
