@@ -1,4 +1,4 @@
-package ru.bclib.mixin.client;
+package ru.bclib.interfaces;
 
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.biome.Biome;

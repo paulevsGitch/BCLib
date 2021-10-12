@@ -8,6 +8,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import ru.bclib.interfaces.IStructureFeatures;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -15,9 +16,9 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 @Mixin(StructureFeatures.class)
-public abstract class StructureFeaturesMixin implements IStructureFeatures{
+public abstract class StructureFeaturesMixin implements IStructureFeatures {
     @Inject(method="registerStructures", at=@At("TAIL"))
-    static void bclib_registerStructures(BiConsumer<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>> biConsumer, CallbackInfo ci){
+    private static void bclib_registerStructures(BiConsumer<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>> biConsumer, CallbackInfo ci){
         bclib_callbacks.forEach(consumer -> consumer.accept(biConsumer));
         bclib_callbacks.clear();
     }

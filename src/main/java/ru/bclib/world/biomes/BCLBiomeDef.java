@@ -2,7 +2,6 @@ package ru.bclib.world.biomes;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
 import net.minecraft.core.Registry;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.data.BuiltinRegistries;
@@ -36,7 +35,7 @@ import net.minecraft.world.level.levelgen.surfacebuilders.SurfaceBuilder;
 import net.minecraft.world.level.levelgen.surfacebuilders.SurfaceBuilderBaseConfiguration;
 import net.minecraft.resources.ResourceKey;
 import ru.bclib.config.IdConfig;
-import ru.bclib.mixin.client.IStructureFeatures;
+import ru.bclib.interfaces.IStructureFeatures;
 import ru.bclib.util.ColorUtil;
 import ru.bclib.world.features.BCLFeature;
 import ru.bclib.world.structures.BCLStructureFeature;
