@@ -2,8 +2,11 @@ package ru.bclib.world.biomes;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
 import net.minecraft.core.Registry;
 import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.data.BuiltinRegistries;
+import net.minecraft.data.worldgen.StructureFeatures;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.Music;
 import net.minecraft.sounds.Musics;
@@ -31,7 +34,9 @@ import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
 import net.minecraft.world.level.levelgen.surfacebuilders.ConfiguredSurfaceBuilder;
 import net.minecraft.world.level.levelgen.surfacebuilders.SurfaceBuilder;
 import net.minecraft.world.level.levelgen.surfacebuilders.SurfaceBuilderBaseConfiguration;
+import net.minecraft.resources.ResourceKey;
 import ru.bclib.config.IdConfig;
+import ru.bclib.mixin.client.IStructureFeatures;
 import ru.bclib.util.ColorUtil;
 import ru.bclib.world.features.BCLFeature;
 import ru.bclib.world.structures.BCLStructureFeature;
@@ -44,7 +49,8 @@ public class BCLBiomeDef {
 	public static final int DEF_FOLIAGE_OVERWORLD = ColorUtil.color(110, 143, 64);
 	public static final int DEF_FOLIAGE_NETHER = ColorUtil.color(117, 10, 10);
 	public static final int DEF_FOLIAGE_END = ColorUtil.color(197, 210, 112);
-	
+
+	private final IStructureFeatures structureFeatures = (IStructureFeatures)new StructureFeatures();
 	private final List<ConfiguredStructureFeature<?, ?>> structures = Lists.newArrayList();
 	private final List<FeatureInfo> features = Lists.newArrayList();
 	private final List<CarverInfo> carvers = Lists.newArrayList();
@@ -340,7 +346,7 @@ public class BCLBiomeDef {
 		if (particleConfig != null) effects.ambientParticle(particleConfig);
 		effects.backgroundMusic(music != null ? new Music(music, 600, 2400, true) : Musics.END);
 		
-		return new Biome.BiomeBuilder().precipitation(precipitation)
+		Biome biome = new Biome.BiomeBuilder().precipitation(precipitation)
 									   .biomeCategory(category)
 									   //.depth(depth) //TODO: No longer available in 1.18
 									   //.scale(0.2F)
@@ -350,6 +356,17 @@ public class BCLBiomeDef {
 									   .mobSpawnSettings(spawnSettings.build())
 									   .generationSettings(generationSettings.build())
 									   .build();
+
+		structureFeatures.bclib_registerStructure(biConsumer -> {
+			ResourceKey<Biome> biomeKey =  ResourceKey.create(Registry.BIOME_REGISTRY, BuiltinRegistries.BIOME.getKey(biome));
+			System.out.println("Biome:" + biomeKey);
+			structures.forEach((structure) -> {
+				biConsumer.accept(structure, biomeKey);
+			});
+
+		});
+
+		return biome;
 	}
 	
 	private static final class SpawnInfo {
