@@ -2,6 +2,7 @@ package ru.bclib.world.generator;
 
 import com.google.common.collect.Maps;
 import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.levelgen.LegacyRandomSource;
 import net.minecraft.world.level.levelgen.WorldgenRandom;
 import ru.bclib.noise.OpenSimplexNoise;
 import ru.bclib.util.MHelper;
@@ -10,7 +11,7 @@ import ru.bclib.world.biomes.BCLBiome;
 import java.util.Map;
 
 public class BiomeMap {
-	private static final WorldgenRandom RANDOM = new WorldgenRandom();
+	private final WorldgenRandom RANDOM;
 	
 	private final Map<ChunkPos, BiomeChunk> maps = Maps.newHashMap();
 	private final int size;
@@ -23,7 +24,7 @@ public class BiomeMap {
 	
 	public BiomeMap(long seed, int size, BiomePicker picker) {
 		maps.clear();
-		RANDOM.setSeed(seed);
+		RANDOM = new WorldgenRandom(new LegacyRandomSource(seed));
 		noiseX = new OpenSimplexNoise(RANDOM.nextLong());
 		noiseZ = new OpenSimplexNoise(RANDOM.nextLong());
 		this.sizeXZ = size;

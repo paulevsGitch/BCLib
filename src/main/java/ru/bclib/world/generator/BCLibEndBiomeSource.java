@@ -11,6 +11,7 @@ import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.biome.Climate;
 import net.minecraft.world.level.biome.TheEndBiomeSource;
+import net.minecraft.world.level.levelgen.LegacyRandomSource;
 import net.minecraft.world.level.levelgen.WorldgenRandom;
 import net.minecraft.world.level.levelgen.synth.SimplexNoise;
 import ru.bclib.BCLib;
@@ -76,7 +77,7 @@ public class BCLibEndBiomeSource extends BiomeSource {
 		this.biomeRegistry = biomeRegistry;
 		this.seed = seed;
 		
-		WorldgenRandom chunkRandom = new WorldgenRandom(seed);
+		WorldgenRandom chunkRandom = new WorldgenRandom(new LegacyRandomSource(seed));
 		chunkRandom.consumeCount(17292);
 		this.noise = new SimplexNoise(chunkRandom);
 		
