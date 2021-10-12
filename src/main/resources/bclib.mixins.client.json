@@ -11,7 +11,8 @@
 		"TextureAtlasMixin",
 		"ModelBakeryMixin",
 		"MinecraftMixin",
-		"GameMixin"
+		"GameMixin",
+		"StructureFeaturesMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
