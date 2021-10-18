@@ -37,97 +37,19 @@ import java.util.Optional;
 import java.util.Random;
 
 @SuppressWarnings("deprecation")
-public abstract class FeatureSaplingBlock extends SaplingBlock implements RenderLayerProvider, BlockModelProvider {
+public abstract class FeatureSaplingBlock extends FeatureSaplingBlockCommon {
 	private static final VoxelShape SHAPE = Block.box(4, 0, 4, 12, 14, 12);
 	
 	public FeatureSaplingBlock() {
-		super(
-			null,
-			FabricBlockSettings.of(Material.PLANT)
-							   .breakByHand(true)
-							   .collidable(false)
-							   .instabreak()
-							   .sound(SoundType.GRASS)
-							   .randomTicks()
-		);
+		super();
 	}
 	
 	public FeatureSaplingBlock(int light) {
-		super(
-			null,
-			FabricBlockSettings.of(Material.PLANT)
-							   .breakByHand(true)
-							   .collidable(false)
-							   .luminance(light)
-							   .instabreak()
-							   .sound(SoundType.GRASS)
-							   .randomTicks()
-		);
-	}
-	
-	protected abstract Feature<?> getFeature();
-	
-	@Override
-	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
-		return Collections.singletonList(new ItemStack(this));
+		super(light);
 	}
 	
 	@Override
 	public VoxelShape getShape(BlockState state, BlockGetter view, BlockPos pos, CollisionContext ePos) {
 		return SHAPE;
-	}
-	
-	@Override
-	public BlockState updateShape(BlockState state, Direction facing, BlockState neighborState, LevelAccessor world, BlockPos pos, BlockPos neighborPos) {
-		if (!canSurvive(state, world, pos)) return Blocks.AIR.defaultBlockState();
-		else return state;
-	}
-	
-	@Override
-	public boolean isBonemealSuccess(Level world, Random random, BlockPos pos, BlockState state) {
-		return random.nextInt(16) == 0;
-	}
-	
-	@Override
-	public void advanceTree(ServerLevel world, BlockPos pos, BlockState blockState, Random random) {
-		FeaturePlaceContext context = new FeaturePlaceContext(
-			world,
-			world.getChunkSource().getGenerator(),
-			random,
-			pos,
-			null
-		);
-		getFeature().place(context);
-	}
-	
-	@Override
-	public void randomTick(BlockState state, ServerLevel world, BlockPos pos, Random random) {
-		this.tick(state, world, pos, random);
-	}
-	
-	@Override
-	public void tick(BlockState state, ServerLevel world, BlockPos pos, Random random) {
-		super.tick(state, world, pos, random);
-		if (isBonemealSuccess(world, random, pos, state)) {
-			performBonemeal(world, random, pos, state);
-		}
-	}
-	
-	@Override
-	public BCLRenderLayer getRenderLayer() {
-		return BCLRenderLayer.CUTOUT;
-	}
-	
-	@Override
-	@Environment(EnvType.CLIENT)
-	public BlockModel getItemModel(ResourceLocation resourceLocation) {
-		return ModelsHelper.createBlockItem(resourceLocation);
-	}
-	
-	@Override
-	@Environment(EnvType.CLIENT)
-	public @Nullable BlockModel getBlockModel(ResourceLocation resourceLocation, BlockState blockState) {
-		Optional<String> pattern = PatternsHelper.createJson(BasePatterns.BLOCK_CROSS, resourceLocation);
-		return ModelsHelper.fromPattern(pattern);
 	}
 }
