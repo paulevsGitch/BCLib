@@ -1,5 +1,7 @@
 package ru.bclib;
 
+import java.util.List;
+
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
@@ -22,8 +24,6 @@ import ru.bclib.world.generator.BCLibEndBiomeSource;
 import ru.bclib.world.generator.BCLibNetherBiomeSource;
 import ru.bclib.world.generator.GeneratorOptions;
 import ru.bclib.world.surface.BCLSurfaceBuilders;
-
-import java.util.List;
 
 public class BCLib implements ModInitializer {
 	public static final String MOD_ID = "bclib";
