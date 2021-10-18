@@ -11,7 +11,9 @@
 		"TextureAtlasMixin",
 		"ModelBakeryMixin",
 		"MinecraftMixin",
-		"GameMixin"
+		"GameMixin",
+		"AnvilScreenMixin",
+		"ClientRecipeBookMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
