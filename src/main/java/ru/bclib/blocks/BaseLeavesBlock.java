@@ -20,7 +20,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.MaterialColor;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
-import ru.bclib.api.TagAPI;
 import ru.bclib.client.render.BCLRenderLayer;
 import ru.bclib.interfaces.BlockModelProvider;
 import ru.bclib.interfaces.RenderLayerProvider;
@@ -40,32 +39,24 @@ public class BaseLeavesBlock extends LeavesBlock implements BlockModelProvider, 
 								  .blockVision((state, world, pos) -> false);
 	}
 
-	private void init(Block sapling) {
-		TagAPI.addTags(this, TagAPI.BLOCK_LEAVES);
-	}
-	
 	public BaseLeavesBlock(Block sapling, MaterialColor color, Consumer<FabricBlockSettings> customizeProperties) {
 		super(BaseBlock.acceptAndReturn(customizeProperties, makeLeaves(color)));
 		this.sapling = sapling;
-		init(sapling);
 	}
 
 	public BaseLeavesBlock(Block sapling, MaterialColor color, int light, Consumer<FabricBlockSettings> customizeProperties) {
 		super(BaseBlock.acceptAndReturn(customizeProperties, makeLeaves(color).luminance(light)));
 		this.sapling = sapling;
-		init(sapling);
 	}
 	
 	public BaseLeavesBlock(Block sapling, MaterialColor color) {
 		super(makeLeaves(color));
 		this.sapling = sapling;
-		init(sapling);
 	}
 	
 	public BaseLeavesBlock(Block sapling, MaterialColor color, int light) {
 		super(makeLeaves(color).lightLevel(light));
 		this.sapling = sapling;
-		init(sapling);
 	}
 	
 	@Override

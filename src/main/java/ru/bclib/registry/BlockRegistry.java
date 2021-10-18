@@ -7,6 +7,9 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
+import ru.bclib.api.TagAPI;
+import ru.bclib.blocks.BaseLeavesBlock;
+import ru.bclib.blocks.FeatureSaplingBlock;
 import ru.bclib.interfaces.CustomItemProvider;
 
 public abstract class BlockRegistry extends BaseRegistry<Block> {
@@ -29,7 +32,22 @@ public abstract class BlockRegistry extends BaseRegistry<Block> {
 																						   .getBurnChance() == 0) {
 			FlammableBlockRegistry.getDefaultInstance().add(block, 5, 5);
 		}
-		return Registry.register(Registry.BLOCK, id, block);
+
+		block = Registry.register(Registry.BLOCK, id, block);
+
+		if (block instanceof BaseLeavesBlock){
+			TagAPI.addTags(block, TagAPI.BLOCK_LEAVES);
+			if (item != null){
+				TagAPI.addTags(item, TagAPI.ITEM_LEAVES);
+			}
+		} else if (block instanceof FeatureSaplingBlock){
+			TagAPI.addTags(block, TagAPI.BLOCK_SAPLINGS);
+			if (item != null){
+				TagAPI.addTags(item, TagAPI.ITEM_SAPLINGS);
+			}
+		}
+
+		return block;
 	}
 	
 	public Block registerBlockOnly(ResourceLocation id, Block block) {
