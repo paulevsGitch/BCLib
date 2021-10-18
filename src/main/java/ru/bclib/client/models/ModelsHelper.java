@@ -1,6 +1,11 @@
 package ru.bclib.client.models;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
+
 import com.google.common.collect.Lists;
+
 import com.mojang.math.Transformation;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -16,10 +21,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Function;
 
 @Environment(EnvType.CLIENT)
 public class ModelsHelper {
@@ -88,18 +89,21 @@ public class ModelsHelper {
 	
 	public static class MultiPartBuilder {
 		
-		private final static MultiPartBuilder BUILDER = new MultiPartBuilder();
+		//private final static MultiPartBuilder BUILDER = new MultiPartBuilder();
 		
 		public static MultiPartBuilder create(StateDefinition<Block, BlockState> stateDefinition) {
-			BUILDER.stateDefinition = stateDefinition;
-			BUILDER.modelParts.clear();
-			return BUILDER;
+			// BUILDER.stateDefinition = stateDefinition;
+			//BUILDER.modelParts.clear();
+			// return BUILDER;
+			return new MultiPartBuilder(stateDefinition);
 		}
 		
 		private final List<ModelPart> modelParts = Lists.newArrayList();
 		private StateDefinition<Block, BlockState> stateDefinition;
 		
-		private MultiPartBuilder() {}
+		private MultiPartBuilder(StateDefinition<Block, BlockState> stateDefinition) {
+			this.stateDefinition = stateDefinition;
+		}
 		
 		public ModelPart part(ResourceLocation modelId) {
 			ModelPart part = new ModelPart(modelId);
