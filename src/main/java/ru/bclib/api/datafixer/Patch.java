@@ -151,12 +151,20 @@ public abstract class Patch {
 	 * <p>
 	 * A {@link #Patch} with a given {@link #level} is only included if the patch-level of the
 	 * world is less
-	 * @param config The current patch-level configuration
-	 * @param levelBaseDir The location of the level
+	 * @param config The current patch-level configuration*
 	 * @return a new {@link MigrationProfile} Object.
 	 */
 	static MigrationProfile createMigrationData(CompoundTag config) {
-		return new MigrationProfile(config);
+		return new MigrationProfile(config, false);
+	}
+	
+	/**
+	 * This method is supposed to be used by developers to apply id-patches to custom nbt structures. It is only
+	 * available in Developer-Mode
+	 *
+	 */
+	static MigrationProfile createMigrationData() {
+		return new MigrationProfile(null, true);
 	}
 
 	/**
