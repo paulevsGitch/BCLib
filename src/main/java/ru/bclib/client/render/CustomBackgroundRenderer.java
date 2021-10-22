@@ -42,8 +42,6 @@ public class CustomBackgroundRenderer {
 		float fog = getFogDensity(entity.level, entity.getX(), entity.getEyeY(), entity.getZ());
 		BackgroundInfo.fogDensity = fog;
 		
-		System.out.println(thickFog);
-		
 		if (thickFog) {
 			fogStart = viewDistance * 0.05F / fog;
 			fogEnd = Math.min(viewDistance, 192.0F) * 0.5F / fog;
