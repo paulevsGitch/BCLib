@@ -23,6 +23,7 @@ public class BackgroundRendererMixin {
 	private static final MutableBlockPos BCLIB_LAST_POS = new MutableBlockPos(0, -100, 0);
 	private static final MutableBlockPos BCLIB_MUT_POS = new MutableBlockPos();
 	private static final float[] BCLIB_FOG_DENSITY = new float[8];
+	//private static boolean isEnd;
 	
 	@Shadow
 	private static float fogRed;

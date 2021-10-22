@@ -3,6 +3,7 @@ package ru.bclib.client.render;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Camera;
 import net.minecraft.client.renderer.FogRenderer;
+import net.minecraft.client.renderer.FogRenderer.FogMode;
 import net.minecraft.core.BlockPos.MutableBlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -22,46 +23,62 @@ public class CustomBackgroundRenderer {
 	private static final MutableBlockPos MUT_POS = new MutableBlockPos();
 	private static final float[] FOG_DENSITY = new float[8];
 	private static final int GRID_SIZE = 32;
+	private static float fogStart = 0;
+	private static float fogEnd = 192;
 	
 	public static boolean applyFogDensity(Camera camera, FogRenderer.FogMode fogMode, float viewDistance, boolean thickFog) {
-		Entity entity = camera.getEntity();
 		FogType fogType = camera.getFluidInCamera();
-		if (fogType != FogType.WATER) {
-			if (shouldIgnore(entity.level, (int) entity.getX(), (int) entity.getEyeY(), (int) entity.getZ())) {
-				return false;
-			}
-			float fog = getFogDensity(entity.level, entity.getX(), entity.getEyeY(), entity.getZ());
-			BackgroundInfo.fogDensity = fog;
-			float start = viewDistance * 0.75F / fog;
-			float end = viewDistance / fog;
-			
-			if (entity instanceof LivingEntity) {
-				LivingEntity livingEntity = (LivingEntity) entity;
-				MobEffectInstance effect = livingEntity.getEffect(MobEffects.BLINDNESS);
-				if (effect != null) {
-					int duration = effect.getDuration();
-					if (duration > 20) {
-						start = 0;
-						end *= 0.03F;
-						BackgroundInfo.blindness = 1;
-					}
-					else {
-						float delta = (float) duration / 20F;
-						BackgroundInfo.blindness = delta;
-						start = Mth.lerp(delta, start, 0);
-						end = Mth.lerp(delta, end, end * 0.03F);
-					}
+		
+		if (fogType == FogType.WATER || fogType == FogType.LAVA || fogMode != FogMode.FOG_SKY) {
+			return false;
+		}
+		
+		Entity entity = camera.getEntity();
+		
+		if (shouldIgnore(entity.level, (int) entity.getX(), (int) entity.getEyeY(), (int) entity.getZ())) {
+			return false;
+		}
+		
+		float fog = getFogDensity(entity.level, entity.getX(), entity.getEyeY(), entity.getZ());
+		BackgroundInfo.fogDensity = fog;
+		
+		System.out.println(thickFog);
+		
+		if (thickFog) {
+			fogStart = viewDistance * 0.05F / fog;
+			fogEnd = Math.min(viewDistance, 192.0F) * 0.5F / fog;
+		}
+		else {
+			fogStart = viewDistance * 0.75F / fog;
+			fogEnd = viewDistance / fog;
+		}
+		
+		if (entity instanceof LivingEntity) {
+			LivingEntity livingEntity = (LivingEntity) entity;
+			MobEffectInstance effect = livingEntity.getEffect(MobEffects.BLINDNESS);
+			if (effect != null) {
+				int duration = effect.getDuration();
+				if (duration > 20) {
+					fogStart = 0;
+					fogEnd *= 0.03F;
+					BackgroundInfo.blindness = 1;
 				}
 				else {
-					BackgroundInfo.blindness = 0;
+					float delta = (float) duration / 20F;
+					BackgroundInfo.blindness = delta;
+					fogStart = Mth.lerp(delta, fogStart, 0);
+					fogEnd = Mth.lerp(delta, fogEnd, fogEnd * 0.03F);
 				}
 			}
-			
-			RenderSystem.setShaderFogStart(start);
-			RenderSystem.setShaderFogEnd(end);
-			return true;
+			else {
+				BackgroundInfo.blindness = 0;
+			}
 		}
-		return false;
+		
+		RenderSystem.setShaderFogStart(fogStart);
+		RenderSystem.setShaderFogEnd(fogEnd);
+		
+		return true;
 	}
 	
 	private static boolean shouldIgnore(Level level, int x, int y, int z) {
