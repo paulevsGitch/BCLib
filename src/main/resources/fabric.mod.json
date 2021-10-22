@@ -28,8 +28,7 @@
 		],
         "modmenu": [ "ru.bclib.gui.modmenu.EntryPoint::entrypointObject" ]
 	},
-    "accessWidener" : "bclib.accesswidener",
-	"mixins": [
+    "mixins": [
 		"bclib.mixins.common.json",
 		"bclib.mixins.client.json"
 	],

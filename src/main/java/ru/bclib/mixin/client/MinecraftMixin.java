@@ -2,7 +2,6 @@ package ru.bclib.mixin.client;
 
 import com.mojang.datafixers.util.Function4;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.Minecraft.ExperimentalDialogType;
 import net.minecraft.client.color.block.BlockColors;
 import net.minecraft.client.color.item.ItemColors;
 import net.minecraft.client.main.GameConfig;
@@ -26,6 +25,11 @@ import ru.bclib.api.dataexchange.DataExchangeAPI;
 import ru.bclib.api.datafixer.DataFixerAPI;
 import ru.bclib.interfaces.CustomColorProvider;
 
+import java.lang.reflect.Array;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.function.Function;
 
 @Mixin(Minecraft.class)
@@ -49,19 +53,55 @@ public abstract class MinecraftMixin {
 		});
 	}
 	
-	@Shadow
-	protected abstract void doLoadLevel(String string, RegistryHolder registryHolder, Function<LevelStorageAccess, DataPackConfig> function, Function4<LevelStorageAccess, RegistryHolder, ResourceManager, DataPackConfig, WorldData> function4, boolean bl, ExperimentalDialogType experimentalDialogType);
-	
+//	@Shadow
+//	protected abstract void doLoadLevel(String string, RegistryHolder registryHolder, Function<LevelStorageAccess, DataPackConfig> function, Function4<LevelStorageAccess, RegistryHolder, ResourceManager, DataPackConfig, WorldData> function4, boolean bl, ExperimentalDialogType experimentalDialogType);
+//
 	@Shadow
 	@Final
 	private LevelStorageSource levelSource;
-	
+	Method doLoadLevel = null;
+	Object experimentalDialogType_BACKUP = null;
+
+	private void bclib_doLoadLevel_BACKUP(String levelID, RegistryHolder registryHolder, Function<LevelStorageAccess, DataPackConfig> function, Function4<LevelStorageAccess, RegistryHolder, ResourceManager, DataPackConfig, WorldData> function4, boolean bl){
+		if (experimentalDialogType_BACKUP==null) {
+			try {
+				Class experimentalDialogType = Class.forName("net.minecraft.client.Minecraft$ExperimentalDialogType");
+				Field f = experimentalDialogType.getDeclaredField("$VALUES");
+				f.setAccessible(true);
+				experimentalDialogType_BACKUP = Array.get(f.get(null), 2);
+			} catch (ClassNotFoundException | IllegalAccessException | NoSuchFieldException e) {
+				e.printStackTrace();
+			}
+		}
+
+		if (doLoadLevel==null) {
+			for (Method m : Minecraft.class.getDeclaredMethods()) {
+				if (m.getName().equals("doLoadLevel")) {
+					doLoadLevel = m;
+					break;
+				}
+			}
+		}
+
+		if (doLoadLevel!=null && experimentalDialogType_BACKUP!=null){
+			doLoadLevel.setAccessible(true);
+			try {
+				doLoadLevel.invoke(this, new Object[]{levelID, registryHolder, function, function4, bl, experimentalDialogType_BACKUP});
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+			} catch (InvocationTargetException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
 	@Inject(method = "loadLevel", cancellable = true, at = @At("HEAD"))
 	private void bclib_callFixerOnLoad(String levelID, CallbackInfo ci) {
 		DataExchangeAPI.prepareServerside();
 		
 		if (DataFixerAPI.fixData(this.levelSource, levelID, true, (appliedFixes) -> {
-			this.doLoadLevel(levelID, RegistryAccess.builtin(), Minecraft::loadDataPacks, Minecraft::loadWorldData, false, Minecraft.ExperimentalDialogType.BACKUP);
+			bclib_doLoadLevel_BACKUP(levelID, RegistryAccess.builtin(), Minecraft::loadDataPacks, Minecraft::loadWorldData, false);
+			//this.doLoadLevel(levelID, RegistryAccess.builtin(), Minecraft::loadDataPacks, Minecraft::loadWorldData, false,  Minecraft.ExperimentalDialogType.BACKUP);
 		})) {
 			ci.cancel();
 		}
