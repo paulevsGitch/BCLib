@@ -30,12 +30,14 @@ public class CustomBackgroundRenderer {
 		FogType fogType = camera.getFluidInCamera();
 		
 		if (fogType == FogType.WATER || fogType == FogType.LAVA || fogMode != FogMode.FOG_SKY) {
+			BackgroundInfo.fogDensity = 1;
 			return false;
 		}
 		
 		Entity entity = camera.getEntity();
 		
 		if (shouldIgnore(entity.level, (int) entity.getX(), (int) entity.getEyeY(), (int) entity.getZ())) {
+			BackgroundInfo.fogDensity = 1;
 			return false;
 		}
 		
