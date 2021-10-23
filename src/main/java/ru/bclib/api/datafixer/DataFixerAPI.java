@@ -416,7 +416,7 @@ public class DataFixerAPI {
 				for (int z = 0; z < 32; z++) {
 					ChunkPos pos = new ChunkPos(x, z);
 					changed[0] = false;
-					if (region.hasChunk(pos)) {
+					if (region.hasChunk(pos) && !state.didFail) {
 						DataInputStream input = region.getChunkDataInputStream(pos);
 						CompoundTag root = NbtIo.read(input);
 						// if ((root.toString().contains("betternether:chest") || root.toString().contains("bclib:chest"))) {
@@ -442,6 +442,16 @@ public class DataFixerAPI {
 								CompoundTag blockTagCompound = ((CompoundTag) blockTag);
 								changed[0] |= data.replaceStringFromIDs(blockTagCompound, "Name");
 							});
+							
+							try {
+								changed[0] |= data.patchBlockState(palette, ((CompoundTag) tag).getList("BlockStates", Tag.TAG_LONG));
+							}
+							catch (PatchDidiFailException e) {
+								BCLib.LOGGER.error("Failed fixing BlockState in " + pos);
+								state.didFail = true;
+								changed[0] = false;
+								e.printStackTrace();
+							}
 						});
 
 						if (changed[0]) {
@@ -450,7 +460,6 @@ public class DataFixerAPI {
 							DataOutputStream output = region.getChunkDataOutputStream(pos);
 							NbtIo.write(root, output);
 							output.close();
-
 						}
 					}
 				}
@@ -458,7 +467,7 @@ public class DataFixerAPI {
 			region.close();
 		}
 		catch (Exception e) {
-			BCLib.LOGGER.error("Failed fixing Player Data.");
+			BCLib.LOGGER.error("Failed fixing Region.");
 			state.didFail = true;
 			e.printStackTrace();
 		}
