@@ -9,6 +9,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.OreBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -28,11 +29,16 @@ public class BaseOreBlock extends OreBlock implements BlockModelProvider {
 	private final int maxCount;
 	
 	public BaseOreBlock(Item drop, int minCount, int maxCount, int experience) {
-		super(FabricBlockSettings.of(Material.STONE, MaterialColor.SAND)
+		this(drop, minCount, maxCount, experience, FabricBlockSettings.of(Material.STONE, MaterialColor.SAND)
 								 .hardness(3F)
 								 .resistance(9F)
 								 .requiresCorrectToolForDrops()
-								 .sound(SoundType.STONE), UniformInt.of(1, experience));
+								 .sound(SoundType.STONE));
+		
+	}
+	
+	public BaseOreBlock(Item drop, int minCount, int maxCount, int experience, Properties properties) {
+		super(properties, UniformInt.of(experience>0?1:0, experience));
 		this.dropItem = drop;
 		this.minCount = minCount;
 		this.maxCount = maxCount;
@@ -41,10 +47,14 @@ public class BaseOreBlock extends OreBlock implements BlockModelProvider {
 	@Override
 	@SuppressWarnings("deprecation")
 	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
+		return getDroppedItems(this, dropItem, maxCount, minCount, state, builder);
+	}
+	
+	public static List<ItemStack> getDroppedItems(ItemLike block, Item dropItem, int maxCount, int minCount, BlockState state, LootContext.Builder builder) {
 		ItemStack tool = builder.getParameter(LootContextParams.TOOL);
 		if (tool != null && tool.isCorrectToolForDrops(state)) {
 			if (EnchantmentHelper.getItemEnchantmentLevel(Enchantments.SILK_TOUCH, tool) > 0) {
-				return Collections.singletonList(new ItemStack(this));
+				return Collections.singletonList(new ItemStack(block));
 			}
 			int count;
 			int enchantment = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.BLOCK_FORTUNE, tool);
