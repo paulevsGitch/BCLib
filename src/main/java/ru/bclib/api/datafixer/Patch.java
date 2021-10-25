@@ -1,6 +1,7 @@
 package ru.bclib.api.datafixer;
 
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import org.jetbrains.annotations.NotNull;
 import ru.bclib.util.ModUtil;
 
@@ -144,6 +145,22 @@ public abstract class Patch {
 	 * @return {@code true} if changes were applied and we need to save the data
 	 */
 	public PatchFunction<CompoundTag, Boolean> getWorldDataPatcher() { return null; }
+	
+	/**
+	 * Return a {@link PatchBiFunction} that is called with pallette and blockstate of
+	 * each chunk in every region. This method is called AFTER all ID replacements
+	 * from {@link #getIDReplacements()} were applied to the pallete.
+	 *
+	 * The first parameter is the palette and the second is the blockstate.
+	 *
+	 * The function needs to return {@code true}, if changes were made to the data.
+	 * If an error occurs, the method should throw a {@link PatchDidiFailException}
+	 *
+	 * The default implementation of this method returns null.
+	 *
+	 * @return {@code true} if changes were applied and we need to save the data
+	 */
+	public PatchBiFunction<ListTag, ListTag, Boolean> getBlockStatePatcher() { return null; }
 	
 	/**
 	 * Generates ready to use data for all currently registered patches. The list of

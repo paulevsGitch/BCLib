@@ -25,6 +25,7 @@ public class MigrationProfile {
 	final Set<String> mods;
 	final Map<String, String> idReplacements;
 	final List<PatchFunction<CompoundTag, Boolean>> levelPatchers;
+	final List<PatchBiFunction<ListTag, ListTag, Boolean>> statePatchers;
 	final List<Patch> worldDataPatchers;
 	final Map<String, List<String>> worldDataIDPaths;
 	
@@ -46,6 +47,7 @@ public class MigrationProfile {
 		HashMap<String, String> replacements = new HashMap<String, String>();
 		List<PatchFunction<CompoundTag, Boolean>> levelPatches = new LinkedList<>();
 		List<Patch> worldDataPatches = new LinkedList<>();
+		List<PatchBiFunction<ListTag, ListTag, Boolean>> statePatches = new LinkedList<>();
 		HashMap<String, List<String>> worldDataIDPaths = new HashMap<>();
 		for (String modID : mods) {
 
@@ -62,6 +64,8 @@ public class MigrationProfile {
 							 levelPatches.add(patch.getLevelDatPatcher());
 						 if (patch.getWorldDataPatcher()!=null)
 							 worldDataPatches.add(patch);
+						 if (patch.getBlockStatePatcher()!=null)
+							 statePatches.add(patch.getBlockStatePatcher());
 						 DataFixerAPI.LOGGER.info("Applying " + patch);
 					 }
 					 else {
@@ -74,6 +78,7 @@ public class MigrationProfile {
 		this.idReplacements = Collections.unmodifiableMap(replacements);
 		this.levelPatchers = Collections.unmodifiableList(levelPatches);
 		this.worldDataPatchers = Collections.unmodifiableList(worldDataPatches);
+		this.statePatchers = Collections.unmodifiableList(statePatches);
 	}
 	
 	/**
@@ -304,5 +309,13 @@ public class MigrationProfile {
 				WorldDataAPI.saveFile(entry.getKey());
 			}
 		}
+	}
+	
+	public boolean patchBlockState(ListTag palette, ListTag states) throws PatchDidiFailException{
+		boolean changed = false;
+		for (PatchBiFunction<ListTag, ListTag, Boolean> f : statePatchers) {
+			changed |= f.apply(palette, states, this);
+		}
+		return changed;
 	}
 }
