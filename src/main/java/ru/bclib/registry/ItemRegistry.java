@@ -4,6 +4,7 @@ import net.fabricmc.fabric.api.tool.attribute.v1.FabricToolTags;
 import net.minecraft.core.BlockSource;
 import net.minecraft.core.Direction;
 import net.minecraft.core.dispenser.DefaultDispenseItemBehavior;
+import net.minecraft.core.dispenser.ShearsDispenseItemBehavior;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.tags.Tag;
@@ -18,11 +19,11 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ShovelItem;
 import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.item.SwordItem;
-import net.minecraft.world.item.TieredItem;
 import net.minecraft.world.level.block.DispenserBlock;
 import ru.bclib.api.TagAPI;
 import ru.bclib.items.BaseDiscItem;
 import ru.bclib.items.BaseDrinkItem;
+import ru.bclib.items.tool.BaseShearsItem;
 import ru.bclib.items.BaseSpawnEggItem;
 import ru.bclib.items.ModelProviderItem;
 import ru.bclib.items.tool.BaseAxeItem;
@@ -49,7 +50,7 @@ public abstract class ItemRegistry extends BaseRegistry<Item> {
 		return item;
 	}
 	
-	public TieredItem registerTool(String name, TieredItem item) {
+	public Item registerTool(String name, Item item) {
 		ResourceLocation id = createModId(name);
 		registerItem(id, item, BaseRegistry.getModItems(id.getNamespace()));
 		
@@ -67,6 +68,10 @@ public abstract class ItemRegistry extends BaseRegistry<Item> {
 		}
 		else if (item instanceof BaseHoeItem) {
 			TagAPI.addTag((Tag.Named<Item>) FabricToolTags.HOES, item);
+		}
+		else if (item instanceof BaseShearsItem) {
+			TagAPI.addTags(item, (Tag.Named<Item>) FabricToolTags.SHEARS, TagAPI.ITEM_SHEARS, TagAPI.ITEM_COMMON_SHEARS);
+			DispenserBlock.registerBehavior(item.asItem(), new ShearsDispenseItemBehavior());
 		}
 		
 		return item;
