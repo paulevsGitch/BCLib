@@ -61,6 +61,8 @@ public class TagAPI {
 	public final static Tag.Named<Item> ITEM_HAMMERS = makeCommonItemTag("hammers");
 	public static final Tag.Named<Item> ITEM_SAPLINGS = makeCommonItemTag("saplings");
 	public static final Tag.Named<Item> ITEM_LEAVES = makeCommonItemTag("leaves");
+	public static final Tag.Named<Item> ITEM_SHEARS = getMCItemTag("shears");
+	public static final Tag.Named<Item> ITEM_COMMON_SHEARS = makeCommonItemTag("shears");
 
 
 	/**
@@ -129,6 +131,18 @@ public class TagAPI {
 		ResourceLocation id = new ResourceLocation(name);
 		Tag<Block> tag = BlockTags.getAllTags().getTag(id);
 		return tag == null ? (Named<Block>) TagRegistry.block(id) : (Named<Block>) tag;
+	}
+	
+	/**
+	 * Get or create Minecraft {@link Item} {@link Tag.Named}.
+	 *
+	 * @param name - {@link String} tag name.
+	 * @return {@link Item} {@link Tag.Named}.
+	 */
+	public static Tag.Named<Item> getMCItemTag(String name) {
+		ResourceLocation id = new ResourceLocation(name);
+		Tag<Item> tag = ItemTags.getAllTags().getTag(id);
+		return tag == null ? (Named<Item>) TagRegistry.item(id) : (Named<Item>) tag;
 	}
 	
 	/**

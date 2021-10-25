@@ -20,7 +20,14 @@
 		"AnvilMenuMixin",
 		"TagLoaderMixin",
 		"BiomeMixin",
-        "MainMixin"
+        "MainMixin",
+		"shears.BeehiveBlockMixin",
+		"shears.DiggingEnchantmentMixin",
+		"shears.MushroomCowMixin",
+		"shears.PumpkinBlockMixin",
+		"shears.SheepMixin",
+		"shears.SnowGolemMixin",
+		"shears.TripWireBlockMixi"
 	],
 	"injectors": {
 		"defaultRequire": 1
