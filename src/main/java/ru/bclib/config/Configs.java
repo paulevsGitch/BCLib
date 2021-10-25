@@ -12,7 +12,7 @@ public class Configs {
 	public static final ServerConfig SERVER_CONFIG = new ServerConfig();
 	
 	
-	public static final PathConfig GENERATOR_CONFIG = new PathConfig(BCLib.MOD_ID, "generator");
+	public static final PathConfig GENERATOR_CONFIG = new PathConfig(BCLib.MOD_ID, "generator", false);
 	public static final PathConfig MAIN_CONFIG = new PathConfig(BCLib.MOD_ID, "main", true, true);
 	public static final String MAIN_PATCH_CATEGORY = "patches";
 	
@@ -23,5 +23,6 @@ public class Configs {
 	public static void save() {
 		MAIN_CONFIG.saveChanges();
 		RECIPE_CONFIG.saveChanges();
+		GENERATOR_CONFIG.saveChanges();
 	}
 }
