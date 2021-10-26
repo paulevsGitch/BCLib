@@ -39,6 +39,7 @@ public class TagAPI {
 	public static final Tag.Named<Block> BLOCK_WOODEN_BARREL = makeCommonBlockTag("wooden_barrels");
 	public static final Tag.Named<Block> BLOCK_END_STONES = makeCommonBlockTag("end_stones");
 	public static final Tag.Named<Block> BLOCK_NETHER_STONES = makeCommonBlockTag("nether_stones");
+	public static final Tag.Named<Block> BLOCK_NETHER_PORTAL_FRAME = makeCommonBlockTag("nether_pframe");
 	public static final Tag.Named<Block> BLOCK_WORKBENCHES = makeCommonBlockTag("workbench");
 	public static final Tag.Named<Block> BLOCK_SAPLINGS = makeCommonBlockTag("saplings");
 	public static final Tag.Named<Block> BLOCK_LEAVES = makeCommonBlockTag("leaves");
