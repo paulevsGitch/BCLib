@@ -12,6 +12,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.material.FogType;
 import ru.bclib.api.BiomeAPI;
 import ru.bclib.util.BackgroundInfo;
@@ -36,7 +37,7 @@ public class CustomBackgroundRenderer {
 		
 		Entity entity = camera.getEntity();
 		
-		if (shouldIgnore(entity.level, (int) entity.getX(), (int) entity.getEyeY(), (int) entity.getZ())) {
+		if (!isForcedDimension(entity.level) && shouldIgnoreArea(entity.level, (int) entity.getX(), (int) entity.getEyeY(), (int) entity.getZ())) {
 			BackgroundInfo.fogDensity = 1;
 			return false;
 		}
@@ -78,6 +79,21 @@ public class CustomBackgroundRenderer {
 		RenderSystem.setShaderFogStart(fogStart);
 		RenderSystem.setShaderFogEnd(fogEnd);
 		
+		return true;
+	}
+	
+	private static boolean isForcedDimension(Level level) {
+		return level.dimension() == Level.END || level.dimension() == Level.NETHER;
+	}
+	
+	private static boolean shouldIgnoreArea(Level level, int x, int y, int z) {
+		for (int i = -8; i <= 8; i += 8) {
+			for (int j = -8; j <= 8; j += 8) {
+				if (!shouldIgnore(level, x + i, y, z + j)) {
+					return false;
+				}
+			}
+		}
 		return true;
 	}
 	
