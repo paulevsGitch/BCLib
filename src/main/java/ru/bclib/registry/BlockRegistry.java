@@ -12,7 +12,7 @@ import ru.bclib.blocks.BaseLeavesBlock;
 import ru.bclib.blocks.FeatureSaplingBlock;
 import ru.bclib.interfaces.CustomItemProvider;
 
-public abstract class BlockRegistry extends BaseRegistry<Block> {
+public class BlockRegistry extends BaseRegistry<Block> {
 	protected BlockRegistry(CreativeModeTab creativeTab) {
 		super(creativeTab);
 	}

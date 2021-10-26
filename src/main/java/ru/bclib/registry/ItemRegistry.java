@@ -30,7 +30,7 @@ import ru.bclib.items.tool.BaseAxeItem;
 import ru.bclib.items.tool.BaseHoeItem;
 import ru.bclib.items.tool.BasePickaxeItem;
 
-public abstract class ItemRegistry extends BaseRegistry<Item> {
+public class ItemRegistry extends BaseRegistry<Item> {
 	
 	protected ItemRegistry(CreativeModeTab creativeTab) {
 		super(creativeTab);
