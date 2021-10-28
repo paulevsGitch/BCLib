@@ -65,6 +65,7 @@ public class BCLBiomeDef {
 	private int waterFogColor = 329011;
 	private int waterColor = 4159204;
 	private int fogColor = 10518688;
+	private int skyColor = 0;
 	private float fogDensity = 1F;
 	private float depth = 0.1F;
 	
@@ -242,9 +243,22 @@ public class BCLBiomeDef {
 		return ColorUtil.color(r, g, b);
 	}
 	
-	public BCLBiomeDef setFogColor(int r, int g, int b) {
-		this.fogColor = getColor(r, g, b);
+	public BCLBiomeDef setSkyColor(int rgb) {
+		this.skyColor = rgb;
 		return this;
+	}
+	
+	public BCLBiomeDef setSkyColor(int r, int g, int b) {
+		return setSkyColor(getColor(r, g, b));
+	}
+	
+	public BCLBiomeDef setFogColor(int rgb) {
+		this.fogColor = rgb;
+		return this;
+	}
+	
+	public BCLBiomeDef setFogColor(int r, int g, int b) {
+		return setFogColor(getColor(r, g, b));
 	}
 	
 	public BCLBiomeDef setFogDensity(float density) {
@@ -327,7 +341,7 @@ public class BCLBiomeDef {
 		
 		addCustomToBuild(generationSettings);
 		
-		effects.skyColor(0)
+		effects.skyColor(skyColor)
 			   .waterColor(waterColor)
 			   .waterFogColor(waterFogColor)
 			   .fogColor(fogColor)
@@ -339,16 +353,17 @@ public class BCLBiomeDef {
 		if (particleConfig != null) effects.ambientParticle(particleConfig);
 		effects.backgroundMusic(music != null ? new Music(music, 600, 2400, true) : Musics.END);
 		
-		return new Biome.BiomeBuilder().precipitation(precipitation)
-									   .biomeCategory(category)
-									   .depth(depth)
-									   .scale(0.2F)
-									   .temperature(temperature)
-									   .downfall(downfall)
-									   .specialEffects(effects.build())
-									   .mobSpawnSettings(spawnSettings.build())
-									   .generationSettings(generationSettings.build())
-									   .build();
+		return new Biome.BiomeBuilder()
+			.precipitation(precipitation)
+			.biomeCategory(category)
+			.depth(depth)
+			.scale(0.2F)
+			.temperature(temperature)
+			.downfall(downfall)
+			.specialEffects(effects.build())
+			.mobSpawnSettings(spawnSettings.build())
+			.generationSettings(generationSettings.build())
+			.build();
 	}
 	
 	private static final class SpawnInfo {
