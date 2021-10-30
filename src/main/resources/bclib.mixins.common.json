@@ -27,8 +27,9 @@
 		"shears.PumpkinBlockMixin",
 		"shears.SheepMixin",
 		"shears.SnowGolemMixin",
-		"shears.TripWireBlockMixi",
-		"PortalShapeMixin"
+		"shears.TripWireBlockMixin",
+		"PortalShapeMixin",
+		"PistonBaseBlockMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

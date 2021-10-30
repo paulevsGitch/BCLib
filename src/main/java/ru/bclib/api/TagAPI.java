@@ -43,6 +43,7 @@ public class TagAPI {
 	public static final Tag.Named<Block> BLOCK_WORKBENCHES = makeCommonBlockTag("workbench");
 	public static final Tag.Named<Block> BLOCK_SAPLINGS = makeCommonBlockTag("saplings");
 	public static final Tag.Named<Block> BLOCK_LEAVES = makeCommonBlockTag("leaves");
+	public static final Tag.Named<Block> BLOCK_IMMOBILE = makeCommonBlockTag("immobile");
 	
 	public static final Tag.Named<Block> BLOCK_DRAGON_IMMUNE = getMCBlockTag("dragon_immune");
 	
