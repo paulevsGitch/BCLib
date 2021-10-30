@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import ru.bclib.items.tool.BaseShearsItem;
 
 @Mixin(TripWireBlock.class)
-public class TripWireBlockMixi {
+public class TripWireBlockMixin {
 	@Redirect(method="playerWillDestroy", at=@At(value="INVOKE", target="Lnet/minecraft/world/item/ItemStack;is(Lnet/minecraft/world/item/Item;)Z"))
 	public boolean bn_useProxy(ItemStack itemStack, Item item){
 		return BaseShearsItem.isShear(itemStack, item);
