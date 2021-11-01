@@ -1,11 +1,6 @@
 package ru.bclib.blocks;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.function.Consumer;
-
 import com.google.common.collect.Lists;
-
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.tool.attribute.v1.FabricToolTags;
 import net.minecraft.client.renderer.block.model.BlockModel;
@@ -24,6 +19,10 @@ import ru.bclib.client.render.BCLRenderLayer;
 import ru.bclib.interfaces.BlockModelProvider;
 import ru.bclib.interfaces.RenderLayerProvider;
 import ru.bclib.util.MHelper;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.function.Consumer;
 
 public class BaseLeavesBlock extends LeavesBlock implements BlockModelProvider, RenderLayerProvider {
 	protected final Block sapling;

@@ -378,9 +378,9 @@ public class BCLBiomeDef {
 		ConfiguredFeature<?, ?> feature;
 	}
 	
-	private static final class CarverInfo {
+	private static final class CarverInfo <C extends CarverConfiguration> {
 		Carving carverStep;
-		ConfiguredWorldCarver<CarverConfiguration> carver;
+		ConfiguredWorldCarver<C> carver;
 	}
 	
 	public ResourceLocation getID() {
@@ -399,7 +399,7 @@ public class BCLBiomeDef {
 		return edgeSize;
 	}
 	
-	public BCLBiomeDef addCarver(Carving carverStep, ConfiguredWorldCarver<CarverConfiguration> carver) {
+	public <C extends CarverConfiguration> BCLBiomeDef addCarver(Carving carverStep, ConfiguredWorldCarver<C> carver) {
 		CarverInfo info = new CarverInfo();
 		info.carverStep = carverStep;
 		info.carver = carver;

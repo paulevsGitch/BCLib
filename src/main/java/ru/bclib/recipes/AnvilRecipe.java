@@ -1,9 +1,6 @@
 package ru.bclib.recipes;
 
-import java.util.Objects;
-
 import com.google.gson.JsonObject;
-
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -32,6 +29,8 @@ import ru.bclib.config.PathConfig;
 import ru.bclib.interfaces.UnknownReceipBookCategory;
 import ru.bclib.util.ItemUtil;
 import ru.bclib.util.RecipeHelper;
+
+import java.util.Objects;
 
 public class AnvilRecipe implements Recipe<Container>, UnknownReceipBookCategory {
     public final static String GROUP = "smithing";

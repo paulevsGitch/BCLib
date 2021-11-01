@@ -1,9 +1,6 @@
 package ru.bclib.mixin.client;
 
-import java.util.List;
-
 import com.google.common.collect.Lists;
-
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
@@ -23,6 +20,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import ru.bclib.interfaces.AnvilScreenHandlerExtended;
+
+import java.util.List;
 
 @Mixin(AnvilScreen.class)
 public class AnvilScreenMixin extends ItemCombinerScreen<AnvilMenu> {

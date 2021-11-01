@@ -1,6 +1,5 @@
 package ru.bclib.api.datafixer;
 
-import net.fabricmc.loom.util.ModUtils;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtIo;

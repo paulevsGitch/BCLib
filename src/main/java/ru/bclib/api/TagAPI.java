@@ -1,12 +1,7 @@
 package ru.bclib.api;
 
-import java.util.Map;
-import java.util.Set;
-import java.util.function.Supplier;
-
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-
 import net.fabricmc.fabric.api.tag.TagRegistry;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
@@ -22,6 +17,10 @@ import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import ru.bclib.BCLib;
+
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Supplier;
 
 public class TagAPI {
 	private static final Map<ResourceLocation, Set<ResourceLocation>> TAGS_BLOCK = Maps.newConcurrentMap();

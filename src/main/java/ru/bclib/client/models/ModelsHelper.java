@@ -1,11 +1,6 @@
 package ru.bclib.client.models;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Function;
-
 import com.google.common.collect.Lists;
-
 import com.mojang.math.Transformation;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -21,6 +16,10 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
 
 @Environment(EnvType.CLIENT)
 public class ModelsHelper {

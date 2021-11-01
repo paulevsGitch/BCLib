@@ -1,9 +1,9 @@
 package ru.bclib.interfaces;
 
 
-import java.util.List;
-
 import ru.bclib.recipes.AnvilRecipe;
+
+import java.util.List;
 
 public interface AnvilScreenHandlerExtended {
 	void be_updateCurrentRecipe(AnvilRecipe recipe);
