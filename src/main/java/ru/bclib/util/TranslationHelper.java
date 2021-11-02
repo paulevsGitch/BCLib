@@ -30,7 +30,7 @@ public class TranslationHelper {
 		
 		Gson gson = new Gson();
 		InputStream inputStream = TranslationHelper.class.getResourceAsStream("/assets/" + modID + "/lang/" + languageCode + ".json");
-		JsonObject translation = gson.fromJson(new InputStreamReader(inputStream), JsonObject.class);
+		JsonObject translation = inputStream == null ? new JsonObject() : gson.fromJson(new InputStreamReader(inputStream), JsonObject.class);
 		
 		Registry.BLOCK.forEach(block -> {
 			if (Registry.BLOCK.getKey(block).getNamespace().equals(modID)) {

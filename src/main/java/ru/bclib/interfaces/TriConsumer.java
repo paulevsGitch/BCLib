@@ -1,4 +1,4 @@
-package ru.bclib.util;
+package ru.bclib.interfaces;
 
 @FunctionalInterface
 public interface TriConsumer<A, B, C> {
