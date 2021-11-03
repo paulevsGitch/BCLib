@@ -394,6 +394,9 @@ public class HelloClient extends DataHandler.FromServer {
 				requestBCLibDownload();
 
 				this.onCloseSyncFilesScreen();
+			} else {
+				Minecraft.getInstance()
+						 .setScreen(null);
 			}
 		}));
 	}
