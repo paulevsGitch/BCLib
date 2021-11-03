@@ -5,17 +5,18 @@ import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.SemanticVersion;
 import net.fabricmc.loader.api.Version;
 import net.fabricmc.loader.api.metadata.ModMetadata;
-import net.fabricmc.loader.metadata.ModMetadataParser;
-import net.fabricmc.loader.metadata.ParseMetadataException;
+import net.fabricmc.loader.impl.metadata.ModMetadataParser;
 import org.apache.logging.log4j.LogManager;
 import ru.bclib.BCLib;
 
-import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
@@ -55,15 +56,17 @@ public class ModUtil {
 					try {
 						Path modMetaFile = fs.getPath("fabric.mod.json");
 						if (modMetaFile != null) {
-							ModMetadata mc = ModMetadataParser.parseMetadata(logger, modMetaFile);
-							mods.put(mc.getId(), new ModInfo(mc, file));
+							try (InputStream is = Files.newInputStream(modMetaFile)) {
+								ModMetadata mc = ModMetadataParser.parseMetadata(is, uri.toString(), new LinkedList<String>());
+								mods.put(mc.getId(), new ModInfo(mc, file));
+							}
 						}
-					} catch (ParseMetadataException e) {
+					} catch (Exception e) {
 						BCLib.LOGGER.error(e.getMessage());
 					}
 				}
 			}
-			catch (IOException e) {
+			catch (Exception e) {
 				BCLib.LOGGER.error(e.getMessage());
 			}
 		}));
