@@ -1,22 +1,36 @@
 package ru.bclib.util;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.stream.JsonReader;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.SemanticVersion;
 import net.fabricmc.loader.api.Version;
+import net.fabricmc.loader.api.VersionParsingException;
+import net.fabricmc.loader.api.metadata.ContactInformation;
+import net.fabricmc.loader.api.metadata.CustomValue;
+import net.fabricmc.loader.api.metadata.ModDependency;
+import net.fabricmc.loader.api.metadata.ModEnvironment;
 import net.fabricmc.loader.api.metadata.ModMetadata;
-import net.fabricmc.loader.impl.metadata.ModMetadataParser;
+import net.fabricmc.loader.api.metadata.Person;
+import net.fabricmc.loader.util.version.SemanticVersionImpl;
 import org.apache.logging.log4j.LogManager;
 import ru.bclib.BCLib;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
@@ -57,8 +71,11 @@ public class ModUtil {
 						Path modMetaFile = fs.getPath("fabric.mod.json");
 						if (modMetaFile != null) {
 							try (InputStream is = Files.newInputStream(modMetaFile)) {
-								ModMetadata mc = ModMetadataParser.parseMetadata(is, uri.toString(), new LinkedList<String>());
-								mods.put(mc.getId(), new ModInfo(mc, file));
+								//ModMetadata mc = ModMetadataParser.parseMetadata(is, uri.toString(), new LinkedList<String>());
+								ModMetadata mc = readJSON(is, uri.toString());
+								if (mc!=null){
+									mods.put(mc.getId(), new ModInfo(mc, file));
+								}
 							}
 						}
 					} catch (Exception e) {
@@ -72,6 +89,160 @@ public class ModUtil {
 		}));
 		
 		return mods;
+	}
+	
+	private static ModMetadata readJSON(InputStream is, String sourceFile) throws IOException {
+		try (com.google.gson.stream.JsonReader reader = new JsonReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
+			JsonObject data = new JsonParser().parse(reader).getAsJsonObject();
+			Version ver;
+			try {
+				ver = new SemanticVersionImpl(data.get("version").getAsString(), false);
+			}
+			catch (VersionParsingException e) {
+				BCLib.LOGGER.error("Unable to parse Version in " + sourceFile);
+				return null;
+			}
+			
+			if (data.get("id") == null){
+				BCLib.LOGGER.error("Unable to read ID in " + sourceFile);
+				return null;
+			}
+			
+			if (data.get("name") == null){
+				BCLib.LOGGER.error("Unable to read name in " + sourceFile);
+				return null;
+			}
+			
+			return new ModMetadata() {
+				@Override
+				public Version getVersion() {
+					return ver;
+				}
+				@Override
+				public String getType() {
+					return "fabric";
+				}
+				
+				@Override
+				public String getId() {
+					return data.get("id").getAsString();
+				}
+				
+				@Override
+				public Collection<String> getProvides() {
+					return new ArrayList<>();
+				}
+				
+				@Override
+				public ModEnvironment getEnvironment() {
+					JsonElement env = data.get("environment");
+					if (env==null) {
+						BCLib.LOGGER.error("No environment specified in " + sourceFile);
+						return ModEnvironment.UNIVERSAL;
+					}
+					final String environment = env.getAsString().toLowerCase(Locale.ROOT);
+					
+					if (environment.isEmpty() || environment.equals("*") || environment.equals("common")) {
+						return ModEnvironment.UNIVERSAL;
+					} else if (environment.equals("client")) {
+						return ModEnvironment.CLIENT;
+					} else if (environment.equals("server")) {
+						return ModEnvironment.SERVER;
+					} else {
+						BCLib.LOGGER.error("Unable to read environment in " + sourceFile);
+						return ModEnvironment.UNIVERSAL;
+					}
+				}
+				
+				@Override
+				public Collection<ModDependency> getDepends() {
+					return new ArrayList<>();
+				}
+				
+				@Override
+				public Collection<ModDependency> getRecommends() {
+					return new ArrayList<>();
+				}
+				
+				@Override
+				public Collection<ModDependency> getSuggests() {
+					return new ArrayList<>();
+				}
+				
+				@Override
+				public Collection<ModDependency> getConflicts() {
+					return new ArrayList<>();
+				}
+				
+				@Override
+				public Collection<ModDependency> getBreaks() {
+					return new ArrayList<>();
+				}
+				
+				public Collection<ModDependency> getDependencies() {
+					return new ArrayList<>();
+				}
+				
+				@Override
+				public String getName() {
+					return data.get("name").getAsString();
+				}
+				
+				@Override
+				public String getDescription() {
+					return "";
+				}
+				
+				@Override
+				public Collection<Person> getAuthors() {
+					return new ArrayList<>();
+				}
+				
+				@Override
+				public Collection<Person> getContributors() {
+					return new ArrayList<>();
+				}
+				
+				@Override
+				public ContactInformation getContact() {
+					return null;
+				}
+				
+				@Override
+				public Collection<String> getLicense() {
+					return new ArrayList<>();
+				}
+				
+				@Override
+				public Optional<String> getIconPath(int size) {
+					return Optional.empty();
+				}
+				
+				@Override
+				public boolean containsCustomValue(String key) {
+					return false;
+				}
+				
+				@Override
+				public CustomValue getCustomValue(String key) {
+					return null;
+				}
+				
+				@Override
+				public Map<String, CustomValue> getCustomValues() {
+					return new HashMap<>();
+				}
+				
+				@Override
+				public boolean containsCustomElement(String key) {
+					return false;
+				}
+				
+				public JsonElement getCustomElement(String key) {
+					return null;
+				}
+			};
+		}
 	}
 	
 	/**
