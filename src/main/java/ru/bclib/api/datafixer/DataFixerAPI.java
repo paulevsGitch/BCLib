@@ -26,6 +26,7 @@ import ru.bclib.config.Configs;
 import ru.bclib.gui.screens.AtomicProgressListener;
 import ru.bclib.gui.screens.ConfirmFixScreen;
 import ru.bclib.gui.screens.LevelFixErrorScreen;
+import ru.bclib.gui.screens.LevelFixErrorScreen.Listener;
 import ru.bclib.gui.screens.ProgressScreen;
 import ru.bclib.util.Logger;
 
@@ -241,13 +242,12 @@ public class DataFixerAPI {
 								 if (profile != null && showUI) {
 									 //something went wrong, show the user our error
 									 if (state.didFail || state.hasError()){
-										 Minecraft.getInstance()
-												  .setScreen(new LevelFixErrorScreen(Minecraft.getInstance().screen, state.getErrorMessages(), (markFixed)->{
-												  		if (markFixed) {
-															profile.markApplied();
-														}
-													  	onResume.accept(applyFixes);
-												  }));
+									 	showLevelFixErrorScreen(state, (markFixed)->{
+											if (markFixed) {
+												profile.markApplied();
+											}
+											onResume.accept(applyFixes);
+										});
 									 } else {
 									 	onResume.accept(applyFixes);
 									 }
@@ -277,6 +277,11 @@ public class DataFixerAPI {
 			}
 		}
 		return false;
+	}
+	@Environment(EnvType.CLIENT)
+	private static void showLevelFixErrorScreen(State state, Listener onContinue){
+		Minecraft.getInstance()
+				 .setScreen(new LevelFixErrorScreen(Minecraft.getInstance().screen, state.getErrorMessages(), onContinue));
 	}
 	
 	private static MigrationProfile loadProfileIfNeeded(File levelBaseDir){
