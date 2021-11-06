@@ -38,6 +38,7 @@ public class BlockRegistry extends BaseRegistry<Block> {
 		}
 
 		block = Registry.register(Registry.BLOCK, id, block);
+		getModBlocks(id.getNamespace()).add(block);
 
 		if (block instanceof BaseLeavesBlock){
 			TagAPI.addTags(block, TagAPI.BLOCK_LEAVES);
@@ -58,6 +59,7 @@ public class BlockRegistry extends BaseRegistry<Block> {
 		if (!config.getBooleanRoot(id.getNamespace(), true)) {
 			return block;
 		}
+		getModBlocks(id.getNamespace()).add(block);
 		return Registry.register(Registry.BLOCK, id, block);
 	}
 	
@@ -70,7 +72,7 @@ public class BlockRegistry extends BaseRegistry<Block> {
 	public void registerItem(ResourceLocation id, Item item) {
 		if (item != null && item != Items.AIR) {
 			Registry.register(Registry.ITEM, id, item);
-			getModBlocks(id.getNamespace()).add(item);
+			getModBlockItems(id.getNamespace()).add(item);
 		}
 	}
 }

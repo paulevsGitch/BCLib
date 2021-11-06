@@ -6,6 +6,7 @@ import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
 import ru.bclib.config.PathConfig;
 
 import java.util.List;
@@ -13,7 +14,8 @@ import java.util.Map;
 
 public abstract class BaseRegistry<T> {
 	private static final List<BaseRegistry<?>> REGISTRIES = Lists.newArrayList();
-	private static final Map<String, List<Item>> MOD_BLOCKS = Maps.newHashMap();
+	private static final Map<String, List<Item>> MOD_BLOCK_ITEMS = Maps.newHashMap();
+	private static final Map<String, List<Block>> MOD_BLOCKS = Maps.newHashMap();
 	private static final Map<String, List<Item>> MOD_ITEMS = Maps.newHashMap();
 	
 	protected final CreativeModeTab creativeTab;
@@ -37,19 +39,19 @@ public abstract class BaseRegistry<T> {
 	private void registerInternal() {}
 	
 	public static Map<String, List<Item>> getRegisteredBlocks() {
-		return MOD_BLOCKS;
+		return MOD_BLOCK_ITEMS;
 	}
 	
 	public static Map<String, List<Item>> getRegisteredItems() {
 		return MOD_ITEMS;
 	}
 	
-	public static List<Item> getModBlocks(String modId) {
-		if (MOD_BLOCKS.containsKey(modId)) {
-			return MOD_BLOCKS.get(modId);
+	public static List<Item> getModBlockItems(String modId) {
+		if (MOD_BLOCK_ITEMS.containsKey(modId)) {
+			return MOD_BLOCK_ITEMS.get(modId);
 		}
 		List<Item> modBlocks = Lists.newArrayList();
-		MOD_BLOCKS.put(modId, modBlocks);
+		MOD_BLOCK_ITEMS.put(modId, modBlocks);
 		return modBlocks;
 	}
 	
@@ -59,6 +61,15 @@ public abstract class BaseRegistry<T> {
 		}
 		List<Item> modBlocks = Lists.newArrayList();
 		MOD_ITEMS.put(modId, modBlocks);
+		return modBlocks;
+	}
+	
+	public static List<Block> getModBlocks(String modId) {
+		if (MOD_BLOCKS.containsKey(modId)) {
+			return MOD_BLOCKS.get(modId);
+		}
+		List<Block> modBlocks = Lists.newArrayList();
+		MOD_BLOCKS.put(modId, modBlocks);
 		return modBlocks;
 	}
 	
