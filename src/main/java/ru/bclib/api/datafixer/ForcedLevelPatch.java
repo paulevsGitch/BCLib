@@ -37,7 +37,7 @@ public abstract class ForcedLevelPatch extends Patch {
 	public PatchFunction<CompoundTag, Boolean> getLevelDatPatcher() { return this::runLevelDatPatch; }
 	
 	/**
-	 * Called with the contents of level.dat in {@Code root}
+	 * Called with the contents of level.dat in {@code root}
 	 * @param root The contents of level.dat
 	 * @param profile The active migration profile
 	 * @return true, if the run did change the contents of root
