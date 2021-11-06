@@ -143,6 +143,22 @@ public class ModUtil {
 					final String environment = env.getAsString().toLowerCase(Locale.ROOT);
 					
 					if (environment.isEmpty() || environment.equals("*") || environment.equals("common")) {
+						JsonElement entrypoints = data.get("entrypoints");
+						boolean hasClient = true;
+						
+						//check if there is an actual client entrypoint
+						if (entrypoints!=null && entrypoints.isJsonObject()){
+							JsonElement client = entrypoints.getAsJsonObject().get("client");
+							if (client!=null && client.isJsonArray()){
+								hasClient = client.getAsJsonArray().size() > 0;
+							} else if (client==null || !client.isJsonPrimitive()){
+								hasClient = false;
+							} else if (!client.getAsJsonPrimitive().isString()){
+								hasClient = false;
+							}
+						}
+						
+						if (hasClient == false) return ModEnvironment.SERVER;
 						return ModEnvironment.UNIVERSAL;
 					} else if (environment.equals("client")) {
 						return ModEnvironment.CLIENT;
