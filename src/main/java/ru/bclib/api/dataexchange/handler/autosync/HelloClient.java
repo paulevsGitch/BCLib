@@ -16,6 +16,7 @@ import ru.bclib.api.dataexchange.DataHandlerDescriptor;
 import ru.bclib.api.dataexchange.handler.autosync.AutoSyncID.WithContentOverride;
 import ru.bclib.api.dataexchange.handler.autosync.SyncFolderDescriptor.SubFile;
 import ru.bclib.config.Configs;
+import ru.bclib.config.ServerConfig;
 import ru.bclib.gui.screens.ModListScreen;
 import ru.bclib.gui.screens.ProgressScreen;
 import ru.bclib.gui.screens.SyncFilesScreen;
@@ -91,6 +92,11 @@ public class HelloClient extends DataHandler.FromServer {
 						.collect(Collectors.toList())
 				);
 			}
+			
+			mods = mods
+				.stream()
+				.filter(entry -> !Configs.SERVER_CONFIG.get(ServerConfig.EXCLUDED_MODS).contains(entry))
+				.collect(Collectors.toList());
 
 			//write Plugin Versions
 			buf.writeInt(mods.size());

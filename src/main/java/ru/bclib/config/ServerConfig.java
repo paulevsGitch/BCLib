@@ -16,6 +16,7 @@ public class ServerConfig extends NamedPathConfig {
 
 
     public static final ConfigToken<List<String>> ADDITIONAL_MODS = ConfigToken.StringArray(new ArrayList<>(0), "additionalMods", AutoSync.SYNC_CATEGORY);
+    public static final ConfigToken<List<String>> EXCLUDED_MODS = ConfigToken.StringArray(new ArrayList<>(0), "excludeMods", AutoSync.SYNC_CATEGORY);
 
 
     public ServerConfig() {
@@ -45,8 +46,5 @@ public class ServerConfig extends NamedPathConfig {
     public boolean isOfferingInfosForMods() {
         return get(SEND_ALL_MOD_INFO) /*&& isAllowingAutoSync()*/;
     }
-
-    public String[] additionalModsForSync() {
-        return new String[0];
-    }
+    
 }

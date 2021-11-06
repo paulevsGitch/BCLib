@@ -135,7 +135,7 @@ public class AutoSync {
 	}
 	
 	private static boolean didRegisterAdditionalMods = false;
-	//we call this from HelloClient on the Srérver to prepare transfer
+	//we call this from HelloClient on the Server to prepare transfer
 	protected static void loadSyncFolder() {
 		if (Configs.SERVER_CONFIG.isOfferingFiles()) {
 			syncFolderDescriptions.forEach(desc -> desc.loadCache());
