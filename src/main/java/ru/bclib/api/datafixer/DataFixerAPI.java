@@ -41,6 +41,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.zip.ZipException;
 
 /**
  * API to manage Patches that need to get applied to a world
@@ -393,11 +394,12 @@ public class DataFixerAPI {
 			e.printStackTrace();
 		}
 	}
-
+	
 	private static void fixPlayer(MigrationProfile data, State state, File file) {
 		try {
 			LOGGER.info("Inspecting " + file);
-			CompoundTag player = NbtIo.readCompressed(file);
+			
+			CompoundTag player = readNbt(file);
 			boolean[] changed = { false };
 			fixPlayerNbt(player, changed, data);
 
@@ -413,7 +415,7 @@ public class DataFixerAPI {
 			e.printStackTrace();
 		}
 	}
-
+	
 	private static void fixPlayerNbt(CompoundTag player, boolean[] changed, MigrationProfile data) {
 		//Checking Inventory
 		ListTag inventory = player.getList("Inventory", Tag.TAG_COMPOUND);
@@ -597,6 +599,14 @@ public class DataFixerAPI {
 	 */
 	public static void registerPatch(Supplier<Patch> patch) {
 		Patch.getALL().add(patch.get());
+	}
+	
+	private static CompoundTag readNbt(File file) throws IOException {
+		try {
+			return NbtIo.readCompressed(file);
+		} catch (ZipException e){
+			return NbtIo.read(file);
+		}
 	}
 	
 }
