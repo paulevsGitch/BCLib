@@ -25,6 +25,7 @@ import ru.bclib.api.WorldDataAPI;
 import ru.bclib.config.Configs;
 import ru.bclib.gui.screens.AtomicProgressListener;
 import ru.bclib.gui.screens.ConfirmFixScreen;
+import ru.bclib.gui.screens.LevelFixErrorScreen;
 import ru.bclib.gui.screens.ProgressScreen;
 import ru.bclib.util.Logger;
 
@@ -47,6 +48,24 @@ public class DataFixerAPI {
 	static final Logger LOGGER = new Logger("DataFixerAPI");
 	static class State {
 		public boolean didFail = false;
+		protected ArrayList<String> errors = new ArrayList<>();
+
+		public void addError(String s){
+			errors.add(s);
+		}
+
+		public boolean hasError(){
+			return errors.size()>0;
+		}
+
+		public String getErrorMessage(){
+			return errors.stream().reduce("", (a, b) -> a + "  - " + b + "\n");
+		}
+
+		public String[] getErrorMessages(){
+			String[] res = new String[errors.size()];
+			return errors.toArray(res);
+		}
 	}
 	
 	@FunctionalInterface
@@ -200,30 +219,51 @@ public class DataFixerAPI {
 				progress = null;
 			}
 
-			Runnable runner = () -> {
+			Supplier<State> runner = () -> {
 				if (createBackup) {
 					progress.progressStage(new TranslatableComponent("message.bclib.datafixer.progress.waitbackup"));
 					EditWorldScreen.makeBackupAndShowToast(Minecraft.getInstance().getLevelSource(), levelID);
 				}
 
 				if (applyFixes) {
-					runDataFixes(dir, profile, progress);
+					return runDataFixes(dir, profile, progress);
 				}
+
+				return new State();
 			};
 
 			if (showUI) {
 				Thread fixerThread = new Thread(() -> {
-					runner.run();
-
-					Minecraft.getInstance().execute(() -> {
-						if (profile != null && showUI) {
-							onResume.accept(applyFixes);
-						}
-					});
+					State state = runner.get();
+					for (int i=0; i<20; i++)
+					state.addError("Hello World");
+					
+					Minecraft.getInstance()
+							 .execute(() -> {
+								 if (profile != null && showUI) {
+									 //something went wrong, show the user our error
+									 if (state.didFail || state.hasError()){
+										 Minecraft.getInstance()
+												  .setScreen(new LevelFixErrorScreen(Minecraft.getInstance().screen, state.getErrorMessages(), (markFixed)->{
+												  		if (markFixed) {
+															profile.markApplied();
+														}
+													  	onResume.accept(applyFixes);
+												  }));
+									 } else {
+									 	onResume.accept(applyFixes);
+									 }
+								 }
+							 });
+					
 				});
 				fixerThread.start();
 			} else {
-				runner.run();
+				State state = runner.get();
+				if (state.hasError()){
+					LOGGER.error("There were Errors while fixing the Level:");
+					LOGGER.error(state.getErrorMessage());
+				}
 			}
 		};
 		
@@ -270,7 +310,7 @@ public class DataFixerAPI {
 		Minecraft.getInstance().setScreen(new ConfirmFixScreen((Screen) null, whenFinished::accept));
 	}
 
-	private static void runDataFixes(File dir, MigrationProfile profile, AtomicProgressListener progress) {
+	private static State runDataFixes(File dir, MigrationProfile profile, AtomicProgressListener progress) {
 		State state = new State();
 		progress.resetAtomic();
 
@@ -295,6 +335,7 @@ public class DataFixerAPI {
 			profile.patchWorldData();
 		} catch (PatchDidiFailException e){
 			state.didFail = true;
+			state.addError("Failed fixing worldconfig (" + e.getMessage() + ")");
 			BCLib.LOGGER.error(e.getMessage());
 		}
 		progress.incAtomic(maxProgress);
@@ -313,6 +354,8 @@ public class DataFixerAPI {
 		progress.incAtomic(maxProgress);
 
 		progress.stop();
+
+		return state;
 	}
 	
 	private static void fixLevel(MigrationProfile profile, State state, File levelBaseDir) {
@@ -342,6 +385,7 @@ public class DataFixerAPI {
 		}
 		catch (Exception e) {
 			BCLib.LOGGER.error("Failed fixing Level-Data.");
+			state.addError("Failed fixing Level-Data in level.dat (" + e.getMessage() + ")");
 			state.didFail = true;
 			e.printStackTrace();
 		}
@@ -361,6 +405,7 @@ public class DataFixerAPI {
 		}
 		catch (Exception e) {
 			BCLib.LOGGER.error("Failed fixing Player-Data.");
+			state.addError("Failed fixing Player-Data in " + file.getName() + " (" + e.getMessage() + ")");
 			state.didFail = true;
 			e.printStackTrace();
 		}
@@ -448,6 +493,7 @@ public class DataFixerAPI {
 							}
 							catch (PatchDidiFailException e) {
 								BCLib.LOGGER.error("Failed fixing BlockState in " + pos);
+								state.addError("Failed fixing BlockState in " + pos + " (" + e.getMessage() + ")");
 								state.didFail = true;
 								changed[0] = false;
 								e.printStackTrace();
@@ -468,6 +514,7 @@ public class DataFixerAPI {
 		}
 		catch (Exception e) {
 			BCLib.LOGGER.error("Failed fixing Region.");
+			state.addError("Failed fixing Region in " + file.getName() + " (" + e.getMessage() + ")");
 			state.didFail = true;
 			e.printStackTrace();
 		}

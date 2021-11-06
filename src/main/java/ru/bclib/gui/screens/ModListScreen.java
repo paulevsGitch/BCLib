@@ -208,7 +208,6 @@ public class ModListScreen extends BCLibScreen {
         row.addFiller();
         row.addButton(buttonTitle, 20, font, (n)-> {
             onClose();
-            System.out.println("Closing");
         });
         row.addFiller();
     }

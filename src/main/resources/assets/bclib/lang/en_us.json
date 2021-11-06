@@ -43,5 +43,8 @@
 	"message.bclib.datafixer.progress.regions": "Repairing all Regions",
 	"message.bclib.datafixer.progress.saving": "Saving Patch State",
 	"title.bclib.datafixer.progress": "Fixing World",
-	"message.bclib.datafixer.progress": "Applying all Patches to your World."
+	"message.bclib.datafixer.progress": "Applying all Patches to your World.",
+	"title.bclib.datafixer.error": "Errors while fixing World",
+	"message.bclib.datafixer.error": "There were errors while repairing the world. This means that this level is probably in an inconsistent state and you should not play it. Please restore your backup and fix the errors below before trying again.",
+	"title.bclib.datafixer.error.continue": "Fortfahren und als behoben markieren"
 }
