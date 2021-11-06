@@ -234,9 +234,7 @@ public class DataFixerAPI {
 
 			if (showUI) {
 				Thread fixerThread = new Thread(() -> {
-					State state = runner.get();
-					for (int i=0; i<20; i++)
-					state.addError("Hello World");
+					final State state = runner.get();
 					
 					Minecraft.getInstance()
 							 .execute(() -> {
