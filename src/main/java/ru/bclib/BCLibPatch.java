@@ -1,14 +1,23 @@
 package ru.bclib;
 
 import net.minecraft.nbt.CompoundTag;
+import ru.bclib.api.datafixer.DataFixerAPI;
 import ru.bclib.api.datafixer.Patch;
 import ru.bclib.api.datafixer.PatchFunction;
 
-public final class BCLibPatch extends Patch {
+
+
+public final class BCLibPatch {
+	public static void register(){
+		DataFixerAPI.registerPatch(BiomeSourcePatch::new);
+	}
+}
+
+final class BiomeSourcePatch extends Patch {
 	private static final String NETHER_BIOME_SOURCE = "bclib:nether_biome_source";
 	private static final String END_BIOME_SOURCE = "bclib:end_biome_source";
 	
-	protected BCLibPatch() {
+	protected BiomeSourcePatch() {
 		super(BCLib.MOD_ID, "0.4.0");
 	}
 	

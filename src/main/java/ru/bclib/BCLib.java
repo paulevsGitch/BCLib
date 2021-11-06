@@ -12,7 +12,6 @@ import ru.bclib.api.dataexchange.handler.autosync.HelloClient;
 import ru.bclib.api.dataexchange.handler.autosync.HelloServer;
 import ru.bclib.api.dataexchange.handler.autosync.RequestFiles;
 import ru.bclib.api.dataexchange.handler.autosync.SendFiles;
-import ru.bclib.api.datafixer.DataFixerAPI;
 import ru.bclib.config.Configs;
 import ru.bclib.recipes.CraftingRecipes;
 import ru.bclib.registry.BaseBlockEntities;
@@ -50,8 +49,7 @@ public class BCLib implements ModInitializer {
 				Chunker.DESCRIPTOR
 		));
 		
-		DataFixerAPI.registerPatch(() -> new BCLibPatch());
-
+		BCLibPatch.register();
 		Configs.save();
 	}
 	

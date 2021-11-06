@@ -31,6 +31,11 @@ public abstract class Patch {
 	@NotNull
 	public final String modID;
 	
+	/**
+	 * This Mod is tested for each level start
+	 */
+	public final boolean alwaysApply;
+	
 	static List<Patch> getALL() {
 		return ALL;
 	}
@@ -82,6 +87,19 @@ public abstract class Patch {
 	 *                {@link Patch#maxPatchVersion(String)}
 	 */
 	protected Patch(@NotNull String modID, String version) {
+		this(modID, version, false);
+	}
+	
+	/**
+	 * Internal Constructor used to create patches that can allways run (no matter what patchlevel a level has)
+	 * @param modID The ID of the Mod
+	 * @param version The mod-version that introduces the patch. When {@Code runAllways} is set, this version will
+	 *                determine the patchlevel that is written to the level
+	 * @param alwaysApply When true, this patch is always active, no matter the patchlevel of the world.
+	 *                    This should be used sparingly and just for patches that apply to level.dat (as they only take
+	 *                    effect when changes are detected). Use {@link ForcedLevelPatch} to instatiate.
+	 */
+	Patch(@NotNull String modID, String version, boolean alwaysApply) {
 		//Patchlevels need to be unique and registered in ascending order
 		if (modID == null || "".equals(modID)) {
 			throw new RuntimeException("[INTERNAL ERROR] Patches need a valid modID!");
@@ -92,6 +110,7 @@ public abstract class Patch {
 		}
 		
 		this.version = version;
+		this.alwaysApply = alwaysApply;
 		this.level = ModUtil.convertModVersion(version);
 		if (!ALL.stream()
 				.filter(p -> p.modID
@@ -185,7 +204,7 @@ public abstract class Patch {
 	}
 
 	/**
-	 * Returns a list of paths,where your mod may IDs in your {@link ru.bclib.api.WorldDataAPI}-File.
+	 * Returns a list of paths where your mod stores IDs in your {@link ru.bclib.api.WorldDataAPI}-File.
 	 * <p>
 	 * {@link DataFixerAPI} will use information from the latest patch that returns a non-null-result. This list is used 
 	 * to automatically fix changed IDs from all active patches (see {@link Patch#getIDReplacements()}

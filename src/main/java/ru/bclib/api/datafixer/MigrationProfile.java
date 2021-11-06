@@ -57,7 +57,7 @@ public class MigrationProfile {
 					 List<String> paths = patch.getWorldDataIDPaths();
 					 if (paths!=null) worldDataIDPaths.put(modID, paths);
 
-					 if (applyAll || currentPatchLevel(modID) < patch.level) {
+					 if (applyAll || currentPatchLevel(modID) < patch.level || patch.alwaysApply) {
 						 replacements.putAll(patch.getIDReplacements());
 						 if (patch.getLevelDatPatcher()!=null)
 							 levelPatches.add(patch.getLevelDatPatcher());
