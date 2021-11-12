@@ -5,8 +5,8 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.components.AbstractWidget;
 import ru.bclib.gui.gridlayout.GridLayout.GridValueType;
-import ru.bclib.util.Pair;
 import ru.bclib.interfaces.TriConsumer;
+import ru.bclib.util.Pair;
 
 import java.util.LinkedList;
 import java.util.List;
