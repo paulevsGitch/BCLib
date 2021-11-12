@@ -12,24 +12,29 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import ru.bclib.world.generator.BCLibEndBiomeSource;
 import ru.bclib.world.generator.BCLibNetherBiomeSource;
+import ru.bclib.world.generator.GeneratorOptions;
 
 @Mixin(value = DimensionType.class, priority = 100)
 public class DimensionTypeMixin {
 	@Inject(method = "defaultNetherGenerator", at = @At("HEAD"), cancellable = true)
 	private static void be_replaceNetherBiomeSource(Registry<Biome> biomeRegistry, Registry<NoiseGeneratorSettings> chunkGeneratorSettingsRegistry, long seed, CallbackInfoReturnable<ChunkGenerator> info) {
-		info.setReturnValue(new NoiseBasedChunkGenerator(
-			new BCLibNetherBiomeSource(biomeRegistry, seed),
-			seed,
-			() -> chunkGeneratorSettingsRegistry.getOrThrow(NoiseGeneratorSettings.NETHER)
-		));
+		if (GeneratorOptions.customNetherBiomeSource()) {
+			info.setReturnValue(new NoiseBasedChunkGenerator(
+				new BCLibNetherBiomeSource(biomeRegistry, seed),
+				seed,
+				() -> chunkGeneratorSettingsRegistry.getOrThrow(NoiseGeneratorSettings.NETHER)
+			));
+		}
 	}
 	
 	@Inject(method = "defaultEndGenerator", at = @At("HEAD"), cancellable = true)
 	private static void be_replaceEndBiomeSource(Registry<Biome> biomeRegistry, Registry<NoiseGeneratorSettings> chunkGeneratorSettingsRegistry, long seed, CallbackInfoReturnable<ChunkGenerator> info) {
-		info.setReturnValue(new NoiseBasedChunkGenerator(
-			new BCLibEndBiomeSource(biomeRegistry, seed),
-			seed,
-			() -> chunkGeneratorSettingsRegistry.getOrThrow(NoiseGeneratorSettings.END)
-		));
+		if (GeneratorOptions.customEndBiomeSource()) {
+			info.setReturnValue(new NoiseBasedChunkGenerator(
+				new BCLibEndBiomeSource(biomeRegistry, seed),
+				seed,
+				() -> chunkGeneratorSettingsRegistry.getOrThrow(NoiseGeneratorSettings.END)
+			));
+		}
 	}
 }
