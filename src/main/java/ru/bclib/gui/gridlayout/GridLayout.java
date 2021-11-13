@@ -5,8 +5,8 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.components.AbstractWidget;
 import ru.bclib.gui.gridlayout.GridLayout.GridValueType;
+import ru.bclib.interfaces.TriConsumer;
 import ru.bclib.util.Pair;
-import ru.bclib.util.TriConsumer;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -88,6 +88,7 @@ public class GridLayout extends GridColumn {
 	public static final int COLOR_RED = 0xFFDB1F48;
 	public static final int COLOR_CYAN = 0xFF01949A;
 	public static final int COLOR_GREEN = 0xFF00FF00;
+	public static final int COLOR_DARK_GREEN = 0xFF007F00;
 	public static final int COLOR_YELLOW = 0xFFFAD02C;
 	public static final int COLOR_BLUE = 0xFF0000FF;
 	public static final int COLOR_GRAY = 0xFF7F7F7F;

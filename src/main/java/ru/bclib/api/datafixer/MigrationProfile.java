@@ -11,6 +11,7 @@ import ru.bclib.util.ModUtil;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -23,6 +24,7 @@ public class MigrationProfile {
 	final Set<String> mods;
 	final Map<String, String> idReplacements;
 	final List<PatchFunction<CompoundTag, Boolean>> levelPatchers;
+	final List<PatchBiFunction<ListTag, ListTag, Boolean>> statePatchers;
 	final List<Patch> worldDataPatchers;
 	final Map<String, List<String>> worldDataIDPaths;
 	
@@ -33,7 +35,7 @@ public class MigrationProfile {
 	private boolean didRunPrePatch;
 	private Exception prePatchException;
 	
-	MigrationProfile(CompoundTag config) {
+	MigrationProfile(CompoundTag config, boolean applyAll) {
 		this.config = config;
 		
 		this.mods = Collections.unmodifiableSet(Patch.getALL()
@@ -44,6 +46,7 @@ public class MigrationProfile {
 		HashMap<String, String> replacements = new HashMap<String, String>();
 		List<PatchFunction<CompoundTag, Boolean>> levelPatches = new LinkedList<>();
 		List<Patch> worldDataPatches = new LinkedList<>();
+		List<PatchBiFunction<ListTag, ListTag, Boolean>> statePatches = new LinkedList<>();
 		HashMap<String, List<String>> worldDataIDPaths = new HashMap<>();
 		for (String modID : mods) {
 
@@ -54,12 +57,14 @@ public class MigrationProfile {
 					 List<String> paths = patch.getWorldDataIDPaths();
 					 if (paths!=null) worldDataIDPaths.put(modID, paths);
 
-					 if (currentPatchLevel(modID) < patch.level) {
+					 if (applyAll || currentPatchLevel(modID) < patch.level || patch.alwaysApply) {
 						 replacements.putAll(patch.getIDReplacements());
 						 if (patch.getLevelDatPatcher()!=null)
 							 levelPatches.add(patch.getLevelDatPatcher());
 						 if (patch.getWorldDataPatcher()!=null)
 							 worldDataPatches.add(patch);
+						 if (patch.getBlockStatePatcher()!=null)
+							 statePatches.add(patch.getBlockStatePatcher());
 						 DataFixerAPI.LOGGER.info("Applying " + patch);
 					 }
 					 else {
@@ -72,6 +77,54 @@ public class MigrationProfile {
 		this.idReplacements = Collections.unmodifiableMap(replacements);
 		this.levelPatchers = Collections.unmodifiableList(levelPatches);
 		this.worldDataPatchers = Collections.unmodifiableList(worldDataPatches);
+		this.statePatchers = Collections.unmodifiableList(statePatches);
+	}
+	
+	/**
+	 * This method is supposed to be used by developers to apply id-patches to custom nbt structures. It is only
+	 * available in Developer-Mode
+	 *
+	 */
+	public static void fixCustomFolder(File dir){
+		if (!BCLib.isDevEnvironment()) return;
+		MigrationProfile profile = Patch.createMigrationData();
+		List<File> nbts = getAllNbts(dir, null);
+		nbts.parallelStream().forEach((file) -> {
+			DataFixerAPI.LOGGER.info("Loading NBT " + file);
+			try {
+				CompoundTag root = NbtIo.readCompressed(file);
+				boolean[] changed = {false};
+				if (root.contains("palette")){
+					ListTag items = root.getList("palette", Tag.TAG_COMPOUND);
+					items.forEach(inTag -> {
+						CompoundTag tag = (CompoundTag)inTag;
+						changed[0] |= profile.replaceStringFromIDs(tag, "Name");
+					});
+				}
+				
+				if (changed[0]){
+					DataFixerAPI.LOGGER.info("Writing NBT " + file);
+					NbtIo.writeCompressed(root, file);
+				}
+			}
+			catch (IOException e) {
+				e.printStackTrace();
+			}
+		});
+	}
+	
+	private static List<File> getAllNbts(File dir, List<File> list) {
+		if (list == null) {
+			list = new ArrayList<>();
+		}
+		for (File file : dir.listFiles()) {
+			if (file.isDirectory()) {
+				getAllNbts(file, list);
+			} else if (file.isFile() && file.getName().endsWith(".nbt")) {
+				list.add(file);
+			}
+		}
+		return list;
 	}
 	
 	final public CompoundTag getLevelDat(File levelBaseDir){
@@ -124,12 +177,13 @@ public class MigrationProfile {
 	final public void markApplied() {
 		for (String modID : mods) {
 			DataFixerAPI.LOGGER.info("Updating Patch-Level for '{}' from {} to {}", modID, ModUtil.convertModVersion(currentPatchLevel(modID)), ModUtil.convertModVersion(Patch.maxPatchLevel(modID)));
-			config.putString(modID, Patch.maxPatchVersion(modID));
+			if (config!=null)
+				config.putString(modID, Patch.maxPatchVersion(modID));
 		}
 	}
 	
 	public String currentPatchVersion(@NotNull String modID) {
-		if (!config.contains(modID)) return "0.0.0";
+		if (config==null || !config.contains(modID)) return "0.0.0";
 		return config.getString(modID);
 	}
 	
@@ -254,5 +308,13 @@ public class MigrationProfile {
 				WorldDataAPI.saveFile(entry.getKey());
 			}
 		}
+	}
+	
+	public boolean patchBlockState(ListTag palette, ListTag states) throws PatchDidiFailException{
+		boolean changed = false;
+		for (PatchBiFunction<ListTag, ListTag, Boolean> f : statePatchers) {
+			changed |= f.apply(palette, states, this);
+		}
+		return changed;
 	}
 }

@@ -3,7 +3,7 @@ package ru.bclib.gui.gridlayout;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import ru.bclib.util.TriConsumer;
+import ru.bclib.interfaces.TriConsumer;
 
 import java.util.List;
 import java.util.function.Function;

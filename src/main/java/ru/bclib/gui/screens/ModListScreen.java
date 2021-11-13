@@ -73,13 +73,14 @@ public class ModListScreen extends BCLibScreen {
 
 
     public static void addModDesc(GridColumn grid, java.util.List<ModUtil.ModInfo> mods, HelloClient.IServerModMap serverInfo, GridScreen parent) {
-        final int STATE_OK = 0;
-        final int STATE_MISSING = 1;
-        final int STATE_SERVER_MISSING = 2;
-        final int STATE_VERSION = 3;
-        final int STATE_SERVER_MISSING_CLIENT_MOD = 4;
-        final int STATE_VERSION_NOT_OFFERED = 5;
-        final int STATE_MISSING_NOT_OFFERED = 6;
+        final int STATE_OK = 6;
+        final int STATE_SERVER_MISSING_CLIENT_MOD = 5;
+        final int STATE_MISSING_NOT_OFFERED = 4;
+        final int STATE_VERSION_NOT_OFFERED = 3;
+        final int STATE_VERSION = 2;
+        final int STATE_SERVER_MISSING = 1;
+        final int STATE_MISSING = 0;
+        
 
         List<Triple<String, Integer, String>> items = new LinkedList<>();
         if (serverInfo!=null) {
@@ -141,7 +142,7 @@ public class ModListScreen extends BCLibScreen {
         });
 
         items.stream()
-                .sorted(Comparator.comparing(a -> a.first.toLowerCase(Locale.ROOT)))
+                .sorted(Comparator.comparing(a -> a.second + a.first.toLowerCase(Locale.ROOT)))
                 .forEach(t -> {
                     final String name = t.first;
                     final int state = t.second;
@@ -160,12 +161,14 @@ public class ModListScreen extends BCLibScreen {
                             color = GridLayout.COLOR_YELLOW;
                         }
                     } else if (state==STATE_SERVER_MISSING || state == STATE_SERVER_MISSING_CLIENT_MOD) {
-                        typeText = "[NOT ON SERVER]";
                         if (state == STATE_SERVER_MISSING_CLIENT_MOD) {
-                            color = GridLayout.COLOR_YELLOW;
+                            color = GridLayout.COLOR_CYAN;
+                            typeText = "[OK]";
+                        } else {
+                            typeText = "[NOT ON SERVER]";
                         }
                     } else {
-                        color = GridLayout.COLOR_CYAN;
+                        color = GridLayout.COLOR_DARK_GREEN;
                         typeText = "[OK]";
                     }
                     TextComponent dash = new TextComponent("-");
@@ -208,7 +211,6 @@ public class ModListScreen extends BCLibScreen {
         row.addFiller();
         row.addButton(buttonTitle, 20, font, (n)-> {
             onClose();
-            System.out.println("Closing");
         });
         row.addFiller();
     }

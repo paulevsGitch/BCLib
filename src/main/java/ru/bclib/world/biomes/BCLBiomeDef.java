@@ -70,6 +70,7 @@ public class BCLBiomeDef {
 	private int waterFogColor = 329011;
 	private int waterColor = 4159204;
 	private int fogColor = 10518688;
+	private int skyColor = 0;
 	private float fogDensity = 1F;
 	private float depth = 0.1F;
 	
@@ -247,9 +248,22 @@ public class BCLBiomeDef {
 		return ColorUtil.color(r, g, b);
 	}
 	
-	public BCLBiomeDef setFogColor(int r, int g, int b) {
-		this.fogColor = getColor(r, g, b);
+	public BCLBiomeDef setSkyColor(int rgb) {
+		this.skyColor = rgb;
 		return this;
+	}
+	
+	public BCLBiomeDef setSkyColor(int r, int g, int b) {
+		return setSkyColor(getColor(r, g, b));
+	}
+	
+	public BCLBiomeDef setFogColor(int rgb) {
+		this.fogColor = rgb;
+		return this;
+	}
+	
+	public BCLBiomeDef setFogColor(int r, int g, int b) {
+		return setFogColor(getColor(r, g, b));
 	}
 	
 	public BCLBiomeDef setFogDensity(float density) {
@@ -333,7 +347,7 @@ public class BCLBiomeDef {
 		
 		addCustomToBuild(generationSettings);
 		
-		effects.skyColor(0)
+		effects.skyColor(skyColor)
 			   .waterColor(waterColor)
 			   .waterFogColor(waterFogColor)
 			   .fogColor(fogColor)
@@ -380,9 +394,9 @@ public class BCLBiomeDef {
 		ConfiguredFeature<?, ?> feature;
 	}
 	
-	private static final class CarverInfo {
+	private static final class CarverInfo <C extends CarverConfiguration> {
 		Carving carverStep;
-		ConfiguredWorldCarver<CarverConfiguration> carver;
+		ConfiguredWorldCarver<C> carver;
 	}
 	
 	public ResourceLocation getID() {
@@ -401,7 +415,7 @@ public class BCLBiomeDef {
 		return edgeSize;
 	}
 	
-	public BCLBiomeDef addCarver(Carving carverStep, ConfiguredWorldCarver<CarverConfiguration> carver) {
+	public <C extends CarverConfiguration> BCLBiomeDef addCarver(Carving carverStep, ConfiguredWorldCarver<C> carver) {
 		CarverInfo info = new CarverInfo();
 		info.carverStep = carverStep;
 		info.carver = carver;

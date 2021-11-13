@@ -34,9 +34,16 @@ public class TagAPI {
 	public static final Tag.Named<Block> BLOCK_END_GROUND = makeBlockTag(BCLib.MOD_ID, "end_ground");
 	
 	public static final Tag.Named<Block> BLOCK_CHEST = makeCommonBlockTag("chest");
+	public static final Tag.Named<Block> BLOCK_WOODEN_CHEST = makeCommonBlockTag("wooden_chests");
+	public static final Tag.Named<Block> BLOCK_BARREL = makeCommonBlockTag("barrel");
+	public static final Tag.Named<Block> BLOCK_WOODEN_BARREL = makeCommonBlockTag("wooden_barrels");
 	public static final Tag.Named<Block> BLOCK_END_STONES = makeCommonBlockTag("end_stones");
 	public static final Tag.Named<Block> BLOCK_NETHER_STONES = makeCommonBlockTag("nether_stones");
-	public static final Tag.Named<Block> BLOCK_WORKBENCHES = makeCommonBlockTag("workbenches");
+	public static final Tag.Named<Block> BLOCK_NETHER_PORTAL_FRAME = makeCommonBlockTag("nether_pframe");
+	public static final Tag.Named<Block> BLOCK_WORKBENCHES = makeCommonBlockTag("workbench");
+	public static final Tag.Named<Block> BLOCK_SAPLINGS = makeCommonBlockTag("saplings");
+	public static final Tag.Named<Block> BLOCK_LEAVES = makeCommonBlockTag("leaves");
+	public static final Tag.Named<Block> BLOCK_IMMOBILE = makeCommonBlockTag("immobile");
 	
 	public static final Tag.Named<Block> BLOCK_DRAGON_IMMUNE = getMCBlockTag("dragon_immune");
 	
@@ -47,11 +54,19 @@ public class TagAPI {
 	
 	// Item Tags
 	public static final Tag.Named<Item> ITEM_CHEST = makeCommonItemTag("chest");
+	public static final Tag.Named<Item> ITEM_WOODEN_CHEST = makeCommonItemTag("wooden_chests");
+	public static final Tag.Named<Item> ITEM_BARREL = makeCommonItemTag("barrel");
+	public static final Tag.Named<Item> ITEM_WOODEN_BARREL = makeCommonItemTag("wooden_barrels");
 	public static final Tag.Named<Item> ITEM_IRON_INGOTS = makeCommonItemTag("iron_ingots");
 	public static final Tag.Named<Item> ITEM_FURNACES = makeCommonItemTag("furnaces");
-	public static final Tag.Named<Item> ITEM_WORKBENCHES = makeCommonItemTag("workbenches");
+	public static final Tag.Named<Item> ITEM_WORKBENCHES = makeCommonItemTag("workbench");
 	public final static Tag.Named<Item> ITEM_HAMMERS = makeCommonItemTag("hammers");
-	
+	public static final Tag.Named<Item> ITEM_SAPLINGS = makeCommonItemTag("saplings");
+	public static final Tag.Named<Item> ITEM_LEAVES = makeCommonItemTag("leaves");
+	public static final Tag.Named<Item> ITEM_SHEARS = getMCItemTag("shears");
+	public static final Tag.Named<Item> ITEM_COMMON_SHEARS = makeCommonItemTag("shears");
+
+
 	/**
 	 * Get or create {@link Tag.Named}.
 	 *
@@ -120,6 +135,18 @@ public class TagAPI {
 		Tag<Block> tag = BlockTags.getAllTags().getTag(id);
 		//return tag == null ? (Named<Block>) TagRegistry.block(id) : (Named<Block>) tag;
 		return tag == null ? (Named<Block>) TagFactory.BLOCK.create(id): (Named<Block>) tag;
+	}
+	
+	/**
+	 * Get or create Minecraft {@link Item} {@link Tag.Named}.
+	 *
+	 * @param name - {@link String} tag name.
+	 * @return {@link Item} {@link Tag.Named}.
+	 */
+	public static Tag.Named<Item> getMCItemTag(String name) {
+		ResourceLocation id = new ResourceLocation(name);
+		Tag<Item> tag = ItemTags.getAllTags().getTag(id);
+		return tag == null ? (Named<Item>) TagRegistry.item(id) : (Named<Item>) tag;
 	}
 	
 	/**

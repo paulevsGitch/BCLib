@@ -1,28 +1,42 @@
 package ru.bclib.api;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.biome.v1.NetherBiomes;
-import net.fabricmc.fabric.impl.biome.NetherBiomeData;
-import net.fabricmc.fabric.impl.biome.TheEndBiomeData;
+import net.fabricmc.fabric.impl.biome.InternalBiomeData;
+import net.fabricmc.fabric.mixin.biome.modification.GenerationSettingsAccessor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.Registry;
 import net.minecraft.data.BuiltinRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.Biome.ClimateParameters;
+import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.biome.Biomes;
-import net.minecraft.world.level.biome.Climate;
+import net.minecraft.world.level.levelgen.GenerationStep.Decoration;
+import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
+import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
 import org.jetbrains.annotations.Nullable;
 import ru.bclib.util.MHelper;
 import ru.bclib.world.biomes.BCLBiome;
 import ru.bclib.world.biomes.FabricBiomesData;
+import ru.bclib.world.features.BCLFeature;
 import ru.bclib.world.generator.BiomePicker;
+import ru.bclib.world.structures.BCLStructureFeature;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
+import java.util.function.BiConsumer;
+import java.util.function.Supplier;
 
 public class BiomeAPI {
 	/**
@@ -38,6 +52,9 @@ public class BiomeAPI {
 	private static final Map<ResourceLocation, BCLBiome> ID_MAP = Maps.newHashMap();
 	private static final Map<Biome, BCLBiome> CLIENT = Maps.newHashMap();
 	private static Registry<Biome> biomeRegistry;
+	
+	private static final Map<ResourceKey, List<BiConsumer<ResourceLocation, Biome>>> MODIFICATIONS = Maps.newHashMap();
+	private static final Set<ResourceLocation> MODIFIED_BIOMES = Sets.newHashSet();
 	
 	public static final BCLBiome NETHER_WASTES_BIOME = registerNetherBiome(getFromRegistry(Biomes.NETHER_WASTES));
 	public static final BCLBiome CRIMSON_FOREST_BIOME = registerNetherBiome(getFromRegistry(Biomes.CRIMSON_FOREST));
@@ -324,5 +341,144 @@ public class BiomeAPI {
 	
 	private static boolean pickerHasBiome(BiomePicker picker, ResourceLocation key) {
 		return picker.getBiomes().stream().filter(biome -> biome.getID().equals(key)).findFirst().isPresent();
+	}
+	
+	/**
+	 * Registers new biome modification for specified dimension. Will work both for mod and datapack biomes.
+	 * @param dimensionID {@link ResourceLocation} dimension ID, example: Level.OVERWORLD or "minecraft:overworld".
+	 * @param modification {@link BiConsumer} with {@link ResourceKey} biome ID and {@link Biome} parameters.
+	 */
+	public static void registerBiomeModification(ResourceKey dimensionID, BiConsumer<ResourceLocation, Biome> modification) {
+		List<BiConsumer<ResourceLocation, Biome>> modifications = MODIFICATIONS.get(dimensionID);
+		if (modifications == null) {
+			modifications = Lists.newArrayList();
+			MODIFICATIONS.put(dimensionID, modifications);
+		}
+		modifications.add(modification);
+	}
+	
+	/**
+	 * Registers new biome modification for the Overworld. Will work both for mod and datapack biomes.
+	 * @param modification {@link BiConsumer} with {@link ResourceLocation} biome ID and {@link Biome} parameters.
+	 */
+	public static void registerOverworldBiomeModification(BiConsumer<ResourceLocation, Biome> modification) {
+		registerBiomeModification(Level.OVERWORLD, modification);
+	}
+	
+	/**
+	 * Registers new biome modification for the Nether. Will work both for mod and datapack biomes.
+	 * @param modification {@link BiConsumer} with {@link ResourceLocation} biome ID and {@link Biome} parameters.
+	 */
+	public static void registerNetherBiomeModification(BiConsumer<ResourceLocation, Biome> modification) {
+		registerBiomeModification(Level.NETHER, modification);
+	}
+	
+	/**
+	 * Registers new biome modification for the End. Will work both for mod and datapack biomes.
+	 * @param modification {@link BiConsumer} with {@link ResourceLocation} biome ID and {@link Biome} parameters.
+	 */
+	public static void registerEndBiomeModification(BiConsumer<ResourceLocation, Biome> modification) {
+		registerBiomeModification(Level.END, modification);
+	}
+	
+	/**
+	 * Will apply biome modifications to world, internal usage only.
+	 * @param level
+	 */
+	public static void applyModifications(ServerLevel level) {
+		List<BiConsumer<ResourceLocation, Biome>> modifications = MODIFICATIONS.get(level.dimension());
+		if (modifications == null) {
+			return;
+		}
+		BiomeSource source = level.getChunkSource().getGenerator().getBiomeSource();
+		List<Biome> biomes = source.possibleBiomes();
+		
+		biomes.forEach(biome -> {
+			ResourceLocation biomeID =  getBiomeID(biome);
+			boolean modify = isDatapackBiome(biomeID);
+			if (!modify && !MODIFIED_BIOMES.contains(biomeID)) {
+				MODIFIED_BIOMES.add(biomeID);
+				modify = true;
+			}
+			if (modify) {
+				modifications.forEach(consumer -> {
+					consumer.accept(biomeID, biome);
+				});
+			}
+		});
+	}
+	
+	/**
+	 * Adds new features to existing biome.
+	 * @param biome {@link Biome} to add features in.
+	 * @param feature {@link ConfiguredFeature} to add.
+	 * @param step a {@link Decoration} step for the feature.
+	 */
+	public static void addBiomeFeature(Biome biome, ConfiguredFeature feature, Decoration step) {
+		GenerationSettingsAccessor accessor = (GenerationSettingsAccessor) biome.getGenerationSettings();
+		List<List<Supplier<ConfiguredFeature<?, ?>>>> biomeFeatures = getMutableList(accessor.fabric_getFeatures());
+		int index = step.ordinal();
+		if (biomeFeatures.size() < index) {
+			for (int i = biomeFeatures.size(); i <= index; i++) {
+				biomeFeatures.add(Lists.newArrayList());
+			}
+		}
+		List<Supplier<ConfiguredFeature<?, ?>>> list = getMutableList(biomeFeatures.get(index));
+		list.add(() -> feature);
+		accessor.fabric_setFeatures(biomeFeatures);
+	}
+	
+	/**
+	 * Adds new features to existing biome.
+	 * @param biome {@link Biome} to add features in.
+	 * @param features array of {@link BCLFeature} to add.
+	 */
+	public static void addBiomeFeatures(Biome biome, BCLFeature... features) {
+		GenerationSettingsAccessor accessor = (GenerationSettingsAccessor) biome.getGenerationSettings();
+		List<List<Supplier<ConfiguredFeature<?, ?>>>> biomeFeatures = getMutableList(accessor.fabric_getFeatures());
+		for (BCLFeature feature: features) {
+			int index = feature.getFeatureStep().ordinal();
+			if (biomeFeatures.size() < index) {
+				for (int i = biomeFeatures.size(); i <= index; i++) {
+					biomeFeatures.add(Lists.newArrayList());
+				}
+			}
+			List<Supplier<ConfiguredFeature<?, ?>>> list = getMutableList(biomeFeatures.get(index));
+			list.add(feature::getFeatureConfigured);
+		}
+		accessor.fabric_setFeatures(biomeFeatures);
+	}
+	
+	/**
+	 * Adds new structure feature to existing biome.
+	 * @param biome {@link Biome} to add structure feature in.
+	 * @param structure {@link ConfiguredStructureFeature} to add.
+	 */
+	public static void addBiomeStructure(Biome biome, ConfiguredStructureFeature structure) {
+		GenerationSettingsAccessor accessor = (GenerationSettingsAccessor) biome.getGenerationSettings();
+		List<Supplier<ConfiguredStructureFeature<?, ?>>> biomeStructures = getMutableList(accessor.fabric_getStructureFeatures());
+		biomeStructures.add(() -> structure);
+		accessor.fabric_setStructureFeatures(biomeStructures);
+	}
+	
+	/**
+	 * Adds new structure features to existing biome.
+	 * @param biome {@link Biome} to add structure features in.
+	 * @param structures array of {@link BCLStructureFeature} to add.
+	 */
+	public static void addBiomeStructures(Biome biome, BCLStructureFeature... structures) {
+		GenerationSettingsAccessor accessor = (GenerationSettingsAccessor) biome.getGenerationSettings();
+		List<Supplier<ConfiguredStructureFeature<?, ?>>> biomeStructures = getMutableList(accessor.fabric_getStructureFeatures());
+		for (BCLStructureFeature structure: structures) {
+			biomeStructures.add(structure::getFeatureConfigured);
+		}
+		accessor.fabric_setStructureFeatures(biomeStructures);
+	}
+	
+	private static <T extends Object> List<T> getMutableList(List<T> input) {
+		if (input instanceof ImmutableList) {
+			return Lists.newArrayList(input);
+		}
+		return input;
 	}
 }

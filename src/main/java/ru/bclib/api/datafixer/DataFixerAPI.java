@@ -25,6 +25,8 @@ import ru.bclib.api.WorldDataAPI;
 import ru.bclib.config.Configs;
 import ru.bclib.gui.screens.AtomicProgressListener;
 import ru.bclib.gui.screens.ConfirmFixScreen;
+import ru.bclib.gui.screens.LevelFixErrorScreen;
+import ru.bclib.gui.screens.LevelFixErrorScreen.Listener;
 import ru.bclib.gui.screens.ProgressScreen;
 import ru.bclib.util.Logger;
 
@@ -39,6 +41,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.zip.ZipException;
 
 /**
  * API to manage Patches that need to get applied to a world
@@ -47,6 +50,24 @@ public class DataFixerAPI {
 	static final Logger LOGGER = new Logger("DataFixerAPI");
 	static class State {
 		public boolean didFail = false;
+		protected ArrayList<String> errors = new ArrayList<>();
+
+		public void addError(String s){
+			errors.add(s);
+		}
+
+		public boolean hasError(){
+			return errors.size()>0;
+		}
+
+		public String getErrorMessage(){
+			return errors.stream().reduce("", (a, b) -> a + "  - " + b + "\n");
+		}
+
+		public String[] getErrorMessages(){
+			String[] res = new String[errors.size()];
+			return errors.toArray(res);
+		}
 	}
 	
 	@FunctionalInterface
@@ -200,30 +221,48 @@ public class DataFixerAPI {
 				progress = null;
 			}
 
-			Runnable runner = () -> {
+			Supplier<State> runner = () -> {
 				if (createBackup) {
 					progress.progressStage(new TranslatableComponent("message.bclib.datafixer.progress.waitbackup"));
 					EditWorldScreen.makeBackupAndShowToast(Minecraft.getInstance().getLevelSource(), levelID);
 				}
 
 				if (applyFixes) {
-					runDataFixes(dir, profile, progress);
+					return runDataFixes(dir, profile, progress);
 				}
+
+				return new State();
 			};
 
 			if (showUI) {
 				Thread fixerThread = new Thread(() -> {
-					runner.run();
-
-					Minecraft.getInstance().execute(() -> {
-						if (profile != null && showUI) {
-							onResume.accept(applyFixes);
-						}
-					});
+					final State state = runner.get();
+					
+					Minecraft.getInstance()
+							 .execute(() -> {
+								 if (profile != null && showUI) {
+									 //something went wrong, show the user our error
+									 if (state.didFail || state.hasError()){
+									 	showLevelFixErrorScreen(state, (markFixed)->{
+											if (markFixed) {
+												profile.markApplied();
+											}
+											onResume.accept(applyFixes);
+										});
+									 } else {
+									 	onResume.accept(applyFixes);
+									 }
+								 }
+							 });
+					
 				});
 				fixerThread.start();
 			} else {
-				runner.run();
+				State state = runner.get();
+				if (state.hasError()){
+					LOGGER.error("There were Errors while fixing the Level:");
+					LOGGER.error(state.getErrorMessage());
+				}
 			}
 		};
 		
@@ -239,6 +278,11 @@ public class DataFixerAPI {
 			}
 		}
 		return false;
+	}
+	@Environment(EnvType.CLIENT)
+	private static void showLevelFixErrorScreen(State state, Listener onContinue){
+		Minecraft.getInstance()
+				 .setScreen(new LevelFixErrorScreen(Minecraft.getInstance().screen, state.getErrorMessages(), onContinue));
 	}
 	
 	private static MigrationProfile loadProfileIfNeeded(File levelBaseDir){
@@ -270,7 +314,7 @@ public class DataFixerAPI {
 		Minecraft.getInstance().setScreen(new ConfirmFixScreen((Screen) null, whenFinished::accept));
 	}
 
-	private static void runDataFixes(File dir, MigrationProfile profile, AtomicProgressListener progress) {
+	private static State runDataFixes(File dir, MigrationProfile profile, AtomicProgressListener progress) {
 		State state = new State();
 		progress.resetAtomic();
 
@@ -295,6 +339,7 @@ public class DataFixerAPI {
 			profile.patchWorldData();
 		} catch (PatchDidiFailException e){
 			state.didFail = true;
+			state.addError("Failed fixing worldconfig (" + e.getMessage() + ")");
 			BCLib.LOGGER.error(e.getMessage());
 		}
 		progress.incAtomic(maxProgress);
@@ -313,6 +358,8 @@ public class DataFixerAPI {
 		progress.incAtomic(maxProgress);
 
 		progress.stop();
+
+		return state;
 	}
 	
 	private static void fixLevel(MigrationProfile profile, State state, File levelBaseDir) {
@@ -342,15 +389,17 @@ public class DataFixerAPI {
 		}
 		catch (Exception e) {
 			BCLib.LOGGER.error("Failed fixing Level-Data.");
+			state.addError("Failed fixing Level-Data in level.dat (" + e.getMessage() + ")");
 			state.didFail = true;
 			e.printStackTrace();
 		}
 	}
-
+	
 	private static void fixPlayer(MigrationProfile data, State state, File file) {
 		try {
 			LOGGER.info("Inspecting " + file);
-			CompoundTag player = NbtIo.readCompressed(file);
+			
+			CompoundTag player = readNbt(file);
 			boolean[] changed = { false };
 			fixPlayerNbt(player, changed, data);
 
@@ -361,11 +410,12 @@ public class DataFixerAPI {
 		}
 		catch (Exception e) {
 			BCLib.LOGGER.error("Failed fixing Player-Data.");
+			state.addError("Failed fixing Player-Data in " + file.getName() + " (" + e.getMessage() + ")");
 			state.didFail = true;
 			e.printStackTrace();
 		}
 	}
-
+	
 	private static void fixPlayerNbt(CompoundTag player, boolean[] changed, MigrationProfile data) {
 		//Checking Inventory
 		ListTag inventory = player.getList("Inventory", Tag.TAG_COMPOUND);
@@ -416,7 +466,7 @@ public class DataFixerAPI {
 				for (int z = 0; z < 32; z++) {
 					ChunkPos pos = new ChunkPos(x, z);
 					changed[0] = false;
-					if (region.hasChunk(pos)) {
+					if (region.hasChunk(pos) && !state.didFail) {
 						DataInputStream input = region.getChunkDataInputStream(pos);
 						CompoundTag root = NbtIo.read(input);
 						// if ((root.toString().contains("betternether:chest") || root.toString().contains("bclib:chest"))) {
@@ -442,6 +492,17 @@ public class DataFixerAPI {
 								CompoundTag blockTagCompound = ((CompoundTag) blockTag);
 								changed[0] |= data.replaceStringFromIDs(blockTagCompound, "Name");
 							});
+							
+							try {
+								changed[0] |= data.patchBlockState(palette, ((CompoundTag) tag).getList("BlockStates", Tag.TAG_LONG));
+							}
+							catch (PatchDidiFailException e) {
+								BCLib.LOGGER.error("Failed fixing BlockState in " + pos);
+								state.addError("Failed fixing BlockState in " + pos + " (" + e.getMessage() + ")");
+								state.didFail = true;
+								changed[0] = false;
+								e.printStackTrace();
+							}
 						});
 
 						if (changed[0]) {
@@ -450,7 +511,6 @@ public class DataFixerAPI {
 							DataOutputStream output = region.getChunkDataOutputStream(pos);
 							NbtIo.write(root, output);
 							output.close();
-
 						}
 					}
 				}
@@ -458,12 +518,13 @@ public class DataFixerAPI {
 			region.close();
 		}
 		catch (Exception e) {
-			BCLib.LOGGER.error("Failed fixing Player Data.");
+			BCLib.LOGGER.error("Failed fixing Region.");
+			state.addError("Failed fixing Region in " + file.getName() + " (" + e.getMessage() + ")");
 			state.didFail = true;
 			e.printStackTrace();
 		}
 	}
-
+	
 	static CompoundTag patchConfTag = null;
 	static CompoundTag getPatchData(){
 		if (patchConfTag==null) {
@@ -538,6 +599,14 @@ public class DataFixerAPI {
 	 */
 	public static void registerPatch(Supplier<Patch> patch) {
 		Patch.getALL().add(patch.get());
+	}
+	
+	private static CompoundTag readNbt(File file) throws IOException {
+		try {
+			return NbtIo.readCompressed(file);
+		} catch (ZipException e){
+			return NbtIo.read(file);
+		}
 	}
 	
 }

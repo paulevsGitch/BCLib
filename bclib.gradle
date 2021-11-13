@@ -167,3 +167,14 @@ publishing {
 		}
 	}
 }
+
+configurations {
+    dev {
+        canBeResolved = false
+        canBeConsumed = true
+    }
+}
+
+artifacts {
+    dev jar
+}

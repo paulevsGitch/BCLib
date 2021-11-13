@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class BaseLeavesBlock extends LeavesBlock implements BlockModelProvider, RenderLayerProvider {
-	private final Block sapling;
+	protected final Block sapling;
 	
 	private static FabricBlockSettings makeLeaves(MaterialColor color) {
 		return FabricBlockSettings.copyOf(Blocks.OAK_LEAVES)
@@ -37,12 +37,12 @@ public class BaseLeavesBlock extends LeavesBlock implements BlockModelProvider, 
 								  .suffocates((state, world, pos) -> false)
 								  .blockVision((state, world, pos) -> false);
 	}
-	
+
 	public BaseLeavesBlock(Block sapling, MaterialColor color, Consumer<FabricBlockSettings> customizeProperties) {
 		super(BaseBlock.acceptAndReturn(customizeProperties, makeLeaves(color)));
 		this.sapling = sapling;
 	}
-	
+
 	public BaseLeavesBlock(Block sapling, MaterialColor color, int light, Consumer<FabricBlockSettings> customizeProperties) {
 		super(BaseBlock.acceptAndReturn(customizeProperties, makeLeaves(color).luminance(light)));
 		this.sapling = sapling;

@@ -29,6 +29,7 @@ public class BCLibNetherBiomeSource extends BiomeSource {
 	private BiomeMap biomeMap;
 	private final long seed;
 	
+	@Deprecated(forRemoval = true)
 	public static final List<Consumer<BCLibNetherBiomeSource>> onInit = new LinkedList<>();
 	
 	public BCLibNetherBiomeSource(Registry<Biome> biomeRegistry, long seed) {

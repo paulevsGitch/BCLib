@@ -7,7 +7,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
 import ru.bclib.gui.gridlayout.GridLayout.Alignment;
 import ru.bclib.gui.gridlayout.GridRow;
-import ru.bclib.gui.gridlayout.GridScreen;
 
 @Environment(EnvType.CLIENT)
 public class WarnBCLibVersionMismatch extends BCLibScreen {

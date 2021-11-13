@@ -100,8 +100,7 @@ public abstract class MinecraftMixin {
 		DataExchangeAPI.prepareServerside();
 		
 		if (DataFixerAPI.fixData(this.levelSource, levelID, true, (appliedFixes) -> {
-			bclib_doLoadLevel_BACKUP(levelID, RegistryAccess.builtin(), Minecraft::loadDataPacks, Minecraft::loadWorldData, false);
-			//this.doLoadLevel(levelID, RegistryAccess.builtin(), Minecraft::loadDataPacks, Minecraft::loadWorldData, false,  Minecraft.ExperimentalDialogType.BACKUP);
+			this.doLoadLevel(levelID, RegistryAccess.builtin(), Minecraft::loadDataPacks, Minecraft::loadWorldData, false, appliedFixes?ExperimentalDialogType.NONE:ExperimentalDialogType.BACKUP);
 		})) {
 			ci.cancel();
 		}
