@@ -20,6 +20,7 @@
 		"MinecraftServerMixin",
 		"PistonBaseBlockMixin",
 		"WorldGenRegionMixin",
+		"LayerLightSectionStorageMixin",
 		"DimensionTypeMixin",
 		"RecipeManagerMixin",
 		"CraftingMenuMixin",
