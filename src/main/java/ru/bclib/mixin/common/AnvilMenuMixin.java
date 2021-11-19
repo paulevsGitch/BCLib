@@ -81,21 +81,22 @@ public abstract class AnvilMenuMixin extends ItemCombinerMenu implements AnvilSc
 			stack = be_currentRecipe.craft(inputSlots, player);
 			slotsChanged(inputSlots);
 			access.execute((world, blockPos) -> {
-				BlockState anvilState = world.getBlockState(blockPos);
-				BaseAnvilBlock anvil = (BaseAnvilBlock) anvilState.getBlock();
-				if (!player.getAbilities().instabuild && anvilState.is(BlockTags.ANVIL) && player.getRandom().nextDouble() < 0.1) {
-					BlockState damagedState = anvil.damageAnvilUse(anvilState, player.getRandom());
-					if (damagedState == null) {
-						world.removeBlock(blockPos, false);
-						world.levelEvent(1029, blockPos, 0);
-					}
-					else {
-						world.setBlock(blockPos, damagedState, 2);
+				final BlockState anvilState = world.getBlockState(blockPos);
+				final Block anvilBlock = anvilState.getBlock();
+				if (anvilBlock instanceof BaseAnvilBlock) {
+					final BaseAnvilBlock anvil = (BaseAnvilBlock) anvilBlock;
+					if (!player.getAbilities().instabuild && anvilState.is(BlockTags.ANVIL) && player.getRandom().nextDouble() < 0.1) {
+						BlockState damagedState = anvil.damageAnvilUse(anvilState, player.getRandom());
+						if (damagedState == null) {
+							world.removeBlock(blockPos, false);
+							world.levelEvent(1029, blockPos, 0);
+						} else {
+							world.setBlock(blockPos, damagedState, 2);
+							world.levelEvent(1030, blockPos, 0);
+						}
+					} else {
 						world.levelEvent(1030, blockPos, 0);
 					}
-				}
-				else {
-					world.levelEvent(1030, blockPos, 0);
 				}
 			});
 			info.cancel();
