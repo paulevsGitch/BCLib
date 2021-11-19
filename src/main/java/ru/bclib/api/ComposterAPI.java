@@ -7,14 +7,14 @@ import ru.bclib.mixin.common.ComposterBlockAccessor;
 
 public class ComposterAPI {
 	public static Block allowCompost(float chance, Block block){
-		if (block!=null){
+		if (block != null) {
 			allowCompost(chance, block.asItem());
 		}
 		return block;
 	}
 	
 	public static Item allowCompost(float chance, Item item){
-		if (item!=null && item != Items.AIR) {
+		if (item != null && item != Items.AIR) {
 			ComposterBlockAccessor.callAdd(chance, item);
 		}
 		return item;
