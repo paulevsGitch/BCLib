@@ -570,6 +570,9 @@ public class DataFixerAPI {
 	private static List<File> getAllPlayers(File dir) {
 		List<File> list = new ArrayList<>();
 		dir = new File(dir, "playerdata");
+		if (!dir.exists() || !dir.isDirectory()) {
+			return list;
+		}
 		for (File file : dir.listFiles()) {
 			if (file.isFile() && file.getName().endsWith(".dat")) {
 				list.add(file);
