@@ -32,6 +32,7 @@ import net.minecraft.world.level.levelgen.surfacebuilders.ConfiguredSurfaceBuild
 import net.minecraft.world.level.levelgen.surfacebuilders.SurfaceBuilder;
 import net.minecraft.world.level.levelgen.surfacebuilders.SurfaceBuilderBaseConfiguration;
 import ru.bclib.config.IdConfig;
+import ru.bclib.config.PathConfig;
 import ru.bclib.util.ColorUtil;
 import ru.bclib.world.features.BCLFeature;
 import ru.bclib.world.structures.BCLStructureFeature;
@@ -113,7 +114,6 @@ public class BCLBiomeDef {
 	
 	/**
 	 * Used to load biome settings from config.
-	 *
 	 * @param config - {@link IdConfig}.
 	 * @return this {@link BCLBiomeDef}.
 	 */
@@ -125,8 +125,20 @@ public class BCLBiomeDef {
 	}
 	
 	/**
+	 * Used to load biome settings from config.
+	 * @param config - {@link PathConfig}.
+	 * @return this {@link BCLBiomeDef}.
+	 */
+	public BCLBiomeDef loadConfigValues(PathConfig config) {
+		String biomePath = id.getNamespace() + "." + id.getPath();
+		this.fogDensity = config.getFloat(biomePath, "fog_density", this.fogDensity);
+		this.genChance = config.getFloat(biomePath, "generation_chance", this.genChance);
+		this.edgeSize = config.getInt(biomePath, "edge_size", this.edgeSize);
+		return this;
+	}
+	
+	/**
 	 * Set category of the biome.
-	 *
 	 * @param category - {@link BiomeCategory}.
 	 * @return this {@link BCLBiomeDef}.
 	 */

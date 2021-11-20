@@ -7,6 +7,8 @@ import com.google.gson.JsonObject;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.Biomes;
+import ru.bclib.config.Configs;
 import ru.bclib.util.JsonFactory;
 import ru.bclib.util.StructureHelper;
 import ru.bclib.util.WeightedList;
@@ -38,6 +40,7 @@ public class BCLBiome {
 	private Biome actualBiome;
 	
 	public BCLBiome(BCLBiomeDef definition) {
+		definition.loadConfigValues(Configs.BIOMES_CONFIG);
 		this.mcID = definition.getID();
 		this.readStructureList();
 		if (structuresFeature != null) {
@@ -53,8 +56,15 @@ public class BCLBiome {
 	public BCLBiome(ResourceLocation id, Biome biome, float fogDensity, float genChance) {
 		this.mcID = id;
 		this.biome = biome;
-		this.genChance = genChance;
-		this.fogDensity = fogDensity;
+		if (id.equals(Biomes.THE_VOID.location())) {
+			this.genChance = fogDensity;
+			this.fogDensity = genChance;
+		}
+		else {
+			String biomePath = id.getNamespace() + "." + id.getPath();
+			this.genChance = Configs.BIOMES_CONFIG.getFloat(biomePath, "generation_chance", genChance);
+			this.fogDensity = Configs.BIOMES_CONFIG.getFloat(biomePath, "fog_density", fogDensity);
+		}
 		this.readStructureList();
 		this.customData = Maps.newHashMap();
 		subbiomes.add(this, 1);

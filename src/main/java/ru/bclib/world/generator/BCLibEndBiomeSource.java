@@ -14,6 +14,7 @@ import net.minecraft.world.level.levelgen.WorldgenRandom;
 import net.minecraft.world.level.levelgen.synth.SimplexNoise;
 import ru.bclib.BCLib;
 import ru.bclib.api.BiomeAPI;
+import ru.bclib.config.Configs;
 import ru.bclib.noise.OpenSimplexNoise;
 import ru.bclib.world.biomes.BCLBiome;
 
@@ -61,6 +62,8 @@ public class BCLibEndBiomeSource extends BiomeSource {
 				}
 			}
 		});
+		
+		Configs.BIOMES_CONFIG.saveChanges();
 		
 		BiomeAPI.END_LAND_BIOME_PICKER.getBiomes().forEach(biome -> biome.updateActualBiomes(biomeRegistry));
 		BiomeAPI.END_VOID_BIOME_PICKER.getBiomes().forEach(biome -> biome.updateActualBiomes(biomeRegistry));

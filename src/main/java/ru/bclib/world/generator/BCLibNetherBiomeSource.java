@@ -10,6 +10,7 @@ import net.minecraft.world.level.biome.Biome.BiomeCategory;
 import net.minecraft.world.level.biome.BiomeSource;
 import ru.bclib.BCLib;
 import ru.bclib.api.BiomeAPI;
+import ru.bclib.config.Configs;
 import ru.bclib.world.biomes.BCLBiome;
 
 import java.util.LinkedList;
@@ -52,6 +53,7 @@ public class BCLibNetherBiomeSource extends BiomeSource {
 			}
 		});
 		
+		Configs.BIOMES_CONFIG.saveChanges();
 		BiomeAPI.NETHER_BIOME_PICKER.getBiomes().forEach(biome -> biome.updateActualBiomes(biomeRegistry));
 		BiomeAPI.NETHER_BIOME_PICKER.rebuild();
 		
