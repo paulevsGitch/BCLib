@@ -24,7 +24,6 @@ import net.minecraft.world.level.levelgen.GenerationStep.Decoration;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
 import org.jetbrains.annotations.Nullable;
-import ru.bclib.config.Configs;
 import ru.bclib.util.MHelper;
 import ru.bclib.world.biomes.BCLBiome;
 import ru.bclib.world.biomes.FabricBiomesData;
@@ -86,11 +85,6 @@ public class BiomeAPI {
 	 * @return {@link BCLBiome}
 	 */
 	public static BCLBiome registerBiome(BCLBiome biome) {
-		String biomePath = biome.getID().getNamespace() + "." + biome.getID().getPath();
-		if (!Configs.BIOMES_CONFIG.getBoolean(biomePath, "enabled", true)) {
-			return biome;
-		}
-		
 		if (BuiltinRegistries.BIOME.get(biome.getID()) == null) {
 			Registry.register(BuiltinRegistries.BIOME, biome.getID(), biome.getBiome());
 		}
@@ -99,11 +93,6 @@ public class BiomeAPI {
 	}
 	
 	public static BCLBiome registerSubBiome(BCLBiome parent, BCLBiome subBiome) {
-		String biomePath = subBiome.getID().getNamespace() + "." + subBiome.getID().getPath();
-		if (!Configs.BIOMES_CONFIG.getBoolean(biomePath, "enabled", true)) {
-			return subBiome;
-		}
-		
 		registerBiome(subBiome);
 		parent.addSubBiome(subBiome);
 		return subBiome;
