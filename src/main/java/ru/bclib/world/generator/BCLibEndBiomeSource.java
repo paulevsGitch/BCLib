@@ -14,6 +14,7 @@ import net.minecraft.world.level.levelgen.WorldgenRandom;
 import net.minecraft.world.level.levelgen.synth.SimplexNoise;
 import ru.bclib.BCLib;
 import ru.bclib.api.BiomeAPI;
+import ru.bclib.config.ConfigKeeper.StringArrayEntry;
 import ru.bclib.config.Configs;
 import ru.bclib.noise.OpenSimplexNoise;
 import ru.bclib.world.biomes.BCLBiome;
@@ -87,8 +88,15 @@ public class BCLibEndBiomeSource extends BiomeSource {
 	}
 	
 	private static List<Biome> getBiomes(Registry<Biome> biomeRegistry) {
+		List<String> include = Configs.BIOMES_CONFIG.getEntry("force_include", "end_biomes", StringArrayEntry.class).getValue();
+		
 		return biomeRegistry.stream().filter(biome -> {
 			ResourceLocation key = biomeRegistry.getKey(biome);
+			
+			if (include.contains(key.toString())) {
+				return true;
+			}
+			
 			BCLBiome bclBiome = BiomeAPI.getBiome(key);
 			if (bclBiome != BiomeAPI.EMPTY_BIOME) {
 				if (bclBiome.hasParentBiome()) {

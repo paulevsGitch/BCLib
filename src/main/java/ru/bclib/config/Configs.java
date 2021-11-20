@@ -3,6 +3,9 @@ package ru.bclib.config;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import ru.bclib.BCLib;
+import ru.bclib.config.ConfigKeeper.StringArrayEntry;
+
+import java.util.Collections;
 
 public class Configs {
 	// Client and Server-Config must be the first entries. They are not part of the Auto-Sync process
@@ -13,15 +16,22 @@ public class Configs {
 	
 	public static final PathConfig GENERATOR_CONFIG = new PathConfig(BCLib.MOD_ID, "generator", false);
 	public static final PathConfig MAIN_CONFIG = new PathConfig(BCLib.MOD_ID, "main", true, true);
-	public static final String MAIN_PATCH_CATEGORY = "patches";
 	
 	public static final PathConfig RECIPE_CONFIG = new PathConfig(BCLib.MOD_ID, "recipes");
 	public static final PathConfig BIOMES_CONFIG = new PathConfig(BCLib.MOD_ID, "biomes", false);
+	
+	public static final String MAIN_PATCH_CATEGORY = "patches";
 	
 	public static void save() {
 		MAIN_CONFIG.saveChanges();
 		RECIPE_CONFIG.saveChanges();
 		GENERATOR_CONFIG.saveChanges();
+		initForcedConfig();
+	}
+	
+	private static void initForcedConfig() {
+		BIOMES_CONFIG.keeper.registerEntry(new ConfigKey("end_biomes", "force_include"), new StringArrayEntry(Collections.EMPTY_LIST));
+		BIOMES_CONFIG.keeper.registerEntry(new ConfigKey("nether_biomes", "force_include"), new StringArrayEntry(Collections.EMPTY_LIST));
 		BIOMES_CONFIG.saveChanges();
 	}
 }

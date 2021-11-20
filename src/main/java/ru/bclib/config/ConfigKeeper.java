@@ -23,9 +23,9 @@ import java.util.function.Supplier;
 
 public final class ConfigKeeper {
 	private final Map<ConfigKey, Entry<?>> configEntries = Maps.newHashMap();
-	private JsonObject configObject;
 	private final ConfigWriter writer;
 	
+	private JsonObject configObject;
 	private boolean changed = false;
 	
 	public ConfigKeeper(String modID, String group) {
@@ -33,7 +33,7 @@ public final class ConfigKeeper {
 		this.configObject = writer.load();
 	}
 	
-	File getConfigFile() {
+	public File getConfigFile() {
 		return this.writer.getConfigFile();
 	}
 	
@@ -141,7 +141,9 @@ public final class ConfigKeeper {
 		}
 		
 		String paramKey = key.getEntry();
-		paramKey += " [default: " + entry.getDefault() + "]";
+		if (entry.hasDefaultInName()) {
+			paramKey += " [default: " + entry.getDefault() + "]";
+		}
 		
 		this.changed |= entry.setLocation(obj, paramKey);
 	}
@@ -328,7 +330,6 @@ public final class ConfigKeeper {
 	}
 	
 	public static class StringArrayEntry extends ArrayEntry<String> {
-		
 		public StringArrayEntry(List<String> defaultValue) {
 			super(defaultValue);
 		}
@@ -341,10 +342,14 @@ public final class ConfigKeeper {
 		protected void add(JsonArray array, String el){
 			array.add(el);
 		}
+		
+		@Override
+		protected boolean hasDefaultInName() {
+			return false;
+		}
 	}
 	
 	public static class EnumEntry<T extends Enum<T>> extends Entry<T> {
-		
 		private final Type type;
 		
 		public EnumEntry(T defaultValue) {
@@ -372,7 +377,6 @@ public final class ConfigKeeper {
 	}
 	
 	public static abstract class RangeEntry<T extends Comparable<T>> extends Entry<T> {
-		
 		private final T min, max;
 		
 		public RangeEntry(T defaultValue, T minVal, T maxVal) {
@@ -396,7 +400,6 @@ public final class ConfigKeeper {
 	}
 	
 	public static abstract class Entry<T> {
-		
 		protected final T defaultValue;
 		protected Consumer<T> writer;
 		protected Supplier<T> reader;
@@ -447,6 +450,10 @@ public final class ConfigKeeper {
 		
 		public void setDefault() {
 			this.setValue(defaultValue);
+		}
+		
+		protected boolean hasDefaultInName() {
+			return true;
 		}
 	}
 }

@@ -14,7 +14,7 @@ import ru.bclib.world.generator.BCLibEndBiomeSource;
 import ru.bclib.world.generator.BCLibNetherBiomeSource;
 import ru.bclib.world.generator.GeneratorOptions;
 
-@Mixin(value = DimensionType.class, priority = 100)
+@Mixin(value = DimensionType.class, priority = 10)
 public class DimensionTypeMixin {
 	@Inject(method = "defaultNetherGenerator", at = @At("HEAD"), cancellable = true)
 	private static void be_replaceNetherBiomeSource(Registry<Biome> biomeRegistry, Registry<NoiseGeneratorSettings> chunkGeneratorSettingsRegistry, long seed, CallbackInfoReturnable<ChunkGenerator> info) {

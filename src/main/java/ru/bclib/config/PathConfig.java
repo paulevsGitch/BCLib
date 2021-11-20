@@ -6,7 +6,6 @@ import ru.bclib.config.ConfigKeeper.FloatRange;
 import ru.bclib.config.ConfigKeeper.IntegerRange;
 
 public class PathConfig extends Config {
-
 	public PathConfig(String modID, String group, boolean autoSync, boolean diffContent) {
 		super(modID, group, autoSync, diffContent);
 	}
