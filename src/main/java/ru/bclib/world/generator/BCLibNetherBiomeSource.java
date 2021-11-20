@@ -75,6 +75,10 @@ public class BCLibNetherBiomeSource extends BiomeSource {
 				return true;
 			}
 			
+			if (GeneratorOptions.addNetherBiomesByCategory() && biome.getBiomeCategory() == BiomeCategory.NETHER) {
+				return true;
+			}
+			
 			BCLBiome bclBiome = BiomeAPI.getBiome(key);
 			if (bclBiome != BiomeAPI.EMPTY_BIOME) {
 				if (bclBiome.hasParentBiome()) {

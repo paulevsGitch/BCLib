@@ -97,6 +97,10 @@ public class BCLibEndBiomeSource extends BiomeSource {
 				return true;
 			}
 			
+			if (GeneratorOptions.addEndBiomesByCategory() && biome.getBiomeCategory() == BiomeCategory.THEEND) {
+				return true;
+			}
+			
 			BCLBiome bclBiome = BiomeAPI.getBiome(key);
 			if (bclBiome != BiomeAPI.EMPTY_BIOME) {
 				if (bclBiome.hasParentBiome()) {
