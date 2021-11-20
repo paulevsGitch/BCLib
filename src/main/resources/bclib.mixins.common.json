@@ -6,6 +6,7 @@
 	"mixins": [
 		"SimpleReloadableResourceManagerMixin",
 		"shears.DiggingEnchantmentMixin",
+		"LayerLightSectionStorageMixin",
 		"shears.TripWireBlockMixin",
 		"ChunkBiomeContainerMixin",
 		"shears.BeehiveBlockMixin",
@@ -20,7 +21,6 @@
 		"MinecraftServerMixin",
 		"PistonBaseBlockMixin",
 		"WorldGenRegionMixin",
-		"LayerLightSectionStorageMixin",
 		"DimensionTypeMixin",
 		"RecipeManagerMixin",
 		"CraftingMenuMixin",

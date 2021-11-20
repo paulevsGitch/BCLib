@@ -12,29 +12,24 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(LayerLightSectionStorage.class)
 public class LayerLightSectionStorageMixin {
-
-    @Shadow
-    protected DataLayer getDataLayer(long sectionPos, boolean cached) {
-        return null;
-    }
-
-    @Inject(method = "getStoredLevel", at = @At(value = "HEAD"), cancellable = true)
-    private void lightFix(long blockPos, CallbackInfoReturnable<Integer> info) {
-        try {
-            long m = SectionPos.blockToSection(blockPos);
-            DataLayer dataLayer = this.getDataLayer(m, true);
-            info.setReturnValue(
-                    dataLayer.get(
-                            SectionPos.sectionRelative(BlockPos.getX(blockPos)),
-                            SectionPos.sectionRelative(BlockPos.getY(blockPos)),
-                            SectionPos.sectionRelative(BlockPos.getZ(blockPos))
-                    )
-            );
-            info.cancel();
-        } catch (Exception e) {
-            info.setReturnValue(0);
-            info.cancel();
-        }
-    }
-
+	@Shadow
+	protected DataLayer getDataLayer(long sectionPos, boolean cached) {
+		return null;
+	}
+	
+	@Inject(method = "getStoredLevel", at = @At(value = "HEAD"), cancellable = true)
+	private void bclib_lightFix(long blockPos, CallbackInfoReturnable<Integer> info) {
+		try {
+			long pos = SectionPos.blockToSection(blockPos);
+			DataLayer dataLayer = this.getDataLayer(pos, true);
+			info.setReturnValue(dataLayer.get(
+				SectionPos.sectionRelative(BlockPos.getX(blockPos)),
+				SectionPos.sectionRelative(BlockPos.getY(blockPos)),
+				SectionPos.sectionRelative(BlockPos.getZ(blockPos))
+			));
+		}
+		catch (Exception e) {
+			info.setReturnValue(0);
+		}
+	}
 }
