@@ -414,13 +414,7 @@ public class BiomeAPI {
 	public static void addBiomeFeature(Biome biome, ConfiguredFeature feature, Decoration step) {
 		GenerationSettingsAccessor accessor = (GenerationSettingsAccessor) biome.getGenerationSettings();
 		List<List<Supplier<ConfiguredFeature<?, ?>>>> biomeFeatures = getMutableList(accessor.fabric_getFeatures());
-		int index = step.ordinal();
-		if (biomeFeatures.size() < index) {
-			for (int i = biomeFeatures.size(); i <= index; i++) {
-				biomeFeatures.add(Lists.newArrayList());
-			}
-		}
-		List<Supplier<ConfiguredFeature<?, ?>>> list = getMutableList(biomeFeatures.get(index));
+		List<Supplier<ConfiguredFeature<?, ?>>> list = getList(step, biomeFeatures);
 		list.add(() -> feature);
 		accessor.fabric_setFeatures(biomeFeatures);
 	}
@@ -434,16 +428,28 @@ public class BiomeAPI {
 		GenerationSettingsAccessor accessor = (GenerationSettingsAccessor) biome.getGenerationSettings();
 		List<List<Supplier<ConfiguredFeature<?, ?>>>> biomeFeatures = getMutableList(accessor.fabric_getFeatures());
 		for (BCLFeature feature: features) {
-			int index = feature.getFeatureStep().ordinal();
-			if (biomeFeatures.size() < index) {
-				for (int i = biomeFeatures.size(); i <= index; i++) {
-					biomeFeatures.add(Lists.newArrayList());
-				}
-			}
-			List<Supplier<ConfiguredFeature<?, ?>>> list = getMutableList(biomeFeatures.get(index));
+			List<Supplier<ConfiguredFeature<?, ?>>> list = getList(feature.getFeatureStep(), biomeFeatures);
 			list.add(feature::getFeatureConfigured);
 		}
 		accessor.fabric_setFeatures(biomeFeatures);
+	}
+	
+	/**
+	 * Getter for correct feature list from all biome feature list of lists.
+	 * @param step feature {@link Decoration} step.
+	 * @param lists biome accessor lists.
+	 * @return mutable {@link ConfiguredFeature} list.
+	 */
+	private static List<Supplier<ConfiguredFeature<?, ?>>> getList(Decoration step, List<List<Supplier<ConfiguredFeature<?, ?>>>> lists) {
+		int index = step.ordinal();
+		if (lists.size() <= index) {
+			for (int i = lists.size(); i <= index; i++) {
+				lists.add(Lists.newArrayList());
+			}
+		}
+		List<Supplier<ConfiguredFeature<?, ?>>> list = getMutableList(lists.get(index));
+		lists.set(index, list);
+		return list;
 	}
 	
 	/**
