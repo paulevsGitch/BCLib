@@ -55,8 +55,8 @@ public class SpawnAPI<T extends Entity> {
 		return this;
 	}
 	
-	public SpawnAPI<T> belowMinHeight() {
-		rules.add((type, world, spawnReason, pos, random) -> pos.getY() < world.dimensionType().minY());
+	public SpawnAPI<T> belowMaxHeight() {
+		rules.add((type, world, spawnReason, pos, random) -> pos.getY() >= world.dimensionType().logicalHeight());
 		return this;
 	}
 	
