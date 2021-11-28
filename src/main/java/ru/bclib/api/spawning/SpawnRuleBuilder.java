@@ -15,7 +15,9 @@ import net.minecraft.world.level.levelgen.Heightmap.Types;
 import net.minecraft.world.phys.AABB;
 import ru.bclib.interfaces.SpawnRule;
 
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -86,7 +88,7 @@ public class SpawnRuleBuilder<M extends Mob> {
 	 * @return same {@link SpawnRuleBuilder} instance.
 	 */
 	public SpawnRuleBuilder onlyOnValidBlocks() {
-		entryInstance = getFromCache("below_max_height", () -> {
+		entryInstance = getFromCache("only_on_valid_blocks", () -> {
 			return new SpawnRuleEntry(0, (type, world, spawnReason, pos, random) -> {
 				BlockPos below = pos.below();
 				return world.getBlockState(below).isValidSpawn(world, below, type);
@@ -101,12 +103,14 @@ public class SpawnRuleBuilder<M extends Mob> {
 	 * @return same {@link SpawnRuleBuilder} instance.
 	 */
 	public SpawnRuleBuilder onlyOnBlocks(Block... blocks) {
-		String id = "" + blocks.length;
-		for(Block bl : blocks){
-			id += "_" + bl.getDescriptionId();
-		}
+		StringBuilder builder = new StringBuilder();
 		final Block[] floorBlocks = blocks;
-		entryInstance = getFromCache("below_max_height_" + id, () -> {
+		Arrays.sort(floorBlocks, Comparator.comparing(Block::getDescriptionId));
+		for (Block block : floorBlocks) {
+			builder.append('_');
+			builder.append(block.getDescriptionId());
+		}
+		entryInstance = getFromCache("only_on_blocks" + builder, () -> {
 			return new SpawnRuleEntry(0, (type, world, spawnReason, pos, random) -> {
 				Block below = world.getBlockState(pos.below()).getBlock();
 				for (Block floor: floorBlocks) {
