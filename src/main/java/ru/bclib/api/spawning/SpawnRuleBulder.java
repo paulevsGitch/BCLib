@@ -3,12 +3,14 @@ package ru.bclib.api.spawning;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import net.fabricmc.fabric.mixin.object.builder.SpawnRestrictionAccessor;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.SpawnPlacements.SpawnPredicate;
 import net.minecraft.world.entity.SpawnPlacements.Type;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.levelgen.Heightmap.Types;
 import net.minecraft.world.phys.AABB;
 import ru.bclib.interfaces.SpawnRule;
@@ -74,6 +76,42 @@ public class SpawnRuleBulder<M extends Mob> {
 	public SpawnRuleBulder belowMaxHeight() {
 		entryInstance = getFromCache("below_max_height", () -> {
 			return new SpawnRuleEntry(0, (type, world, spawnReason, pos, random) -> pos.getY() < world.dimensionType().logicalHeight());
+		});
+		rules.add(entryInstance);
+		return this;
+	}
+	
+	/**
+	 * Restricts spawning only to vanilla valid blocks.
+	 * @return same {@link SpawnRuleBulder} instance.
+	 */
+	public SpawnRuleBulder onlyOnValidBlocks() {
+		entryInstance = getFromCache("below_max_height", () -> {
+			return new SpawnRuleEntry(0, (type, world, spawnReason, pos, random) -> {
+				BlockPos below = pos.below();
+				return world.getBlockState(below).isValidSpawn(world, below, type);
+			});
+		});
+		rules.add(entryInstance);
+		return this;
+	}
+	
+	/**
+	 * Restricts spawning only to specified blocks.
+	 * @return same {@link SpawnRuleBulder} instance.
+	 */
+	public SpawnRuleBulder onlyOnBlocks(Block... blocks) {
+		final Block[] floorBlocks = blocks;
+		entryInstance = getFromCache("below_max_height", () -> {
+			return new SpawnRuleEntry(0, (type, world, spawnReason, pos, random) -> {
+				Block below = world.getBlockState(pos.below()).getBlock();
+				for (Block floor: floorBlocks) {
+					if (floor == below) {
+						return true;
+					}
+				}
+				return false;
+			});
 		});
 		rules.add(entryInstance);
 		return this;
