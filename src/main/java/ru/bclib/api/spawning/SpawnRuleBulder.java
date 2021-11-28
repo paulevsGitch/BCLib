@@ -14,6 +14,7 @@ import net.minecraft.world.entity.SpawnPlacements.Type;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.levelgen.Heightmap.Types;
 import net.minecraft.world.phys.AABB;
+import ru.bclib.interfaces.SpawnRule;
 
 import java.util.Collections;
 import java.util.List;
@@ -32,7 +33,7 @@ public class SpawnRuleBulder<M extends Mob> {
 	
 	/**
 	 * Starts new rule building process.
-	 * @return prepared {@link SpawnRuleBulder} instance
+	 * @return prepared {@link SpawnRuleBulder} instance.
 	 */
 	public static SpawnRuleBulder start(EntityType<? extends Mob> entityType) {
 		INSTANCE.entityType = entityType;
@@ -42,7 +43,7 @@ public class SpawnRuleBulder<M extends Mob> {
 	
 	/**
 	 * Stop entity spawn on peaceful {@link Difficulty}
-	 * @return same {@link SpawnRuleBulder} instance
+	 * @return same {@link SpawnRuleBulder} instance.
 	 */
 	public SpawnRuleBulder notPeaceful() {
 		entryInstance = getFromCache("not_peaceful", () -> {
@@ -55,7 +56,7 @@ public class SpawnRuleBulder<M extends Mob> {
 	/**
 	 * Restricts entity spawn above world surface (flying mobs).
 	 * @param minHeight minimal spawn height.
-	 * @return same {@link SpawnRuleBulder} instance
+	 * @return same {@link SpawnRuleBulder} instance.
 	 */
 	public SpawnRuleBulder aboveGround(int minHeight) {
 		entryInstance = getFromCache("above_ground", () -> {
@@ -72,7 +73,7 @@ public class SpawnRuleBulder<M extends Mob> {
 	
 	/**
 	 * Restricts entity spawn below world logical height (useful for Nether mobs).
-	 * @return same {@link SpawnRuleBulder} instance
+	 * @return same {@link SpawnRuleBulder} instance.
 	 */
 	public SpawnRuleBulder belowMaxHeight() {
 		entryInstance = getFromCache("below_max_height", () -> {
@@ -85,7 +86,7 @@ public class SpawnRuleBulder<M extends Mob> {
 	/**
 	 * Will spawn entity with 1 / chance probability (randomly).
 	 * @param chance probability limit.
-	 * @return same {@link SpawnRuleBulder} instance
+	 * @return same {@link SpawnRuleBulder} instance.
 	 */
 	public SpawnRuleBulder withChance(int chance) {
 		entryInstance = getFromCache("with_chance_" + chance, () -> {
@@ -98,7 +99,7 @@ public class SpawnRuleBulder<M extends Mob> {
 	/**
 	 * Will spawn entity only below specified brightness value.
 	 * @param lightLevel light level upper limit.
-	 * @return same {@link SpawnRuleBulder} instance
+	 * @return same {@link SpawnRuleBulder} instance.
 	 */
 	public SpawnRuleBulder belowBrightness(int lightLevel) {
 		entryInstance = getFromCache("below_brightness_" + lightLevel, () -> {
@@ -111,7 +112,7 @@ public class SpawnRuleBulder<M extends Mob> {
 	/**
 	 * Will spawn entity only above specified brightness value.
 	 * @param lightLevel light level lower limit.
-	 * @return same {@link SpawnRuleBulder} instance
+	 * @return same {@link SpawnRuleBulder} instance.
 	 */
 	public SpawnRuleBulder aboveBrightness(int lightLevel) {
 		entryInstance = getFromCache("above_brightness_" + lightLevel, () -> {
@@ -124,7 +125,7 @@ public class SpawnRuleBulder<M extends Mob> {
 	/**
 	 * Entity spawn will follow common vanilla spawn rules - spawn in darkness and not on peaceful level.
 	 * @param lightLevel light level upper limit.
-	 * @return same {@link SpawnRuleBulder} instance
+	 * @return same {@link SpawnRuleBulder} instance.
 	 */
 	public SpawnRuleBulder hostile(int lightLevel) {
 		return notPeaceful().belowBrightness(lightLevel);
@@ -132,7 +133,7 @@ public class SpawnRuleBulder<M extends Mob> {
 	
 	/**
 	 * Entity spawn will follow common vanilla spawn rules - spawn in darkness (below light level 7) and not on peaceful level.
-	 * @return same {@link SpawnRuleBulder} instance
+	 * @return same {@link SpawnRuleBulder} instance.
 	 */
 	public SpawnRuleBulder vanillaHostile() {
 		return hostile(7);
@@ -143,7 +144,7 @@ public class SpawnRuleBulder<M extends Mob> {
 	 * @param selectorType selector {@link EntityType} to search.
 	 * @param count max entity count.
 	 * @param side side of box to search in.
-	 * @return same {@link SpawnRuleBulder} instance
+	 * @return same {@link SpawnRuleBulder} instance.
 	 */
 	public SpawnRuleBulder maxNearby(EntityType<?> selectorType, int count, int side) {
 		final Class<? extends Entity> baseClass = selectorType.getBaseClass();
@@ -167,7 +168,7 @@ public class SpawnRuleBulder<M extends Mob> {
 	 * Will spawn entity only if count of nearby entities with same type will be lower than specified.
 	 * @param count max entity count.
 	 * @param side side of box to search in.
-	 * @return same {@link SpawnRuleBulder} instance
+	 * @return same {@link SpawnRuleBulder} instance.
 	 */
 	public SpawnRuleBulder maxNearby(int count, int side) {
 		return maxNearby(entityType, count, side);
@@ -176,10 +177,20 @@ public class SpawnRuleBulder<M extends Mob> {
 	/**
 	 * Will spawn entity only if count of nearby entities with same type will be lower than specified.
 	 * @param count max entity count.
-	 * @return same {@link SpawnRuleBulder} instance
+	 * @return same {@link SpawnRuleBulder} instance.
 	 */
 	public SpawnRuleBulder maxNearby(int count) {
 		return maxNearby(entityType, count, 256);
+	}
+	
+	/**
+	 * Allows to add custom spawning rule for specific entities.
+	 * @param rule {@SpawnRule} rule, can be a lambda expression.
+	 * @return same {@link SpawnRuleBulder} instance.
+	 */
+	public SpawnRuleBulder customRule(SpawnRule rule) {
+		rules.add(new SpawnRuleEntry(7, rule));
+		return this;
 	}
 	
 	/**
