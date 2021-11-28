@@ -1,6 +1,7 @@
 package ru.bclib.api;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -497,7 +498,7 @@ public class BiomeAPI {
 	public static <M extends Mob> void addBiomeMobSpawn(Biome biome, EntityType<M> entityType, int weight, int minGroupCount, int maxGroupCount) {
 		MobCategory category = entityType.getCategory();
 		SpawnSettingsAccessor accessor = (SpawnSettingsAccessor) biome.getMobSettings();
-		Map<MobCategory, WeightedRandomList<SpawnerData>> spawners = accessor.fabric_getSpawners();
+		Map<MobCategory, WeightedRandomList<SpawnerData>> spawners = getMutableMap(accessor.fabric_getSpawners());
 		List<SpawnerData> mobs = spawners.containsKey(category) ? getMutableList(spawners.get(category).unwrap()) : Lists.newArrayList();
 		mobs.add(new SpawnerData(entityType, weight, minGroupCount, maxGroupCount));
 		spawners.put(category, WeightedRandomList.create(mobs));
@@ -507,6 +508,13 @@ public class BiomeAPI {
 	private static <T extends Object> List<T> getMutableList(List<T> input) {
 		if (input instanceof ImmutableList) {
 			return Lists.newArrayList(input);
+		}
+		return input;
+	}
+	
+	private static <K extends Object, V extends Object> Map<K, V> getMutableMap(Map<K, V> input) {
+		if (input instanceof ImmutableMap) {
+			return Maps.newHashMap(input);
 		}
 		return input;
 	}
