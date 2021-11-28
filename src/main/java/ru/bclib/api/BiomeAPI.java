@@ -8,6 +8,8 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.impl.biome.InternalBiomeData;
 import net.fabricmc.fabric.mixin.biome.modification.GenerationSettingsAccessor;
+import net.fabricmc.fabric.mixin.biome.modification.SpawnDensityAccessor;
+import net.fabricmc.fabric.mixin.biome.modification.SpawnSettingsAccessor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.Registry;
 import net.minecraft.data.BuiltinRegistries;
@@ -15,11 +17,17 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.random.WeightedRandomList;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.SpawnData;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biome.ClimateParameters;
 import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.biome.Biomes;
+import net.minecraft.world.level.biome.MobSpawnSettings.SpawnerData;
 import net.minecraft.world.level.levelgen.GenerationStep.Decoration;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
@@ -476,6 +484,24 @@ public class BiomeAPI {
 			biomeStructures.add(structure::getFeatureConfigured);
 		}
 		accessor.fabric_setStructureFeatures(biomeStructures);
+	}
+	
+	/**
+	 * Adds mob spawning to specified biome.
+	 * @param biome {@link Biome} to add mob spawning.
+	 * @param entityType {@link EntityType} mob type.
+	 * @param weight spawn weight.
+	 * @param minGroupCount minimum mobs in group.
+	 * @param maxGroupCount maximum mobs in group.
+	 */
+	public static <M extends Mob> void addBiomeMobSpawn(Biome biome, EntityType<M> entityType, int weight, int minGroupCount, int maxGroupCount) {
+		MobCategory category = entityType.getCategory();
+		SpawnSettingsAccessor accessor = (SpawnSettingsAccessor) biome.getMobSettings();
+		Map<MobCategory, WeightedRandomList<SpawnerData>> spawners = accessor.fabric_getSpawners();
+		List<SpawnerData> mobs = spawners.containsKey(category) ? getMutableList(spawners.get(category).unwrap()) : Lists.newArrayList();
+		mobs.add(new SpawnerData(entityType, weight, minGroupCount, maxGroupCount));
+		spawners.put(category, WeightedRandomList.create(mobs));
+		accessor.fabric_setSpawners(spawners);
 	}
 	
 	private static <T extends Object> List<T> getMutableList(List<T> input) {
