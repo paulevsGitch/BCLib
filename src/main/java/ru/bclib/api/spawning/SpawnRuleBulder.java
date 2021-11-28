@@ -53,11 +53,29 @@ public class SpawnRuleBulder<M extends Mob> {
 	}
 	
 	/**
+	 * Restricts entity spawn above world surface (flying mobs).
+	 * @param minHeight minimal spawn height.
+	 * @return same {@link SpawnRuleBulder} instance
+	 */
+	public SpawnRuleBulder aboveGround(int minHeight) {
+		entryInstance = getFromCache("above_ground", () -> {
+			return new SpawnRuleEntry(0, (type, world, spawnReason, pos, random) -> {
+				if (pos.getY() < world.getMinBuildHeight() + 2) {
+					return false;
+				}
+				return pos.getY() > world.getHeight(Types.WORLD_SURFACE, pos.getX(), pos.getZ()) + minHeight;
+			});
+		});
+		rules.add(entryInstance);
+		return this;
+	}
+	
+	/**
 	 * Restricts entity spawn below world logical height (useful for Nether mobs).
 	 * @return same {@link SpawnRuleBulder} instance
 	 */
 	public SpawnRuleBulder belowMaxHeight() {
-		entryInstance = getFromCache("not_peaceful", () -> {
+		entryInstance = getFromCache("below_max_height", () -> {
 			return new SpawnRuleEntry(0, (type, world, spawnReason, pos, random) -> pos.getY() < world.dimensionType().logicalHeight());
 		});
 		rules.add(entryInstance);
