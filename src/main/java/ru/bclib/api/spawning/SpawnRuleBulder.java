@@ -134,7 +134,7 @@ public class SpawnRuleBulder<M extends Mob> {
 	 */
 	public SpawnRuleBulder maxNearby(EntityType<?> selectorType, int count, int side) {
 		final Class<? extends Entity> baseClass = selectorType.getBaseClass();
-		entryInstance = getFromCache("below_brightness_" + selectorType.getDescriptionId(), () -> {
+		entryInstance = getFromCache("max_nearby_" + selectorType.getDescriptionId(), () -> {
 			return new SpawnRuleEntry(2, (type, world, spawnReason, pos, random) -> {
 				try {
 					final AABB box = new AABB(pos).inflate(side, world.getHeight(), side);
