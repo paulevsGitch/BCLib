@@ -185,7 +185,7 @@ public class SpawnRuleBulder<M extends Mob> {
 	
 	/**
 	 * Allows to add custom spawning rule for specific entities.
-	 * @param rule {@SpawnRule} rule, can be a lambda expression.
+	 * @param rule {@link SpawnRule} rule, can be a lambda expression.
 	 * @return same {@link SpawnRuleBulder} instance.
 	 */
 	public SpawnRuleBulder customRule(SpawnRule rule) {
