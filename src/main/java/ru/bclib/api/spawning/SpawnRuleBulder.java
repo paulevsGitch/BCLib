@@ -160,16 +160,13 @@ public class SpawnRuleBulder<M extends Mob> {
 		final List<SpawnRuleEntry> rulesCopy = Lists.newArrayList(this.rules);
 		Collections.sort(rulesCopy);
 		
-		SpawnPredicate<M> predicate = new SpawnPredicate<M>() {
-			@Override
-			public boolean test(EntityType<M> entityType, ServerLevelAccessor serverLevelAccessor, MobSpawnType mobSpawnType, BlockPos blockPos, Random random) {
-				for (SpawnRuleEntry rule: rulesCopy) {
-					if (!rule.canSpawn(entityType, serverLevelAccessor, mobSpawnType, blockPos, random)) {
-						return false;
-					}
+		SpawnPredicate<M> predicate = (entityType, serverLevelAccessor, mobSpawnType, blockPos, random) -> {
+			for (SpawnRuleEntry rule: rulesCopy) {
+				if (!rule.canSpawn(entityType, serverLevelAccessor, mobSpawnType, blockPos, random)) {
+					return false;
 				}
-				return true;
 			}
+			return true;
 		};
 		
 		SpawnRestrictionAccessor.callRegister(entityType, spawnType, heightmapType, predicate);
