@@ -92,10 +92,19 @@ public class SpawnRuleBulder<M extends Mob> {
 	
 	/**
 	 * Entity spawn will follow common vanilla spawn rules - spawn in darkness and not on peaceful level.
+	 * @param lightLevel light level upper limit.
+	 * @return same {@link SpawnRuleBulder} instance
+	 */
+	public SpawnRuleBulder hostile(int lightLevel) {
+		return notPeaceful().belowBrightness(lightLevel);
+	}
+	
+	/**
+	 * Entity spawn will follow common vanilla spawn rules - spawn in darkness (below light level 7) and not on peaceful level.
 	 * @return same {@link SpawnRuleBulder} instance
 	 */
 	public SpawnRuleBulder vanillaHostile() {
-		return notPeaceful().belowBrightness(7);
+		return hostile(7);
 	}
 	
 	/**
@@ -105,7 +114,7 @@ public class SpawnRuleBulder<M extends Mob> {
 	 * @param side side of box to search in.
 	 * @return same {@link SpawnRuleBulder} instance
 	 */
-	public SpawnRuleBulder maxNerby(EntityType<?> selectorType, int count, int side) {
+	public SpawnRuleBulder maxNearby(EntityType<?> selectorType, int count, int side) {
 		final Class<? extends Entity> baseClass = selectorType.getBaseClass();
 		entryInstance = getFromCache("below_brightness_" + selectorType.getDescriptionId(), () -> {
 			return new SpawnRuleEntry(2, (type, world, spawnReason, pos, random) -> {
@@ -129,8 +138,8 @@ public class SpawnRuleBulder<M extends Mob> {
 	 * @param side side of box to search in.
 	 * @return same {@link SpawnRuleBulder} instance
 	 */
-	public SpawnRuleBulder maxNerby(int count, int side) {
-		return maxNerby(entityType, count, side);
+	public SpawnRuleBulder maxNearby(int count, int side) {
+		return maxNearby(entityType, count, side);
 	}
 	
 	/**
@@ -138,8 +147,8 @@ public class SpawnRuleBulder<M extends Mob> {
 	 * @param count max entity count.
 	 * @return same {@link SpawnRuleBulder} instance
 	 */
-	public SpawnRuleBulder maxNerby(int count) {
-		return maxNerby(entityType, count, 256);
+	public SpawnRuleBulder maxNearby(int count) {
+		return maxNearby(entityType, count, 256);
 	}
 	
 	/**
