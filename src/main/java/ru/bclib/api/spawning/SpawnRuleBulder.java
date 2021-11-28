@@ -83,13 +83,26 @@ public class SpawnRuleBulder<M extends Mob> {
 	}
 	
 	/**
+	 * Will spawn entity with 1 / chance probability (randomly).
+	 * @param chance probability limit.
+	 * @return same {@link SpawnRuleBulder} instance
+	 */
+	public SpawnRuleBulder withChance(int chance) {
+		entryInstance = getFromCache("with_chance_" + chance, () -> {
+			return new SpawnRuleEntry(1, (type, world, spawnReason, pos, random) -> random.nextInt(chance) == 0);
+		});
+		rules.add(entryInstance);
+		return this;
+	}
+	
+	/**
 	 * Will spawn entity only below specified brightness value.
 	 * @param lightLevel light level upper limit.
 	 * @return same {@link SpawnRuleBulder} instance
 	 */
 	public SpawnRuleBulder belowBrightness(int lightLevel) {
 		entryInstance = getFromCache("below_brightness_" + lightLevel, () -> {
-			return new SpawnRuleEntry(1, (type, world, spawnReason, pos, random) -> world.getMaxLocalRawBrightness(pos) <= lightLevel);
+			return new SpawnRuleEntry(2, (type, world, spawnReason, pos, random) -> world.getMaxLocalRawBrightness(pos) <= lightLevel);
 		});
 		rules.add(entryInstance);
 		return this;
@@ -102,7 +115,7 @@ public class SpawnRuleBulder<M extends Mob> {
 	 */
 	public SpawnRuleBulder aboveBrightness(int lightLevel) {
 		entryInstance = getFromCache("above_brightness_" + lightLevel, () -> {
-			return new SpawnRuleEntry(1, (type, world, spawnReason, pos, random) -> world.getMaxLocalRawBrightness(pos) >= lightLevel);
+			return new SpawnRuleEntry(2, (type, world, spawnReason, pos, random) -> world.getMaxLocalRawBrightness(pos) >= lightLevel);
 		});
 		rules.add(entryInstance);
 		return this;
@@ -135,7 +148,7 @@ public class SpawnRuleBulder<M extends Mob> {
 	public SpawnRuleBulder maxNearby(EntityType<?> selectorType, int count, int side) {
 		final Class<? extends Entity> baseClass = selectorType.getBaseClass();
 		entryInstance = getFromCache("max_nearby_" + selectorType.getDescriptionId(), () -> {
-			return new SpawnRuleEntry(2, (type, world, spawnReason, pos, random) -> {
+			return new SpawnRuleEntry(3, (type, world, spawnReason, pos, random) -> {
 				try {
 					final AABB box = new AABB(pos).inflate(side, world.getHeight(), side);
 					final List<?> list = world.getEntitiesOfClass(baseClass, box, (entity) -> true);
