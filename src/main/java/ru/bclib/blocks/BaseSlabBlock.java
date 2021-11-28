@@ -36,7 +36,8 @@ public class BaseSlabBlock extends SlabBlock implements BlockModelProvider {
 	@Override
 	@SuppressWarnings("deprecation")
 	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
-		return Collections.singletonList(new ItemStack(this));
+		int count = state.getValue(TYPE) == SlabType.DOUBLE ? 2 : 1;
+		return Collections.singletonList(new ItemStack(this, count));
 	}
 	
 	@Override
