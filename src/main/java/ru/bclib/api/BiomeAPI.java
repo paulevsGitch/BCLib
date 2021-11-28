@@ -9,7 +9,6 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.impl.biome.InternalBiomeData;
 import net.fabricmc.fabric.mixin.biome.modification.GenerationSettingsAccessor;
-import net.fabricmc.fabric.mixin.biome.modification.SpawnDensityAccessor;
 import net.fabricmc.fabric.mixin.biome.modification.SpawnSettingsAccessor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.Registry;
@@ -23,7 +22,6 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.SpawnData;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biome.ClimateParameters;
 import net.minecraft.world.level.biome.BiomeSource;
@@ -402,7 +400,10 @@ public class BiomeAPI {
 		biomes.forEach(biome -> {
 			ResourceLocation biomeID =  getBiomeID(biome);
 			boolean modify = isDatapackBiome(biomeID);
-			if (!modify && !MODIFIED_BIOMES.contains(biomeID)) {
+			if (biome != BuiltinRegistries.BIOME.get(biomeID)) {
+				modify = true;
+			}
+			else if (!modify && !MODIFIED_BIOMES.contains(biomeID)) {
 				MODIFIED_BIOMES.add(biomeID);
 				modify = true;
 			}
