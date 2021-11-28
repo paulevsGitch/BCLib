@@ -7,6 +7,8 @@ import net.minecraft.nbt.Tag;
 import org.jetbrains.annotations.NotNull;
 import ru.bclib.BCLib;
 import ru.bclib.api.WorldDataAPI;
+import ru.bclib.interfaces.PatchBiFunction;
+import ru.bclib.interfaces.PatchFunction;
 import ru.bclib.util.ModUtil;
 
 import java.io.File;

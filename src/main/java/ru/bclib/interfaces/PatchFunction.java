@@ -1,4 +1,7 @@
-package ru.bclib.api.datafixer;
+package ru.bclib.interfaces;
+
+import ru.bclib.api.datafixer.MigrationProfile;
+import ru.bclib.api.datafixer.PatchDidiFailException;
 
 @FunctionalInterface
 public interface PatchFunction<T, R> {

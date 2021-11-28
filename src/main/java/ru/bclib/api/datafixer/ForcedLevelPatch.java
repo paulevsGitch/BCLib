@@ -3,6 +3,8 @@ package ru.bclib.api.datafixer;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import org.jetbrains.annotations.NotNull;
+import ru.bclib.interfaces.PatchBiFunction;
+import ru.bclib.interfaces.PatchFunction;
 
 import java.util.HashMap;
 import java.util.List;

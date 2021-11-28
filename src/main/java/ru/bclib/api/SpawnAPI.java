@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-
+@Deprecated(forRemoval = true)
 public class SpawnAPI<T extends Entity> {
 	@FunctionalInterface
 	public interface SpawnRule<E extends Entity> {
