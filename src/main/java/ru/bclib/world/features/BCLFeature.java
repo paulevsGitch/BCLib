@@ -82,11 +82,23 @@ public class BCLFeature {
 		);
 	}
 	
-	public static BCLFeature makeChunkFeature(ResourceLocation id, Feature<NoneFeatureConfiguration> feature) {
+	/**
+	 * Will create feature which will be generated once in each chunk.
+	 * @param id {@link ResourceLocation} feature ID.
+	 * @param step {@link GenerationStep.Decoration} feature step.
+	 * @param feature {@link Feature} with {@link NoneFeatureConfiguration} config.
+	 * @return new BCLFeature instance.
+	 */
+	public static BCLFeature makeChunkFeature(ResourceLocation id, GenerationStep.Decoration step, Feature<NoneFeatureConfiguration> feature) {
 		ConfiguredFeature<?, ?> configured = feature
 			.configured(FeatureConfiguration.NONE)
 			.decorated(FeatureDecorator.COUNT.configured(new CountConfiguration(1)));
-		return new BCLFeature(id, feature, GenerationStep.Decoration.LOCAL_MODIFICATIONS, configured);
+		return new BCLFeature(id, feature, step, configured);
+	}
+	
+	@Deprecated(forRemoval = true)
+	public static BCLFeature makeChunkFeature(ResourceLocation id, Feature<NoneFeatureConfiguration> feature) {
+		return makeChunkFeature(id, GenerationStep.Decoration.LOCAL_MODIFICATIONS, feature);
 	}
 	
 	public static BCLFeature makeChansedFeature(ResourceLocation id, Feature<NoneFeatureConfiguration> feature, int chance) {
