@@ -148,6 +148,18 @@ public class BCLFeature {
 		return new BCLFeature(id, feature, step, configured);
 	}
 	
+	/**
+	 * Makes simple configured feature with {@link NoneFeatureConfiguration} set to NONE.
+	 * @param id {@link ResourceLocation} feature ID.
+	 * @param step {@link Decoration} feature step.
+	 * @param feature {@link Feature} with {@link NoneFeatureConfiguration} config.
+	 * @return new BCLFeature instance.
+	 */
+	public static BCLFeature makeFeatureConfigured(ResourceLocation id, Decoration step, Feature<NoneFeatureConfiguration> feature) {
+		ConfiguredFeature<?, ?> configured = feature.configured(FeatureConfiguration.NONE);
+		return new BCLFeature(id, feature, step, configured);
+	}
+	
 	@Deprecated(forRemoval = true)
 	public static BCLFeature makeOreFeature(ResourceLocation id, Block blockOre, Block hostBlock, int veins, int veinSize, int offset, int minY, int maxY) {
 		return makeOreFeature(id, blockOre, hostBlock, veins, veinSize, minY, maxY);
@@ -173,8 +185,8 @@ public class BCLFeature {
 		return makeCountFeature(id, Decoration.RAW_GENERATION, feature, chance);
 	}
 	
+	@Deprecated(forRemoval = true)
 	public static BCLFeature makeFeatureConfigured(ResourceLocation id, Feature<NoneFeatureConfiguration> feature) {
-		ConfiguredFeature<?, ?> configured = feature.configured(FeatureConfiguration.NONE);
-		return new BCLFeature(id, feature, Decoration.RAW_GENERATION, configured);
+		return makeFeatureConfigured(id, Decoration.RAW_GENERATION, feature);
 	}
 }
