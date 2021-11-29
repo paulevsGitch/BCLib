@@ -4,7 +4,6 @@ import net.minecraft.core.Registry;
 import net.minecraft.data.BuiltinRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.VerticalAnchor;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
@@ -61,9 +60,9 @@ public class BCLFeature {
 		return new BCLFeature(id, feature, GenerationStep.Decoration.LAKES, configured);
 	}
 	
-	public static BCLFeature makeOreFeature(ResourceLocation id, Block blockOre, int veins, int veinSize, int offset, int minY, int maxY) {
+	public static BCLFeature makeOreFeature(ResourceLocation id, Block blockOre, Block hostBlock, int veins, int veinSize, int offset, int minY, int maxY) {
 		OreConfiguration featureConfig = new OreConfiguration(
-			new BlockMatchTest(Blocks.END_STONE),
+			new BlockMatchTest(hostBlock),
 			blockOre.defaultBlockState(),
 			veinSize
 		);
