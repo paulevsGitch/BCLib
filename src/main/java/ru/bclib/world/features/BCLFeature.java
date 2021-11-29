@@ -66,7 +66,7 @@ public class BCLFeature {
 			blockOre.defaultBlockState(),
 			veinSize
 		);
-		OreConfiguration config = new OreConfiguration(ANY_TERRAIN, blockOre.defaultBlockState(), 33);
+		//OreConfiguration config = new OreConfiguration(ANY_TERRAIN, blockOre.defaultBlockState(), 33);
 		ConfiguredFeature<?, ?> oreFeature = Feature.ORE
 			.configured(featureConfig)
 			.rangeUniform(
