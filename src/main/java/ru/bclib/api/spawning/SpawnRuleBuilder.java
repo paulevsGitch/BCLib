@@ -103,14 +103,16 @@ public class SpawnRuleBuilder<M extends Mob> {
 	 * @return same {@link SpawnRuleBuilder} instance.
 	 */
 	public SpawnRuleBuilder onlyOnBlocks(Block... blocks) {
-		StringBuilder builder = new StringBuilder();
 		final Block[] floorBlocks = blocks;
 		Arrays.sort(floorBlocks, Comparator.comparing(Block::getDescriptionId));
+		
+		StringBuilder builder = new StringBuilder("only_on_blocks");
 		for (Block block : floorBlocks) {
 			builder.append('_');
 			builder.append(block.getDescriptionId());
 		}
-		entryInstance = getFromCache("only_on_blocks" + builder, () -> {
+		
+		entryInstance = getFromCache(builder.toString(), () -> {
 			return new SpawnRuleEntry(0, (type, world, spawnReason, pos, random) -> {
 				Block below = world.getBlockState(pos.below()).getBlock();
 				for (Block floor: floorBlocks) {
@@ -121,6 +123,7 @@ public class SpawnRuleBuilder<M extends Mob> {
 				return false;
 			});
 		});
+		
 		rules.add(entryInstance);
 		return this;
 	}
