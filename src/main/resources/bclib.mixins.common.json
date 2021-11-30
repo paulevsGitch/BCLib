@@ -8,7 +8,6 @@
 		"AnvilMenuMixin",
 		"ChunkGeneratorMixin",
 		"BoneMealItemMixin",
-		"ChunkBiomeContainerMixin",
 		"ComposterBlockAccessor",
 		"PotionBrewingAccessor",
 		"RecipeManagerAccessor",
