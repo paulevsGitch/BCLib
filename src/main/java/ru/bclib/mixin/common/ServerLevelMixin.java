@@ -34,7 +34,7 @@ public abstract class ServerLevelMixin extends Level {
 	@Inject(method = "<init>*", at = @At("TAIL"))
 	private void bclib_onServerWorldInit(MinecraftServer server, Executor workerExecutor, LevelStorageSource.LevelStorageAccess session, ServerLevelData properties, ResourceKey<Level> registryKey, DimensionType dimensionType, ChunkProgressListener worldGenerationProgressListener, ChunkGenerator chunkGenerator, boolean debugWorld, long l, List<CustomSpawner> list, boolean bl, CallbackInfo info) {
 		ServerLevel world = ServerLevel.class.cast(this);
-		LifeCycleAPI._onLevelLoad(world, server, workerExecutor, session, properties, registryKey, dimensionType, worldGenerationProgressListener, chunkGenerator, debugWorld, l, list, bl);
+		LifeCycleAPI._runLevelLoad(world, server, workerExecutor, session, properties, registryKey, dimensionType, worldGenerationProgressListener, chunkGenerator, debugWorld, l, list, bl);
 		
 		BiomeAPI.initRegistry(server);
 		BiomeAPI.applyModifications(ServerLevel.class.cast(this));

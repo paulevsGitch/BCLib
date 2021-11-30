@@ -85,19 +85,19 @@ public class LifeCycleAPI {
 	 * @param list
 	 * @param bl2
 	 */
-	public static void _onLevelLoad(ServerLevel world,
-							 MinecraftServer minecraftServer,
-							 Executor executor,
-							 LevelStorageSource.LevelStorageAccess levelStorageAccess,
-							 ServerLevelData serverLevelData,
-							 ResourceKey<Level> resourceKey,
-							 DimensionType dimensionType,
-							 ChunkProgressListener chunkProgressListener,
-							 ChunkGenerator chunkGenerator,
-							 boolean bl,
-							 long l,
-							 List<CustomSpawner> list,
-							 boolean bl2){
+	public static void _runLevelLoad(ServerLevel world,
+									 MinecraftServer minecraftServer,
+									 Executor executor,
+									 LevelStorageSource.LevelStorageAccess levelStorageAccess,
+									 ServerLevelData serverLevelData,
+									 ResourceKey<Level> resourceKey,
+									 DimensionType dimensionType,
+									 ChunkProgressListener chunkProgressListener,
+									 ChunkGenerator chunkGenerator,
+									 boolean bl,
+									 long l,
+									 List<CustomSpawner> list,
+									 boolean bl2){
 		onLoadLevel.forEach(c -> c.onLoad(
 			world,
 			minecraftServer,
