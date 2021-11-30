@@ -12,7 +12,7 @@ public class SimpleLeavesBlock extends BaseBlockNotFull implements RenderLayerPr
 	public SimpleLeavesBlock(MaterialColor color) {
 		super(FabricBlockSettings.of(Material.LEAVES)
 								 .strength(0.2F)
-								 .mapColor(color)
+								 .color(color)
 								 .sound(SoundType.GRASS)
 								 .noOcclusion()
 								 .isValidSpawn((state, world, pos, type) -> false)
@@ -25,7 +25,7 @@ public class SimpleLeavesBlock extends BaseBlockNotFull implements RenderLayerPr
 	public SimpleLeavesBlock(MaterialColor color, int light) {
 		super(FabricBlockSettings.of(Material.LEAVES)
 								 .luminance(light)
-								 .mapColor(color)
+								 .color(color)
 								 .strength(0.2F)
 								 .sound(SoundType.GRASS)
 								 .noOcclusion()

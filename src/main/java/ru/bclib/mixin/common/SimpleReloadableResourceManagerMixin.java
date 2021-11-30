@@ -26,7 +26,7 @@ public class SimpleReloadableResourceManagerMixin {
 	};
 	
 	@Inject(method = "hasResource", at = @At("HEAD"), cancellable = true)
-	private void hasResource(ResourceLocation resourceLocation, CallbackInfoReturnable<Boolean> info) {
+	private void bclib_hasResource(ResourceLocation resourceLocation, CallbackInfoReturnable<Boolean> info) {
 		if (resourceLocation.getNamespace().equals("minecraft")) {
 			for (String key: BCLIB_MISSING_RESOURCES) {
 				if (resourceLocation.getPath().equals(key)) {

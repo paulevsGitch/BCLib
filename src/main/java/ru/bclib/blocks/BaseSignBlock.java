@@ -105,7 +105,7 @@ public class BaseSignBlock extends SignBlock implements BlockModelProvider, Cust
 	@Override
 	public BlockState updateShape(BlockState state, Direction facing, BlockState neighborState, LevelAccessor world, BlockPos pos, BlockPos neighborPos) {
 		if (state.getValue(WATERLOGGED)) {
-			world.getLiquidTicks().scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(world));
+			world.getFluidTicks().schedule(pos, Fluids.WATER, Fluids.WATER.getTickDelay(world));
 		}
 		if (!canSurvive(state, world, pos)) {
 			return state.getValue(WATERLOGGED) ? state.getFluidState()
@@ -191,6 +191,6 @@ public class BaseSignBlock extends SignBlock implements BlockModelProvider, Cust
 	
 	@Override
 	public BlockItem getCustomItem(ResourceLocation blockID, FabricItemSettings settings) {
-		return new BlockItem(this, settings.maxCount(16));
+		return new BlockItem(this, settings.stacksTo(16));
 	}
 }

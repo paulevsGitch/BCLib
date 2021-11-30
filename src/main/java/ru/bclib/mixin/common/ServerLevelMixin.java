@@ -1,5 +1,9 @@
 package ru.bclib.mixin.common;
 
+import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.function.Supplier;
+
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -17,10 +21,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import ru.bclib.api.BiomeAPI;
-
-import java.util.List;
-import java.util.concurrent.Executor;
-import java.util.function.Supplier;
+import ru.bclib.api.LifeCycleAPI;
 
 @Mixin(ServerLevel.class)
 public abstract class ServerLevelMixin extends Level {
@@ -32,6 +33,9 @@ public abstract class ServerLevelMixin extends Level {
 
 	@Inject(method = "<init>*", at = @At("TAIL"))
 	private void bclib_onServerWorldInit(MinecraftServer server, Executor workerExecutor, LevelStorageSource.LevelStorageAccess session, ServerLevelData properties, ResourceKey<Level> registryKey, DimensionType dimensionType, ChunkProgressListener worldGenerationProgressListener, ChunkGenerator chunkGenerator, boolean debugWorld, long l, List<CustomSpawner> list, boolean bl, CallbackInfo info) {
+		ServerLevel world = ServerLevel.class.cast(this);
+		LifeCycleAPI._runLevelLoad(world, server, workerExecutor, session, properties, registryKey, dimensionType, worldGenerationProgressListener, chunkGenerator, debugWorld, l, list, bl);
+		
 		BiomeAPI.initRegistry(server);
 		BiomeAPI.applyModifications(ServerLevel.class.cast(this));
 		
@@ -40,5 +44,7 @@ public abstract class ServerLevelMixin extends Level {
 		}
 		
 		bclib_lastWorld = session.getLevelId();
+		
+		
 	}
 }

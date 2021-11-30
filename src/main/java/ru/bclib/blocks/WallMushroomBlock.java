@@ -20,7 +20,7 @@ public abstract class WallMushroomBlock extends BaseWallPlantBlock {
 								 .breakByTool(FabricToolTags.AXES)
 								 .breakByHand(true)
 								 .luminance(light)
-								 .hardness(0.2F)
+								 .destroyTime(0.2F)
 								 .sound(SoundType.GRASS)
 								 .sound(SoundType.WOOD)
 								 .noCollission());

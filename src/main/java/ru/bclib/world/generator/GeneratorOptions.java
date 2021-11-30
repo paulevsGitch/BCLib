@@ -14,6 +14,8 @@ public class GeneratorOptions {
 	private static boolean farEndBiomes = true;
 	private static boolean customNetherBiomeSource = true;
 	private static boolean customEndBiomeSource = true;
+	private static boolean addNetherBiomesByCategory = false;
+	private static boolean addEndBiomesByCategory = false;
 	
 	public static void init() {
 		biomeSizeNether = Configs.GENERATOR_CONFIG.getInt("nether.biomeMap", "biomeSize", 256);
@@ -21,6 +23,8 @@ public class GeneratorOptions {
 		biomeSizeEndVoid = Configs.GENERATOR_CONFIG.getInt("end.biomeMap", "biomeSizeVoid", 256);
 		customNetherBiomeSource = Configs.GENERATOR_CONFIG.getBoolean("options", "customNetherBiomeSource", true);
 		customEndBiomeSource = Configs.GENERATOR_CONFIG.getBoolean("options", "customEndBiomeSource", true);
+		addNetherBiomesByCategory = Configs.GENERATOR_CONFIG.getBoolean("options", "addNetherBiomesByCategory", false);
+		addEndBiomesByCategory = Configs.GENERATOR_CONFIG.getBoolean("options", "addEndBiomesByCategory", false);
 	}
 	
 	public static int getBiomeSizeNether() {
@@ -57,5 +61,13 @@ public class GeneratorOptions {
 	
 	public static boolean customEndBiomeSource() {
 		return customEndBiomeSource;
+	}
+	
+	public static boolean addNetherBiomesByCategory() {
+		return addNetherBiomesByCategory;
+	}
+	
+	public static boolean addEndBiomesByCategory() {
+		return addEndBiomesByCategory;
 	}
 }

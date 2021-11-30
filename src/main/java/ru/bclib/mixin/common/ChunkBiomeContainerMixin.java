@@ -2,8 +2,8 @@ package ru.bclib.mixin.common;
 
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.BlockPos;
-import net.minecraft.util.BitStorage;
 import net.minecraft.util.Mth;
+import net.minecraft.util.SimpleBitStorage;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.chunk.ChunkBiomeContainer;
 import org.spongepowered.asm.mixin.Final;
@@ -40,7 +40,7 @@ public class ChunkBiomeContainerMixin implements BiomeSetter {
 		if (bclib_hasHydrogen && be_shouldWriteToHydrogen()) {
 			try {
 				ChunkBiomeContainer self = (ChunkBiomeContainer) (Object) this;
-				BitStorage storage = be_getHydrogenStorage(self);
+				SimpleBitStorage storage = be_getHydrogenStorage(self);
 				Biome[] palette = be_getHydrogenPalette(self);
 				int paletteIndex = be_getHydrogenPaletteIndex(biome, palette);
 				if (paletteIndex == -1) {
@@ -57,7 +57,7 @@ public class ChunkBiomeContainerMixin implements BiomeSetter {
 				catch (Exception e) {
 					int size = storage.getSize();
 					int bits = Mth.ceillog2(palette.length);
-					BitStorage newStorage = new BitStorage(bits, size);
+					SimpleBitStorage newStorage = new SimpleBitStorage(bits, size);
 					for (int i = 0; i < size; i++) {
 						newStorage.set(i, storage.get(i));
 					}
@@ -105,8 +105,8 @@ public class ChunkBiomeContainerMixin implements BiomeSetter {
 		return field;
 	}
 	
-	private BitStorage be_getHydrogenStorage(ChunkBiomeContainer container) throws Exception {
-		return (BitStorage) be_getField("intArray").get(container);
+	private SimpleBitStorage be_getHydrogenStorage(ChunkBiomeContainer container) throws Exception {
+		return (SimpleBitStorage) be_getField("intArray").get(container);
 	}
 	
 	private Biome[] be_getHydrogenPalette(ChunkBiomeContainer container) throws Exception {
@@ -128,7 +128,7 @@ public class ChunkBiomeContainerMixin implements BiomeSetter {
 		be_getField("palette").set(container, palette);
 	}
 	
-	private void be_setHydrogenStorage(ChunkBiomeContainer container, BitStorage storage) throws Exception {
+	private void be_setHydrogenStorage(ChunkBiomeContainer container, SimpleBitStorage storage) throws Exception {
 		be_getField("intArray").set(container, storage);
 	}
 }

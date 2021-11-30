@@ -39,7 +39,7 @@ import java.util.Optional;
 
 public class BaseFurnaceBlock extends FurnaceBlock implements BlockModelProvider, RenderLayerProvider {
 	public BaseFurnaceBlock(Block source) {
-		super(FabricBlockSettings.copyOf(source).luminance(state -> state.getValue(LIT) ? 13 : 0));
+		super(FabricBlockSettings.copyOf(source).lightLevel(state -> state.getValue(LIT) ? 13 : 0));
 	}
 	
 	@Override

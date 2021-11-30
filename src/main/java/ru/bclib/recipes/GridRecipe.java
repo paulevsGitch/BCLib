@@ -55,7 +55,7 @@ public class GridRecipe {
 	}
 	
 	public GridRecipe checkConfig(PathConfig config) {
-		exist |= config.getBoolean("grid", id.getPath(), true);
+		exist &= config.getBoolean("grid", id.getPath(), true);
 		return this;
 	}
 	

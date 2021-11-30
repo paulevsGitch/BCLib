@@ -40,7 +40,7 @@ public abstract class BaseAnvilBlock extends AnvilBlock implements BlockModelPro
 	public IntegerProperty durability;
 	
 	public BaseAnvilBlock(MaterialColor color) {
-		super(FabricBlockSettings.copyOf(Blocks.ANVIL).mapColor(color));
+		super(FabricBlockSettings.copyOf(Blocks.ANVIL).color(color));
 	}
 	
 	@Override

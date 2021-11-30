@@ -18,6 +18,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import org.jetbrains.annotations.Nullable;
 import ru.bclib.gui.gridlayout.GridLayout.Alignment;
+import ru.bclib.util.Pair;
 
 
 @Environment(EnvType.CLIENT)

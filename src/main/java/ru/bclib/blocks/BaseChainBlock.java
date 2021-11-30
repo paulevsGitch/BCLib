@@ -28,7 +28,7 @@ import java.util.Optional;
 
 public class BaseChainBlock extends ChainBlock implements BlockModelProvider, RenderLayerProvider {
 	public BaseChainBlock(MaterialColor color) {
-		super(FabricBlockSettings.copyOf(Blocks.CHAIN).mapColor(color));
+		super(FabricBlockSettings.copyOf(Blocks.CHAIN).color(color));
 	}
 	
 	@Override

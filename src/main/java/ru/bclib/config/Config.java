@@ -21,8 +21,8 @@ import java.util.List;
 import java.util.Map;
 
 public abstract class Config {
+	protected final static Map<AutoSyncID, Config> AUTO_SYNC_CONFIGS = new HashMap<>();
 	public static final String CONFIG_SYNC_PREFIX = "CONFIG_";
-	protected final static Map<AutoSyncID, Config> autoSyncConfigs = new HashMap<>();
 	protected final ConfigKeeper keeper;
 	protected final boolean autoSync;
 	public final String configID;
@@ -51,7 +51,7 @@ public abstract class Config {
 			else
 				DataExchangeAPI.addAutoSyncFile(aid.modID, aid.uniqueID, keeper.getConfigFile());
 			
-			autoSyncConfigs.put(aid, this);
+			AUTO_SYNC_CONFIGS.put(aid, this);
 			BCLib.LOGGER.info("Added Config " + configID + " to auto sync (" + (diffContent?"content diff":"file hash") + ")");
 		}
 	}
@@ -70,7 +70,7 @@ public abstract class Config {
 	}
 	
 	public static void reloadSyncedConfig(AutoSyncID aid, File file) {
-		Config cfg = autoSyncConfigs.get(aid);
+		Config cfg = AUTO_SYNC_CONFIGS.get(aid);
 		if (cfg != null) {
 			cfg.reload();
 		}

@@ -3,7 +3,6 @@ package ru.bclib;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import ru.bclib.api.TagAPI;
 import ru.bclib.api.WorldDataAPI;
@@ -23,8 +22,6 @@ import ru.bclib.world.generator.BCLibNetherBiomeSource;
 import ru.bclib.world.generator.GeneratorOptions;
 import ru.bclib.world.surface.BCLSurfaceBuilders;
 
-import java.lang.reflect.Array;
-import java.lang.reflect.Field;
 import java.util.List;
 
 public class BCLib implements ModInitializer {

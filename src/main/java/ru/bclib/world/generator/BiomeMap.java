@@ -2,7 +2,6 @@ package ru.bclib.world.generator;
 
 import com.google.common.collect.Maps;
 import net.minecraft.world.level.ChunkPos;
-import net.minecraft.world.level.levelgen.LegacyRandomSource;
 import net.minecraft.world.level.levelgen.WorldgenRandom;
 import ru.bclib.noise.OpenSimplexNoise;
 import ru.bclib.util.MHelper;

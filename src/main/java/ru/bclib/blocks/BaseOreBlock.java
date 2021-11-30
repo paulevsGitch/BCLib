@@ -30,8 +30,8 @@ public class BaseOreBlock extends OreBlock implements BlockModelProvider {
 	
 	public BaseOreBlock(Item drop, int minCount, int maxCount, int experience) {
 		this(drop, minCount, maxCount, experience, FabricBlockSettings.of(Material.STONE, MaterialColor.SAND)
-								 .hardness(3F)
-								 .resistance(9F)
+								 .destroyTime(3F)
+								 .explosionResistance(9F)
 								 .requiresCorrectToolForDrops()
 								 .sound(SoundType.STONE));
 		

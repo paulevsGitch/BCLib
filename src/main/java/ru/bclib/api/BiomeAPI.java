@@ -1,13 +1,17 @@
 package ru.bclib.api;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.impl.biome.InternalBiomeData;
+import net.fabricmc.fabric.impl.biome.NetherBiomeData;
+import net.fabricmc.fabric.impl.biome.TheEndBiomeData;
 import net.fabricmc.fabric.mixin.biome.modification.GenerationSettingsAccessor;
+import net.fabricmc.fabric.mixin.biome.modification.SpawnSettingsAccessor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.Registry;
 import net.minecraft.data.BuiltinRegistries;
@@ -15,11 +19,16 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.random.WeightedRandomList;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.biome.Biome.ClimateParameters;
+import net.minecraft.world.biome.Biome.ClimateParameters;
 import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.biome.Biomes;
+import net.minecraft.world.level.biome.MobSpawnSettings.SpawnerData;
 import net.minecraft.world.level.levelgen.GenerationStep.Decoration;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
@@ -31,6 +40,8 @@ import ru.bclib.world.features.BCLFeature;
 import ru.bclib.world.generator.BiomePicker;
 import ru.bclib.world.structures.BCLStructureFeature;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -114,8 +125,8 @@ public class BiomeAPI {
 		registerBiome(biome);
 		NETHER_BIOME_PICKER.addBiome(biome);
 		Random random = new Random(biome.getID().hashCode());
-		//TODO: (1.18) did they add depth and scale as two new params here???
-		Climate.ParameterPoint parameters = Climate.parameters(
+        //TODO: (1.18) did they add depth and scale as two new params here???
+		ClimateParameters parameters = new ClimateParameters(
 			MHelper.randRange(-1.5F, 1.5F, random),
 			MHelper.randRange(-1.5F, 1.5F, random),
 			MHelper.randRange(-1.5F, 1.5F, random),
@@ -396,7 +407,10 @@ public class BiomeAPI {
 		biomes.forEach(biome -> {
 			ResourceLocation biomeID =  getBiomeID(biome);
 			boolean modify = isDatapackBiome(biomeID);
-			if (!modify && !MODIFIED_BIOMES.contains(biomeID)) {
+			if (biome != BuiltinRegistries.BIOME.get(biomeID)) {
+				modify = true;
+			}
+			else if (!modify && !MODIFIED_BIOMES.contains(biomeID)) {
 				MODIFIED_BIOMES.add(biomeID);
 				modify = true;
 			}
@@ -417,13 +431,7 @@ public class BiomeAPI {
 	public static void addBiomeFeature(Biome biome, ConfiguredFeature feature, Decoration step) {
 		GenerationSettingsAccessor accessor = (GenerationSettingsAccessor) biome.getGenerationSettings();
 		List<List<Supplier<ConfiguredFeature<?, ?>>>> biomeFeatures = getMutableList(accessor.fabric_getFeatures());
-		int index = step.ordinal();
-		if (biomeFeatures.size() < index) {
-			for (int i = biomeFeatures.size(); i <= index; i++) {
-				biomeFeatures.add(Lists.newArrayList());
-			}
-		}
-		List<Supplier<ConfiguredFeature<?, ?>>> list = getMutableList(biomeFeatures.get(index));
+		List<Supplier<ConfiguredFeature<?, ?>>> list = getList(step, biomeFeatures);
 		list.add(() -> feature);
 		accessor.fabric_setFeatures(biomeFeatures);
 	}
@@ -437,16 +445,28 @@ public class BiomeAPI {
 		GenerationSettingsAccessor accessor = (GenerationSettingsAccessor) biome.getGenerationSettings();
 		List<List<Supplier<ConfiguredFeature<?, ?>>>> biomeFeatures = getMutableList(accessor.fabric_getFeatures());
 		for (BCLFeature feature: features) {
-			int index = feature.getFeatureStep().ordinal();
-			if (biomeFeatures.size() < index) {
-				for (int i = biomeFeatures.size(); i <= index; i++) {
-					biomeFeatures.add(Lists.newArrayList());
-				}
-			}
-			List<Supplier<ConfiguredFeature<?, ?>>> list = getMutableList(biomeFeatures.get(index));
+			List<Supplier<ConfiguredFeature<?, ?>>> list = getList(feature.getFeatureStep(), biomeFeatures);
 			list.add(feature::getFeatureConfigured);
 		}
 		accessor.fabric_setFeatures(biomeFeatures);
+	}
+	
+	/**
+	 * Getter for correct feature list from all biome feature list of lists.
+	 * @param step feature {@link Decoration} step.
+	 * @param lists biome accessor lists.
+	 * @return mutable {@link ConfiguredFeature} list.
+	 */
+	private static List<Supplier<ConfiguredFeature<?, ?>>> getList(Decoration step, List<List<Supplier<ConfiguredFeature<?, ?>>>> lists) {
+		int index = step.ordinal();
+		if (lists.size() <= index) {
+			for (int i = lists.size(); i <= index; i++) {
+				lists.add(Lists.newArrayList());
+			}
+		}
+		List<Supplier<ConfiguredFeature<?, ?>>> list = getMutableList(lists.get(index));
+		lists.set(index, list);
+		return list;
 	}
 	
 	/**
@@ -475,9 +495,40 @@ public class BiomeAPI {
 		accessor.fabric_setStructureFeatures(biomeStructures);
 	}
 	
+	/**
+	 * Adds mob spawning to specified biome.
+	 * @param biome {@link Biome} to add mob spawning.
+	 * @param entityType {@link EntityType} mob type.
+	 * @param weight spawn weight.
+	 * @param minGroupCount minimum mobs in group.
+	 * @param maxGroupCount maximum mobs in group.
+	 */
+	public static <M extends Mob> void addBiomeMobSpawn(Biome biome, EntityType<M> entityType, int weight, int minGroupCount, int maxGroupCount) {
+		MobCategory category = entityType.getCategory();
+		SpawnSettingsAccessor accessor = (SpawnSettingsAccessor) biome.getMobSettings();
+		Map<MobCategory, WeightedRandomList<SpawnerData>> spawners = getMutableMap(accessor.fabric_getSpawners());
+		List<SpawnerData> mobs = spawners.containsKey(category) ? getMutableList(spawners.get(category).unwrap()) : Lists.newArrayList();
+		mobs.add(new SpawnerData(entityType, weight, minGroupCount, maxGroupCount));
+		spawners.put(category, WeightedRandomList.create(mobs));
+		accessor.fabric_setSpawners(spawners);
+	}
+	
 	private static <T extends Object> List<T> getMutableList(List<T> input) {
-		if (input instanceof ImmutableList) {
+		if (input!=null) {
+			System.out.println("getMutableList: " + input.getClass().getName());
+			for (Class cl : input.getClass().getInterfaces()){
+				System.out.println("   - " + cl.getName());
+			}
+		}
+		if (/*input instanceof ImmutableList ||*/ !(input instanceof ArrayList || input instanceof LinkedList)) {
 			return Lists.newArrayList(input);
+		}
+		return input;
+	}
+	
+	private static <K extends Object, V extends Object> Map<K, V> getMutableMap(Map<K, V> input) {
+		if (input instanceof ImmutableMap) {
+			return Maps.newHashMap(input);
 		}
 		return input;
 	}

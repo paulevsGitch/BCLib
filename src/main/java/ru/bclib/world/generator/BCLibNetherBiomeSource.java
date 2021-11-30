@@ -8,9 +8,10 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biome.BiomeCategory;
 import net.minecraft.world.level.biome.BiomeSource;
-import net.minecraft.world.level.biome.Climate;
 import ru.bclib.BCLib;
 import ru.bclib.api.BiomeAPI;
+import ru.bclib.config.ConfigKeeper.StringArrayEntry;
+import ru.bclib.config.Configs;
 import ru.bclib.world.biomes.BCLBiome;
 
 import java.util.LinkedList;
@@ -37,7 +38,7 @@ public class BCLibNetherBiomeSource extends BiomeSource {
 		
 		BiomeAPI.NETHER_BIOME_PICKER.clearMutables();
 		
-		this.possibleBiomes().forEach(biome -> {
+		this.possibleBiomes.forEach(biome -> {
 			ResourceLocation key = biomeRegistry.getKey(biome);
 			if (!BiomeAPI.hasBiome(key)) {
 				BCLBiome bclBiome = new BCLBiome(key, biome, 1, 1);
@@ -53,6 +54,7 @@ public class BCLibNetherBiomeSource extends BiomeSource {
 			}
 		});
 		
+		Configs.BIOMES_CONFIG.saveChanges();
 		BiomeAPI.NETHER_BIOME_PICKER.getBiomes().forEach(biome -> biome.updateActualBiomes(biomeRegistry));
 		BiomeAPI.NETHER_BIOME_PICKER.rebuild();
 		
@@ -64,8 +66,19 @@ public class BCLibNetherBiomeSource extends BiomeSource {
 	}
 	
 	private static List<Biome> getBiomes(Registry<Biome> biomeRegistry) {
+		List<String> include = Configs.BIOMES_CONFIG.getEntry("force_include", "nether_biomes", StringArrayEntry.class).getValue();
+		
 		return biomeRegistry.stream().filter(biome -> {
 			ResourceLocation key = biomeRegistry.getKey(biome);
+			
+			if (include.contains(key.toString())) {
+				return true;
+			}
+			
+			if (GeneratorOptions.addNetherBiomesByCategory() && biome.getBiomeCategory() == BiomeCategory.NETHER) {
+				return true;
+			}
+			
 			BCLBiome bclBiome = BiomeAPI.getBiome(key);
 			if (bclBiome != BiomeAPI.EMPTY_BIOME) {
 				if (bclBiome.hasParentBiome()) {
@@ -78,7 +91,7 @@ public class BCLibNetherBiomeSource extends BiomeSource {
 	}
 	
 	@Override
-	public Biome getNoiseBiome(int biomeX, int biomeY, int biomeZ, Climate.Sampler sampler) {
+	public Biome getBiomeForNoiseGen(int biomeX, int biomeY, int biomeZ) {
 		if ((biomeX & 63) == 0 && (biomeZ & 63) == 0) {
 			biomeMap.clearCache();
 		}

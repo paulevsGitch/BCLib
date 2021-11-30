@@ -4,8 +4,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import net.minecraft.core.Registry;
 import net.minecraft.core.particles.ParticleOptions;
-import net.minecraft.data.BuiltinRegistries;
-import net.minecraft.data.worldgen.StructureFeatures;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.Music;
 import net.minecraft.sounds.Musics;
@@ -33,9 +31,8 @@ import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
 import net.minecraft.world.level.levelgen.surfacebuilders.ConfiguredSurfaceBuilder;
 import net.minecraft.world.level.levelgen.surfacebuilders.SurfaceBuilder;
 import net.minecraft.world.level.levelgen.surfacebuilders.SurfaceBuilderBaseConfiguration;
-import net.minecraft.resources.ResourceKey;
 import ru.bclib.config.IdConfig;
-import ru.bclib.interfaces.IStructureFeatures;
+import ru.bclib.config.PathConfig;
 import ru.bclib.util.ColorUtil;
 import ru.bclib.world.features.BCLFeature;
 import ru.bclib.world.structures.BCLStructureFeature;
@@ -48,8 +45,7 @@ public class BCLBiomeDef {
 	public static final int DEF_FOLIAGE_OVERWORLD = ColorUtil.color(110, 143, 64);
 	public static final int DEF_FOLIAGE_NETHER = ColorUtil.color(117, 10, 10);
 	public static final int DEF_FOLIAGE_END = ColorUtil.color(197, 210, 112);
-
-	protected final IStructureFeatures structureFeatures = (IStructureFeatures)new StructureFeatures();
+	
 	private final List<ConfiguredStructureFeature<?, ?>> structures = Lists.newArrayList();
 	private final List<FeatureInfo> features = Lists.newArrayList();
 	private final List<CarverInfo> carvers = Lists.newArrayList();
@@ -118,7 +114,6 @@ public class BCLBiomeDef {
 	
 	/**
 	 * Used to load biome settings from config.
-	 *
 	 * @param config - {@link IdConfig}.
 	 * @return this {@link BCLBiomeDef}.
 	 */
@@ -130,8 +125,20 @@ public class BCLBiomeDef {
 	}
 	
 	/**
+	 * Used to load biome settings from config.
+	 * @param config - {@link PathConfig}.
+	 * @return this {@link BCLBiomeDef}.
+	 */
+	public BCLBiomeDef loadConfigValues(PathConfig config) {
+		String biomePath = id.getNamespace() + "." + id.getPath();
+		this.fogDensity = config.getFloat(biomePath, "fog_density", this.fogDensity);
+		this.genChance = config.getFloat(biomePath, "generation_chance", this.genChance);
+		this.edgeSize = config.getInt(biomePath, "edge_size", this.edgeSize);
+		return this;
+	}
+	
+	/**
 	 * Set category of the biome.
-	 *
 	 * @param category - {@link BiomeCategory}.
 	 * @return this {@link BCLBiomeDef}.
 	 */
@@ -340,8 +347,7 @@ public class BCLBiomeDef {
 		});
 		
 		generationSettings.surfaceBuilder(surface == null ? net.minecraft.data.worldgen.SurfaceBuilders.END : surface);
-		//TODO: (1.18) Removed now. Seems to part of a registry step per biome now
-		//structures.forEach((structure) -> generationSettings.addStructureStart(structure));
+		structures.forEach((structure) -> generationSettings.addStructureStart(structure));
 		features.forEach((info) -> generationSettings.addFeature(info.featureStep, info.feature));
 		carvers.forEach((info) -> generationSettings.addCarver(info.carverStep, info.carver));
 		
@@ -359,27 +365,17 @@ public class BCLBiomeDef {
 		if (particleConfig != null) effects.ambientParticle(particleConfig);
 		effects.backgroundMusic(music != null ? new Music(music, 600, 2400, true) : Musics.END);
 		
-		Biome biome = new Biome.BiomeBuilder().precipitation(precipitation)
-									   .biomeCategory(category)
-									   //.depth(depth) //TODO: No longer available in 1.18
-									   //.scale(0.2F)
-									   .temperature(temperature)
-									   .downfall(downfall)
-									   .specialEffects(effects.build())
-									   .mobSpawnSettings(spawnSettings.build())
-									   .generationSettings(generationSettings.build())
-									   .build();
-
-		structureFeatures.bclib_registerStructure(biConsumer -> {
-			ResourceKey<Biome> biomeKey =  ResourceKey.create(Registry.BIOME_REGISTRY, BuiltinRegistries.BIOME.getKey(biome));
-			System.out.println("Biome:" + biomeKey);
-			structures.forEach((structure) -> {
-				biConsumer.accept(structure, biomeKey);
-			});
-
-		});
-
-		return biome;
+		return new Biome.BiomeBuilder()
+			.precipitation(precipitation)
+			.biomeCategory(category)
+			.depth(depth)
+			.scale(0.2F)
+			.temperature(temperature)
+			.downfall(downfall)
+			.effects(effects.build())
+			.spawnSettings(spawnSettings.build())
+			.generationSettings(generationSettings.build())
+			.build();
 	}
 	
 	private static final class SpawnInfo {
