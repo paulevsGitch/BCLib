@@ -93,6 +93,7 @@ public class BCLFeature {
 	 * @return new BCLFeature instance.
 	 */
 	public static BCLFeature makeOreFeature(ResourceLocation id, Block blockOre, Block hostBlock, int veins, int veinSize, int minY, int maxY) {
+		//TODO: 1.18 See if this still works
 		return makeOreFeature(id, blockOre, hostBlock, veins, veinSize, minY, maxY, false);
 	}
 	

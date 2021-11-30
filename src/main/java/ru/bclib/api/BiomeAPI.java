@@ -6,10 +6,9 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
 import net.fabricmc.fabric.impl.biome.NetherBiomeData;
 import net.fabricmc.fabric.impl.biome.TheEndBiomeData;
-import net.fabricmc.fabric.mixin.biome.modification.GenerationSettingsAccessor;
-import net.fabricmc.fabric.mixin.biome.modification.SpawnSettingsAccessor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.Registry;
 import net.minecraft.data.BuiltinRegistries;
@@ -23,14 +22,17 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.biome.Biome.ClimateParameters;
 import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.biome.Biomes;
+import net.minecraft.world.level.biome.Climate;
 import net.minecraft.world.level.biome.MobSpawnSettings.SpawnerData;
 import net.minecraft.world.level.levelgen.GenerationStep.Decoration;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
+import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import org.jetbrains.annotations.Nullable;
+import ru.bclib.mixin.common.BiomeGenerationSettingsAccessor;
+import ru.bclib.mixin.common.MobSpawnSettingsAccessor;
 import ru.bclib.util.MHelper;
 import ru.bclib.world.biomes.BCLBiome;
 import ru.bclib.world.biomes.FabricBiomesData;
@@ -123,14 +125,16 @@ public class BiomeAPI {
 		registerBiome(biome);
 		NETHER_BIOME_PICKER.addBiome(biome);
 		Random random = new Random(biome.getID().hashCode());
-        //TODO: (1.18) did they add depth and scale as two new params here???
-		ClimateParameters parameters = new ClimateParameters(
+		
+		//TODO: 1.18 Check parameters, depth was previously called altitude
+		//temperature, humidity, continentalness, erosion, depth, weirdness, offset
+        Climate.ParameterPoint parameters = Climate.parameters(
 			MHelper.randRange(-1.5F, 1.5F, random),
 			MHelper.randRange(-1.5F, 1.5F, random),
+			0.0f, //new in 1.18
+			0.0f, //new in 1.18
 			MHelper.randRange(-1.5F, 1.5F, random),
 			MHelper.randRange(-1.5F, 1.5F, random),
-			0.0f,
-			0.0f,
 			random.nextFloat()
 		);
 		ResourceKey<Biome> key = BuiltinRegistries.BIOME.getResourceKey(biome.getBiome()).get();
@@ -400,7 +404,7 @@ public class BiomeAPI {
 			return;
 		}
 		BiomeSource source = level.getChunkSource().getGenerator().getBiomeSource();
-		List<Biome> biomes = source.possibleBiomes();
+		Set<Biome> biomes = source.possibleBiomes();
 		
 		biomes.forEach(biome -> {
 			ResourceLocation biomeID =  getBiomeID(biome);
@@ -426,12 +430,12 @@ public class BiomeAPI {
 	 * @param feature {@link ConfiguredFeature} to add.
 	 * @param step a {@link Decoration} step for the feature.
 	 */
-	public static void addBiomeFeature(Biome biome, ConfiguredFeature feature, Decoration step) {
-		GenerationSettingsAccessor accessor = (GenerationSettingsAccessor) biome.getGenerationSettings();
-		List<List<Supplier<ConfiguredFeature<?, ?>>>> biomeFeatures = getMutableList(accessor.fabric_getFeatures());
-		List<Supplier<ConfiguredFeature<?, ?>>> list = getList(step, biomeFeatures);
+	public static void addBiomeFeature(Biome biome, PlacedFeature feature, Decoration step) {
+		BiomeGenerationSettingsAccessor accessor = (BiomeGenerationSettingsAccessor) biome.getGenerationSettings();
+		List<List<Supplier<PlacedFeature>>> biomeFeatures = getMutableList(accessor.bcl_getFeatures());
+		List<Supplier<PlacedFeature>> list = getList(step, biomeFeatures);
 		list.add(() -> feature);
-		accessor.fabric_setFeatures(biomeFeatures);
+		accessor.bcl_setFeatures(biomeFeatures);
 	}
 	
 	/**
@@ -440,13 +444,13 @@ public class BiomeAPI {
 	 * @param features array of {@link BCLFeature} to add.
 	 */
 	public static void addBiomeFeatures(Biome biome, BCLFeature... features) {
-		GenerationSettingsAccessor accessor = (GenerationSettingsAccessor) biome.getGenerationSettings();
-		List<List<Supplier<ConfiguredFeature<?, ?>>>> biomeFeatures = getMutableList(accessor.fabric_getFeatures());
+		BiomeGenerationSettingsAccessor accessor = (BiomeGenerationSettingsAccessor) biome.getGenerationSettings();
+		List<List<Supplier<PlacedFeature>>> biomeFeatures = getMutableList(accessor.bcl_getFeatures());
 		for (BCLFeature feature: features) {
-			List<Supplier<ConfiguredFeature<?, ?>>> list = getList(feature.getFeatureStep(), biomeFeatures);
+			List<Supplier<PlacedFeature>> list = getList(feature.getFeatureStep(), biomeFeatures);
 			list.add(feature::getPlacedFeature);
 		}
-		accessor.fabric_setFeatures(biomeFeatures);
+		accessor.bcl_setFeatures(biomeFeatures);
 	}
 	
 	/**
@@ -455,42 +459,52 @@ public class BiomeAPI {
 	 * @param lists biome accessor lists.
 	 * @return mutable {@link ConfiguredFeature} list.
 	 */
-	private static List<Supplier<ConfiguredFeature<?, ?>>> getList(Decoration step, List<List<Supplier<ConfiguredFeature<?, ?>>>> lists) {
+	private static List<Supplier<PlacedFeature>> getList(Decoration step, List<List<Supplier<PlacedFeature>>> lists) {
 		int index = step.ordinal();
 		if (lists.size() <= index) {
 			for (int i = lists.size(); i <= index; i++) {
 				lists.add(Lists.newArrayList());
 			}
 		}
-		List<Supplier<ConfiguredFeature<?, ?>>> list = getMutableList(lists.get(index));
+		List<Supplier<PlacedFeature>> list = getMutableList(lists.get(index));
 		lists.set(index, list);
 		return list;
 	}
 	
+	// TODO: 1.18 There are no more StructureFeatures in the Biomes, they are in a separate registry now
 	/**
 	 * Adds new structure feature to existing biome.
 	 * @param biome {@link Biome} to add structure feature in.
 	 * @param structure {@link ConfiguredStructureFeature} to add.
 	 */
 	public static void addBiomeStructure(Biome biome, ConfiguredStructureFeature structure) {
-		GenerationSettingsAccessor accessor = (GenerationSettingsAccessor) biome.getGenerationSettings();
-		List<Supplier<ConfiguredStructureFeature<?, ?>>> biomeStructures = getMutableList(accessor.fabric_getStructureFeatures());
-		biomeStructures.add(() -> structure);
-		accessor.fabric_setStructureFeatures(biomeStructures);
+		BuiltinRegistries.CONFIGURED_STRUCTURE_FEATURE.getResourceKey(structure)
+													  .ifPresent((key)->
+															BiomeModifications.addStructure(
+																(ctx)->ctx.getBiomeKey().equals(BuiltinRegistries.BIOME.getKey(biome)),
+																key
+														));
+//		BiomeGenerationSettingsAccessor accessor = (BiomeGenerationSettingsAccessor) biome.getGenerationSettings();
+//		List<Supplier<ConfiguredStructureFeature<?, ?>>> biomeStructures = getMutableList(accessor.fabric_getStructureFeatures());
+//		biomeStructures.add(() -> structure);
+//		accessor.fabric_setStructureFeatures(biomeStructures);
 	}
-	
+
 	/**
 	 * Adds new structure features to existing biome.
 	 * @param biome {@link Biome} to add structure features in.
 	 * @param structures array of {@link BCLStructureFeature} to add.
 	 */
 	public static void addBiomeStructures(Biome biome, BCLStructureFeature... structures) {
-		GenerationSettingsAccessor accessor = (GenerationSettingsAccessor) biome.getGenerationSettings();
-		List<Supplier<ConfiguredStructureFeature<?, ?>>> biomeStructures = getMutableList(accessor.fabric_getStructureFeatures());
 		for (BCLStructureFeature structure: structures) {
-			biomeStructures.add(structure::getFeatureConfigured);
+			addBiomeStructure(biome, structure.getFeatureConfigured());
 		}
-		accessor.fabric_setStructureFeatures(biomeStructures);
+//		GenerationSettingsAccessor accessor = (GenerationSettingsAccessor) biome.getGenerationSettings();
+//		List<Supplier<ConfiguredStructureFeature<?, ?>>> biomeStructures = getMutableList(accessor.fabric_getStructureFeatures());
+//		for (BCLStructureFeature structure: structures) {
+//			biomeStructures.add(structure::getFeatureConfigured);
+//		}
+//		accessor.fabric_setStructureFeatures(biomeStructures);
 	}
 	
 	/**
@@ -503,12 +517,12 @@ public class BiomeAPI {
 	 */
 	public static <M extends Mob> void addBiomeMobSpawn(Biome biome, EntityType<M> entityType, int weight, int minGroupCount, int maxGroupCount) {
 		MobCategory category = entityType.getCategory();
-		SpawnSettingsAccessor accessor = (SpawnSettingsAccessor) biome.getMobSettings();
-		Map<MobCategory, WeightedRandomList<SpawnerData>> spawners = getMutableMap(accessor.fabric_getSpawners());
+		MobSpawnSettingsAccessor accessor = (MobSpawnSettingsAccessor) biome.getMobSettings();
+		Map<MobCategory, WeightedRandomList<SpawnerData>> spawners = getMutableMap(accessor.bcl_getSpawners());
 		List<SpawnerData> mobs = spawners.containsKey(category) ? getMutableList(spawners.get(category).unwrap()) : Lists.newArrayList();
 		mobs.add(new SpawnerData(entityType, weight, minGroupCount, maxGroupCount));
 		spawners.put(category, WeightedRandomList.create(mobs));
-		accessor.fabric_setSpawners(spawners);
+		accessor.bcl_setSpawners(spawners);
 	}
 	
 	private static <T extends Object> List<T> getMutableList(List<T> input) {
