@@ -7,6 +7,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.levelgen.GenerationStep.Decoration;
 import net.minecraft.world.level.levelgen.VerticalAnchor;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
+import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.configurations.CountConfiguration;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
 import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
@@ -18,15 +19,15 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.BlockMatchTes
 public class BCLFeature {
 	private ConfiguredFeature<?, ?> featureConfigured;
 	private Decoration featureStep;
-	private net.minecraft.world.level.levelgen.feature.Feature<?> feature;
+	private Feature<?> feature;
 	
-	public BCLFeature(net.minecraft.world.level.levelgen.feature.Feature<?> feature, ConfiguredFeature<?, ?> configuredFeature, Decoration featureStep) {
+	public BCLFeature(Feature<?> feature, ConfiguredFeature<?, ?> configuredFeature, Decoration featureStep) {
 		this.featureConfigured = configuredFeature;
 		this.featureStep = featureStep;
 		this.feature = feature;
 	}
 	
-	public BCLFeature(ResourceLocation id, net.minecraft.world.level.levelgen.feature.Feature<NoneFeatureConfiguration> feature, Decoration featureStep, ConfiguredFeature<?, ?> configuredFeature) {
+	public BCLFeature(ResourceLocation id, Feature<NoneFeatureConfiguration> feature, Decoration featureStep, ConfiguredFeature<?, ?> configuredFeature) {
 		this.featureConfigured = Registry.register(BuiltinRegistries.CONFIGURED_FEATURE, id, configuredFeature);
 		this.feature = Registry.register(Registry.FEATURE, id, feature);
 		this.featureStep = featureStep;
@@ -34,9 +35,9 @@ public class BCLFeature {
 	
 	/**
 	 * Get raw feature.
-	 * @return {@link net.minecraft.world.level.levelgen.feature.Feature}.
+	 * @return {@link Feature}.
 	 */
-	public net.minecraft.world.level.levelgen.feature.Feature<?> getFeature() {
+	public Feature<?> getFeature() {
 		return feature;
 	}
 	
@@ -59,11 +60,11 @@ public class BCLFeature {
 	/**
 	 * Will create a basic plant feature.
 	 * @param id {@link ResourceLocation} feature ID.
-	 * @param feature {@link net.minecraft.world.level.levelgen.feature.Feature} with {@link NoneFeatureConfiguration} config.
+	 * @param feature {@link Feature} with {@link NoneFeatureConfiguration} config.
 	 * @param density iterations per chunk.
 	 * @return new BCLFeature instance.
 	 */
-	public static BCLFeature makeVegetationFeature(ResourceLocation id, net.minecraft.world.level.levelgen.feature.Feature<NoneFeatureConfiguration> feature, int density) {
+	public static BCLFeature makeVegetationFeature(ResourceLocation id, Feature<NoneFeatureConfiguration> feature, int density) {
 		ConfiguredFeature<?, ?> configured = feature
 			.configured(FeatureConfiguration.NONE)
 			.decorated(BCLDecorators.HEIGHTMAP_SQUARE)
@@ -88,7 +89,7 @@ public class BCLFeature {
 			blockOre.defaultBlockState(),
 			veinSize
 		);
-		ConfiguredFeature<?, ?> oreFeature = net.minecraft.world.level.levelgen.feature.Feature.ORE
+		ConfiguredFeature<?, ?> oreFeature = Feature.ORE
 			.configured(featureConfig)
 			.rangeUniform(
 				VerticalAnchor.absolute(minY),
@@ -107,10 +108,10 @@ public class BCLFeature {
 	 * Will create feature which will be generated once in each chunk.
 	 * @param id {@link ResourceLocation} feature ID.
 	 * @param step {@link Decoration} feature step.
-	 * @param feature {@link net.minecraft.world.level.levelgen.feature.Feature} with {@link NoneFeatureConfiguration} config.
+	 * @param feature {@link Feature} with {@link NoneFeatureConfiguration} config.
 	 * @return new BCLFeature instance.
 	 */
-	public static BCLFeature makeChunkFeature(ResourceLocation id, Decoration step, net.minecraft.world.level.levelgen.feature.Feature<NoneFeatureConfiguration> feature) {
+	public static BCLFeature makeChunkFeature(ResourceLocation id, Decoration step, Feature<NoneFeatureConfiguration> feature) {
 		ConfiguredFeature<?, ?> configured = feature
 			.configured(FeatureConfiguration.NONE)
 			.decorated(FeatureDecorator.COUNT.configured(new CountConfiguration(1)));
@@ -121,11 +122,11 @@ public class BCLFeature {
 	 * Will create feature with chanced decoration, chance for feature to generate per chunk is 1 / chance.
 	 * @param id {@link ResourceLocation} feature ID.
 	 * @param step {@link Decoration} feature step.
-	 * @param feature {@link net.minecraft.world.level.levelgen.feature.Feature} with {@link NoneFeatureConfiguration} config.
+	 * @param feature {@link Feature} with {@link NoneFeatureConfiguration} config.
 	 * @param chance chance for feature to be generated in.
 	 * @return new BCLFeature instance.
 	 */
-	public static BCLFeature makeChancedFeature(ResourceLocation id, Decoration step, net.minecraft.world.level.levelgen.feature.Feature<NoneFeatureConfiguration> feature, int chance) {
+	public static BCLFeature makeChancedFeature(ResourceLocation id, Decoration step, Feature<NoneFeatureConfiguration> feature, int chance) {
 		ConfiguredFeature<?, ?> configured = feature
 			.configured(FeatureConfiguration.NONE)
 			.decorated(FeatureDecorator.CHANCE.configured(new ChanceDecoratorConfiguration(chance)));
@@ -136,11 +137,11 @@ public class BCLFeature {
 	 * Will create feature with specified generation iterations per chunk.
 	 * @param id {@link ResourceLocation} feature ID.
 	 * @param step {@link Decoration} feature step.
-	 * @param feature {@link net.minecraft.world.level.levelgen.feature.Feature} with {@link NoneFeatureConfiguration} config.
+	 * @param feature {@link Feature} with {@link NoneFeatureConfiguration} config.
 	 * @param count iterations steps.
 	 * @return new BCLFeature instance.
 	 */
-	public static BCLFeature makeCountFeature(ResourceLocation id, Decoration step, net.minecraft.world.level.levelgen.feature.Feature<NoneFeatureConfiguration> feature, int count) {
+	public static BCLFeature makeCountFeature(ResourceLocation id, Decoration step, Feature<NoneFeatureConfiguration> feature, int count) {
 		ConfiguredFeature<?, ?> configured = feature
 			.configured(FeatureConfiguration.NONE)
 			.decorated(FeatureDecorator.COUNT.configured(new CountConfiguration(count)));
@@ -151,10 +152,10 @@ public class BCLFeature {
 	 * Makes simple configured feature with {@link NoneFeatureConfiguration} set to NONE.
 	 * @param id {@link ResourceLocation} feature ID.
 	 * @param step {@link Decoration} feature step.
-	 * @param feature {@link net.minecraft.world.level.levelgen.feature.Feature} with {@link NoneFeatureConfiguration} config.
+	 * @param feature {@link Feature} with {@link NoneFeatureConfiguration} config.
 	 * @return new BCLFeature instance.
 	 */
-	public static BCLFeature makeFeatureConfigured(ResourceLocation id, Decoration step, net.minecraft.world.level.levelgen.feature.Feature<NoneFeatureConfiguration> feature) {
+	public static BCLFeature makeFeatureConfigured(ResourceLocation id, Decoration step, Feature<NoneFeatureConfiguration> feature) {
 		ConfiguredFeature<?, ?> configured = feature.configured(FeatureConfiguration.NONE);
 		return new BCLFeature(id, feature, step, configured);
 	}
@@ -165,27 +166,27 @@ public class BCLFeature {
 	}
 	
 	@Deprecated(forRemoval = true)
-	public static BCLFeature makeRawGenFeature(ResourceLocation id, net.minecraft.world.level.levelgen.feature.Feature<NoneFeatureConfiguration> feature, int chance) {
+	public static BCLFeature makeRawGenFeature(ResourceLocation id, Feature<NoneFeatureConfiguration> feature, int chance) {
 		return makeChancedFeature(id, Decoration.RAW_GENERATION, feature, chance);
 	}
 	
 	@Deprecated(forRemoval = true)
-	public static BCLFeature makeChunkFeature(ResourceLocation id, net.minecraft.world.level.levelgen.feature.Feature<NoneFeatureConfiguration> feature) {
+	public static BCLFeature makeChunkFeature(ResourceLocation id, Feature<NoneFeatureConfiguration> feature) {
 		return makeChunkFeature(id, Decoration.LOCAL_MODIFICATIONS, feature);
 	}
 	
 	@Deprecated(forRemoval = true)
-	public static BCLFeature makeChansedFeature(ResourceLocation id, net.minecraft.world.level.levelgen.feature.Feature<NoneFeatureConfiguration> feature, int chance) {
+	public static BCLFeature makeChansedFeature(ResourceLocation id, Feature<NoneFeatureConfiguration> feature, int chance) {
 		return makeChancedFeature(id, Decoration.SURFACE_STRUCTURES, feature, chance);
 	}
 	
 	@Deprecated(forRemoval = true)
-	public static BCLFeature makeCountRawFeature(ResourceLocation id, net.minecraft.world.level.levelgen.feature.Feature<NoneFeatureConfiguration> feature, int chance) {
+	public static BCLFeature makeCountRawFeature(ResourceLocation id, Feature<NoneFeatureConfiguration> feature, int chance) {
 		return makeCountFeature(id, Decoration.RAW_GENERATION, feature, chance);
 	}
 	
 	@Deprecated(forRemoval = true)
-	public static BCLFeature makeFeatureConfigured(ResourceLocation id, net.minecraft.world.level.levelgen.feature.Feature<NoneFeatureConfiguration> feature) {
+	public static BCLFeature makeFeatureConfigured(ResourceLocation id, Feature<NoneFeatureConfiguration> feature) {
 		return makeFeatureConfigured(id, Decoration.RAW_GENERATION, feature);
 	}
 }
