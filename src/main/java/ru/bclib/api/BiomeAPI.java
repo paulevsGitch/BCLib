@@ -1,6 +1,5 @@
 package ru.bclib.api;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -445,7 +444,7 @@ public class BiomeAPI {
 		List<List<Supplier<ConfiguredFeature<?, ?>>>> biomeFeatures = getMutableList(accessor.fabric_getFeatures());
 		for (BCLFeature feature: features) {
 			List<Supplier<ConfiguredFeature<?, ?>>> list = getList(feature.getFeatureStep(), biomeFeatures);
-			list.add(feature::getFeatureConfigured);
+			list.add(feature::getPlacedFeature);
 		}
 		accessor.fabric_setFeatures(biomeFeatures);
 	}
