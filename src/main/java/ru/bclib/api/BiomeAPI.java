@@ -16,23 +16,18 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.util.random.WeightedRandomList;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.biome.Climate;
-import net.minecraft.world.level.biome.MobSpawnSettings.SpawnerData;
 import net.minecraft.world.level.levelgen.GenerationStep.Decoration;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import org.jetbrains.annotations.Nullable;
-import ru.bclib.mixin.common.BiomeGenerationSettingsAccessor;
-import ru.bclib.mixin.common.MobSpawnSettingsAccessor;
 import ru.bclib.util.MHelper;
 import ru.bclib.world.biomes.BCLBiome;
 import ru.bclib.world.biomes.FabricBiomesData;
@@ -431,11 +426,18 @@ public class BiomeAPI {
 	 * @param step a {@link Decoration} step for the feature.
 	 */
 	public static void addBiomeFeature(Biome biome, PlacedFeature feature, Decoration step) {
-		BiomeGenerationSettingsAccessor accessor = (BiomeGenerationSettingsAccessor) biome.getGenerationSettings();
-		List<List<Supplier<PlacedFeature>>> biomeFeatures = getMutableList(accessor.bcl_getFeatures());
-		List<Supplier<PlacedFeature>> list = getList(step, biomeFeatures);
-		list.add(() -> feature);
-		accessor.bcl_setFeatures(biomeFeatures);
+		BuiltinRegistries.PLACED_FEATURE.getResourceKey(feature)
+													  .ifPresent((key)->
+														  BiomeModifications.addFeature(
+															  (ctx)->ctx.getBiomeKey().equals(BuiltinRegistries.BIOME.getKey(biome)),
+															  step,
+															  key
+														  ));
+//		BiomeGenerationSettingsAccessor accessor = (BiomeGenerationSettingsAccessor) biome.getGenerationSettings();
+//		List<List<Supplier<PlacedFeature>>> biomeFeatures = getMutableList(accessor.bcl_getFeatures());
+//		List<Supplier<PlacedFeature>> list = getList(step, biomeFeatures);
+//		list.add(() -> feature);
+//		accessor.bcl_setFeatures(biomeFeatures);
 	}
 	
 	/**
@@ -444,13 +446,16 @@ public class BiomeAPI {
 	 * @param features array of {@link BCLFeature} to add.
 	 */
 	public static void addBiomeFeatures(Biome biome, BCLFeature... features) {
-		BiomeGenerationSettingsAccessor accessor = (BiomeGenerationSettingsAccessor) biome.getGenerationSettings();
-		List<List<Supplier<PlacedFeature>>> biomeFeatures = getMutableList(accessor.bcl_getFeatures());
 		for (BCLFeature feature: features) {
-			List<Supplier<PlacedFeature>> list = getList(feature.getFeatureStep(), biomeFeatures);
-			list.add(feature::getPlacedFeature);
+			addBiomeFeature(biome, feature.getPlacedFeature(), feature.getFeatureStep());
 		}
-		accessor.bcl_setFeatures(biomeFeatures);
+//		BiomeGenerationSettingsAccessor accessor = (BiomeGenerationSettingsAccessor) biome.getGenerationSettings();
+//		List<List<Supplier<PlacedFeature>>> biomeFeatures = getMutableList(accessor.bcl_getFeatures());
+//		for (BCLFeature feature: features) {
+//			List<Supplier<PlacedFeature>> list = getList(feature.getFeatureStep(), biomeFeatures);
+//			list.add(feature::getPlacedFeature);
+//		}
+//		accessor.bcl_setFeatures(biomeFeatures);
 	}
 	
 	/**
@@ -516,13 +521,21 @@ public class BiomeAPI {
 	 * @param maxGroupCount maximum mobs in group.
 	 */
 	public static <M extends Mob> void addBiomeMobSpawn(Biome biome, EntityType<M> entityType, int weight, int minGroupCount, int maxGroupCount) {
-		MobCategory category = entityType.getCategory();
-		MobSpawnSettingsAccessor accessor = (MobSpawnSettingsAccessor) biome.getMobSettings();
-		Map<MobCategory, WeightedRandomList<SpawnerData>> spawners = getMutableMap(accessor.bcl_getSpawners());
-		List<SpawnerData> mobs = spawners.containsKey(category) ? getMutableList(spawners.get(category).unwrap()) : Lists.newArrayList();
-		mobs.add(new SpawnerData(entityType, weight, minGroupCount, maxGroupCount));
-		spawners.put(category, WeightedRandomList.create(mobs));
-		accessor.bcl_setSpawners(spawners);
+		BiomeModifications.addSpawn(
+			(ctx)->ctx.getBiomeKey().equals(BuiltinRegistries.BIOME.getKey(biome)),
+			entityType.getCategory(),
+			entityType,
+			weight,
+			minGroupCount,
+			maxGroupCount
+		);
+//		MobCategory category = entityType.getCategory();
+//		MobSpawnSettingsAccessor accessor = (MobSpawnSettingsAccessor) biome.getMobSettings();
+//		Map<MobCategory, WeightedRandomList<SpawnerData>> spawners = getMutableMap(accessor.bcl_getSpawners());
+//		List<SpawnerData> mobs = spawners.containsKey(category) ? getMutableList(spawners.get(category).unwrap()) : Lists.newArrayList();
+//		mobs.add(new SpawnerData(entityType, weight, minGroupCount, maxGroupCount));
+//		spawners.put(category, WeightedRandomList.create(mobs));
+//		accessor.bcl_setSpawners(spawners);
 	}
 	
 	private static <T extends Object> List<T> getMutableList(List<T> input) {
