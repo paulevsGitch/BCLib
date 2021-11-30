@@ -38,6 +38,8 @@ import ru.bclib.world.features.BCLFeature;
 import ru.bclib.world.generator.BiomePicker;
 import ru.bclib.world.structures.BCLStructureFeature;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -507,7 +509,13 @@ public class BiomeAPI {
 	}
 	
 	private static <T extends Object> List<T> getMutableList(List<T> input) {
-		if (input instanceof ImmutableList) {
+		if (input!=null) {
+			System.out.println("getMutableList: " + input.getClass().getName());
+			for (Class cl : input.getClass().getInterfaces()){
+				System.out.println("   - " + cl.getName());
+			}
+		}
+		if (/*input instanceof ImmutableList ||*/ !(input instanceof ArrayList || input instanceof LinkedList)) {
 			return Lists.newArrayList(input);
 		}
 		return input;
