@@ -140,13 +140,12 @@ public class AnvilRecipe implements Recipe<Container>, UnknownReceipBookCategory
     @Override
     public NonNullList<Ingredient> getIngredients() {
         NonNullList<Ingredient> defaultedList = NonNullList.create();
-        defaultedList.add(Ingredient.of(TagAPI.ITEM_HAMMERS.getValues()
-                                                           .stream()
-                                                           .filter(hammer -> ((TieredItem) hammer).getTier()
-                                                                                                  .getLevel() >= toolLevel)
-                                                           .map(ItemStack::new)));
+        defaultedList.add(Ingredient.of(TagAPI.ITEM_HAMMERS
+            .getValues()
+            .stream()
+            .filter(hammer -> ((TieredItem) hammer).getTier().getLevel() >= toolLevel)
+            .map(ItemStack::new)));
         defaultedList.add(input);
-
         return defaultedList;
     }
 
@@ -252,7 +251,7 @@ public class AnvilRecipe implements Recipe<Container>, UnknownReceipBookCategory
         }
 
         public Builder checkConfig(PathConfig config) {
-            exist |= config.getBoolean("anvil", id.getPath(), true);
+            exist &= config.getBoolean("anvil", id.getPath(), true);
             return this;
         }
 
