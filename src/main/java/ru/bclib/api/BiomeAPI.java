@@ -515,7 +515,7 @@ public class BiomeAPI {
 				System.out.println("   - " + cl.getName());
 			}
 		}
-		if (input instanceof ImmutableList || !(input instanceof ArrayList || input instanceof LinkedList)) {
+		if (/*input instanceof ImmutableList ||*/ !(input instanceof ArrayList || input instanceof LinkedList)) {
 			return Lists.newArrayList(input);
 		}
 		return input;
