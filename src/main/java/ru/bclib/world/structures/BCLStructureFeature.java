@@ -1,7 +1,6 @@
 package ru.bclib.world.structures;
 
 import net.fabricmc.fabric.api.structure.v1.FabricStructureBuilder;
-import net.fabricmc.fabric.mixin.structure.FlatChunkGeneratorConfigAccessor;
 import net.minecraft.data.BuiltinRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.levelgen.GenerationStep;
@@ -25,7 +24,8 @@ public class BCLStructureFeature {
 											   .register();
 		this.featureConfigured = this.structure.configured(NoneFeatureConfiguration.NONE);
 		BuiltinRegistries.register(BuiltinRegistries.CONFIGURED_STRUCTURE_FEATURE, id, this.featureConfigured);
-		FlatChunkGeneratorConfigAccessor.getStructureToFeatures().put(this.structure, this.featureConfigured);
+		//TODO: 1.18 check if structures are added correctly
+		//FlatChunkGeneratorConfigAccessor.getStructureToFeatures().put(this.structure, this.featureConfigured);
 	}
 	
 	public StructureFeature<NoneFeatureConfiguration> getStructure() {
