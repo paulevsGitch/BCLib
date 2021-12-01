@@ -1,5 +1,6 @@
 package ru.bclib.world.generator.map.hex;
 
+import ru.bclib.interfaces.BiomeMap;
 import ru.bclib.noise.OpenSimplexNoise;
 import ru.bclib.util.MHelper;
 import ru.bclib.world.biomes.BCLBiome;
@@ -9,7 +10,7 @@ import java.awt.Point;
 import java.util.HashMap;
 import java.util.Random;
 
-public class HexBiomeMap {
+public class HexBiomeMap implements BiomeMap {
 	private static final float RAD_INNER = (float) Math.sqrt(3.0) * 0.5F;
 	private static final float COEF = 0.25F * (float) Math.sqrt(3.0);
 	private static final float COEF_HALF = COEF * 0.5F;
@@ -38,12 +39,14 @@ public class HexBiomeMap {
 		this.seed = (int) (seed & 0xFFFFFFFF);
 	}
 	
+	@Override
 	public void clearCache() {
 		if (chunks.size() > 127) {
 			chunks.clear();
 		}
 	}
 	
+	@Override
 	public BCLBiome getBiome(double x, double z) {
 		BCLBiome BCLBiome = getRawBiome(x, z);
 		if (BCLBiome.getEdge() != null) {

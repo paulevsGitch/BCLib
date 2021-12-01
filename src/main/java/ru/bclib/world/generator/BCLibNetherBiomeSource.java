@@ -13,8 +13,10 @@ import ru.bclib.BCLib;
 import ru.bclib.api.biomes.BiomeAPI;
 import ru.bclib.config.ConfigKeeper.StringArrayEntry;
 import ru.bclib.config.Configs;
+import ru.bclib.interfaces.BiomeMap;
 import ru.bclib.world.biomes.BCLBiome;
 import ru.bclib.world.generator.map.hex.HexBiomeMap;
+import ru.bclib.world.generator.map.square.SquareBiomeMap;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -29,7 +31,7 @@ public class BCLibNetherBiomeSource extends BiomeSource {
 		})).apply(instance, instance.stable(BCLibNetherBiomeSource::new));
 	});
 	private final Registry<Biome> biomeRegistry;
-	private HexBiomeMap biomeMap;
+	private BiomeMap biomeMap;
 	private final long seed;
 	
 	@Deprecated(forRemoval = true)
@@ -60,7 +62,13 @@ public class BCLibNetherBiomeSource extends BiomeSource {
 		BiomeAPI.NETHER_BIOME_PICKER.getBiomes().forEach(biome -> biome.updateActualBiomes(biomeRegistry));
 		BiomeAPI.NETHER_BIOME_PICKER.rebuild();
 		
-		this.biomeMap = new HexBiomeMap(seed, GeneratorOptions.getBiomeSizeNether(), BiomeAPI.NETHER_BIOME_PICKER);
+		if (GeneratorOptions.useOldBiomeGenerator()) {
+			this.biomeMap = new SquareBiomeMap(seed, GeneratorOptions.getBiomeSizeNether(), BiomeAPI.NETHER_BIOME_PICKER);
+		}
+		else {
+			this.biomeMap = new HexBiomeMap(seed, GeneratorOptions.getBiomeSizeNether(), BiomeAPI.NETHER_BIOME_PICKER);
+		}
+		
 		this.biomeRegistry = biomeRegistry;
 		this.seed = seed;
 

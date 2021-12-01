@@ -5,7 +5,6 @@ import ru.bclib.world.generator.BiomePicker;
 
 import java.util.Random;
 
-@Deprecated
 public class SquareBiomeChunk {
 	private static final int BIT_OFFSET = 4;
 	protected static final int WIDTH = 1 << BIT_OFFSET;
@@ -19,7 +18,7 @@ public class SquareBiomeChunk {
 	
 	private final BCLBiome[] biomes;
 	
-	public SquareBiomeChunk(SquareBiomeMap map, Random random, BiomePicker picker) {
+	public SquareBiomeChunk(Random random, BiomePicker picker) {
 		BCLBiome[] PreBio = new BCLBiome[SM_CAPACITY];
 		biomes = new BCLBiome[CAPACITY];
 		
