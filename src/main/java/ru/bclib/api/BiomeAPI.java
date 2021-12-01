@@ -462,6 +462,14 @@ public class BiomeAPI {
 																key
 														));
 	}
+	/**
+	 * Adds new structure feature to existing biome.
+	 * @param biome {@link Biome} to add structure feature in.
+	 * @param structure {@link BCLStructureFeature} to add.
+	 */
+	public static void addBiomeStructure(Biome biome, BCLStructureFeature structure) {
+		addBiomeStructure(biome, structure.getFeatureConfigured());
+	}
 
 	/**
 	 * Adds new structure features to existing biome.
