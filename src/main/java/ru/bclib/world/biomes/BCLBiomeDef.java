@@ -147,12 +147,12 @@ public class BCLBiomeDef {
 	}
 	
 	public BCLBiomeDef setSurface(Block block) {
-		
+		//TODO: 1.18 add back surface Code
 		return this;
 	}
 	
 	public BCLBiomeDef setSurface(Block block1, Block block2) {
-		
+		//TODO: 1.18 add back surface Code
 		return this;
 	}
 	
