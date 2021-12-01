@@ -4,17 +4,17 @@
 	"package": "ru.bclib.mixin.client",
 	"compatibilityLevel": "JAVA_17",
 	"client": [
-		"AnvilScreenMixin",
+		"SimpleReloadableResourceManagerMixin",
+		"EnchantingTableBlockMixin",
 		"BackgroundRendererMixin",
 		"ClientRecipeBookMixin",
-		"EnchantingTableBlockMixin",
-		"GameMixin",
+		"ModelManagerMixin",
+		"TextureAtlasMixin",
+		"AnvilScreenMixin",
+		"ModelBakeryMixin",
 		"MinecraftMixin",
 		"GameMixin",
-		"ModelBakeryMixin",
-		"ModelManagerMixin",
-		"SimpleReloadableResourceManagerMixin",
-		"TextureAtlasMixin"
+		"GameMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

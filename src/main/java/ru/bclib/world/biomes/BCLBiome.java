@@ -3,6 +3,7 @@ package ru.bclib.world.biomes;
 import com.google.common.collect.Maps;
 import net.minecraft.core.Registry;
 import net.minecraft.data.BuiltinRegistries;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biome;
 import org.jetbrains.annotations.Nullable;
@@ -28,6 +29,14 @@ public class BCLBiome {
 	
 	/**
 	 * Create wrapper for existing biome using its {@link ResourceLocation} identifier.
+	 * @param biomeKey {@link ResourceKey} for the {@link Biome}.
+	 */
+	public BCLBiome(ResourceKey<Biome> biomeKey) {
+		this(biomeKey.location());
+	}
+	
+	/**
+	 * Create wrapper for existing biome using its {@link ResourceLocation} identifier.
 	 * @param biomeID {@link ResourceLocation} biome ID.
 	 */
 	public BCLBiome(ResourceLocation biomeID) {
@@ -43,6 +52,7 @@ public class BCLBiome {
 	}
 	
 	public BCLBiome(ResourceLocation biomeID, Biome biome) {
+		this.subbiomes.add(this, 1.0F);
 		this.biomeID = biomeID;
 		this.biome = biome;
 	}
