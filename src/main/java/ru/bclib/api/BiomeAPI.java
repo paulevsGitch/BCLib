@@ -1,6 +1,5 @@
 package ru.bclib.api;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -35,14 +34,11 @@ import ru.bclib.world.features.BCLFeature;
 import ru.bclib.world.generator.BiomePicker;
 import ru.bclib.world.structures.BCLStructureFeature;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.function.BiConsumer;
-import java.util.function.Supplier;
 
 public class BiomeAPI {
 	/**
@@ -428,8 +424,7 @@ public class BiomeAPI {
 	public static void addBiomeFeature(Biome biome, BCLFeature feature) {
 		addBiomeFeature(biome, feature.getPlacedFeature(), feature.getFeatureStep());
 	}
-		
-		
+	
 	/**
 	 * Adds new features to existing biome.
 	 * @param biome {@link Biome} to add features in.
@@ -437,18 +432,9 @@ public class BiomeAPI {
 	 * @param step a {@link Decoration} step for the feature.
 	 */
 	public static void addBiomeFeature(Biome biome, PlacedFeature feature, Decoration step) {
-		BuiltinRegistries.PLACED_FEATURE.getResourceKey(feature)
-													  .ifPresent((key)->
-														  BiomeModifications.addFeature(
-															  (ctx)->ctx.getBiomeKey().equals(BuiltinRegistries.BIOME.getKey(biome)),
-															  step,
-															  key
-														  ));
-//		BiomeGenerationSettingsAccessor accessor = (BiomeGenerationSettingsAccessor) biome.getGenerationSettings();
-//		List<List<Supplier<PlacedFeature>>> biomeFeatures = getMutableList(accessor.bcl_getFeatures());
-//		List<Supplier<PlacedFeature>> list = getList(step, biomeFeatures);
-//		list.add(() -> feature);
-//		accessor.bcl_setFeatures(biomeFeatures);
+		BuiltinRegistries.PLACED_FEATURE
+			.getResourceKey(feature)
+			.ifPresent(key -> BiomeModifications.addFeature(ctx -> ctx.getBiomeKey().equals(BuiltinRegistries.BIOME.getKey(biome)), step, key));
 	}
 	
 	/**
@@ -460,31 +446,6 @@ public class BiomeAPI {
 		for (BCLFeature feature: features) {
 			addBiomeFeature(biome, feature.getPlacedFeature(), feature.getFeatureStep());
 		}
-//		BiomeGenerationSettingsAccessor accessor = (BiomeGenerationSettingsAccessor) biome.getGenerationSettings();
-//		List<List<Supplier<PlacedFeature>>> biomeFeatures = getMutableList(accessor.bcl_getFeatures());
-//		for (BCLFeature feature: features) {
-//			List<Supplier<PlacedFeature>> list = getList(feature.getFeatureStep(), biomeFeatures);
-//			list.add(feature::getPlacedFeature);
-//		}
-//		accessor.bcl_setFeatures(biomeFeatures);
-	}
-	
-	/**
-	 * Getter for correct feature list from all biome feature list of lists.
-	 * @param step feature {@link Decoration} step.
-	 * @param lists biome accessor lists.
-	 * @return mutable {@link ConfiguredFeature} list.
-	 */
-	private static List<Supplier<PlacedFeature>> getList(Decoration step, List<List<Supplier<PlacedFeature>>> lists) {
-		int index = step.ordinal();
-		if (lists.size() <= index) {
-			for (int i = lists.size(); i <= index; i++) {
-				lists.add(Lists.newArrayList());
-			}
-		}
-		List<Supplier<PlacedFeature>> list = getMutableList(lists.get(index));
-		lists.set(index, list);
-		return list;
 	}
 	
 	// TODO: 1.18 There are no more StructureFeatures in the Biomes, they are in a separate registry now
@@ -494,16 +455,9 @@ public class BiomeAPI {
 	 * @param structure {@link ConfiguredStructureFeature} to add.
 	 */
 	public static void addBiomeStructure(Biome biome, ConfiguredStructureFeature structure) {
-		BuiltinRegistries.CONFIGURED_STRUCTURE_FEATURE.getResourceKey(structure)
-													  .ifPresent((key)->
-															BiomeModifications.addStructure(
-																(ctx)->ctx.getBiomeKey().equals(BuiltinRegistries.BIOME.getKey(biome)),
-																key
-														));
-//		BiomeGenerationSettingsAccessor accessor = (BiomeGenerationSettingsAccessor) biome.getGenerationSettings();
-//		List<Supplier<ConfiguredStructureFeature<?, ?>>> biomeStructures = getMutableList(accessor.fabric_getStructureFeatures());
-//		biomeStructures.add(() -> structure);
-//		accessor.fabric_setStructureFeatures(biomeStructures);
+		BuiltinRegistries.CONFIGURED_STRUCTURE_FEATURE
+			.getResourceKey(structure)
+			.ifPresent(key -> BiomeModifications.addStructure(ctx -> ctx.getBiomeKey().equals(BuiltinRegistries.BIOME.getKey(biome)), key));
 	}
 
 	/**
@@ -515,12 +469,6 @@ public class BiomeAPI {
 		for (BCLStructureFeature structure: structures) {
 			addBiomeStructure(biome, structure.getFeatureConfigured());
 		}
-//		GenerationSettingsAccessor accessor = (GenerationSettingsAccessor) biome.getGenerationSettings();
-//		List<Supplier<ConfiguredStructureFeature<?, ?>>> biomeStructures = getMutableList(accessor.fabric_getStructureFeatures());
-//		for (BCLStructureFeature structure: structures) {
-//			biomeStructures.add(structure::getFeatureConfigured);
-//		}
-//		accessor.fabric_setStructureFeatures(biomeStructures);
 	}
 	
 	/**
@@ -532,40 +480,14 @@ public class BiomeAPI {
 	 * @param maxGroupCount maximum mobs in group.
 	 */
 	public static <M extends Mob> void addBiomeMobSpawn(Biome biome, EntityType<M> entityType, int weight, int minGroupCount, int maxGroupCount) {
+		ResourceLocation biomeKey = BuiltinRegistries.BIOME.getKey(biome);
 		BiomeModifications.addSpawn(
-			(ctx)->ctx.getBiomeKey().equals(BuiltinRegistries.BIOME.getKey(biome)),
+			ctx -> ctx.getBiomeKey().equals(biomeKey),
 			entityType.getCategory(),
 			entityType,
 			weight,
 			minGroupCount,
 			maxGroupCount
 		);
-//		MobCategory category = entityType.getCategory();
-//		MobSpawnSettingsAccessor accessor = (MobSpawnSettingsAccessor) biome.getMobSettings();
-//		Map<MobCategory, WeightedRandomList<SpawnerData>> spawners = getMutableMap(accessor.bcl_getSpawners());
-//		List<SpawnerData> mobs = spawners.containsKey(category) ? getMutableList(spawners.get(category).unwrap()) : Lists.newArrayList();
-//		mobs.add(new SpawnerData(entityType, weight, minGroupCount, maxGroupCount));
-//		spawners.put(category, WeightedRandomList.create(mobs));
-//		accessor.bcl_setSpawners(spawners);
-	}
-	
-	private static <T extends Object> List<T> getMutableList(List<T> input) {
-		if (input!=null) {
-			System.out.println("getMutableList: " + input.getClass().getName());
-			for (Class cl : input.getClass().getInterfaces()){
-				System.out.println("   - " + cl.getName());
-			}
-		}
-		if (/*input instanceof ImmutableList ||*/ !(input instanceof ArrayList || input instanceof LinkedList)) {
-			return Lists.newArrayList(input);
-		}
-		return input;
-	}
-	
-	private static <K extends Object, V extends Object> Map<K, V> getMutableMap(Map<K, V> input) {
-		if (input instanceof ImmutableMap) {
-			return Maps.newHashMap(input);
-		}
-		return input;
 	}
 }
