@@ -8,19 +8,25 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.level.biome.AmbientAdditionsSettings;
+import net.minecraft.world.level.biome.AmbientMoodSettings;
 import net.minecraft.world.level.biome.AmbientParticleSettings;
 import net.minecraft.world.level.biome.Biome.BiomeBuilder;
 import net.minecraft.world.level.biome.Biome.BiomeCategory;
 import net.minecraft.world.level.biome.Biome.Precipitation;
+import net.minecraft.world.level.biome.BiomeGenerationSettings;
 import net.minecraft.world.level.biome.BiomeSpecialEffects;
 import net.minecraft.world.level.biome.MobSpawnSettings;
 import net.minecraft.world.level.biome.MobSpawnSettings.SpawnerData;
+import net.minecraft.world.level.levelgen.GenerationStep.Decoration;
+import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import ru.bclib.util.ColorUtil;
 import ru.bclib.world.biomes.BCLBiome;
+import ru.bclib.world.features.BCLFeature;
 
 public class BCLBiomeBuilder {
 	private static final BCLBiomeBuilder INSTANCE = new BCLBiomeBuilder();
 	
+	private BiomeGenerationSettings.Builder generationSettings;
 	private BiomeSpecialEffects.Builder effectsBuilder;
 	private MobSpawnSettings.Builder spawnSettings;
 	private Precipitation precipitation;
@@ -39,10 +45,12 @@ public class BCLBiomeBuilder {
 		INSTANCE.biomeID = biomeID;
 		INSTANCE.precipitation = Precipitation.NONE;
 		INSTANCE.category = BiomeCategory.NONE;
+		INSTANCE.generationSettings = null;
 		INSTANCE.effectsBuilder = null;
 		INSTANCE.spawnSettings = null;
 		INSTANCE.temperature = 1.0F;
 		INSTANCE.fogDensity = 1.0F;
+		INSTANCE.downfall = 1.0F;
 		return INSTANCE;
 	}
 	
@@ -340,6 +348,28 @@ public class BCLBiomeBuilder {
 	}
 	
 	/**
+	 * Sets biome mood sound. Can be used for biome environment.
+	 * @param mood {@link SoundEvent} to use as a mood.
+	 * @param tickDelay delay between sound events in ticks.
+	 * @param blockSearchExtent block search radius (for area available for sound).
+	 * @param soundPositionOffset offset in sound.
+	 * @return same {@link BCLBiomeBuilder} instance.
+	 */
+	public BCLBiomeBuilder mood(SoundEvent mood, int tickDelay, int blockSearchExtent, float soundPositionOffset) {
+		getEffects().ambientMoodSound(new AmbientMoodSettings(mood, tickDelay, blockSearchExtent, soundPositionOffset));
+		return this;
+	}
+	
+	/**
+	 * Sets biome mood sound. Can be used for biome environment.
+	 * @param mood {@link SoundEvent} to use as a mood.
+	 * @return same {@link BCLBiomeBuilder} instance.
+	 */
+	public BCLBiomeBuilder mood(SoundEvent mood) {
+		return mood(mood, 6000, 8, 2.0F);
+	}
+	
+	/**
 	 * Sets biome additionsl ambient sounds.
 	 * @param additions {@link SoundEvent} to use.
 	 * @param intensity sound intensity. Default is 0.0111F.
@@ -360,6 +390,26 @@ public class BCLBiomeBuilder {
 	}
 	
 	/**
+	 * Adds new feature to the biome.
+	 * @param decoration {@link Decoration} feature step.
+	 * @param feature {@link PlacedFeature}.
+	 * @return same {@link BCLBiomeBuilder} instance.
+	 */
+	public BCLBiomeBuilder feature(Decoration decoration, PlacedFeature feature) {
+		getGeneration().addFeature(decoration, feature);
+		return this;
+	}
+	
+	/**
+	 * Adds new feature to the biome.
+	 * @param feature {@link BCLFeature}.
+	 * @return same {@link BCLBiomeBuilder} instance.
+	 */
+	public BCLBiomeBuilder feature(BCLFeature feature) {
+		return feature(feature.getDecoration(), feature.getPlacedFeature());
+	}
+	
+	/**
 	 * Finalize biome creation.
 	 * @return created {@link BCLBiome} instance.
 	 */
@@ -376,6 +426,10 @@ public class BCLBiomeBuilder {
 		
 		if (effectsBuilder != null) {
 			builder.specialEffects(effectsBuilder.build());
+		}
+		
+		if (generationSettings != null) {
+			builder.generationSettings(generationSettings.build());
 		}
 		
 		return new BCLBiome(biomeID, builder.build()).setFogDensity(fogDensity);
@@ -403,5 +457,17 @@ public class BCLBiomeBuilder {
 			spawnSettings = new MobSpawnSettings.Builder();
 		}
 		return spawnSettings;
+	}
+	
+	/**
+	 * Get or create {@link BiomeGenerationSettings.Builder} for biome features and generation.
+	 * For internal usage only.
+	 * @return new or same {@link BiomeGenerationSettings.Builder} instance.
+	 */
+	private BiomeGenerationSettings.Builder getGeneration() {
+		if (generationSettings == null) {
+			generationSettings = new BiomeGenerationSettings.Builder();
+		}
+		return generationSettings;
 	}
 }

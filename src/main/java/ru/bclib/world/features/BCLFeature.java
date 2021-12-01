@@ -58,7 +58,7 @@ public class BCLFeature {
 	 * Get feature decoration step.
 	 * @return {@link Decoration}.
 	 */
-	public Decoration getFeatureStep() {
+	public Decoration getDecoration() {
 		return featureStep;
 	}
 	/**

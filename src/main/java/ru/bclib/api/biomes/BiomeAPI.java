@@ -412,7 +412,7 @@ public class BiomeAPI {
 	 *
 	 */
 	public static void addBiomeFeature(Biome biome, BCLFeature feature) {
-		addBiomeFeature(biome, feature.getPlacedFeature(), feature.getFeatureStep());
+		addBiomeFeature(biome, feature.getPlacedFeature(), feature.getDecoration());
 	}
 	
 	/**
@@ -434,7 +434,7 @@ public class BiomeAPI {
 	 */
 	public static void addBiomeFeatures(Biome biome, BCLFeature... features) {
 		for (BCLFeature feature: features) {
-			addBiomeFeature(biome, feature.getPlacedFeature(), feature.getFeatureStep());
+			addBiomeFeature(biome, feature.getPlacedFeature(), feature.getDecoration());
 		}
 	}
 	

@@ -217,7 +217,7 @@ public class BCLBiomeDef {
 	
 	public BCLBiomeDef addFeature(BCLFeature feature) {
 		FeatureInfo info = new FeatureInfo();
-		info.featureStep = feature.getFeatureStep();
+		info.featureStep = feature.getDecoration();
 		info.feature = feature.getPlacedFeature();
 		features.add(info);
 		return this;
