@@ -497,14 +497,17 @@ public class BiomeAPI {
 		BuiltinRegistries.CONFIGURED_STRUCTURE_FEATURE.getResourceKey(structure)
 													  .ifPresent((key)->
 															BiomeModifications.addStructure(
-																(ctx)-> ctx.getBiomeKey().location()
-																			  .equals(BuiltinRegistries.BIOME.getKey(biome)),
+																(ctx)-> ctx.getBiomeKey().location().equals(BuiltinRegistries.BIOME.getKey(biome)),
 																key
 														));
-//		BiomeGenerationSettingsAccessor accessor = (BiomeGenerationSettingsAccessor) biome.getGenerationSettings();
-//		List<Supplier<ConfiguredStructureFeature<?, ?>>> biomeStructures = getMutableList(accessor.fabric_getStructureFeatures());
-//		biomeStructures.add(() -> structure);
-//		accessor.fabric_setStructureFeatures(biomeStructures);
+	}
+	/**
+	 * Adds new structure feature to existing biome.
+	 * @param biome {@link Biome} to add structure feature in.
+	 * @param structure {@link BCLStructureFeature} to add.
+	 */
+	public static void addBiomeStructure(Biome biome, BCLStructureFeature structure) {
+		addBiomeStructure(biome, structure.getFeatureConfigured());
 	}
 
 	/**
