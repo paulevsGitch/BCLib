@@ -63,7 +63,7 @@ public class BCLBiomeDef {
 	private int fogColor = 10518688;
 	private int skyColor = 0;
 	private float fogDensity = 1F;
-	private float depth = 0.1F;
+	private float terrainHeight = 0.1F;
 	
 	private Precipitation precipitation = Precipitation.NONE;
 	private BiomeCategory category = BiomeCategory.NONE;
@@ -165,8 +165,8 @@ public class BCLBiomeDef {
 		return this;
 	}
 	
-	public BCLBiomeDef setDepth(float depth) {
-		this.depth = depth;
+	public BCLBiomeDef setTerrainHeight(float terrainHeight) {
+		this.terrainHeight = terrainHeight;
 		return this;
 	}
 	
@@ -359,6 +359,10 @@ public class BCLBiomeDef {
 			.mobSpawnSettings(spawnSettings.build())
 			.generationSettings(generationSettings.build())
 			.build();
+	}
+	
+	public float getTerrainHeight() {
+		return terrainHeight;
 	}
 	
 	private static final class SpawnInfo {

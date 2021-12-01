@@ -24,19 +24,20 @@ import java.util.Map;
 import java.util.Random;
 
 public class BCLBiome {
-	protected WeightedList<BCLBiome> subbiomes = new WeightedList<BCLBiome>();
+	protected WeightedList<BCLBiome> subbiomes = new WeightedList<>();
 	
-	protected final Biome biome;
 	protected final ResourceLocation mcID;
-	protected BCLBiome edge;
-	protected int edgeSize;
-	
-	protected BCLBiome biomeParent;
-	protected float maxSubBiomeChance = 1;
+	protected final float terrainHeight;
 	protected final float genChance;
+	protected final Biome biome;
 	
 	private final Map<String, Object> customData;
 	private final float fogDensity;
+	
+	protected BCLBiome biomeParent;
+	protected BCLBiome edge;
+	protected int edgeSize;
+	
 	private BCLFeature structuresFeature;
 	private Biome actualBiome;
 	
@@ -51,6 +52,7 @@ public class BCLBiome {
 		this.genChance = definition.getGenChance();
 		this.fogDensity = definition.getFodDensity();
 		this.customData = definition.getCustomData();
+		this.terrainHeight = definition.getTerrainHeight();
 		subbiomes.add(this, 1);
 	}
 	
@@ -68,6 +70,7 @@ public class BCLBiome {
 		}
 		this.readStructureList();
 		this.customData = Maps.newHashMap();
+		this.terrainHeight = 0.1F;
 		subbiomes.add(this, 1);
 	}
 	
@@ -209,5 +212,9 @@ public class BCLBiome {
 	
 	public void addCustomData(String name, Object obj) {
 		customData.put(name, obj);
+	}
+	
+	public float getTerrainHeight() {
+		return terrainHeight;
 	}
 }
