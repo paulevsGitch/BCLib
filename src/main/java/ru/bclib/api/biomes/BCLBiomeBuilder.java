@@ -2,9 +2,12 @@ package ru.bclib.api.biomes;
 
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.Music;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.level.biome.AmbientAdditionsSettings;
 import net.minecraft.world.level.biome.AmbientParticleSettings;
 import net.minecraft.world.level.biome.Biome.BiomeBuilder;
 import net.minecraft.world.level.biome.Biome.BiomeCategory;
@@ -166,6 +169,197 @@ public class BCLBiomeBuilder {
 	}
 	
 	/**
+	 * Sets water color for the biome. Color is in ARGB int format.
+	 * @param color ARGB color as integer.
+	 * @return same {@link BCLBiomeBuilder} instance.
+	 */
+	public BCLBiomeBuilder waterColor(int color) {
+		getEffects().waterColor(color);
+		return this;
+	}
+	
+	/**
+	 * Sets water color for the biome. Color represented as red, green and blue channel values.
+	 * @param red red color component [0-255]
+	 * @param green green color component [0-255]
+	 * @param blue blue color component [0-255]
+	 * @return same {@link BCLBiomeBuilder} instance.
+	 */
+	public BCLBiomeBuilder waterColor(int red, int green, int blue) {
+		red = Mth.clamp(red, 0, 255);
+		green = Mth.clamp(green, 0, 255);
+		blue = Mth.clamp(blue, 0, 255);
+		return waterColor(ColorUtil.color(red, green, blue));
+	}
+	
+	/**
+	 * Sets underwater fog color for the biome. Color is in ARGB int format.
+	 * @param color ARGB color as integer.
+	 * @return same {@link BCLBiomeBuilder} instance.
+	 */
+	public BCLBiomeBuilder waterFogColor(int color) {
+		getEffects().waterFogColor(color);
+		return this;
+	}
+	
+	/**
+	 * Sets underwater fog color for the biome. Color represented as red, green and blue channel values.
+	 * @param red red color component [0-255]
+	 * @param green green color component [0-255]
+	 * @param blue blue color component [0-255]
+	 * @return same {@link BCLBiomeBuilder} instance.
+	 */
+	public BCLBiomeBuilder waterFogColor(int red, int green, int blue) {
+		red = Mth.clamp(red, 0, 255);
+		green = Mth.clamp(green, 0, 255);
+		blue = Mth.clamp(blue, 0, 255);
+		return waterFogColor(ColorUtil.color(red, green, blue));
+	}
+	
+	/**
+	 * Sets water and underwater fig color for the biome. Color is in ARGB int format.
+	 * @param color ARGB color as integer.
+	 * @return same {@link BCLBiomeBuilder} instance.
+	 */
+	public BCLBiomeBuilder waterAndFogColor(int color) {
+		return waterColor(color).waterFogColor(color);
+	}
+	
+	/**
+	 * Sets water and underwater fig color for the biome. Color is in ARGB int format.
+	 * @param red red color component [0-255]
+	 * @param green green color component [0-255]
+	 * @param blue blue color component [0-255]
+	 * @return same {@link BCLBiomeBuilder} instance.
+	 */
+	public BCLBiomeBuilder waterAndFogColor(int red, int green, int blue) {
+		red = Mth.clamp(red, 0, 255);
+		green = Mth.clamp(green, 0, 255);
+		blue = Mth.clamp(blue, 0, 255);
+		return waterAndFogColor(ColorUtil.color(red, green, blue));
+	}
+	
+	/**
+	 * Sets grass color for the biome. Color is in ARGB int format.
+	 * @param color ARGB color as integer.
+	 * @return same {@link BCLBiomeBuilder} instance.
+	 */
+	public BCLBiomeBuilder grassColor(int color) {
+		getEffects().grassColorOverride(color);
+		return this;
+	}
+	
+	/**
+	 * Sets grass color for the biome. Color represented as red, green and blue channel values.
+	 * @param red red color component [0-255]
+	 * @param green green color component [0-255]
+	 * @param blue blue color component [0-255]
+	 * @return same {@link BCLBiomeBuilder} instance.
+	 */
+	public BCLBiomeBuilder grassColor(int red, int green, int blue) {
+		red = Mth.clamp(red, 0, 255);
+		green = Mth.clamp(green, 0, 255);
+		blue = Mth.clamp(blue, 0, 255);
+		return grassColor(ColorUtil.color(red, green, blue));
+	}
+	
+	/**
+	 * Sets leaves and plants color for the biome. Color is in ARGB int format.
+	 * @param color ARGB color as integer.
+	 * @return same {@link BCLBiomeBuilder} instance.
+	 */
+	public BCLBiomeBuilder foliageColor(int color) {
+		getEffects().foliageColorOverride(color);
+		return this;
+	}
+	
+	/**
+	 * Sets leaves and plants color for the biome. Color represented as red, green and blue channel values.
+	 * @param red red color component [0-255]
+	 * @param green green color component [0-255]
+	 * @param blue blue color component [0-255]
+	 * @return same {@link BCLBiomeBuilder} instance.
+	 */
+	public BCLBiomeBuilder foliageColor(int red, int green, int blue) {
+		red = Mth.clamp(red, 0, 255);
+		green = Mth.clamp(green, 0, 255);
+		blue = Mth.clamp(blue, 0, 255);
+		return foliageColor(ColorUtil.color(red, green, blue));
+	}
+	
+	/**
+	 * Sets grass, leaves and all plants color for the biome. Color is in ARGB int format.
+	 * @param color ARGB color as integer.
+	 * @return same {@link BCLBiomeBuilder} instance.
+	 */
+	public BCLBiomeBuilder plantsColor(int color) {
+		return grassColor(color).foliageColor(color);
+	}
+	
+	/**
+	 * Sets grass, leaves and all plants color for the biome. Color represented as red, green and blue channel values.
+	 * @param red red color component [0-255]
+	 * @param green green color component [0-255]
+	 * @param blue blue color component [0-255]
+	 * @return same {@link BCLBiomeBuilder} instance.
+	 */
+	public BCLBiomeBuilder plantsColor(int red, int green, int blue) {
+		red = Mth.clamp(red, 0, 255);
+		green = Mth.clamp(green, 0, 255);
+		blue = Mth.clamp(blue, 0, 255);
+		return plantsColor(ColorUtil.color(red, green, blue));
+	}
+	
+	/**
+	 * Sets biome music, used for biomes in the Nether and End.
+	 * @param music {@link Music} to use.
+	 * @return same {@link BCLBiomeBuilder} instance.
+	 */
+	public BCLBiomeBuilder music(Music music) {
+		getEffects().backgroundMusic(music);
+		return this;
+	}
+	
+	/**
+	 * Sets biome music, used for biomes in the Nether and End.
+	 * @param music {@link SoundEvent} to use.
+	 * @return same {@link BCLBiomeBuilder} instance.
+	 */
+	public BCLBiomeBuilder music(SoundEvent music) {
+		return music(new Music(music, 600, 2400, true));
+	}
+	
+	/**
+	 * Sets biome ambient loop sound. Can be used for biome environment.
+	 * @param loopSound {@link SoundEvent} to use as a loop.
+	 * @return same {@link BCLBiomeBuilder} instance.
+	 */
+	public BCLBiomeBuilder loop(SoundEvent loopSound) {
+		getEffects().ambientLoopSound(loopSound);
+		return this;
+	}
+	
+	/**
+	 * Sets biome additionsl ambient sounds.
+	 * @param additions {@link SoundEvent} to use.
+	 * @param intensity sound intensity. Default is 0.0111F.
+	 * @return same {@link BCLBiomeBuilder} instance.
+	 */
+	public BCLBiomeBuilder additions(SoundEvent additions, float intensity) {
+		getEffects().ambientAdditionsSound(new AmbientAdditionsSettings(additions, intensity));
+		return this;
+	}
+	
+	/**
+	 * Sets biome additionsl ambient sounds.
+	 * @param additions {@link SoundEvent} to use.
+	 * @return same {@link BCLBiomeBuilder} instance.
+	 */
+	public BCLBiomeBuilder additions(SoundEvent additions) {
+		return additions(additions, 0.0111F);
+	}
+	
+	/**
 	 * Finalize biome creation.
 	 * @return created {@link BCLBiome} instance.
 	 */
@@ -187,6 +381,11 @@ public class BCLBiomeBuilder {
 		return new BCLBiome(biomeID, builder.build()).setFogDensity(fogDensity);
 	}
 	
+	/**
+	 * Get or create {@link BiomeSpecialEffects.Builder} for biome visual effects.
+	 * For internal usage only.
+	 * @return new or same {@link BiomeSpecialEffects.Builder} instance.
+	 */
 	private BiomeSpecialEffects.Builder getEffects() {
 		if (effectsBuilder == null) {
 			effectsBuilder = new BiomeSpecialEffects.Builder();
@@ -194,6 +393,11 @@ public class BCLBiomeBuilder {
 		return effectsBuilder;
 	}
 	
+	/**
+	 * Get or create {@link MobSpawnSettings.Builder} for biome mob spawning.
+	 * For internal usage only.
+	 * @return new or same {@link MobSpawnSettings.Builder} instance.
+	 */
 	private MobSpawnSettings.Builder getSpawns() {
 		if (spawnSettings == null) {
 			spawnSettings = new MobSpawnSettings.Builder();
