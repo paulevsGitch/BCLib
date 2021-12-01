@@ -53,12 +53,12 @@ public class BCLibEndBiomeSource extends BiomeSource {
 		this.possibleBiomes().forEach(biome -> {
 			ResourceLocation key = biomeRegistry.getKey(biome);
 			if (!BiomeAPI.hasBiome(key)) {
-				BCLBiome bclBiome = new BCLBiome(key, biome, 1, 1);
+				BCLBiome bclBiome = new BCLBiome(key, biome);
 				BiomeAPI.END_LAND_BIOME_PICKER.addBiomeMutable(bclBiome);
 			}
 			else {
 				BCLBiome bclBiome = BiomeAPI.getBiome(key);
-				if (bclBiome != BiomeAPI.EMPTY_BIOME && !bclBiome.hasParentBiome()) {
+				if (bclBiome != BiomeAPI.EMPTY_BIOME && bclBiome.getParentBiome() == null) {
 					if (!BiomeAPI.END_LAND_BIOME_PICKER.containsImmutable(key) && !BiomeAPI.END_VOID_BIOME_PICKER.containsImmutable(key)) {
 						BiomeAPI.END_LAND_BIOME_PICKER.addBiomeMutable(bclBiome);
 					}
@@ -105,7 +105,7 @@ public class BCLibEndBiomeSource extends BiomeSource {
 			
 			BCLBiome bclBiome = BiomeAPI.getBiome(key);
 			if (bclBiome != BiomeAPI.EMPTY_BIOME) {
-				if (bclBiome.hasParentBiome()) {
+				if (bclBiome.getParentBiome() != null) {
 					bclBiome = bclBiome.getParentBiome();
 				}
 				key = bclBiome.getID();

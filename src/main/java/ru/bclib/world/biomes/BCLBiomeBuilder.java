@@ -1,13 +1,23 @@
 package ru.bclib.world.biomes;
 
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.level.biome.Biome.BiomeBuilder;
 import net.minecraft.world.level.biome.Biome.BiomeCategory;
 import net.minecraft.world.level.biome.Biome.Precipitation;
+import net.minecraft.world.level.biome.BiomeSpecialEffects;
+import net.minecraft.world.level.biome.MobSpawnSettings;
+import net.minecraft.world.level.biome.MobSpawnSettings.SpawnerData;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class BCLBiomeBuilder {
 	private static final BCLBiomeBuilder INSTANCE = new BCLBiomeBuilder();
 	
+	private List<SpawnerData> mobs = new ArrayList<>(32);
+	private BiomeSpecialEffects.Builder effectsBuilder;
 	private Precipitation precipitation;
 	private ResourceLocation biomeID;
 	private BiomeCategory category;
@@ -23,7 +33,9 @@ public class BCLBiomeBuilder {
 		INSTANCE.biomeID = biomeID;
 		INSTANCE.precipitation = Precipitation.NONE;
 		INSTANCE.category = BiomeCategory.NONE;
+		INSTANCE.effectsBuilder = null;
 		INSTANCE.temperature = 1.0F;
+		INSTANCE.mobs.clear();
 		return INSTANCE;
 	}
 	
@@ -67,17 +79,46 @@ public class BCLBiomeBuilder {
 		return this;
 	}
 	
+	/**
+	 * Adds mob spawning to biome.
+	 * @param entityType {@link EntityType} mob type.
+	 * @param weight spawn weight.
+	 * @param minGroupCount minimum mobs in group.
+	 * @param maxGroupCount maximum mobs in group.
+	 * @return
+	 */
+	public <M extends Mob> BCLBiomeBuilder spawn(EntityType<M> entityType, int weight, int minGroupCount, int maxGroupCount) {
+		mobs.add(new SpawnerData(entityType, weight, minGroupCount, maxGroupCount));
+		return this;
+	}
+	
 	public BCLBiome build() {
-		Biome biome = new Biome.BiomeBuilder()
+		BiomeBuilder builder = new BiomeBuilder()
 			.precipitation(precipitation)
 			.biomeCategory(category)
 			.temperature(temperature)
-			.downfall(downfall)
+			.downfall(downfall);
 			/*
-			.specialEffects(effects.build())
-			.mobSpawnSettings(spawnSettings.build())
 			.generationSettings(generationSettings.build())*/
-			.build();
-		return new BCLBiome(biomeID, biome);
+			//.build();
+		
+		if (!mobs.isEmpty()) {
+			MobSpawnSettings.Builder spawnSettings = new MobSpawnSettings.Builder();
+			mobs.forEach(spawn -> spawnSettings.addSpawn(spawn.type.getCategory(), spawn));
+			builder.mobSpawnSettings(spawnSettings.build());
+		}
+		
+		if (effectsBuilder != null) {
+			builder.specialEffects(effectsBuilder.build());
+		}
+		
+		return new BCLBiome(biomeID, builder.build());
+	}
+	
+	private BiomeSpecialEffects.Builder getEffects() {
+		if (effectsBuilder == null) {
+			effectsBuilder = new BiomeSpecialEffects.Builder();
+		}
+		return effectsBuilder;
 	}
 }

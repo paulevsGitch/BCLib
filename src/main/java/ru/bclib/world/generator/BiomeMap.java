@@ -87,9 +87,9 @@ public class BiomeMap {
 	public BCLBiome getBiome(int x, int z) {
 		BCLBiome biome = getRawBiome(x, z);
 		
-		if (biome.hasEdge() || (biome.hasParentBiome() && biome.getParentBiome().hasEdge())) {
+		if (biome.getEdge() != null || (biome.getParentBiome() != null && biome.getParentBiome().getEdge() != null)) {
 			BCLBiome search = biome;
-			if (biome.hasParentBiome()) {
+			if (biome.getParentBiome() != null) {
 				search = biome.getParentBiome();
 			}
 			int d = (int) Math.ceil(search.getEdgeSize() / 4F) << 2;

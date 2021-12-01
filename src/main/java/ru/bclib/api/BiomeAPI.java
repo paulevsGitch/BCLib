@@ -45,7 +45,7 @@ public class BiomeAPI {
 	 * Empty biome used as default value if requested biome doesn't exist or linked. Shouldn't be registered anywhere to prevent bugs.
 	 * Have {@code Biomes.THE_VOID} as the reference biome.
 	 */
-	public static final BCLBiome EMPTY_BIOME = new BCLBiome(Biomes.THE_VOID.location(), BuiltinRegistries.BIOME.get(Biomes.THE_VOID), 1, 0);
+	public static final BCLBiome EMPTY_BIOME = new BCLBiome(Biomes.THE_VOID.location());
 	
 	public static final BiomePicker NETHER_BIOME_PICKER = new BiomePicker();
 	public static final BiomePicker END_LAND_BIOME_PICKER = new BiomePicker();
@@ -100,9 +100,8 @@ public class BiomeAPI {
 		return subBiome;
 	}
 	
-	public static BCLBiome registerSubBiome(BCLBiome parent, Biome biome, float chance) {
-		ResourceKey<Biome> key = BuiltinRegistries.BIOME.getResourceKey(biome).get();
-		BCLBiome subBiome = new BCLBiome(key.location(), biome, 1, chance);
+	public static BCLBiome registerSubBiome(BCLBiome parent, Biome biome, float genChance) {
+		BCLBiome subBiome = new BCLBiome(biome).setGenChance(genChance);
 		return registerSubBiome(parent, subBiome);
 	}
 	
@@ -122,8 +121,8 @@ public class BiomeAPI {
         Climate.ParameterPoint parameters = Climate.parameters(
 			MHelper.randRange(-1.5F, 1.5F, random),
 			MHelper.randRange(-1.5F, 1.5F, random),
-			0.0f, //new in 1.18
-			0.0f, //new in 1.18
+			MHelper.randRange(-1.5F, 1.5F, random), //new in 1.18
+			MHelper.randRange(-1.5F, 1.5F, random), //new in 1.18
 			MHelper.randRange(-1.5F, 1.5F, random),
 			MHelper.randRange(-1.5F, 1.5F, random),
 			random.nextFloat()
@@ -140,8 +139,7 @@ public class BiomeAPI {
 	 * @return {@link BCLBiome}
 	 */
 	public static BCLBiome registerNetherBiome(Biome biome) {
-		ResourceKey<Biome> key = BuiltinRegistries.BIOME.getResourceKey(biome).get();
-		BCLBiome bclBiome = new BCLBiome(key.location(), biome, 1, 1);
+		BCLBiome bclBiome = new BCLBiome(biome);
 		NETHER_BIOME_PICKER.addBiome(bclBiome);
 		registerBiome(bclBiome);
 		return bclBiome;
@@ -170,8 +168,7 @@ public class BiomeAPI {
 	 * @return {@link BCLBiome}
 	 */
 	public static BCLBiome registerEndLandBiome(Biome biome) {
-		ResourceKey<Biome> key = BuiltinRegistries.BIOME.getResourceKey(biome).get();
-		BCLBiome bclBiome = new BCLBiome(key.location(), biome, 1, 1);
+		BCLBiome bclBiome = new BCLBiome(biome);
 		END_LAND_BIOME_PICKER.addBiome(bclBiome);
 		registerBiome(bclBiome);
 		return bclBiome;
@@ -181,12 +178,11 @@ public class BiomeAPI {
 	 * Register {@link BCLBiome} wrapper for {@link Biome}.
 	 * After that biome will be added to BCLib End Biome Generator and into Fabric Biome API as a land biome (will generate only on islands).
 	 * @param biome {@link BCLBiome};
-	 * @param weight float generation chance.
+	 * @param genChance float generation chance.
 	 * @return {@link BCLBiome}
 	 */
-	public static BCLBiome registerEndLandBiome(Biome biome, float weight) {
-		ResourceKey<Biome> key = BuiltinRegistries.BIOME.getResourceKey(biome).get();
-		BCLBiome bclBiome = new BCLBiome(key.location(), biome, 1, weight);
+	public static BCLBiome registerEndLandBiome(Biome biome, float genChance) {
+		BCLBiome bclBiome = new BCLBiome(biome).setGenChance(genChance);
 		END_LAND_BIOME_PICKER.addBiome(bclBiome);
 		registerBiome(bclBiome);
 		return bclBiome;
@@ -214,8 +210,7 @@ public class BiomeAPI {
 	 * @return {@link BCLBiome}
 	 */
 	public static BCLBiome registerEndVoidBiome(Biome biome) {
-		ResourceKey<Biome> key = BuiltinRegistries.BIOME.getResourceKey(biome).get();
-		BCLBiome bclBiome = new BCLBiome(key.location(), biome, 1, 1);
+		BCLBiome bclBiome = new BCLBiome(biome);
 		END_VOID_BIOME_PICKER.addBiome(bclBiome);
 		registerBiome(bclBiome);
 		return bclBiome;
@@ -224,13 +219,13 @@ public class BiomeAPI {
 	/**
 	 * Register {@link BCLBiome} instance and its {@link Biome} if necessary.
 	 * After that biome will be added to BCLib End Biome Generator and into Fabric Biome API as a void biome (will generate only in the End void - between islands).
-	 * @param biome {@link BCLBiome};
-	 * @param weight float generation chance.
+	 * @param biome {@link BCLBiome}.
+	 * @param genChance float generation chance.
 	 * @return {@link BCLBiome}
 	 */
-	public static BCLBiome registerEndVoidBiome(Biome biome, float weight) {
+	public static BCLBiome registerEndVoidBiome(Biome biome, float genChance) {
 		ResourceKey<Biome> key = BuiltinRegistries.BIOME.getResourceKey(biome).get();
-		BCLBiome bclBiome = new BCLBiome(key.location(), biome, 1, weight);
+		BCLBiome bclBiome = new BCLBiome(biome).setGenChance(genChance);
 		END_VOID_BIOME_PICKER.addBiome(bclBiome);
 		registerBiome(bclBiome);
 		return bclBiome;
@@ -238,7 +233,6 @@ public class BiomeAPI {
 	
 	/**
 	 * Get {@link BCLBiome} from {@link Biome} instance on server. Used to convert world biomes to BCLBiomes.
-	 *
 	 * @param biome - {@link Biome} from world.
 	 * @return {@link BCLBiome} or {@code BiomeAPI.EMPTY_BIOME}.
 	 */
@@ -251,7 +245,6 @@ public class BiomeAPI {
 	
 	/**
 	 * Get {@link BCLBiome} from biome on client. Used in fog rendering.
-	 *
 	 * @param biome - {@link Biome} from client world.
 	 * @return {@link BCLBiome} or {@code BiomeAPI.EMPTY_BIOME}.
 	 */
@@ -269,7 +262,6 @@ public class BiomeAPI {
 	
 	/**
 	 * Get biome {@link ResourceLocation} from given {@link Biome}.
-	 *
 	 * @param biome - {@link Biome} from server world.
 	 * @return biome {@link ResourceLocation}.
 	 */
@@ -280,7 +272,6 @@ public class BiomeAPI {
 	
 	/**
 	 * Get {@link BCLBiome} from given {@link ResourceLocation}.
-	 *
 	 * @param biomeID - biome {@link ResourceLocation}.
 	 * @return {@link BCLBiome} or {@code BiomeAPI.EMPTY_BIOME}.
 	 */
@@ -290,7 +281,6 @@ public class BiomeAPI {
 	
 	/**
 	 * Check if biome with {@link ResourceLocation} exists in API registry.
-	 *
 	 * @param biomeID - biome {@link ResourceLocation}.
 	 * @return {@code true} if biome exists in API registry and {@code false} if not.
 	 */
@@ -455,12 +445,9 @@ public class BiomeAPI {
 	 * @param structure {@link ConfiguredStructureFeature} to add.
 	 */
 	public static void addBiomeStructure(Biome biome, ConfiguredStructureFeature structure) {
-		BuiltinRegistries.CONFIGURED_STRUCTURE_FEATURE.getResourceKey(structure)
-													  .ifPresent((key)->
-															BiomeModifications.addStructure(
-																(ctx)-> ctx.getBiomeKey().location().equals(BuiltinRegistries.BIOME.getKey(biome)),
-																key
-														));
+		BuiltinRegistries.CONFIGURED_STRUCTURE_FEATURE
+			.getResourceKey(structure)
+			.ifPresent(key -> BiomeModifications.addStructure(ctx -> ctx.getBiomeKey().location().equals(BuiltinRegistries.BIOME.getKey(biome)), key));
 	}
 	/**
 	 * Adds new structure feature to existing biome.

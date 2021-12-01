@@ -1,9 +1,5 @@
 package ru.bclib.mixin.common;
 
-import java.util.List;
-import java.util.concurrent.Executor;
-import java.util.function.Supplier;
-
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -22,6 +18,10 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import ru.bclib.api.BiomeAPI;
 import ru.bclib.api.LifeCycleAPI;
+
+import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.function.Supplier;
 
 @Mixin(ServerLevel.class)
 public abstract class ServerLevelMixin extends Level {

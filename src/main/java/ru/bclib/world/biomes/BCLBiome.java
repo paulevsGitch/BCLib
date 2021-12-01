@@ -1,26 +1,13 @@
 package ru.bclib.world.biomes;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import net.minecraft.core.Registry;
+import net.minecraft.data.BuiltinRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.biome.Biomes;
-import net.minecraft.world.level.levelgen.GenerationStep.Decoration;
 import org.jetbrains.annotations.Nullable;
-import ru.bclib.config.Configs;
-import ru.bclib.util.JsonFactory;
-import ru.bclib.util.StructureHelper;
 import ru.bclib.util.WeightedList;
-import ru.bclib.world.features.BCLFeature;
-import ru.bclib.world.features.ListFeature;
-import ru.bclib.world.features.ListFeature.StructureInfo;
-import ru.bclib.world.features.NBTStructureFeature.TerrainMerge;
 
-import java.io.InputStream;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -39,6 +26,22 @@ public class BCLBiome {
 	private float genChance = 1.0F;
 	private float edgeSize = 0.0F;
 	
+	/**
+	 * Create wrapper for existing biome using its {@link ResourceLocation} identifier.
+	 * @param biomeID {@link ResourceLocation} biome ID.
+	 */
+	public BCLBiome(ResourceLocation biomeID) {
+		this(biomeID, BuiltinRegistries.BIOME.get(biomeID));
+	}
+	
+	/**
+	 * Create wrapper for existing biome using biome instance from {@link BuiltinRegistries}.
+	 * @param biome {@link Biome} to wrap.
+	 */
+	public BCLBiome(Biome biome) {
+		this(BuiltinRegistries.BIOME.getKey(biome), biome);
+	}
+	
 	public BCLBiome(ResourceLocation biomeID, Biome biome) {
 		this.biomeID = biomeID;
 		this.biome = biome;
@@ -56,10 +59,12 @@ public class BCLBiome {
 	/**
 	 * Set biome edge for this biome instance.
 	 * @param edge {@link BCLBiome} as the edge biome.
+	 * @return same {@link BCLBiome}.
 	 */
-	public void setEdge(BCLBiome edge) {
+	public BCLBiome setEdge(BCLBiome edge) {
 		this.edge = edge;
 		edge.biomeParent = this;
+		return this;
 	}
 	
 	/**
@@ -73,19 +78,23 @@ public class BCLBiome {
 	/**
 	 * Set edges size for this biome. Size is in relative units to work fine with biome scale.
 	 * @param size as a float value.
+	 * @return same {@link BCLBiome}.
 	 */
-	public void setEdgeSize(float size) {
+	public BCLBiome setEdgeSize(float size) {
 		edgeSize = size;
+		return this;
 	}
 	
 	/**
 	 * Adds sub-biome into this biome instance. Biome chance will be interpreted as a sub-biome generation chance.
 	 * Biome itself has chance 1.0 compared to all its sub-biomes.
 	 * @param biome {@link Random} to be added.
+	 * @return same {@link BCLBiome}.
 	 */
-	public void addSubBiome(BCLBiome biome) {
+	public BCLBiome addSubBiome(BCLBiome biome) {
 		biome.biomeParent = this;
 		subbiomes.add(biome, biome.getGenChance());
+		return this;
 	}
 	
 	/**
@@ -116,31 +125,12 @@ public class BCLBiome {
 	}
 	
 	/**
-	 * Checks if this biome has edge biome.
-	 * @return true if it has edge.
-	 */
-	@Deprecated(forRemoval = true)
-	public boolean hasEdge() {
-		return edge != null;
-	}
-	
-	/**
-	 * Checks if this biome has parent biome.
-	 * @return true if it has parent.
-	 */
-	@Deprecated(forRemoval = true)
-	public boolean hasParentBiome() {
-		return biomeParent != null;
-	}
-	
-	/**
 	 * Compares biome instances (directly) and their parents. Used in custom world generator.
 	 * @param biome {@link BCLBiome}
 	 * @return true if biome or its parent is same.
 	 */
-	@Deprecated(forRemoval = true)
 	public boolean isSame(BCLBiome biome) {
-		return biome == this || (biome.hasParentBiome() && biome.getParentBiome() == this);
+		return biome == this || (biome.biomeParent != null && biome.biomeParent == this);
 	}
 	
 	/**
@@ -181,6 +171,16 @@ public class BCLBiome {
 	 */
 	public float getGenChance() {
 		return this.genChance;
+	}
+	
+	/**
+	 * Set gen chance for this biome, default value is 1.0.
+	 * @param genChance chance of this biome to be generated.
+	 * @return same {@link BCLBiome}.
+	 */
+	public BCLBiome setGenChance(float genChance) {
+		this.genChance = genChance;
+		return this;
 	}
 	
 	/**
@@ -225,17 +225,21 @@ public class BCLBiome {
 	 * Adds custom data object to this biome instance.
 	 * @param name {@link String} name of data object.
 	 * @param obj any data to add.
+	 * @return same {@link BCLBiome}.
 	 */
-	public void addCustomData(String name, Object obj) {
+	public BCLBiome addCustomData(String name, Object obj) {
 		customData.put(name, obj);
+		return this;
 	}
 	
 	/**
 	 * Adds custom data object to this biome instance.
 	 * @param data a {@link Map} with custom data.
+	 * @return same {@link BCLBiome}.
 	 */
-	public void addCustomData(Map<String, Object> data) {
+	public BCLBiome addCustomData(Map<String, Object> data) {
 		customData.putAll(data);
+		return this;
 	}
 	
 	/**
