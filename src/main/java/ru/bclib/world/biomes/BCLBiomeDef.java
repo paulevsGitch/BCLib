@@ -27,6 +27,7 @@ import net.minecraft.world.level.levelgen.carver.CarverConfiguration;
 import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
 import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
+import ru.bclib.api.BiomeAPI;
 import ru.bclib.config.IdConfig;
 import ru.bclib.config.PathConfig;
 import ru.bclib.util.ColorUtil;
@@ -348,7 +349,7 @@ public class BCLBiomeDef {
 		if (particleConfig != null) effects.ambientParticle(particleConfig);
 		effects.backgroundMusic(music != null ? new Music(music, 600, 2400, true) : Musics.END);
 		
-		return new Biome.BiomeBuilder()
+		Biome b = new Biome.BiomeBuilder()
 			.precipitation(precipitation)
 			.biomeCategory(category)
 			//.depth(depth)
@@ -359,6 +360,9 @@ public class BCLBiomeDef {
 			.mobSpawnSettings(spawnSettings.build())
 			.generationSettings(generationSettings.build())
 			.build();
+		
+		structures.forEach((structure) -> BiomeAPI.addBiomeStructure(b, structure));
+		return b;
 	}
 	
 	private static final class SpawnInfo {

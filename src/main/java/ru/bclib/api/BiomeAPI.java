@@ -497,7 +497,8 @@ public class BiomeAPI {
 		BuiltinRegistries.CONFIGURED_STRUCTURE_FEATURE.getResourceKey(structure)
 													  .ifPresent((key)->
 															BiomeModifications.addStructure(
-																(ctx)->ctx.getBiomeKey().equals(BuiltinRegistries.BIOME.getKey(biome)),
+																(ctx)-> ctx.getBiomeKey().location()
+																			  .equals(BuiltinRegistries.BIOME.getKey(biome)),
 																key
 														));
 //		BiomeGenerationSettingsAccessor accessor = (BiomeGenerationSettingsAccessor) biome.getGenerationSettings();
