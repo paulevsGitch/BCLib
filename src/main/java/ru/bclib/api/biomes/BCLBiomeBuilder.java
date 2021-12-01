@@ -1,28 +1,30 @@
 package ru.bclib.api.biomes;
 
+import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.level.biome.AmbientParticleSettings;
 import net.minecraft.world.level.biome.Biome.BiomeBuilder;
 import net.minecraft.world.level.biome.Biome.BiomeCategory;
 import net.minecraft.world.level.biome.Biome.Precipitation;
 import net.minecraft.world.level.biome.BiomeSpecialEffects;
 import net.minecraft.world.level.biome.MobSpawnSettings;
 import net.minecraft.world.level.biome.MobSpawnSettings.SpawnerData;
+import ru.bclib.util.ColorUtil;
 import ru.bclib.world.biomes.BCLBiome;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class BCLBiomeBuilder {
 	private static final BCLBiomeBuilder INSTANCE = new BCLBiomeBuilder();
 	
-	private List<SpawnerData> mobs = new ArrayList<>(32);
 	private BiomeSpecialEffects.Builder effectsBuilder;
+	private MobSpawnSettings.Builder spawnSettings;
 	private Precipitation precipitation;
 	private ResourceLocation biomeID;
 	private BiomeCategory category;
 	private float temperature;
+	private float fogDensity;
 	private float downfall;
 	
 	/**
@@ -35,8 +37,9 @@ public class BCLBiomeBuilder {
 		INSTANCE.precipitation = Precipitation.NONE;
 		INSTANCE.category = BiomeCategory.NONE;
 		INSTANCE.effectsBuilder = null;
+		INSTANCE.spawnSettings = null;
 		INSTANCE.temperature = 1.0F;
-		INSTANCE.mobs.clear();
+		INSTANCE.fogDensity = 1.0F;
 		return INSTANCE;
 	}
 	
@@ -86,26 +89,94 @@ public class BCLBiomeBuilder {
 	 * @param weight spawn weight.
 	 * @param minGroupCount minimum mobs in group.
 	 * @param maxGroupCount maximum mobs in group.
-	 * @return
+	 * @return same {@link BCLBiomeBuilder} instance.
 	 */
 	public <M extends Mob> BCLBiomeBuilder spawn(EntityType<M> entityType, int weight, int minGroupCount, int maxGroupCount) {
-		mobs.add(new SpawnerData(entityType, weight, minGroupCount, maxGroupCount));
+		getSpawns().addSpawn(entityType.getCategory(), new SpawnerData(entityType, weight, minGroupCount, maxGroupCount));
 		return this;
 	}
 	
+	/**
+	 * Adds ambient particles to thr biome.
+	 * @param particle {@link ParticleOptions} particles (or {@link net.minecraft.core.particles.ParticleType}).
+	 * @param probability particle spawn probability, should have low value (example: 0.01F).
+	 * @return same {@link BCLBiomeBuilder} instance.
+	 */
+	public BCLBiomeBuilder particles(ParticleOptions particle, float probability) {
+		getEffects().ambientParticle(new AmbientParticleSettings(particle, probability));
+		return this;
+	}
+	
+	/**
+	 * Sets sky color for the biome. Color is in ARGB int format.
+	 * @param color ARGB color as integer.
+	 * @return same {@link BCLBiomeBuilder} instance.
+	 */
+	public BCLBiomeBuilder skyColor(int color) {
+		getEffects().skyColor(color);
+		return this;
+	}
+	
+	/**
+	 * Sets sky color for the biome. Color represented as red, green and blue channel values.
+	 * @param red red color component [0-255]
+	 * @param green green color component [0-255]
+	 * @param blue blue color component [0-255]
+	 * @return same {@link BCLBiomeBuilder} instance.
+	 */
+	public BCLBiomeBuilder skyColor(int red, int green, int blue) {
+		red = Mth.clamp(red, 0, 255);
+		green = Mth.clamp(green, 0, 255);
+		blue = Mth.clamp(blue, 0, 255);
+		return skyColor(ColorUtil.color(red, green, blue));
+	}
+	
+	/**
+	 * Sets fog color for the biome. Color is in ARGB int format.
+	 * @param color ARGB color as integer.
+	 * @return same {@link BCLBiomeBuilder} instance.
+	 */
+	public BCLBiomeBuilder fogColor(int color) {
+		getEffects().fogColor(color);
+		return this;
+	}
+	
+	/**
+	 * Sets fog color for the biome. Color represented as red, green and blue channel values.
+	 * @param red red color component [0-255]
+	 * @param green green color component [0-255]
+	 * @param blue blue color component [0-255]
+	 * @return same {@link BCLBiomeBuilder} instance.
+	 */
+	public BCLBiomeBuilder fogColor(int red, int green, int blue) {
+		red = Mth.clamp(red, 0, 255);
+		green = Mth.clamp(green, 0, 255);
+		blue = Mth.clamp(blue, 0, 255);
+		return fogColor(ColorUtil.color(red, green, blue));
+	}
+	
+	/**
+	 * Sets fog density for the biome.
+	 * @param density fog density as a float, default value is 1.0F.
+	 * @return same {@link BCLBiomeBuilder} instance.
+	 */
+	public BCLBiomeBuilder fogDensity(float density) {
+		this.fogDensity = density;
+		return this;
+	}
+	
+	/**
+	 * Finalize biome creation.
+	 * @return created {@link BCLBiome} instance.
+	 */
 	public BCLBiome build() {
 		BiomeBuilder builder = new BiomeBuilder()
 			.precipitation(precipitation)
 			.biomeCategory(category)
 			.temperature(temperature)
 			.downfall(downfall);
-			/*
-			.generationSettings(generationSettings.build())*/
-			//.build();
 		
-		if (!mobs.isEmpty()) {
-			MobSpawnSettings.Builder spawnSettings = new MobSpawnSettings.Builder();
-			mobs.forEach(spawn -> spawnSettings.addSpawn(spawn.type.getCategory(), spawn));
+		if (spawnSettings != null) {
 			builder.mobSpawnSettings(spawnSettings.build());
 		}
 		
@@ -113,7 +184,7 @@ public class BCLBiomeBuilder {
 			builder.specialEffects(effectsBuilder.build());
 		}
 		
-		return new BCLBiome(biomeID, builder.build());
+		return new BCLBiome(biomeID, builder.build()).setFogDensity(fogDensity);
 	}
 	
 	private BiomeSpecialEffects.Builder getEffects() {
@@ -121,5 +192,12 @@ public class BCLBiomeBuilder {
 			effectsBuilder = new BiomeSpecialEffects.Builder();
 		}
 		return effectsBuilder;
+	}
+	
+	private MobSpawnSettings.Builder getSpawns() {
+		if (spawnSettings == null) {
+			spawnSettings = new MobSpawnSettings.Builder();
+		}
+		return spawnSettings;
 	}
 }

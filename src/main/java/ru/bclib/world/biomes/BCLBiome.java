@@ -150,6 +150,16 @@ public class BCLBiome {
 	}
 	
 	/**
+	 * Sets fog density for this biome.
+	 * @param fogDensity
+	 * @return same {@link BCLBiome}.
+	 */
+	public BCLBiome setFogDensity(float fogDensity) {
+		this.fogDensity = fogDensity;
+		return this;
+	}
+	
+	/**
 	 * Getter for biome from buil-in registry. For datapack biomes will be same as actual biome.
 	 * @return {@link Biome}.
 	 */
