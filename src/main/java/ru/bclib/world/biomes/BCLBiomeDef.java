@@ -36,6 +36,7 @@ import ru.bclib.world.structures.BCLStructureFeature;
 import java.util.List;
 import java.util.Map;
 
+@Deprecated(forRemoval = true)
 public class BCLBiomeDef {
 	public static final int DEF_FOLIAGE_OVERWORLD = ColorUtil.color(110, 143, 64);
 	public static final int DEF_FOLIAGE_NETHER = ColorUtil.color(117, 10, 10);

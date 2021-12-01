@@ -9,6 +9,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.levelgen.GenerationStep.Decoration;
+import org.jetbrains.annotations.Nullable;
 import ru.bclib.config.Configs;
 import ru.bclib.util.JsonFactory;
 import ru.bclib.util.StructureHelper;
@@ -24,161 +25,168 @@ import java.util.Map;
 import java.util.Random;
 
 public class BCLBiome {
-	protected WeightedList<BCLBiome> subbiomes = new WeightedList<>();
+	private final WeightedList<BCLBiome> subbiomes = new WeightedList<>();
+	private final Map<String, Object> customData = Maps.newHashMap();
+	private final ResourceLocation biomeID;
+	private final Biome biome;
 	
-	protected final ResourceLocation mcID;
-	protected final float terrainHeight;
-	protected final float genChance;
-	protected final Biome biome;
-	
-	private final Map<String, Object> customData;
-	private final float fogDensity;
-	
-	protected BCLBiome biomeParent;
-	protected BCLBiome edge;
-	protected int edgeSize;
-	
-	private BCLFeature structuresFeature;
+	private BCLBiome biomeParent;
 	private Biome actualBiome;
+	private BCLBiome edge;
 	
-	public BCLBiome(BCLBiomeDef definition) {
-		definition.loadConfigValues(Configs.BIOMES_CONFIG);
-		this.mcID = definition.getID();
-		this.readStructureList();
-		if (structuresFeature != null) {
-			definition.addFeature(structuresFeature);
-		}
-		this.biome = definition.build();
-		this.genChance = definition.getGenChance();
-		this.fogDensity = definition.getFodDensity();
-		this.customData = definition.getCustomData();
-		this.terrainHeight = definition.getTerrainHeight();
-		subbiomes.add(this, 1);
-	}
+	private float terrainHeight = 0.1F;
+	private float fogDensity = 1.0F;
+	private float genChance = 1.0F;
+	private float edgeSize = 0.0F;
 	
-	public BCLBiome(ResourceLocation id, Biome biome, float fogDensity, float genChance) {
-		this.mcID = id;
+	public BCLBiome(ResourceLocation biomeID, Biome biome) {
+		this.biomeID = biomeID;
 		this.biome = biome;
-		if (id.equals(Biomes.THE_VOID.location())) {
-			this.genChance = fogDensity;
-			this.fogDensity = genChance;
-		}
-		else {
-			String biomePath = id.getNamespace() + "." + id.getPath();
-			this.genChance = Configs.BIOMES_CONFIG.getFloat(biomePath, "generation_chance", genChance);
-			this.fogDensity = Configs.BIOMES_CONFIG.getFloat(biomePath, "fog_density", fogDensity);
-		}
-		this.readStructureList();
-		this.customData = Maps.newHashMap();
-		this.terrainHeight = 0.1F;
-		subbiomes.add(this, 1);
 	}
 	
+	/**
+	 * Get current bime edge.
+	 * @return {@link BCLBiome} edge.
+	 */
+	@Nullable
 	public BCLBiome getEdge() {
-		return edge == null ? this : edge;
+		return edge;
 	}
 	
+	/**
+	 * Set biome edge for this biome instance.
+	 * @param edge {@link BCLBiome} as the edge biome.
+	 */
 	public void setEdge(BCLBiome edge) {
 		this.edge = edge;
 		edge.biomeParent = this;
 	}
 	
-	public int getEdgeSize() {
+	/**
+	 * Getter for biome edge size.
+	 * @return edge size.
+	 */
+	public float getEdgeSize() {
 		return edgeSize;
 	}
 	
-	public void setEdgeSize(int size) {
+	/**
+	 * Set edges size for this biome. Size is in relative units to work fine with biome scale.
+	 * @param size as a float value.
+	 */
+	public void setEdgeSize(float size) {
 		edgeSize = size;
 	}
 	
+	/**
+	 * Adds sub-biome into this biome instance. Biome chance will be interpreted as a sub-biome generation chance.
+	 * Biome itself has chance 1.0 compared to all its sub-biomes.
+	 * @param biome {@link Random} to be added.
+	 */
 	public void addSubBiome(BCLBiome biome) {
 		biome.biomeParent = this;
 		subbiomes.add(biome, biome.getGenChance());
 	}
 	
+	/**
+	 * Checks if specified biome is a sub-biome of this one.
+	 * @param biome {@link Random}.
+	 * @return true if this instance contains specified biome as a sub-biome.
+	 */
 	public boolean containsSubBiome(BCLBiome biome) {
 		return subbiomes.contains(biome);
 	}
 	
+	/**
+	 * Getter for a random sub-biome from all existing sub-biomes. Will return biome itself if there are no sub-biomes.
+	 * @param random {@link Random}.
+	 * @return {@link BCLBiome}.
+	 */
 	public BCLBiome getSubBiome(Random random) {
 		return subbiomes.get(random);
 	}
 	
+	/**
+	 * Getter for parent {@link BCLBiome} or null if there are no parent biome.
+	 * @return {@link BCLBiome} or null.
+	 */
+	@Nullable
 	public BCLBiome getParentBiome() {
 		return this.biomeParent;
 	}
 	
+	/**
+	 * Checks if this biome has edge biome.
+	 * @return true if it has edge.
+	 */
+	@Deprecated(forRemoval = true)
 	public boolean hasEdge() {
 		return edge != null;
 	}
 	
+	/**
+	 * Checks if this biome has parent biome.
+	 * @return true if it has parent.
+	 */
+	@Deprecated(forRemoval = true)
 	public boolean hasParentBiome() {
 		return biomeParent != null;
 	}
 	
+	/**
+	 * Compares biome instances (directly) and their parents. Used in custom world generator.
+	 * @param biome {@link BCLBiome}
+	 * @return true if biome or its parent is same.
+	 */
+	@Deprecated(forRemoval = true)
 	public boolean isSame(BCLBiome biome) {
 		return biome == this || (biome.hasParentBiome() && biome.getParentBiome() == this);
 	}
 	
-	public Biome getBiome() {
-		return biome;
-	}
-	
-	@Override
-	public String toString() {
-		return mcID.toString();
-	}
-	
+	/**
+	 * Getter for biome identifier.
+	 * @return {@link ResourceLocation}
+	 */
 	public ResourceLocation getID() {
-		return mcID;
+		return biomeID;
 	}
 	
+	/**
+	 * Getter for fog density, used in custom for renderer.
+	 * @return fog density as a float.
+	 */
 	public float getFogDensity() {
 		return fogDensity;
 	}
 	
-	protected void readStructureList() {
-		String ns = mcID.getNamespace();
-		String nm = mcID.getPath();
-		
-		String path = "/data/" + ns + "/structures/biome/" + nm + "/";
-		InputStream inputstream = StructureHelper.class.getResourceAsStream(path + "structures.json");
-		if (inputstream != null) {
-			JsonObject obj = JsonFactory.getJsonObject(inputstream);
-			JsonArray enties = obj.getAsJsonArray("structures");
-			if (enties != null) {
-				List<StructureInfo> list = Lists.newArrayList();
-				enties.forEach((entry) -> {
-					JsonObject e = entry.getAsJsonObject();
-					String structure = path + e.get("nbt").getAsString() + ".nbt";
-					TerrainMerge terrainMerge = TerrainMerge.getFromString(e.get("terrainMerge").getAsString());
-					int offsetY = e.get("offsetY").getAsInt();
-					list.add(new StructureInfo(structure, offsetY, terrainMerge));
-				});
-				if (!list.isEmpty()) {
-					structuresFeature = BCLFeature.makeChancedFeature(
-						new ResourceLocation(ns, nm + "_structures"),
-						Decoration.SURFACE_STRUCTURES,
-						new ListFeature(list),
-						10
-					);
-				}
-			}
-		}
+	/**
+	 * Getter for biome from buil-in registry. For datapack biomes will be same as actual biome.
+	 * @return {@link Biome}.
+	 */
+	public Biome getBiome() {
+		return biome;
 	}
 	
-	public BCLFeature getStructuresFeature() {
-		return structuresFeature;
-	}
-	
+	/**
+	 * Getter for actual biome (biome from current world registry with same {@link ResourceLocation} id).
+	 * @return {@link Biome}.
+	 */
 	public Biome getActualBiome() {
 		return this.actualBiome;
 	}
 	
+	/**
+	 * Getter for biome generation chance, used in {@link ru.bclib.world.generator.BiomePicker} and in custom generators.
+	 * @return biome generation chance as float.
+	 */
 	public float getGenChance() {
 		return this.genChance;
 	}
 	
+	/**
+	 * Recursively update biomes to correct world biome registry instances, for internal usage only.
+	 * @param biomeRegistry {@link Registry} for {@link Biome}.
+	 */
 	public void updateActualBiomes(Registry<Biome> biomeRegistry) {
 		subbiomes.forEach((sub) -> {
 			if (sub != this) {
@@ -188,7 +196,54 @@ public class BCLBiome {
 		if (edge != null && edge != this) {
 			edge.updateActualBiomes(biomeRegistry);
 		}
-		this.actualBiome = biomeRegistry.get(mcID);
+		this.actualBiome = biomeRegistry.get(biomeID);
+	}
+	
+	/**
+	 * Getter for custom data. Will get custom data object or null if object doesn't exists.
+	 * @param name {@link String} name of data object.
+	 * @return object value or null.
+	 */
+	@Nullable
+	@SuppressWarnings("unchecked")
+	public <T> T getCustomData(String name) {
+		return (T) customData.get(name);
+	}
+	
+	/**
+	 * Getter for custom data. Will get custom data object or default value if object doesn't exists.
+	 * @param name {@link String} name of data object.
+	 * @param defaultValue object default value.
+	 * @return object value or default value.
+	 */
+	@SuppressWarnings("unchecked")
+	public <T> T getCustomData(String name, T defaultValue) {
+		return (T) customData.getOrDefault(name, defaultValue);
+	}
+	
+	/**
+	 * Adds custom data object to this biome instance.
+	 * @param name {@link String} name of data object.
+	 * @param obj any data to add.
+	 */
+	public void addCustomData(String name, Object obj) {
+		customData.put(name, obj);
+	}
+	
+	/**
+	 * Adds custom data object to this biome instance.
+	 * @param data a {@link Map} with custom data.
+	 */
+	public void addCustomData(Map<String, Object> data) {
+		customData.putAll(data);
+	}
+	
+	/**
+	 * Getter for terrain height, can be used in custom terrain generator.
+	 * @return terrain height.
+	 */
+	public float getTerrainHeight() {
+		return terrainHeight;
 	}
 	
 	@Override
@@ -197,24 +252,16 @@ public class BCLBiome {
 			return true;
 		}
 		BCLBiome biome = (BCLBiome) obj;
-		return biome == null ? false : biome.mcID.equals(mcID);
+		return biome == null ? false : biomeID.equals(biome.biomeID);
 	}
 	
 	@Override
 	public int hashCode() {
-		return mcID.hashCode();
+		return biomeID.hashCode();
 	}
 	
-	@SuppressWarnings("unchecked")
-	public <T> T getCustomData(String name, T defaultValue) {
-		return (T) customData.getOrDefault(name, defaultValue);
-	}
-	
-	public void addCustomData(String name, Object obj) {
-		customData.put(name, obj);
-	}
-	
-	public float getTerrainHeight() {
-		return terrainHeight;
+	@Override
+	public String toString() {
+		return biomeID.toString();
 	}
 }
