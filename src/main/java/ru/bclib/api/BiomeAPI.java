@@ -423,6 +423,17 @@ public class BiomeAPI {
 	 * Adds new features to existing biome.
 	 * @param biome {@link Biome} to add features in.
 	 * @param feature {@link ConfiguredFeature} to add.
+	 *
+	 */
+	public static void addBiomeFeature(Biome biome, BCLFeature feature) {
+		addBiomeFeature(biome, feature.getPlacedFeature(), feature.getFeatureStep());
+	}
+		
+		
+	/**
+	 * Adds new features to existing biome.
+	 * @param biome {@link Biome} to add features in.
+	 * @param feature {@link ConfiguredFeature} to add.
 	 * @param step a {@link Decoration} step for the feature.
 	 */
 	public static void addBiomeFeature(Biome biome, PlacedFeature feature, Decoration step) {
