@@ -1,6 +1,8 @@
 package ru.bclib.api.biomes;
 
 import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.data.worldgen.BiomeDefaultFeatures;
+import net.minecraft.data.worldgen.placement.OrePlacements;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.Music;
 import net.minecraft.sounds.SoundEvent;
@@ -10,10 +12,12 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.level.biome.AmbientAdditionsSettings;
 import net.minecraft.world.level.biome.AmbientMoodSettings;
 import net.minecraft.world.level.biome.AmbientParticleSettings;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biome.BiomeBuilder;
 import net.minecraft.world.level.biome.Biome.BiomeCategory;
 import net.minecraft.world.level.biome.Biome.Precipitation;
 import net.minecraft.world.level.biome.BiomeGenerationSettings;
+import net.minecraft.world.level.biome.BiomeGenerationSettings.Builder;
 import net.minecraft.world.level.biome.BiomeSpecialEffects;
 import net.minecraft.world.level.biome.MobSpawnSettings;
 import net.minecraft.world.level.biome.MobSpawnSettings.SpawnerData;
@@ -397,6 +401,24 @@ public class BCLBiomeBuilder {
 	 */
 	public BCLBiomeBuilder feature(Decoration decoration, PlacedFeature feature) {
 		getGeneration().addFeature(decoration, feature);
+		return this;
+	}
+	
+	/**
+	 * Adds vanilla Mushrooms.
+	 * @return same {@link BCLBiomeBuilder} instance.
+	 */
+	public BCLBiomeBuilder defaultMushrooms(){
+		BiomeDefaultFeatures.addDefaultMushrooms(getGeneration());
+		return this;
+	}
+	
+	/**
+	 * Adds vanilla Nether Ores.
+	 * @return same {@link BCLBiomeBuilder} instance.
+	 */
+	public BCLBiomeBuilder netherDefaultOres(){
+		BiomeDefaultFeatures.addNetherDefaultOres(getGeneration());
 		return this;
 	}
 	
