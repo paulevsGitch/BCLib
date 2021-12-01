@@ -48,16 +48,16 @@ public class HexBiomeMap implements BiomeMap {
 	
 	@Override
 	public BCLBiome getBiome(double x, double z) {
-		BCLBiome BCLBiome = getRawBiome(x, z);
-		if (BCLBiome!=null && BCLBiome.getEdge() != null) {
-			float offset = scale * BCLBiome.getEdgeSize();
+		BCLBiome biome = getRawBiome(x, z);
+		if (biome.getEdge() != null) {
+			float offset = scale * biome.getEdgeSize();
 			for (byte i = 0; i < 8; i++) {
-				if (getRawBiome(x + offset * EDGE_CIRCLE_X[i], z + offset * EDGE_CIRCLE_Z[i]) != BCLBiome) {
-					return BCLBiome.getEdge();
+				if (getRawBiome(x + offset * EDGE_CIRCLE_X[i], z + offset * EDGE_CIRCLE_Z[i]) != biome) {
+					return biome.getEdge();
 				}
 			}
 		}
-		return BCLBiome;
+		return biome;
 	}
 	
 	private BCLBiome getRawBiome(double x, double z) {
@@ -112,13 +112,18 @@ public class HexBiomeMap implements BiomeMap {
 			cz += 1;
 		}
 		
-		selector.setLocation(cx, cz);
-		HexBiomeChunk chunk = chunks.get(selector);
+		HexBiomeChunk chunk;
+		synchronized (selector) {
+			selector.setLocation(cx, cz);
+			chunk = chunks.get(selector);
+		}
+		
 		if (chunk == null) {
 			RANDOM.setSeed(MHelper.getSeed(seed, cx, cz));
 			chunk = new HexBiomeChunk(RANDOM, picker);
-			chunks.put(new Point(selector), chunk);
+			chunks.put(new Point(cx, cz), chunk);
 		}
+		
 		return chunk.getBiome(x, z);
 	}
 	

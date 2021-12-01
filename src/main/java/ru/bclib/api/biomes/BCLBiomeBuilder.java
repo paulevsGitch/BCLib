@@ -26,8 +26,10 @@ import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import ru.bclib.util.ColorUtil;
 import ru.bclib.world.biomes.BCLBiome;
 import ru.bclib.world.features.BCLFeature;
+import ru.bclib.world.structures.BCLStructureFeature;
 
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
 
 public class BCLBiomeBuilder {
 	private static final BCLBiomeBuilder INSTANCE = new BCLBiomeBuilder();
@@ -410,17 +412,25 @@ public class BCLBiomeBuilder {
 	 * Adds vanilla Mushrooms.
 	 * @return same {@link BCLBiomeBuilder} instance.
 	 */
-	public BCLBiomeBuilder defaultMushrooms(){
-		BiomeDefaultFeatures.addDefaultMushrooms(getGeneration());
-		return this;
+	public BCLBiomeBuilder defaultMushrooms() {
+		return feature(BiomeDefaultFeatures::addDefaultMushrooms);
 	}
 	
 	/**
 	 * Adds vanilla Nether Ores.
 	 * @return same {@link BCLBiomeBuilder} instance.
 	 */
-	public BCLBiomeBuilder netherDefaultOres(){
-		BiomeDefaultFeatures.addNetherDefaultOres(getGeneration());
+	public BCLBiomeBuilder netherDefaultOres() {
+		return feature(BiomeDefaultFeatures::addNetherDefaultOres);
+	}
+	
+	/**
+	 * Will add features into biome, used for vanilla feature adding functions.
+	 * @param featureAdd {@link Consumer} with {@link BiomeGenerationSettings.Builder}.
+	 * @return same {@link BCLBiomeBuilder} instance.
+	 */
+	public BCLBiomeBuilder feature(Consumer<BiomeGenerationSettings.Builder> featureAdd) {
+		featureAdd.accept(getGeneration());
 		return this;
 	}
 	
@@ -431,6 +441,11 @@ public class BCLBiomeBuilder {
 	 */
 	public BCLBiomeBuilder feature(BCLFeature feature) {
 		return feature(feature.getDecoration(), feature.getPlacedFeature());
+	}
+	
+	// TODO Make feature registration
+	public BCLBiomeBuilder structure(BCLStructureFeature structure) {
+		return this;
 	}
 	
 	/**

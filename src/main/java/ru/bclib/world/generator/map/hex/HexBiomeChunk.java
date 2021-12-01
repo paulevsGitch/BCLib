@@ -65,6 +65,9 @@ public class HexBiomeChunk {
 		}
 		
 		for (short index = 0; index < SIZE; index++) {
+			if (outBuffer[index] == null) {
+				System.out.println("Buffer is null at " + index + ": " + (index >> SIDE_OFFSET) + " " + (index & SIDE_MASK));
+			}
 			if (outBuffer[index] != null && random.nextInt(4) == 0) {
 				circle(outBuffer, index, outBuffer[index].getSubBiome(random), outBuffer[index]);
 			}
