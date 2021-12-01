@@ -378,7 +378,9 @@ public class StructureHelper {
 			mut.setX(x);
 			for (int z = bounds.minZ(); z <= bounds.maxZ(); z++) {
 				mut.setZ(z);
-				BlockState top = world.getBiome(mut).getGenerationSettings().getSurfaceBuilderConfig().getTopMaterial();
+				BlockState top = Blocks.PURPLE_CONCRETE.defaultBlockState();
+					//TODO: 1.18 find another way to get the Top Materiel
+					//world.getBiome(mut).getGenerationSettings().getSurfaceBuilderConfig().getTopMaterial();
 				for (int y = bounds.maxY(); y >= bounds.minY(); y--) {
 					mut.setY(y);
 					BlockState state = world.getBlockState(mut);

@@ -10,6 +10,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.state.BlockState;
@@ -141,11 +142,14 @@ public abstract class NBTStructureFeature extends DefaultFeature {
 							BlockState stateSt = world.getBlockState(mut);
 							if (!stateSt.is(TagAPI.BLOCK_GEN_TERRAIN)) {
 								if (merge == TerrainMerge.SURFACE) {
-									SurfaceBuilderConfiguration config = world.getBiome(mut)
-																			  .getGenerationSettings()
-																			  .getSurfaceBuilderConfig();
+//									SurfaceBuilderConfiguration config = world.getBiome(mut)
+//																			  .getGenerationSettings()
+//																			  .getSurfaceBuilderConfig();
 									boolean isTop = mut.getY() == surfMax && state.getMaterial().isSolidBlocking();
-									BlockState top = isTop ? config.getTopMaterial() : config.getUnderMaterial();
+									BlockState top =
+										Blocks.PURPLE_CONCRETE.defaultBlockState();
+									   //TODO: 1.18 find another way to get the Top/Bottom Materiel
+										//isTop ? config.getTopMaterial() : config.getUnderMaterial();
 									BlocksHelper.setWithoutUpdate(world, mut, top);
 								}
 								else {
@@ -155,10 +159,13 @@ public abstract class NBTStructureFeature extends DefaultFeature {
 							else {
 								if (stateSt.is(TagAPI.BLOCK_END_GROUND) && state.getMaterial().isSolidBlocking()) {
 									if (merge == TerrainMerge.SURFACE) {
-										SurfaceBuilderConfiguration config = world.getBiome(mut)
-																				  .getGenerationSettings()
-																				  .getSurfaceBuilderConfig();
-										BlocksHelper.setWithoutUpdate(world, mut, config.getUnderMaterial());
+//										SurfaceBuilderConfiguration config = world.getBiome(mut)
+//																				  .getGenerationSettings()
+//																				  .getSurfaceBuilderConfig();
+										BlockState bottom = Blocks.PURPLE_CONCRETE.defaultBlockState();
+										//TODO: 1.18 find another way to get the Top Material
+										//config.getUnderMaterial()
+										BlocksHelper.setWithoutUpdate(world, mut, bottom);
 									}
 									else {
 										BlocksHelper.setWithoutUpdate(world, mut, state);
