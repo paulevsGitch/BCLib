@@ -20,6 +20,7 @@ import ru.bclib.config.ConfigKeeper.StringArrayEntry;
 import ru.bclib.config.Configs;
 import ru.bclib.noise.OpenSimplexNoise;
 import ru.bclib.world.biomes.BCLBiome;
+import ru.bclib.world.generator.map.hex.HexBiomeMap;
 
 import java.awt.Point;
 import java.util.List;
@@ -39,8 +40,8 @@ public class BCLibEndBiomeSource extends BiomeSource {
 	private final SimplexNoise noise;
 	private final Biome centerBiome;
 	private final Biome barrens;
-	private BiomeMap mapLand;
-	private BiomeMap mapVoid;
+	private HexBiomeMap mapLand;
+	private HexBiomeMap mapVoid;
 	private final long seed;
 	private final Point pos;
 	
@@ -74,8 +75,8 @@ public class BCLibEndBiomeSource extends BiomeSource {
 		BiomeAPI.END_LAND_BIOME_PICKER.rebuild();
 		BiomeAPI.END_VOID_BIOME_PICKER.rebuild();
 		
-		this.mapLand = new BiomeMap(seed, GeneratorOptions.getBiomeSizeEndLand(), BiomeAPI.END_LAND_BIOME_PICKER);
-		this.mapVoid = new BiomeMap(seed, GeneratorOptions.getBiomeSizeEndVoid(), BiomeAPI.END_VOID_BIOME_PICKER);
+		this.mapLand = new HexBiomeMap(seed, GeneratorOptions.getBiomeSizeEndLand(), BiomeAPI.END_LAND_BIOME_PICKER);
+		this.mapVoid = new HexBiomeMap(seed, GeneratorOptions.getBiomeSizeEndVoid(), BiomeAPI.END_VOID_BIOME_PICKER);
 		this.centerBiome = biomeRegistry.getOrThrow(Biomes.THE_END);
 		this.barrens = biomeRegistry.getOrThrow(Biomes.END_BARRENS);
 		this.biomeRegistry = biomeRegistry;
