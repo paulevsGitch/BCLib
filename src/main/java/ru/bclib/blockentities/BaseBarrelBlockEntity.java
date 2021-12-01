@@ -94,7 +94,7 @@ public class BaseBarrelBlockEntity extends RandomizableContainerBlockEntity {
 	}
 	
 	private void scheduleUpdate() {
-		level.getBlockTicks().schedule(getBlockPos(), getBlockState().getBlock(), 5);
+		level.scheduleTick(getBlockPos(), getBlockState().getBlock(), 5);
 	}
 	
 	public void tick() {

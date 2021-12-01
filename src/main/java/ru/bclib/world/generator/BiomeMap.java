@@ -2,6 +2,7 @@ package ru.bclib.world.generator;
 
 import com.google.common.collect.Maps;
 import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.levelgen.LegacyRandomSource;
 import net.minecraft.world.level.levelgen.WorldgenRandom;
 import ru.bclib.noise.OpenSimplexNoise;
 import ru.bclib.util.MHelper;
@@ -75,7 +76,7 @@ public class BiomeMap {
 		ChunkPos cpos = new ChunkPos(MHelper.floor(x / BiomeChunk.WIDTH), MHelper.floor(z / BiomeChunk.WIDTH));
 		BiomeChunk chunk = maps.get(cpos);
 		if (chunk == null) {
-			RANDOM.setBaseChunkSeed(cpos.x, cpos.z);
+			RANDOM.setLargeFeatureWithSalt(0, cpos.x, cpos.z, 0);
 			chunk = new BiomeChunk(this, RANDOM, picker);
 			maps.put(cpos, chunk);
 		}

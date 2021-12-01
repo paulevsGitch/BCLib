@@ -3,6 +3,7 @@ package ru.bclib.api;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import net.fabricmc.fabric.api.tag.TagFactory;
+import net.fabricmc.fabric.api.tag.TagRegistry;
 import net.fabricmc.fabric.impl.tag.extension.TagDelegate;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;

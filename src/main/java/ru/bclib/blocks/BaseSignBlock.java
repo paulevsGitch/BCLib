@@ -105,7 +105,7 @@ public class BaseSignBlock extends SignBlock implements BlockModelProvider, Cust
 	@Override
 	public BlockState updateShape(BlockState state, Direction facing, BlockState neighborState, LevelAccessor world, BlockPos pos, BlockPos neighborPos) {
 		if (state.getValue(WATERLOGGED)) {
-			world.getFluidTicks().schedule(pos, Fluids.WATER, Fluids.WATER.getTickDelay(world));
+			world.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(world));
 		}
 		if (!canSurvive(state, world, pos)) {
 			return state.getValue(WATERLOGGED) ? state.getFluidState()

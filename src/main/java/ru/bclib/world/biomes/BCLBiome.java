@@ -8,6 +8,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
+import net.minecraft.world.level.levelgen.GenerationStep.Decoration;
 import ru.bclib.config.Configs;
 import ru.bclib.util.JsonFactory;
 import ru.bclib.util.StructureHelper;
@@ -152,8 +153,9 @@ public class BCLBiome {
 					list.add(new StructureInfo(structure, offsetY, terrainMerge));
 				});
 				if (!list.isEmpty()) {
-					structuresFeature = BCLFeature.makeChansedFeature(
+					structuresFeature = BCLFeature.makeChancedFeature(
 						new ResourceLocation(ns, nm + "_structures"),
+						Decoration.SURFACE_STRUCTURES,
 						new ListFeature(list),
 						10
 					);

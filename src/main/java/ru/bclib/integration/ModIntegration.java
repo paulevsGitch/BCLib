@@ -17,6 +17,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.Feature;
+import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import ru.bclib.BCLib;
 import ru.bclib.world.features.BCLFeature;
 
@@ -58,9 +59,9 @@ public abstract class ModIntegration {
 		return FabricLoader.getInstance().isModLoaded(modID);
 	}
 	
-	public BCLFeature getFeature(String featureID, String configuredFeatureID, GenerationStep.Decoration featureStep) {
+	public BCLFeature getFeature(String featureID, String placedFeatureID, GenerationStep.Decoration featureStep) {
 		Feature<?> feature = Registry.FEATURE.get(getID(featureID));
-		ConfiguredFeature<?, ?> featureConfigured = BuiltinRegistries.CONFIGURED_FEATURE.get(getID(configuredFeatureID));
+		PlacedFeature featureConfigured = BuiltinRegistries.PLACED_FEATURE.get(getID(placedFeatureID));
 		return new BCLFeature(feature, featureConfigured, featureStep);
 	}
 	

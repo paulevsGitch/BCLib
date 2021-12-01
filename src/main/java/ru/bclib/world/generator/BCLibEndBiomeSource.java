@@ -9,7 +9,9 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biome.BiomeCategory;
 import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.biome.Biomes;
+import net.minecraft.world.level.biome.Climate;
 import net.minecraft.world.level.biome.TheEndBiomeSource;
+import net.minecraft.world.level.levelgen.LegacyRandomSource;
 import net.minecraft.world.level.levelgen.WorldgenRandom;
 import net.minecraft.world.level.levelgen.synth.SimplexNoise;
 import ru.bclib.BCLib;
@@ -113,7 +115,7 @@ public class BCLibEndBiomeSource extends BiomeSource {
 	}
 	
 	@Override
-	public Biome getBiomeForNoiseGen(int biomeX, int biomeY, int biomeZ) {
+	public Biome getNoiseBiome(int biomeX, int biomeY, int biomeZ, Climate.Sampler sampler) {
 		long i = (long) biomeX * (long) biomeX;
 		long j = (long) biomeZ * (long) biomeZ;
 		long check = GeneratorOptions.isFarEndBiomes() ? 65536L : 625L;

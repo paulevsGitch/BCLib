@@ -87,6 +87,7 @@ abstract class FeatureSaplingBlockCommon extends SaplingBlock implements RenderL
 	@Override
 	public void advanceTree(ServerLevel world, BlockPos pos, BlockState blockState, Random random) {
 		FeaturePlaceContext context = new FeaturePlaceContext(
+			Optional.empty(),
 			world,
 			world.getChunkSource().getGenerator(),
 			random,

@@ -21,22 +21,17 @@ import net.minecraft.world.level.biome.BiomeSpecialEffects.Builder;
 import net.minecraft.world.level.biome.MobSpawnSettings;
 import net.minecraft.world.level.biome.MobSpawnSettings.SpawnerData;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.GenerationStep.Carving;
 import net.minecraft.world.level.levelgen.GenerationStep.Decoration;
 import net.minecraft.world.level.levelgen.carver.CarverConfiguration;
 import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
-import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
-import net.minecraft.world.level.levelgen.surfacebuilders.ConfiguredSurfaceBuilder;
-import net.minecraft.world.level.levelgen.surfacebuilders.SurfaceBuilder;
-import net.minecraft.world.level.levelgen.surfacebuilders.SurfaceBuilderBaseConfiguration;
+import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import ru.bclib.config.IdConfig;
 import ru.bclib.config.PathConfig;
 import ru.bclib.util.ColorUtil;
 import ru.bclib.world.features.BCLFeature;
 import ru.bclib.world.structures.BCLStructureFeature;
-import ru.bclib.world.surface.DoubleBlockSurfaceBuilder;
 
 import java.util.List;
 import java.util.Map;
@@ -76,8 +71,6 @@ public class BCLBiomeDef {
 	private float genChance = 1F;
 	private float downfall = 0F;
 	private int edgeSize = 32;
-	
-	private ConfiguredSurfaceBuilder<?> surface;
 	
 	/**
 	 * Custom biome definition. Can be extended with new parameters.
@@ -153,24 +146,12 @@ public class BCLBiomeDef {
 	}
 	
 	public BCLBiomeDef setSurface(Block block) {
-		setSurface(SurfaceBuilder.DEFAULT.configured(new SurfaceBuilderBaseConfiguration(
-			block.defaultBlockState(),
-			Blocks.END_STONE.defaultBlockState(),
-			Blocks.END_STONE.defaultBlockState()
-		)));
+		
 		return this;
 	}
 	
 	public BCLBiomeDef setSurface(Block block1, Block block2) {
-		setSurface(DoubleBlockSurfaceBuilder.register("bclib_" + id.getPath() + "_surface")
-											.setBlock1(block1)
-											.setBlock2(block2)
-											.configured());
-		return this;
-	}
-	
-	public BCLBiomeDef setSurface(ConfiguredSurfaceBuilder<?> builder) {
-		this.surface = builder;
+		
 		return this;
 	}
 	
@@ -240,7 +221,7 @@ public class BCLBiomeDef {
 		return this;
 	}
 	
-	public BCLBiomeDef addFeature(Decoration featureStep, ConfiguredFeature<?, ?> feature) {
+	public BCLBiomeDef addFeature(Decoration featureStep, PlacedFeature feature) {
 		FeatureInfo info = new FeatureInfo();
 		info.featureStep = featureStep;
 		info.feature = feature;
@@ -346,8 +327,10 @@ public class BCLBiomeDef {
 			spawnSettings.addSpawn(entry.type.getCategory(), entry);
 		});
 		
-		generationSettings.surfaceBuilder(surface == null ? net.minecraft.data.worldgen.SurfaceBuilders.END : surface);
-		structures.forEach((structure) -> generationSettings.addStructureStart(structure));
+		//generationSettings.surfaceBuilder(surface == null ? net.minecraft.data.worldgen.SurfaceBuilders.END : surface);
+		
+		//TODO: 1.18 Done elsewhere now
+		//structures.forEach((structure) -> generationSettings.addStructureStart(structure));
 		features.forEach((info) -> generationSettings.addFeature(info.featureStep, info.feature));
 		carvers.forEach((info) -> generationSettings.addCarver(info.carverStep, info.carver));
 		
@@ -368,12 +351,12 @@ public class BCLBiomeDef {
 		return new Biome.BiomeBuilder()
 			.precipitation(precipitation)
 			.biomeCategory(category)
-			.depth(depth)
-			.scale(0.2F)
+			//.depth(depth)
+			//.scale(0.2F)
 			.temperature(temperature)
 			.downfall(downfall)
-			.effects(effects.build())
-			.spawnSettings(spawnSettings.build())
+			.specialEffects(effects.build())
+			.mobSpawnSettings(spawnSettings.build())
 			.generationSettings(generationSettings.build())
 			.build();
 	}
@@ -387,7 +370,7 @@ public class BCLBiomeDef {
 	
 	private static final class FeatureInfo {
 		Decoration featureStep;
-		ConfiguredFeature<?, ?> feature;
+		PlacedFeature feature;
 	}
 	
 	private static final class CarverInfo <C extends CarverConfiguration> {

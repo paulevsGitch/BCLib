@@ -29,13 +29,13 @@ public class BaseLeavesBlock extends LeavesBlock implements BlockModelProvider, 
 	
 	private static FabricBlockSettings makeLeaves(MaterialColor color) {
 		return FabricBlockSettings.copyOf(Blocks.OAK_LEAVES)
-								  .color(color)
+								  .mapColor(color)
 								  .breakByTool(FabricToolTags.HOES)
 								  .breakByTool(FabricToolTags.SHEARS)
 								  .breakByHand(true)
-								  .isValidSpawn((state, world, pos, type) -> false)
-								  .isSuffocating((state, world, pos) -> false)
-								  .isViewBlocking((state, world, pos) -> false);
+								  .allowsSpawning((state, world, pos, type) -> false)
+								  .suffocates((state, world, pos) -> false)
+								  .blockVision((state, world, pos) -> false);
 	}
 
 	public BaseLeavesBlock(Block sapling, MaterialColor color, Consumer<FabricBlockSettings> customizeProperties) {
