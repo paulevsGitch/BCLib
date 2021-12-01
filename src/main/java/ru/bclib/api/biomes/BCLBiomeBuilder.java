@@ -1,4 +1,4 @@
-package ru.bclib.world.biomes;
+package ru.bclib.api.biomes;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
@@ -9,6 +9,7 @@ import net.minecraft.world.level.biome.Biome.Precipitation;
 import net.minecraft.world.level.biome.BiomeSpecialEffects;
 import net.minecraft.world.level.biome.MobSpawnSettings;
 import net.minecraft.world.level.biome.MobSpawnSettings.SpawnerData;
+import ru.bclib.world.biomes.BCLBiome;
 
 import java.util.ArrayList;
 import java.util.List;
