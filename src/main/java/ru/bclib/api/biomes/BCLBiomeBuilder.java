@@ -27,6 +27,8 @@ import ru.bclib.util.ColorUtil;
 import ru.bclib.world.biomes.BCLBiome;
 import ru.bclib.world.features.BCLFeature;
 
+import java.util.function.BiFunction;
+
 public class BCLBiomeBuilder {
 	private static final BCLBiomeBuilder INSTANCE = new BCLBiomeBuilder();
 	
@@ -436,6 +438,15 @@ public class BCLBiomeBuilder {
 	 * @return created {@link BCLBiome} instance.
 	 */
 	public BCLBiome build() {
+		return build(BCLBiome::new);
+	}
+	
+	/**
+	 * Finalize biome creation.
+	 * @param biomeConstructor {@link BiFunction} biome constructor.
+	 * @return created {@link BCLBiome} instance.
+	 */
+	public BCLBiome build(BiFunction<ResourceLocation, Biome, BCLBiome> biomeConstructor) {
 		BiomeBuilder builder = new BiomeBuilder()
 			.precipitation(precipitation)
 			.biomeCategory(category)
@@ -454,7 +465,7 @@ public class BCLBiomeBuilder {
 			builder.generationSettings(generationSettings.build());
 		}
 		
-		return new BCLBiome(biomeID, builder.build()).setFogDensity(fogDensity);
+		return biomeConstructor.apply(biomeID, builder.build()).setFogDensity(fogDensity);
 	}
 	
 	/**
