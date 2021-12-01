@@ -455,9 +455,12 @@ public class BiomeAPI {
 	 * @param structure {@link ConfiguredStructureFeature} to add.
 	 */
 	public static void addBiomeStructure(Biome biome, ConfiguredStructureFeature structure) {
-		BuiltinRegistries.CONFIGURED_STRUCTURE_FEATURE
-			.getResourceKey(structure)
-			.ifPresent(key -> BiomeModifications.addStructure(ctx -> ctx.getBiomeKey().equals(BuiltinRegistries.BIOME.getKey(biome)), key));
+		BuiltinRegistries.CONFIGURED_STRUCTURE_FEATURE.getResourceKey(structure)
+													  .ifPresent((key)->
+															BiomeModifications.addStructure(
+																(ctx)-> ctx.getBiomeKey().location().equals(BuiltinRegistries.BIOME.getKey(biome)),
+																key
+														));
 	}
 
 	/**
