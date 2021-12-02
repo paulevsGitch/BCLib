@@ -119,8 +119,10 @@ public class HexBiomeMap implements BiomeMap {
 		}
 		
 		if (chunk == null) {
-			RANDOM.setSeed(MHelper.getSeed(seed, cx, cz));
-			chunk = new HexBiomeChunk(RANDOM, picker);
+			synchronized (RANDOM) {
+				RANDOM.setSeed(MHelper.getSeed(seed, cx, cz));
+				chunk = new HexBiomeChunk(RANDOM, picker);
+			}
 			chunks.put(new Point(cx, cz), chunk);
 		}
 		
