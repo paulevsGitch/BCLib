@@ -480,7 +480,7 @@ public class BCLBiomeBuilder {
 	 * @param biomeConstructor {@link BiFunction} biome constructor.
 	 * @return created {@link BCLBiome} instance.
 	 */
-	public BCLBiome build(BiFunction<ResourceLocation, Biome, BCLBiome> biomeConstructor) {
+	public <T extends BCLBiome> T build(BiFunction<ResourceLocation, Biome, T> biomeConstructor) {
 		BiomeBuilder builder = new BiomeBuilder()
 			.precipitation(precipitation)
 			.biomeCategory(category)
@@ -499,7 +499,9 @@ public class BCLBiomeBuilder {
 			builder.generationSettings(generationSettings.build());
 		}
 		
-		return biomeConstructor.apply(biomeID, builder.build()).setFogDensity(fogDensity);
+		final T res = biomeConstructor.apply(biomeID, builder.build());
+		res.setFogDensity(fogDensity);
+		return res;
 	}
 	
 	/**
