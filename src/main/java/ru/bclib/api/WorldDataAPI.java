@@ -44,6 +44,7 @@ public class WorldDataAPI {
 					catch (IOException e) {
 						BCLib.LOGGER.error("World data loading failed", e);
 					}
+					TAGS.put(modID, root);
 				}
 				else {
 					Optional<ModContainer> optional = FabricLoader.getInstance()
@@ -58,11 +59,10 @@ public class WorldDataAPI {
 																  .getVersion()
 																  .toString());
 						}
+						TAGS.put(modID, root);
 						saveFile(modID);
 					}
 				}
-			
-				TAGS.put(modID, root);
 			});
 	}
 	
