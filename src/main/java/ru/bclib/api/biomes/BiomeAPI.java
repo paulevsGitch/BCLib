@@ -27,6 +27,7 @@ import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import org.jetbrains.annotations.Nullable;
+import ru.bclib.config.Configs;
 import ru.bclib.util.MHelper;
 import ru.bclib.world.biomes.BCLBiome;
 import ru.bclib.world.biomes.FabricBiomesData;
@@ -140,6 +141,7 @@ public class BiomeAPI {
 	 */
 	public static BCLBiome registerNetherBiome(Biome biome) {
 		BCLBiome bclBiome = new BCLBiome(biome);
+		configureBiome(bclBiome, 1.0F, 1.0F);
 		NETHER_BIOME_PICKER.addBiome(bclBiome);
 		registerBiome(bclBiome);
 		return bclBiome;
@@ -153,6 +155,7 @@ public class BiomeAPI {
 	 */
 	public static BCLBiome registerEndLandBiome(BCLBiome biome) {
 		registerBiome(biome);
+		configureBiome(biome, 1.0F, 1.0F);
 		END_LAND_BIOME_PICKER.addBiome(biome);
 		float weight = biome.getGenChance();
 		ResourceKey<Biome> key = BuiltinRegistries.BIOME.getResourceKey(biome.getBiome()).get();
@@ -169,6 +172,7 @@ public class BiomeAPI {
 	 */
 	public static BCLBiome registerEndLandBiome(Biome biome) {
 		BCLBiome bclBiome = new BCLBiome(biome);
+		configureBiome(bclBiome, 1.0F, 1.0F);
 		END_LAND_BIOME_PICKER.addBiome(bclBiome);
 		registerBiome(bclBiome);
 		return bclBiome;
@@ -182,7 +186,8 @@ public class BiomeAPI {
 	 * @return {@link BCLBiome}
 	 */
 	public static BCLBiome registerEndLandBiome(Biome biome, float genChance) {
-		BCLBiome bclBiome = new BCLBiome(biome).setGenChance(genChance);
+		BCLBiome bclBiome = new BCLBiome(biome);
+		configureBiome(bclBiome, genChance, 1.0F);
 		END_LAND_BIOME_PICKER.addBiome(bclBiome);
 		registerBiome(bclBiome);
 		return bclBiome;
@@ -196,6 +201,7 @@ public class BiomeAPI {
 	 */
 	public static BCLBiome registerEndVoidBiome(BCLBiome biome) {
 		registerBiome(biome);
+		configureBiome(biome, 1.0F, 1.0F);
 		END_VOID_BIOME_PICKER.addBiome(biome);
 		float weight = biome.getGenChance();
 		ResourceKey<Biome> key = BuiltinRegistries.BIOME.getResourceKey(biome.getBiome()).get();
@@ -211,6 +217,7 @@ public class BiomeAPI {
 	 */
 	public static BCLBiome registerEndVoidBiome(Biome biome) {
 		BCLBiome bclBiome = new BCLBiome(biome);
+		configureBiome(bclBiome, 1.0F, 1.0F);
 		END_VOID_BIOME_PICKER.addBiome(bclBiome);
 		registerBiome(bclBiome);
 		return bclBiome;
@@ -225,7 +232,8 @@ public class BiomeAPI {
 	 */
 	public static BCLBiome registerEndVoidBiome(Biome biome, float genChance) {
 		ResourceKey<Biome> key = BuiltinRegistries.BIOME.getResourceKey(biome).get();
-		BCLBiome bclBiome = new BCLBiome(biome).setGenChance(genChance);
+		BCLBiome bclBiome = new BCLBiome(biome);
+		configureBiome(bclBiome, genChance, 1.0F);
 		END_VOID_BIOME_PICKER.addBiome(bclBiome);
 		registerBiome(bclBiome);
 		return bclBiome;
@@ -487,5 +495,12 @@ public class BiomeAPI {
 			minGroupCount,
 			maxGroupCount
 		);
+	}
+	
+	private static void configureBiome(BCLBiome biome, float chance, float fog) {
+		String group = biome.getID().getNamespace() + "." + biome.getID().getPath();
+		chance = Configs.BIOMES_CONFIG.getFloat(group, "generation_chance", chance);
+		fog = Configs.BIOMES_CONFIG.getFloat(group, "fog_density", fog);
+		biome.setGenChance(chance).setFogDensity(fog);
 	}
 }

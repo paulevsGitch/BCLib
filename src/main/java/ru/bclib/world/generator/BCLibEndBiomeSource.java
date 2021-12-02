@@ -53,17 +53,31 @@ public class BCLibEndBiomeSource extends BiomeSource {
 		BiomeAPI.END_LAND_BIOME_PICKER.clearMutables();
 		BiomeAPI.END_VOID_BIOME_PICKER.clearMutables();
 		
+		List<String> includeVoid = Configs.BIOMES_CONFIG.getEntry("force_include", "end_void_biomes", StringArrayEntry.class).getValue();
 		this.possibleBiomes().forEach(biome -> {
 			ResourceLocation key = biomeRegistry.getKey(biome);
 			if (!BiomeAPI.hasBiome(key)) {
-				BCLBiome bclBiome = new BCLBiome(key, biome);
-				BiomeAPI.END_LAND_BIOME_PICKER.addBiomeMutable(bclBiome);
+				String group = key.getNamespace() + "." + key.getPath();
+				float chance = Configs.BIOMES_CONFIG.getFloat(group, "generation_chance", 1.0F);
+				float fog = Configs.BIOMES_CONFIG.getFloat(group, "fog_density", 1.0F);
+				BCLBiome bclBiome = new BCLBiome(key, biome).setGenChance(chance).setFogDensity(fog);
+				if (includeVoid.contains(key.toString())) {
+					BiomeAPI.END_VOID_BIOME_PICKER.addBiomeMutable(bclBiome);
+				}
+				else {
+					BiomeAPI.END_LAND_BIOME_PICKER.addBiomeMutable(bclBiome);
+				}
 			}
 			else {
 				BCLBiome bclBiome = BiomeAPI.getBiome(key);
 				if (bclBiome != BiomeAPI.EMPTY_BIOME && bclBiome.getParentBiome() == null) {
 					if (!BiomeAPI.END_LAND_BIOME_PICKER.containsImmutable(key) && !BiomeAPI.END_VOID_BIOME_PICKER.containsImmutable(key)) {
-						BiomeAPI.END_LAND_BIOME_PICKER.addBiomeMutable(bclBiome);
+						if (includeVoid.contains(key.toString())) {
+							BiomeAPI.END_VOID_BIOME_PICKER.addBiomeMutable(bclBiome);
+						}
+						else {
+							BiomeAPI.END_LAND_BIOME_PICKER.addBiomeMutable(bclBiome);
+						}
 					}
 				}
 			}
@@ -100,12 +114,13 @@ public class BCLibEndBiomeSource extends BiomeSource {
 	}
 	
 	private static List<Biome> getBiomes(Registry<Biome> biomeRegistry) {
-		List<String> include = Configs.BIOMES_CONFIG.getEntry("force_include", "end_biomes", StringArrayEntry.class).getValue();
+		List<String> includeLand = Configs.BIOMES_CONFIG.getEntry("force_include", "end_land_biomes", StringArrayEntry.class).getValue();
+		List<String> includeVoid = Configs.BIOMES_CONFIG.getEntry("force_include", "end_void_biomes", StringArrayEntry.class).getValue();
 		
 		return biomeRegistry.stream().filter(biome -> {
 			ResourceLocation key = biomeRegistry.getKey(biome);
 			
-			if (include.contains(key.toString())) {
+			if (includeLand.contains(key.toString()) || includeVoid.contains(key.toString())) {
 				return true;
 			}
 			

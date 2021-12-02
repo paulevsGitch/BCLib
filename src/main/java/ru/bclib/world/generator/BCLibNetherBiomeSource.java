@@ -45,7 +45,10 @@ public class BCLibNetherBiomeSource extends BiomeSource {
 		this.possibleBiomes().forEach(biome -> {
 			ResourceLocation key = biomeRegistry.getKey(biome);
 			if (!BiomeAPI.hasBiome(key)) {
-				BCLBiome bclBiome = new BCLBiome(key, biome);
+				String group = key.getNamespace() + "." + key.getPath();
+				float chance = Configs.BIOMES_CONFIG.getFloat(group, "generation_chance", 1.0F);
+				float fog = Configs.BIOMES_CONFIG.getFloat(group, "fog_density", 1.0F);
+				BCLBiome bclBiome = new BCLBiome(key, biome).setGenChance(chance).setFogDensity(fog);
 				BiomeAPI.NETHER_BIOME_PICKER.addBiomeMutable(bclBiome);
 			}
 			else {

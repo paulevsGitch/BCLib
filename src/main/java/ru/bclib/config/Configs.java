@@ -26,12 +26,12 @@ public class Configs {
 		MAIN_CONFIG.saveChanges();
 		RECIPE_CONFIG.saveChanges();
 		GENERATOR_CONFIG.saveChanges();
-		initForcedConfig();
+		BIOMES_CONFIG.saveChanges();
 	}
 	
-	private static void initForcedConfig() {
-		BIOMES_CONFIG.keeper.registerEntry(new ConfigKey("end_biomes", "force_include"), new StringArrayEntry(Collections.EMPTY_LIST));
+	static {
+		BIOMES_CONFIG.keeper.registerEntry(new ConfigKey("end_land_biomes", "force_include"), new StringArrayEntry(Collections.EMPTY_LIST));
+		BIOMES_CONFIG.keeper.registerEntry(new ConfigKey("end_void_biomes", "force_include"), new StringArrayEntry(Collections.EMPTY_LIST));
 		BIOMES_CONFIG.keeper.registerEntry(new ConfigKey("nether_biomes", "force_include"), new StringArrayEntry(Collections.EMPTY_LIST));
-		BIOMES_CONFIG.saveChanges();
 	}
 }
