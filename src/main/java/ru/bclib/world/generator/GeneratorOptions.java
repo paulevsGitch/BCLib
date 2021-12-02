@@ -16,7 +16,7 @@ public class GeneratorOptions {
 	private static boolean customEndBiomeSource = true;
 	private static boolean addNetherBiomesByCategory = false;
 	private static boolean addEndBiomesByCategory = false;
-	private static boolean useOldBiomeGenerator = false;
+	private static boolean useOldBiomeGenerator = false;    
 	
 	public static void init() {
 		biomeSizeNether = Configs.GENERATOR_CONFIG.getInt("nether.biomeMap", "biomeSize", 256);

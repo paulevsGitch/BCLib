@@ -22,7 +22,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class BCLibNetherBiomeSource extends BiomeSource {
+public class BCLibNetherBiomeSource extends BiomeSource {    
 	public static final Codec<BCLibNetherBiomeSource> CODEC = RecordCodecBuilder.create((instance) -> {
 		return instance.group(RegistryLookupCodec.create(Registry.BIOME_REGISTRY).forGetter((theEndBiomeSource) -> {
 			return theEndBiomeSource.biomeRegistry;
@@ -33,6 +33,18 @@ public class BCLibNetherBiomeSource extends BiomeSource {
 	private final Registry<Biome> biomeRegistry;
 	private BiomeMap biomeMap;
 	private final long seed;
+    private static boolean forceLegacyGenerator = false;
+
+    /**
+     * When true, the older square generator is used for the nether.
+	 *
+	 * This override is used (for example) by BetterNether to force the legacy generation for worlds
+	 * that were created before 1.18
+     * @param val wether or not you want to force the old generatore.
+     */
+    public static void setForceLegacyGeneration(boolean val){
+        forceLegacyGenerator = val;
+    }
 	
 	@Deprecated(forRemoval = true)
 	public static final List<Consumer<BCLibNetherBiomeSource>> onInit = new LinkedList<>();
@@ -65,7 +77,7 @@ public class BCLibNetherBiomeSource extends BiomeSource {
 		BiomeAPI.NETHER_BIOME_PICKER.getBiomes().forEach(biome -> biome.updateActualBiomes(biomeRegistry));
 		BiomeAPI.NETHER_BIOME_PICKER.rebuild();
 		
-		if (GeneratorOptions.useOldBiomeGenerator()) {
+		if (GeneratorOptions.useOldBiomeGenerator() || forceLegacyGenerator) {
 			this.biomeMap = new SquareBiomeMap(seed, GeneratorOptions.getBiomeSizeNether(), BiomeAPI.NETHER_BIOME_PICKER);
 		}
 		else {
