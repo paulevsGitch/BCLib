@@ -1,6 +1,9 @@
 package ru.bclib.api.biomes;
 
+import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
+import net.minecraft.core.Registry;
 import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.data.BuiltinRegistries;
 import net.minecraft.data.worldgen.BiomeDefaultFeatures;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.Music;
@@ -20,6 +23,7 @@ import net.minecraft.world.level.biome.BiomeSpecialEffects;
 import net.minecraft.world.level.biome.MobSpawnSettings;
 import net.minecraft.world.level.biome.MobSpawnSettings.SpawnerData;
 import net.minecraft.world.level.levelgen.GenerationStep.Decoration;
+import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import ru.bclib.util.ColorUtil;
 import ru.bclib.world.biomes.BCLBiome;
@@ -441,9 +445,26 @@ public class BCLBiomeBuilder {
 		return feature(feature.getDecoration(), feature.getPlacedFeature());
 	}
 	
-	// TODO Make feature registration
-	public BCLBiomeBuilder structure(BCLStructureFeature structure) {
+	/**
+	 * Adds new structure feature into thr biome.
+	 * @param structure {@link ConfiguredStructureFeature} to add.
+	 * @return same {@link BCLBiomeBuilder} instance.
+	 */
+	public BCLBiomeBuilder structure(ConfiguredStructureFeature<?, ?> structure) {
+		BuiltinRegistries.CONFIGURED_STRUCTURE_FEATURE
+			.getResourceKey(structure)
+			.ifPresent(key -> BiomeModifications.addStructure(ctx -> ctx.getBiomeKey().location().equals(biomeID), key));
 		return this;
+	}
+	
+	/**
+	 * Adds new structure feature into thr biome. Will add building biome into the structure list.
+	 * @param structure {@link BCLStructureFeature} to add.
+	 * @return same {@link BCLBiomeBuilder} instance.
+	 */
+	public BCLBiomeBuilder structure(BCLStructureFeature structure) {
+		structure.addInternalBiome(biomeID);
+		return structure(structure.getFeatureConfigured());
 	}
 	
 	/**
