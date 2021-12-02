@@ -23,6 +23,13 @@ import java.util.concurrent.Executor;
 public class LifeCycleAPI {
 	private final static List<LevelLoadBiomesCall> onLoadLevelBiomes = new ArrayList<>(2);
 	private final static List<LevelLoadCall> onLoadLevel = new ArrayList<>(2);
+	private final static List<BeforeLevelLoadCall> beforeLoadLevel = new ArrayList<>(2);
+	/**
+	 * A callback function that is used for each new ServerLevel instance
+	 */
+	public interface BeforeLevelLoadCall {
+		void beforeLoad();
+	}
 	
 	/**
 	 * A callback function that is used for each new ServerLevel instance
@@ -52,6 +59,17 @@ public class LifeCycleAPI {
 	}
 	
 	/**
+	 * Register a callback that is called before a level is loaded or created,
+	 * but after the {@link WorldDataAPI} was initialized and patches from
+	 * the {@link ru.bclib.api.datafixer.DataFixerAPI} were applied.
+	 *
+	 * @param call The callback Method
+	 */
+	public static void beforeLevelLoad(BeforeLevelLoadCall call){
+		beforeLoadLevel.add(call);
+	}
+	
+	/**
 	 * Register a callback that is called when a new {@code ServerLevel is instantiated}.
 	 * This callback will receive the world seed as well as it's biome registry.
 	 * @param call The calbback Method
@@ -69,6 +87,13 @@ public class LifeCycleAPI {
 		onLoadLevel.add(call);
 	}
 	
+	/**
+	 * For internal use, You should not call this method!
+	 * @param src
+	 */
+	public static void _runBeforeLevelLoad(){
+		beforeLoadLevel.forEach(c -> c.beforeLoad());
+	}
 	/**
 	 * For internal use, You should not call this method!
 	 * @param minecraftServer
