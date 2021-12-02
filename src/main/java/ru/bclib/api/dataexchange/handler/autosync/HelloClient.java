@@ -48,7 +48,7 @@ public class HelloClient extends DataHandler.FromServer {
 	public interface IServerModMap extends Map<String, OfferedModInfo> {}
 	public static class ServerModMap extends HashMap<String, OfferedModInfo> implements IServerModMap {}
 
-	public static DataHandlerDescriptor DESCRIPTOR = new DataHandlerDescriptor(new ResourceLocation(BCLib.MOD_ID, "hello_client"), HelloClient::new, false, false);
+	public static final DataHandlerDescriptor DESCRIPTOR = new DataHandlerDescriptor(new ResourceLocation(BCLib.MOD_ID, "hello_client"), HelloClient::new, false, false);
 	
 	public HelloClient() {
 		super(DESCRIPTOR.IDENTIFIER);

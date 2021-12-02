@@ -25,6 +25,7 @@
 		"ChunkGeneratorMixin",
 		"WorldGenRegionMixin",
 		"WorldGenRegionMixin",
+		"DimensionTypeMixin",
 		"RecipeManagerMixin",
 		"RecipeManagerMixin",
 		"BoneMealItemMixin",
