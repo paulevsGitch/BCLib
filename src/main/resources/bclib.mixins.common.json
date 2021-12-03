@@ -33,8 +33,7 @@
 		"AnvilBlockMixin",
 		"AnvilMenuMixin",
 		"TagLoaderMixin",
-		"MainMixin",
-		"RegistryReadOpsMixin"
+		"MainMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
