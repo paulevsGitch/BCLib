@@ -14,9 +14,9 @@ import net.fabricmc.fabric.impl.biome.TheEndBiomeData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.Registry;
 import net.minecraft.data.BuiltinRegistries;
+import net.minecraft.data.worldgen.SurfaceRuleData;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.random.WeightedRandomList;
 import net.minecraft.world.entity.EntityType;
@@ -24,12 +24,18 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.Biome.BiomeCategory;
 import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.biome.Climate;
 import net.minecraft.world.level.biome.MobSpawnSettings.SpawnerData;
+import net.minecraft.world.level.dimension.DimensionType;
+import net.minecraft.world.level.levelgen.GenerationStep.Carving;
 import net.minecraft.world.level.levelgen.GenerationStep.Decoration;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
+import net.minecraft.world.level.levelgen.SurfaceRules;
+import net.minecraft.world.level.levelgen.SurfaceRules.RuleSource;
+import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
 import net.minecraft.world.level.levelgen.feature.StructureFeature;
@@ -49,16 +55,16 @@ import ru.bclib.world.generator.BiomePicker;
 import ru.bclib.world.structures.BCLStructureFeature;
 
 import java.util.ArrayList;
-import java.util.EnumMap;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 public class BiomeAPI {
 	/**
@@ -76,6 +82,7 @@ public class BiomeAPI {
 	private static Registry<Biome> biomeRegistry;
 	
 	private static final Map<ResourceKey, List<BiConsumer<ResourceLocation, Biome>>> MODIFICATIONS = Maps.newHashMap();
+	private static final Map<ResourceLocation, SurfaceRules.RuleSource> SURFACE_RULES = Maps.newHashMap();
 	private static final Set<ResourceLocation> MODIFIED_BIOMES = Sets.newHashSet();
 	
 	public static final BCLBiome NETHER_WASTES_BIOME = registerNetherBiome(getFromRegistry(Biomes.NETHER_WASTES));
@@ -91,12 +98,14 @@ public class BiomeAPI {
 	public static final BCLBiome END_BARRENS = registerEndVoidBiome(getFromRegistry(new ResourceLocation("end_barrens")));
 	public static final BCLBiome SMALL_END_ISLANDS = registerEndVoidBiome(getFromRegistry(new ResourceLocation("small_end_islands")));
 	
+	private static SurfaceRules.RuleSource netherRuleSource;
+	private static SurfaceRules.RuleSource endRuleSource;
+	
 	/**
 	 * Initialize registry for current server.
-	 *
-	 * @param server - {@link MinecraftServer}
+	 * @param biomeRegistry - {@link Registry} for {@link Biome}.
 	 */
-	public static void initRegistry( Registry<Biome> biomeRegistry) {
+	public static void initRegistry(Registry<Biome> biomeRegistry) {
 		BiomeAPI.biomeRegistry = biomeRegistry;
 		CLIENT.clear();
 	}
@@ -412,17 +421,44 @@ public class BiomeAPI {
 	}
 	
 	/**
+	 * Returns surface rule source for the Nether.
+	 * @return {@link SurfaceRules.RuleSource}.
+	 */
+	public static SurfaceRules.RuleSource getNetherRuleSource() {
+		return netherRuleSource;
+	}
+	
+	/**
+	 * Returns surface rule source for the End.
+	 * @return {@link SurfaceRules.RuleSource}.
+	 */
+	public static SurfaceRules.RuleSource getEndRuleSource() {
+		return endRuleSource;
+	}
+	
+	/**
 	 * Will apply biome modifications to world, internal usage only.
 	 * @param level
 	 */
 	public static void applyModifications(ServerLevel level) {
+		BiomeSource source = level.getChunkSource().getGenerator().getBiomeSource();
+		Set<Biome> biomes = source.possibleBiomes();
+		
+		if (level.dimension() == Level.NETHER) {
+			RuleSource[] rules = getRuleSources(biomes, level.dimension());
+			netherRuleSource = rules.length > 0 ? SurfaceRules.sequence(rules) : null;
+			System.out.println("Adding nether sources! " + rules.length);
+		}
+		else if (level.dimension() == Level.END) {
+			RuleSource[] rules = getRuleSources(biomes, level.dimension());
+			endRuleSource = rules.length > 0 ? SurfaceRules.sequence(rules) : null;
+			System.out.println("Adding end sources! " + rules.length);
+		}
+		
 		List<BiConsumer<ResourceLocation, Biome>> modifications = MODIFICATIONS.get(level.dimension());
 		if (modifications == null) {
 			return;
 		}
-		
-		BiomeSource source = level.getChunkSource().getGenerator().getBiomeSource();
-		Set<Biome> biomes = source.possibleBiomes();
 		
 		biomes.forEach(biome -> {
 			ResourceLocation biomeID = getBiomeID(biome);
@@ -440,6 +476,41 @@ public class BiomeAPI {
 				});
 			}
 		});
+	}
+	
+	private static SurfaceRules.RuleSource[] getRuleSources(Set<Biome> biomes, ResourceKey<Level> dimensionType) {
+		Set<ResourceLocation> biomeIDs = biomes.stream().map(biome -> getBiomeID(biome)).collect(Collectors.toSet());
+		List<SurfaceRules.RuleSource> rules = Lists.newArrayList();
+		SURFACE_RULES.forEach((biomeID, rule) -> {
+			if (biomeIDs.contains(biomeID)) {
+				rules.add(rule);
+			}
+		});
+		
+		// Try handle biomes from other dimension, may work not as expected
+		// Will not work
+		/*Optional<Biome> optional = biomes
+			.stream()
+			.filter(biome -> biome.getBiomeCategory() != BiomeCategory.THEEND && biome.getBiomeCategory() != BiomeCategory.NETHER)
+			.findAny();
+		if (optional.isPresent()) {
+			rules.add(SurfaceRuleData.overworld());
+		}
+		
+		if (dimensionType == Level.NETHER) {
+			optional = biomes.stream().filter(biome -> biome.getBiomeCategory() != BiomeCategory.THEEND).findAny();
+			if (optional.isPresent()) {
+				rules.add(SurfaceRuleData.end());
+			}
+		}
+		else if (dimensionType == Level.END) {
+			optional = biomes.stream().filter(biome -> biome.getBiomeCategory() != BiomeCategory.NETHER).findAny();
+			if (optional.isPresent()) {
+				rules.add(SurfaceRuleData.end());
+			}
+		}*/
+		
+		return rules.toArray(new SurfaceRules.RuleSource[rules.size()]);
 	}
 	
 	/**
@@ -503,21 +574,16 @@ public class BiomeAPI {
 	 * @param structure {@link ConfiguredStructureFeature} to add.
 	 */
 	public static void addBiomeStructure(ResourceKey biomeKey, ConfiguredStructureFeature structure) {
-		//BiomeStructureStartsImpl.addStart(registries, structure, getBiomeID(biome));
 		changeStructureStarts(structureMap -> {
 			Multimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>> configuredMap = structureMap.computeIfAbsent(structure.feature, k -> HashMultimap.create());
 			
 			configuredMap.put(structure, biomeKey);
 		});
-		
-		
 	}
 	
 	public static void addBiomeStructure(Biome biome, ConfiguredStructureFeature structure) {
-		//BiomeStructureStartsImpl.addStart(registries, structure, getBiomeID(biome));
 		changeStructureStarts(structureMap -> {
 			Multimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>> configuredMap = structureMap.computeIfAbsent(structure.feature, k -> HashMultimap.create());
-			
 			var key = getBiomeKey(biome);
 			if (key!=null) {
 				configuredMap.put(structure, key);
@@ -525,10 +591,7 @@ public class BiomeAPI {
 				BCLib.LOGGER.error("Unable to find Biome " + getBiomeID(biome));
 			}
 		});
-		
-		
 	}
-	
 	
 	private static void changeStructureStarts(Consumer<Map<StructureFeature<?>, Multimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>>>> modifier) {
 		Registry<NoiseGeneratorSettings> chunkGenSettingsRegistry = BuiltinRegistries.NOISE_GENERATOR_SETTINGS;
@@ -539,10 +602,7 @@ public class BiomeAPI {
 			modifier.accept(structureMap);
 			setMutableStructureConfig(entry.getValue(), structureMap);
 		}
-		
-		
 	}
-	
 	
 	/**
 	 * Adds new structure feature to existing biome.
@@ -552,7 +612,6 @@ public class BiomeAPI {
 	public static void addBiomeStructure(ResourceKey biomeKey, BCLStructureFeature structure) {
 		addBiomeStructure(biomeKey, structure.getFeatureConfigured());
 	}
-	
 
 	/**
 	 * Adds new structure features to existing biome.
@@ -563,6 +622,40 @@ public class BiomeAPI {
 		for (BCLStructureFeature structure: structures) {
 			addBiomeStructure(biomeKey, structure.getFeatureConfigured());
 		}
+	}
+	
+	/**
+	 * Adds new carver into existing biome.
+	 * @param biome {@link Biome} to add carver in.
+	 * @param carver {@link ConfiguredWorldCarver} to add.
+	 * @param stage {@link Carving} stage.
+	 */
+	public static void addBiomeCarver(Biome biome, ConfiguredWorldCarver carver, Carving stage) {
+		BiomeGenerationSettingsAccessor accessor = (BiomeGenerationSettingsAccessor) biome.getGenerationSettings();
+		Map<Carving, List<Supplier<ConfiguredWorldCarver<?>>>> carvers = CollectionsUtil.getMutable(accessor.bclib_getCarvers());
+		List<Supplier<ConfiguredWorldCarver<?>>> carverList = CollectionsUtil.getMutable(carvers.getOrDefault(stage, new ArrayList<>()));
+		carvers.put(stage, carverList);
+		carverList.add(() -> carver);
+		accessor.bclib_setCarvers(carvers);
+	}
+	
+	/**
+	 * Adds surface rule to specified biome.
+	 * @param biomeID biome {@link ResourceLocation}.
+	 * @param source {@link SurfaceRules.RuleSource}.
+	 */
+	public static void addSurfaceRule(ResourceLocation biomeID, SurfaceRules.RuleSource source) {
+		SURFACE_RULES.put(biomeID, source);
+	}
+	
+	/**
+	 * Get surface rule for the biome using its {@link ResourceLocation} ID as a key.
+	 * @param biomeID {@link ResourceLocation} biome ID.
+	 * @return {@link SurfaceRules.RuleSource}.
+	 */
+	@Nullable
+	public static SurfaceRules.RuleSource getSurfaceRule(ResourceLocation biomeID) {
+		return SURFACE_RULES.get(biomeID);
 	}
 	
 	/**
@@ -633,11 +726,12 @@ public class BiomeAPI {
 	
 	//inspired by net.fabricmc.fabric.impl.biome.modification.BiomeStructureStartsImpl
 	private static void setMutableStructureConfig(NoiseGeneratorSettings settings, Map<StructureFeature<?>, Multimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>>> structureStarts) {
-		final StructureSettingsAccessor access = (StructureSettingsAccessor)settings.structureSettings();
-		access.bcl_setStructureConfig(structureStarts.entrySet().stream()
-													 .collect(ImmutableMap.toImmutableMap(
-														 Map.Entry::getKey,
-														 e -> ImmutableMultimap.copyOf(e.getValue())
-													 )));
+		final StructureSettingsAccessor access = (StructureSettingsAccessor) settings.structureSettings();
+		access.bcl_setStructureConfig(
+			structureStarts
+				.entrySet()
+				.stream()
+				.collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, e -> ImmutableMultimap.copyOf(e.getValue())))
+		);
 	}
 }

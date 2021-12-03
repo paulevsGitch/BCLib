@@ -37,7 +37,8 @@
 		"MainMixin",
 		"BiomeGenerationSettingsAccessor",
 		"MobSpawnSettingsAccessor",
-		"StructureSettingsAccessor"
+		"StructureSettingsAccessor",
+		"SurfaceRuleDataMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
