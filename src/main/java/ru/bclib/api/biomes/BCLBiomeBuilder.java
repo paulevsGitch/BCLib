@@ -529,7 +529,7 @@ public class BCLBiomeBuilder {
 		
 		final T res = biomeConstructor.apply(biomeID, builder.build());
 		res.attachedStructures = structures;
-		surfaceRules.forEach(s -> BiomeAPI.addSurfaceRule(BiomeAPI.getBiomeID(res.getBiome()), s));
+		res.surfaceRules = surfaceRules;
 		res.setFogDensity(fogDensity);
 		return res;
 	}

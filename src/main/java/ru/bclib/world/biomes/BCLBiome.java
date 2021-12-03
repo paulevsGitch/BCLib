@@ -6,8 +6,10 @@ import net.minecraft.data.BuiltinRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.levelgen.SurfaceRules;
 import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
 import org.jetbrains.annotations.Nullable;
+import ru.bclib.api.biomes.BiomeAPI;
 import ru.bclib.util.WeightedList;
 
 import java.util.List;
@@ -210,8 +212,14 @@ public class BCLBiome {
 	 * maintains a list of all structures added to this biome, this is automatically set by
 	 * {@link ru.bclib.api.biomes.BCLBiomeBuilder}
 	 */
-	
 	public List<ConfiguredStructureFeature> attachedStructures = null;
+	
+	/**
+	 * For internal use only!!!
+	 * maintains a list of all structures added to this biome, this is automatically set by
+	 * {@link ru.bclib.api.biomes.BCLBiomeBuilder}
+	 */
+	public  List<SurfaceRules.RuleSource> surfaceRules = null;
 	
 	/**
 	 * Recursively update biomes to correct world biome registry instances, for internal usage only.
@@ -227,6 +235,11 @@ public class BCLBiome {
 			edge.updateActualBiomes(biomeRegistry);
 		}
 		this.actualBiome = biomeRegistry.get(biomeID);
+		if (this.attachedStructures!=null)
+			attachedStructures.forEach(s -> BiomeAPI.addBiomeStructure(BiomeAPI.getBiomeKey(actualBiome), s));
+		
+		if (this.surfaceRules!=null)
+			surfaceRules.forEach(s -> BiomeAPI.addSurfaceRule(biomeID, s));
 	}
 	
 	/**
