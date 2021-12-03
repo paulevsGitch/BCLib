@@ -501,7 +501,7 @@ public class BCLBiomeBuilder {
 	 * Adds blocks to the biome surface and below it (with specified depth).
 	 * @param surfaceBlock {@link Block} that will cover biome.
 	 * @param subterrainBlock {@link Block} below it with specified depth.
-	 * @param depth thickness of bottom block layer.
+	 * @param depth thickness of bottom block layer.`
 	 * @return same {@link BCLBiomeBuilder} instance.
 	 */
 	public BCLBiomeBuilder surface(Block surfaceBlock, Block subterrainBlock, int depth) {
