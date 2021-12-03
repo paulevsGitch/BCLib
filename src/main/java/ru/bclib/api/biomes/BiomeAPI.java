@@ -20,6 +20,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.Biome.BiomeCategory;
 import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.biome.Climate;
@@ -413,9 +414,18 @@ public class BiomeAPI {
 		Registry<Biome> biomeReg = registryAccess.registryOrThrow(Registry.BIOME_REGISTRY);
 		Set<Biome> biomes = biomeReg.entrySet().stream().map(e -> e.getValue()).collect(Collectors.toSet());
 		
-		applyModifications(biomes, Level.NETHER);
-		applyModifications(biomes, Level.OVERWORLD);
-		applyModifications(biomes, Level.END);
+		applyModifications(
+			biomes.stream().filter(b->b.getBiomeCategory().equals(BiomeCategory.NETHER)).collect(Collectors.toSet()),
+			Level.NETHER
+		);
+		applyModifications(
+			biomes.stream().filter(b->!b.getBiomeCategory().equals(BiomeCategory.NETHER) && !b.getBiomeCategory().equals(BiomeCategory.THEEND)).collect(Collectors.toSet()),
+			Level.OVERWORLD
+		);
+		applyModifications(
+			biomes.stream().filter(b->b.getBiomeCategory().equals(BiomeCategory.THEEND)).collect(Collectors.toSet()),
+			Level.END
+		);
 	}
 	
 	private static void applyModifications(Set<Biome> biomes, ResourceKey<Level> dimension) {
