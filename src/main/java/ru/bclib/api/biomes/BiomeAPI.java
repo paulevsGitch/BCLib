@@ -576,8 +576,8 @@ public class BiomeAPI {
 	public static <M extends Mob> void addBiomeMobSpawn(Biome biome, EntityType<M> entityType, int weight, int minGroupCount, int maxGroupCount) {
 		final MobCategory category = entityType.getCategory();
 		MobSpawnSettingsAccessor accessor = (MobSpawnSettingsAccessor) biome.getMobSettings();
-		Map<MobCategory, WeightedRandomList<SpawnerData>> spawners = getMutableMap(accessor.bcl_getSpawners());
-		List<SpawnerData> mobs = spawners.containsKey(category) ? getMutableList(spawners.get(category).unwrap()) : Lists.newArrayList();
+		Map<MobCategory, WeightedRandomList<SpawnerData>> spawners = CollectionsUtil.getMutable(accessor.bcl_getSpawners());
+		List<SpawnerData> mobs = spawners.containsKey(category) ? CollectionsUtil.getMutable(spawners.get(category).unwrap()) : Lists.newArrayList();
 		mobs.add(new SpawnerData(entityType, weight, minGroupCount, maxGroupCount));
 		spawners.put(category, WeightedRandomList.create(mobs));
 		accessor.bcl_setSpawners(spawners);
@@ -603,22 +603,9 @@ public class BiomeAPI {
 				lists.add(Lists.newArrayList());
 			}
 		}
-		List<Supplier<PlacedFeature>> list = getMutableList(lists.get(index));
+		List<Supplier<PlacedFeature>> list = CollectionsUtil.getMutable(lists.get(index));
 		lists.set(index, list);
 		return list;
-	}
-	
-	private static <T extends Object> List<T> getMutableList(List<T> input) {
-		if (input!=null) {
-			System.out.println("getMutableList: " + input.getClass().getName());
-			for (Class cl : input.getClass().getInterfaces()){
-				System.out.println("   - " + cl.getName());
-			}
-		}
-		if (/*input instanceof ImmutableList ||*/ !(input instanceof ArrayList || input instanceof LinkedList)) {
-			return Lists.newArrayList(input);
-		}
-		return input;
 	}
 	
 	private static List<Supplier<PlacedFeature>> getFeaturesList(List<List<Supplier<PlacedFeature>>> features, Decoration step) {
@@ -629,13 +616,6 @@ public class BiomeAPI {
 		List<Supplier<PlacedFeature>> mutable = CollectionsUtil.getMutable(features.get(index));
 		features.set(index, mutable);
 		return mutable;
-	}
-	
-	private static <K extends Object, V extends Object> Map<K, V> getMutableMap(Map<K, V> input) {
-		if (/*input instanceof ImmutableMap*/ !(input instanceof HashMap ||input instanceof EnumMap)) {
-			return Maps.newHashMap(input);
-		}
-		return input;
 	}
 	
 	//inspired by net.fabricmc.fabric.impl.biome.modification.BiomeStructureStartsImpl
