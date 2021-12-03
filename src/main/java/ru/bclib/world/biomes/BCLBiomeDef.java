@@ -362,7 +362,7 @@ public class BCLBiomeDef {
 			.generationSettings(generationSettings.build())
 			.build();
 		
-		structures.forEach((structure) -> BiomeAPI.addBiomeStructure(b, structure));
+		//structures.forEach((structure) -> BiomeAPI.addBiomeStructure(b., structure));
 		return b;
 	}
 	

@@ -6,9 +6,14 @@ import net.minecraft.data.BuiltinRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
 import org.jetbrains.annotations.Nullable;
+import ru.bclib.api.biomes.BiomeAPI;
 import ru.bclib.util.WeightedList;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -58,7 +63,7 @@ public class BCLBiome {
 	}
 	
 	/**
-	 * Get current bime edge.
+	 * Get current biome edge.
 	 * @return {@link BCLBiome} edge.
 	 */
 	@Nullable
@@ -202,6 +207,14 @@ public class BCLBiome {
 		this.genChance = genChance;
 		return this;
 	}
+	
+	/**
+	 * For internal use only!!!
+	 * maintains a list of all structures added to this biome, this is automatically set by
+	 * {@link ru.bclib.api.biomes.BCLBiomeBuilder}
+	 */
+	
+	public List<ConfiguredStructureFeature> attachedStructures = null;
 	
 	/**
 	 * Recursively update biomes to correct world biome registry instances, for internal usage only.

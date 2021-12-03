@@ -32,6 +32,8 @@ import ru.bclib.world.biomes.BCLBiome;
 import ru.bclib.world.features.BCLFeature;
 import ru.bclib.world.structures.BCLStructureFeature;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
@@ -447,15 +449,14 @@ public class BCLBiomeBuilder {
 		return feature(feature.getDecoration(), feature.getPlacedFeature());
 	}
 	
+	private List<ConfiguredStructureFeature> structures = new ArrayList<>(2);
 	/**
 	 * Adds new structure feature into the biome.
 	 * @param structure {@link ConfiguredStructureFeature} to add.
 	 * @return same {@link BCLBiomeBuilder} instance.
 	 */
 	public BCLBiomeBuilder structure(ConfiguredStructureFeature<?, ?> structure) {
-		BuiltinRegistries.CONFIGURED_STRUCTURE_FEATURE
-			.getResourceKey(structure)
-			.ifPresent(key -> BiomeModifications.addStructure(ctx -> ctx.getBiomeKey().location().equals(biomeID), key));
+		structures.add(structure);
 		return this;
 	}
 	
@@ -514,12 +515,14 @@ public class BCLBiomeBuilder {
 		}
 		
 		final T res = biomeConstructor.apply(biomeID, builder.build());
+		res.attachedStructures = structures;
 		res.setFogDensity(fogDensity);
 		return res;
 	}
 	
 	/**
 	 * Get or create {@link BiomeSpecialEffects.Builder} for biome visual effects.
+	 * For internal usage only.
 	 * For internal usage only.
 	 * @return new or same {@link BiomeSpecialEffects.Builder} instance.
 	 */

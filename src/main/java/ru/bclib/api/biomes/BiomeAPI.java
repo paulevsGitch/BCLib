@@ -1,49 +1,64 @@
 package ru.bclib.api.biomes;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
 import net.fabricmc.fabric.impl.biome.NetherBiomeData;
 import net.fabricmc.fabric.impl.biome.TheEndBiomeData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.Registry;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.data.BuiltinRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.random.WeightedRandomList;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.biome.Biome.BiomeCategory;
 import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.biome.Climate;
+import net.minecraft.world.level.biome.MobSpawnSettings.SpawnerData;
 import net.minecraft.world.level.levelgen.GenerationStep.Decoration;
+import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
+import net.minecraft.world.level.levelgen.feature.StructureFeature;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import org.jetbrains.annotations.Nullable;
+import ru.bclib.BCLib;
 import ru.bclib.config.Configs;
+import ru.bclib.mixin.common.BiomeGenerationSettingsAccessor;
+import ru.bclib.mixin.common.MobSpawnSettingsAccessor;
+import ru.bclib.mixin.common.StructureSettingsAccessor;
 import ru.bclib.util.MHelper;
 import ru.bclib.world.biomes.BCLBiome;
+import ru.bclib.world.biomes.BCLBiomeDef;
 import ru.bclib.world.biomes.FabricBiomesData;
 import ru.bclib.world.features.BCLFeature;
 import ru.bclib.world.generator.BiomePicker;
 import ru.bclib.world.structures.BCLStructureFeature;
 
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.function.BiConsumer;
-import java.util.stream.Collectors;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class BiomeAPI {
 	/**
@@ -273,6 +288,15 @@ public class BiomeAPI {
 	}
 	
 	/**
+	 * Get biome {@link ResourceKey} from given {@link Biome}.
+	 * @param biome - {@link Biome} from server world.
+	 * @return biome {@link ResourceKey} or {@code null}.
+	 */
+	public static ResourceKey getBiomeKey(Biome biome) {
+		return biomeRegistry.getResourceKey(biome).orElse(null);
+	}
+	
+	/**
 	 * Get biome {@link ResourceLocation} from given {@link Biome}.
 	 * @param biome - {@link Biome} from server world.
 	 * @return biome {@link ResourceLocation}.
@@ -430,34 +454,18 @@ public class BiomeAPI {
 	
 	/**
 	 * Adds new features to existing biome.
-	 * @param biomeID {@link ResourceLocation} for the {@link Biome} to add features in.
-	 * @param feature {@link ConfiguredFeature} to add.
-	 *
-	 */
-	public static void addBiomeFeature(ResourceLocation biomeID, BCLFeature feature) {
-		addBiomeFeature(biomeID, feature.getPlacedFeature(), feature.getDecoration());
-	}
-	
-	/**
-	 * Adds new features to existing biome.
 	 * @param biome {@link Biome} to add features in.
 	 * @param feature {@link ConfiguredFeature} to add.
 	 * @param step a {@link Decoration} step for the feature.
 	 */
 	public static void addBiomeFeature(Biome biome, PlacedFeature feature, Decoration step) {
-		addBiomeFeature(getBiomeID(biome), feature, step);
-	}
-	
-	/**
-	 * Adds new features to existing biome.
-	 * @param biomeID {@link ResourceLocation} of the {@link Biome} to add features in.
-	 * @param feature {@link ConfiguredFeature} to add.
-	 * @param step a {@link Decoration} step for the feature.
-	 */
-	private static void addBiomeFeature(ResourceLocation biomeID, PlacedFeature feature, Decoration step) {
-		BuiltinRegistries.PLACED_FEATURE
-			.getResourceKey(feature)
-			.ifPresent(key -> BiomeModifications.addFeature(ctx -> ctx.getBiomeKey().location().equals(biomeID), step, key));
+//		BiomeModificationContextImpl ctx = new BiomeModificationContextImpl(,,biome);
+//		ctx.getGenerationSettings().addFeature(step, feature.);
+		BiomeGenerationSettingsAccessor accessor = (BiomeGenerationSettingsAccessor) biome.getGenerationSettings();
+		List<List<Supplier<PlacedFeature>>> biomeFeatures = getMutableList(accessor.bcl_getFeatures());
+		List<Supplier<PlacedFeature>> list = getList(step, biomeFeatures);
+		list.add(() -> feature);
+		accessor.bcl_setFeatures(biomeFeatures);
 	}
 	
 	/**
@@ -473,50 +481,69 @@ public class BiomeAPI {
 	
 	/**
 	 * Adds new structure feature to existing biome.
-	 * @param biome {@link Biome} to add structure feature in.
+	 * @param biomeKey {@link ResourceKey} for the {@link Biome} to add structure feature in.
 	 * @param structure {@link ConfiguredStructureFeature} to add.
 	 */
+	public static void addBiomeStructure(ResourceKey biomeKey, ConfiguredStructureFeature structure) {
+		//BiomeStructureStartsImpl.addStart(registries, structure, getBiomeID(biome));
+		changeStructureStarts(structureMap -> {
+			Multimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>> configuredMap = structureMap.computeIfAbsent(structure.feature, k -> HashMultimap.create());
+			
+			configuredMap.put(structure, biomeKey);
+		});
+		
+		
+	}
+	
 	public static void addBiomeStructure(Biome biome, ConfiguredStructureFeature structure) {
-		addBiomeStructure(getBiomeID(biome), structure);
+		//BiomeStructureStartsImpl.addStart(registries, structure, getBiomeID(biome));
+		changeStructureStarts(structureMap -> {
+			Multimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>> configuredMap = structureMap.computeIfAbsent(structure.feature, k -> HashMultimap.create());
+			
+			var key = getBiomeKey(biome);
+			if (key!=null) {
+				configuredMap.put(structure, key);
+			} else {
+				BCLib.LOGGER.error("Unable to find Biome " + getBiomeID(biome));
+			}
+		});
+		
+		
 	}
+	
+	
+	private static void changeStructureStarts(Consumer<Map<StructureFeature<?>, Multimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>>>> modifier) {
+		Registry<NoiseGeneratorSettings> chunkGenSettingsRegistry = BuiltinRegistries.NOISE_GENERATOR_SETTINGS;
+		
+		for (Map.Entry<ResourceKey<NoiseGeneratorSettings>, NoiseGeneratorSettings> entry : chunkGenSettingsRegistry.entrySet()) {
+			Map<StructureFeature<?>, Multimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>>> structureMap = getMutableStructureConfig(entry.getValue());
+			
+			modifier.accept(structureMap);
+			setMutableStructureConfig(entry.getValue(), structureMap);
+		}
+		
+		
+	}
+	
 	
 	/**
 	 * Adds new structure feature to existing biome.
-	 * @param biomeID {@link ResourceLocation} of the {@link Biome} to add structure feature in.
-	 * @param structure {@link ConfiguredStructureFeature} to add.
-	 */
-	public static void addBiomeStructure(ResourceLocation biomeID, ConfiguredStructureFeature structure) {
-		BuiltinRegistries.CONFIGURED_STRUCTURE_FEATURE
-			.getResourceKey(structure)
-			.ifPresent(key -> BiomeModifications.addStructure(ctx -> ctx.getBiomeKey().location().equals(biomeID), key));
-	}
-	
-	/**
-	 * Adds new structure feature to existing biome.
-	 * @param biome {@link Biome} to add structure feature in.
+	 * @param biomeKey {@link ResourceKey} for the {@link Biome} to add structure feature in.
 	 * @param structure {@link BCLStructureFeature} to add.
 	 */
-	public static void addBiomeStructure(Biome biome, BCLStructureFeature structure) {
-		addBiomeStructure(biome, structure.getFeatureConfigured());
+	public static void addBiomeStructure(ResourceKey biomeKey, BCLStructureFeature structure) {
+		addBiomeStructure(biomeKey, structure.getFeatureConfigured());
 	}
 	
-	/**
-	 * Adds new structure feature to existing biome.
-	 * @param biomeID {@link ResourceLocation} of the {@link Biome} to add structure feature in.
-	 * @param structure {@link BCLStructureFeature} to add.
-	 */
-	public static void addBiomeStructure(ResourceLocation biomeID, BCLStructureFeature structure) {
-		addBiomeStructure(biomeID, structure.getFeatureConfigured());
-	}
 
 	/**
 	 * Adds new structure features to existing biome.
-	 * @param biome {@link Biome} to add structure features in.
+	 * @param  biomeKey {@link ResourceKey} for the {@link Biome} to add structure features in.
 	 * @param structures array of {@link BCLStructureFeature} to add.
 	 */
-	public static void addBiomeStructures(Biome biome, BCLStructureFeature... structures) {
+	public static void addBiomeStructures(ResourceKey biomeKey, BCLStructureFeature... structures) {
 		for (BCLStructureFeature structure: structures) {
-			addBiomeStructure(biome, structure.getFeatureConfigured());
+			addBiomeStructure(biomeKey, structure.getFeatureConfigured());
 		}
 	}
 	
@@ -529,22 +556,13 @@ public class BiomeAPI {
 	 * @param maxGroupCount maximum mobs in group.
 	 */
 	public static <M extends Mob> void addBiomeMobSpawn(Biome biome, EntityType<M> entityType, int weight, int minGroupCount, int maxGroupCount) {
-		addBiomeMobSpawn(getBiomeID(biome), entityType, weight, minGroupCount, maxGroupCount);
-	}
-	
-	/**
-	 * Adds mob spawning to specified biome.
-	 * @param biomeID {@link ResourceLocation} of the {@link Biome }to add mob spawning.
-	 * @param entityType {@link EntityType} mob type.
-	 * @param weight spawn weight.
-	 * @param minGroupCount minimum mobs in group.
-	 * @param maxGroupCount maximum mobs in group.
-	 */
-	public static <M extends Mob> void addBiomeMobSpawn(ResourceLocation biomeID, EntityType<M> entityType, int weight, int minGroupCount, int maxGroupCount) {
-		BiomeModifications.addSpawn(
-			ctx -> ctx.getBiomeKey().location().equals(biomeID),
-			entityType.getCategory(), entityType, weight, minGroupCount, maxGroupCount
-		);
+		final MobCategory category = entityType.getCategory();
+		MobSpawnSettingsAccessor accessor = (MobSpawnSettingsAccessor) biome.getMobSettings();
+		Map<MobCategory, WeightedRandomList<SpawnerData>> spawners = getMutableMap(accessor.bcl_getSpawners());
+		List<SpawnerData> mobs = spawners.containsKey(category) ? getMutableList(spawners.get(category).unwrap()) : Lists.newArrayList();
+		mobs.add(new SpawnerData(entityType, weight, minGroupCount, maxGroupCount));
+		spawners.put(category, WeightedRandomList.create(mobs));
+		accessor.bcl_setSpawners(spawners);
 	}
 	
 	private static void configureBiome(BCLBiome biome, float chance, float fog) {
@@ -552,5 +570,66 @@ public class BiomeAPI {
 		chance = Configs.BIOMES_CONFIG.getFloat(group, "generation_chance", chance);
 		fog = Configs.BIOMES_CONFIG.getFloat(group, "fog_density", fog);
 		biome.setGenChance(chance).setFogDensity(fog);
+	}
+	
+	/**
+	 * Getter for correct feature list from all biome feature list of lists.
+	 * @param step feature {@link Decoration} step.
+	 * @param lists biome accessor lists.
+	 * @return mutable {@link ConfiguredFeature} list.
+	 */
+	private static List<Supplier<PlacedFeature>> getList(Decoration step, List<List<Supplier<PlacedFeature>>> lists) {
+		int index = step.ordinal();
+		if (lists.size() <= index) {
+			for (int i = lists.size(); i <= index; i++) {
+				lists.add(Lists.newArrayList());
+			}
+		}
+		List<Supplier<PlacedFeature>> list = getMutableList(lists.get(index));
+		lists.set(index, list);
+		return list;
+	}
+	
+	private static <T extends Object> List<T> getMutableList(List<T> input) {
+		if (input!=null) {
+			System.out.println("getMutableList: " + input.getClass().getName());
+			for (Class cl : input.getClass().getInterfaces()){
+				System.out.println("   - " + cl.getName());
+			}
+		}
+		if (/*input instanceof ImmutableList ||*/ !(input instanceof ArrayList || input instanceof LinkedList)) {
+			return Lists.newArrayList(input);
+		}
+		return input;
+	}
+	
+	private static <K extends Object, V extends Object> Map<K, V> getMutableMap(Map<K, V> input) {
+		if (/*input instanceof ImmutableMap*/ !(input instanceof HashMap ||input instanceof EnumMap)) {
+			return Maps.newHashMap(input);
+		}
+		return input;
+	}
+	
+	//inspired by net.fabricmc.fabric.impl.biome.modification.BiomeStructureStartsImpl
+	private static Map<StructureFeature<?>, Multimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>>> getMutableStructureConfig(NoiseGeneratorSettings settings) {
+		final StructureSettingsAccessor access = (StructureSettingsAccessor)settings.structureSettings();
+		ImmutableMap<StructureFeature<?>, ImmutableMultimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>>> immutableMap = access.bcl_getStructureConfig();
+		Map<StructureFeature<?>, Multimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>>> result = new HashMap<>(immutableMap.size());
+		
+		for (Map.Entry<StructureFeature<?>, ImmutableMultimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>>> entry : immutableMap.entrySet()) {
+			result.put(entry.getKey(), HashMultimap.create(entry.getValue()));
+		}
+		
+		return result;
+	}
+	
+	//inspired by net.fabricmc.fabric.impl.biome.modification.BiomeStructureStartsImpl
+	private static void setMutableStructureConfig(NoiseGeneratorSettings settings, Map<StructureFeature<?>, Multimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>>> structureStarts) {
+		final StructureSettingsAccessor access = (StructureSettingsAccessor)settings.structureSettings();
+		access.bcl_setStructureConfig(structureStarts.entrySet().stream()
+													 .collect(ImmutableMap.toImmutableMap(
+														 Map.Entry::getKey,
+														 e -> ImmutableMultimap.copyOf(e.getValue())
+													 )));
 	}
 }

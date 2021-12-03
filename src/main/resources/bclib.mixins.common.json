@@ -33,7 +33,10 @@
 		"AnvilBlockMixin",
 		"AnvilMenuMixin",
 		"TagLoaderMixin",
-		"MainMixin"
+		"MainMixin",
+		"BiomeGenerationSettingsAccessor",
+		"MobSpawnSettingsAccessor",
+		"StructureSettingsAccessor"
 	],
 	"injectors": {
 		"defaultRequire": 1
