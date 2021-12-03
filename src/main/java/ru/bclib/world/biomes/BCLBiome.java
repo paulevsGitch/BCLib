@@ -1,5 +1,6 @@
 package ru.bclib.world.biomes;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import net.minecraft.core.Registry;
 import net.minecraft.data.BuiltinRegistries;
@@ -17,11 +18,13 @@ import java.util.Map;
 import java.util.Random;
 
 public class BCLBiome {
+	private final List<ConfiguredStructureFeature> structures = Lists.newArrayList();
 	private final WeightedList<BCLBiome> subbiomes = new WeightedList<>();
 	private final Map<String, Object> customData = Maps.newHashMap();
 	private final ResourceLocation biomeID;
 	private final Biome biome;
 	
+	private SurfaceRules.RuleSource surface;
 	private BCLBiome biomeParent;
 	private Biome actualBiome;
 	private BCLBiome edge;
@@ -208,20 +211,6 @@ public class BCLBiome {
 	}
 	
 	/**
-	 * For internal use only!!!
-	 * maintains a list of all structures added to this biome, this is automatically set by
-	 * {@link ru.bclib.api.biomes.BCLBiomeBuilder}
-	 */
-	public List<ConfiguredStructureFeature> attachedStructures = null;
-	
-	/**
-	 * For internal use only!!!
-	 * maintains a list of all structures added to this biome, this is automatically set by
-	 * {@link ru.bclib.api.biomes.BCLBiomeBuilder}
-	 */
-	public  List<SurfaceRules.RuleSource> surfaceRules = null;
-	
-	/**
 	 * Recursively update biomes to correct world biome registry instances, for internal usage only.
 	 * @param biomeRegistry {@link Registry} for {@link Biome}.
 	 */
@@ -235,11 +224,10 @@ public class BCLBiome {
 			edge.updateActualBiomes(biomeRegistry);
 		}
 		this.actualBiome = biomeRegistry.get(biomeID);
-		if (this.attachedStructures!=null)
-			attachedStructures.forEach(s -> BiomeAPI.addBiomeStructure(BiomeAPI.getBiomeKey(actualBiome), s));
 		
-		if (this.surfaceRules!=null)
-			surfaceRules.forEach(s -> BiomeAPI.addSurfaceRule(biomeID, s));
+		if (!this.structures.isEmpty()) {
+			structures.forEach(s -> BiomeAPI.addBiomeStructure(BiomeAPI.getBiomeKey(actualBiome), s));
+		}
 	}
 	
 	/**
@@ -310,5 +298,23 @@ public class BCLBiome {
 	@Override
 	public String toString() {
 		return biomeID.toString();
+	}
+	
+	/**
+	 * Adds structures to this biome. For internal use only.
+	 * Used inside {@link ru.bclib.api.biomes.BCLBiomeBuilder}.
+	 */
+	public void attachStructures(List<ConfiguredStructureFeature> structures) {
+		this.structures.addAll(structures);
+	}
+	
+	/**
+	 * Sets biome surface rule.
+	 * @param surface {@link SurfaceRules.RuleSource} rule.
+	 */
+	public void setSurface(SurfaceRules.RuleSource surface) {
+		ResourceKey key = BiomeAPI.getBiomeKey(biome);
+		BiomeAPI.addSurfaceRule(biomeID, SurfaceRules.ifTrue(SurfaceRules.isBiome(key), surface));
+		this.surface = surface;
 	}
 }

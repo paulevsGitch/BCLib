@@ -4,7 +4,6 @@ import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.data.BuiltinRegistries;
 import net.minecraft.data.worldgen.BiomeDefaultFeatures;
-import net.minecraft.data.worldgen.SurfaceRuleData;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.Music;
 import net.minecraft.sounds.SoundEvent;
@@ -42,9 +41,11 @@ import java.util.function.Consumer;
 public class BCLBiomeBuilder {
 	private static final BCLBiomeBuilder INSTANCE = new BCLBiomeBuilder();
 	
+	private List<ConfiguredStructureFeature> structures = new ArrayList<>(16);
 	private BiomeGenerationSettings.Builder generationSettings;
 	private BiomeSpecialEffects.Builder effectsBuilder;
 	private MobSpawnSettings.Builder spawnSettings;
+	private SurfaceRules.RuleSource surfaceRule;
 	private Precipitation precipitation;
 	private ResourceLocation biomeID;
 	private BiomeCategory category;
@@ -64,6 +65,7 @@ public class BCLBiomeBuilder {
 		INSTANCE.generationSettings = null;
 		INSTANCE.effectsBuilder = null;
 		INSTANCE.spawnSettings = null;
+		INSTANCE.structures.clear();
 		INSTANCE.temperature = 1.0F;
 		INSTANCE.fogDensity = 1.0F;
 		INSTANCE.downfall = 1.0F;
@@ -451,7 +453,6 @@ public class BCLBiomeBuilder {
 		return feature(feature.getDecoration(), feature.getPlacedFeature());
 	}
 	
-	private List<ConfiguredStructureFeature> structures = new ArrayList<>(2);
 	/**
 	 * Adds new structure feature into the biome.
 	 * @param structure {@link ConfiguredStructureFeature} to add.
@@ -484,14 +485,22 @@ public class BCLBiomeBuilder {
 		return this;
 	}
 	
-	private List<SurfaceRules.RuleSource> surfaceRules = new ArrayList<>(2);
 	/**
 	 * Adds new world surface rule for the given block
 	 * @param surfaceBlock {@link Block} to use.
 	 * @return same {@link BCLBiomeBuilder} instance.
 	 */
 	public BCLBiomeBuilder surface(Block surfaceBlock) {
-		surfaceRules.add(SurfaceRules.ifTrue(SurfaceRules.ON_FLOOR, SurfaceRules.state(surfaceBlock.defaultBlockState())));
+		return surface(SurfaceRules.ifTrue(SurfaceRules.ON_FLOOR, SurfaceRules.state(surfaceBlock.defaultBlockState())));
+	}
+	
+	/**
+	 * Adds surface rule to this biome.
+	 * @param surfaceRule {link SurfaceRules.RuleSource} surface rule.
+	 * @return same {@link BCLBiomeBuilder} instance.
+	 */
+	public BCLBiomeBuilder surface(SurfaceRules.RuleSource surfaceRule) {
+		this.surfaceRule = surfaceRule;
 		return this;
 	}
 	
@@ -528,8 +537,8 @@ public class BCLBiomeBuilder {
 		}
 		
 		final T res = biomeConstructor.apply(biomeID, builder.build());
-		res.attachedStructures = structures;
-		res.surfaceRules = surfaceRules;
+		res.attachStructures(structures);
+		res.setSurface(surfaceRule);
 		res.setFogDensity(fogDensity);
 		return res;
 	}
