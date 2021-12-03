@@ -10,6 +10,7 @@ import net.fabricmc.fabric.impl.biome.NetherBiomeData;
 import net.fabricmc.fabric.impl.biome.TheEndBiomeData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.data.BuiltinRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -40,6 +41,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
 
 public class BiomeAPI {
 	/**
@@ -78,7 +80,16 @@ public class BiomeAPI {
 	 * @param server - {@link MinecraftServer}
 	 */
 	public static void initRegistry(MinecraftServer server) {
-		biomeRegistry = server.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY);
+		initRegistry(server.registryAccess());
+	}
+	
+	/**
+	 * Initialize registry for current server.
+	 *
+	 * @param access - {@link RegistryAccess}
+	 */
+	public static void initRegistry(RegistryAccess access) {
+		biomeRegistry = access.registryOrThrow(Registry.BIOME_REGISTRY);
 		CLIENT.clear();
 	}
 	
@@ -388,13 +399,30 @@ public class BiomeAPI {
 	 * @param level
 	 */
 	public static void applyModifications(ServerLevel level) {
-		List<BiConsumer<ResourceLocation, Biome>> modifications = MODIFICATIONS.get(level.dimension());
-		if (modifications == null) {
-			return;
-		}
 		BiomeSource source = level.getChunkSource().getGenerator().getBiomeSource();
 		Set<Biome> biomes = source.possibleBiomes();
 		
+		applyModifications(biomes, level.dimension());
+	}
+	
+	/**
+	 * Will apply biome modifications to world, internal usage only.
+	 * @param registryAccess
+	 */
+	public static void applyModifications(RegistryAccess registryAccess) {
+		Registry<Biome> biomeReg = registryAccess.registryOrThrow(Registry.BIOME_REGISTRY);
+		Set<Biome> biomes = biomeReg.entrySet().stream().map(e -> e.getValue()).collect(Collectors.toSet());
+		
+		applyModifications(biomes, Level.NETHER);
+		applyModifications(biomes, Level.OVERWORLD);
+		applyModifications(biomes, Level.END);
+	}
+	
+	private static void applyModifications(Set<Biome> biomes, ResourceKey<Level> dimension) {
+		List<BiConsumer<ResourceLocation, Biome>> modifications = MODIFICATIONS.get(dimension);
+		if (modifications == null) {
+			return;
+		}
 		biomes.forEach(biome -> {
 			ResourceLocation biomeID =  getBiomeID(biome);
 			boolean modify = isDatapackBiome(biomeID);

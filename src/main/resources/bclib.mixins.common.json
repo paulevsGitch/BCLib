@@ -13,8 +13,6 @@
 		"shears.MushroomCowMixin",
 		"ComposterBlockAccessor",
 		"PotionBrewingAccessor",
-		"PotionBrewingAccessor",
-		"RecipeManagerAccessor",
 		"RecipeManagerAccessor",
 		"shears.SnowGolemMixin",
 		"EnchantmentMenuMixin",
@@ -24,21 +22,19 @@
 		"TheEndBiomeDataMixin",
 		"ChunkGeneratorMixin",
 		"WorldGenRegionMixin",
-		"WorldGenRegionMixin",
 		"DimensionTypeMixin",
 		"RecipeManagerMixin",
 		"RecipeManagerMixin",
 		"BoneMealItemMixin",
 		"CraftingMenuMixin",
-		"CraftingMenuMixin",
-		"shears.SheepMixin",
 		"shears.SheepMixin",
 		"PortalShapeMixin",
 		"ServerLevelMixin",
 		"AnvilBlockMixin",
 		"AnvilMenuMixin",
 		"TagLoaderMixin",
-		"MainMixin"
+		"MainMixin",
+		"RegistryReadOpsMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
