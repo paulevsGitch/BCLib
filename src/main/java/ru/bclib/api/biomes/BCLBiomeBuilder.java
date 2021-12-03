@@ -22,7 +22,9 @@ import net.minecraft.world.level.biome.BiomeGenerationSettings;
 import net.minecraft.world.level.biome.BiomeSpecialEffects;
 import net.minecraft.world.level.biome.MobSpawnSettings;
 import net.minecraft.world.level.biome.MobSpawnSettings.SpawnerData;
+import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.GenerationStep.Decoration;
+import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
 import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import ru.bclib.util.ColorUtil;
@@ -446,7 +448,7 @@ public class BCLBiomeBuilder {
 	}
 	
 	/**
-	 * Adds new structure feature into thr biome.
+	 * Adds new structure feature into the biome.
 	 * @param structure {@link ConfiguredStructureFeature} to add.
 	 * @return same {@link BCLBiomeBuilder} instance.
 	 */
@@ -465,6 +467,18 @@ public class BCLBiomeBuilder {
 	public BCLBiomeBuilder structure(BCLStructureFeature structure) {
 		structure.addInternalBiome(biomeID);
 		return structure(structure.getFeatureConfigured());
+	}
+	
+	/**
+	 * Adds new world carver into the biome.
+	 * @param carver {@link ConfiguredWorldCarver} to add.
+	 * @return same {@link BCLBiomeBuilder} instance.
+	 */
+	public BCLBiomeBuilder carver(GenerationStep.Carving step, ConfiguredWorldCarver<?> carver) {
+		BuiltinRegistries.CONFIGURED_CARVER
+			.getResourceKey(carver)
+			.ifPresent(key -> BiomeModifications.addCarver(ctx -> ctx.getBiomeKey().location().equals(biomeID), step, key));
+		return this;
 	}
 	
 	/**
