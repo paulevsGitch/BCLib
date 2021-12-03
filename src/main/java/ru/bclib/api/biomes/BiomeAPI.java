@@ -14,6 +14,7 @@ import net.fabricmc.fabric.impl.biome.TheEndBiomeData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.Registry;
 import net.minecraft.data.BuiltinRegistries;
+import net.minecraft.data.worldgen.SurfaceRuleData;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -27,9 +28,11 @@ import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.biome.Climate;
 import net.minecraft.world.level.biome.MobSpawnSettings.SpawnerData;
+import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.levelgen.GenerationStep.Carving;
 import net.minecraft.world.level.levelgen.GenerationStep.Decoration;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
+import net.minecraft.world.level.levelgen.SurfaceRules;
 import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
@@ -58,6 +61,7 @@ import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 public class BiomeAPI {
 	/**
@@ -75,6 +79,7 @@ public class BiomeAPI {
 	private static Registry<Biome> biomeRegistry;
 	
 	private static final Map<ResourceKey, List<BiConsumer<ResourceLocation, Biome>>> MODIFICATIONS = Maps.newHashMap();
+	private static final Map<ResourceLocation, SurfaceRules.RuleSource> SURFACE_RULES = Maps.newHashMap();
 	private static final Set<ResourceLocation> MODIFIED_BIOMES = Sets.newHashSet();
 	
 	public static final BCLBiome NETHER_WASTES_BIOME = registerNetherBiome(getFromRegistry(Biomes.NETHER_WASTES));
@@ -89,6 +94,9 @@ public class BiomeAPI {
 	
 	public static final BCLBiome END_BARRENS = registerEndVoidBiome(getFromRegistry(new ResourceLocation("end_barrens")));
 	public static final BCLBiome SMALL_END_ISLANDS = registerEndVoidBiome(getFromRegistry(new ResourceLocation("small_end_islands")));
+	
+	private static SurfaceRules.RuleSource netherRuleSource;
+	private static SurfaceRules.RuleSource endRuleSource;
 	
 	/**
 	 * Initialize registry for current server.
@@ -410,17 +418,54 @@ public class BiomeAPI {
 	}
 	
 	/**
+	 * Returns surface rule source for the Nether.
+	 * @return {@link SurfaceRules.RuleSource}.
+	 */
+	public static SurfaceRules.RuleSource getNetherRuleSource() {
+		return netherRuleSource;
+	}
+	
+	/**
+	 * Returns surface rule source for the End.
+	 * @return {@link SurfaceRules.RuleSource}.
+	 */
+	public static SurfaceRules.RuleSource getEndRuleSource() {
+		return endRuleSource;
+	}
+	
+	/**
 	 * Will apply biome modifications to world, internal usage only.
 	 * @param level
 	 */
 	public static void applyModifications(ServerLevel level) {
+		BiomeSource source = level.getChunkSource().getGenerator().getBiomeSource();
+		Set<Biome> biomes = source.possibleBiomes();
+		
+		if (level.dimension() == Level.NETHER) {
+			Set<ResourceLocation> biomeIDs = biomes.stream().map(biome -> getBiomeID(biome)).collect(Collectors.toSet());
+			List<SurfaceRules.RuleSource> rules = Lists.newArrayList();
+			SURFACE_RULES.forEach((biomeID, rule) -> {
+				if (biomeIDs.contains(biomeID)) {
+					rules.add(rule);
+				}
+			});
+			netherRuleSource = SurfaceRules.sequence(rules.toArray(new SurfaceRules.RuleSource[rules.size()]));
+		}
+		else if (level.dimension() == Level.END) {
+			Set<ResourceLocation> biomeIDs = biomes.stream().map(biome -> getBiomeID(biome)).collect(Collectors.toSet());
+			List<SurfaceRules.RuleSource> rules = Lists.newArrayList();
+			SURFACE_RULES.forEach((biomeID, rule) -> {
+				if (biomeIDs.contains(biomeID)) {
+					rules.add(rule);
+				}
+			});
+			endRuleSource = SurfaceRules.sequence(rules.toArray(new SurfaceRules.RuleSource[rules.size()]));
+		}
+		
 		List<BiConsumer<ResourceLocation, Biome>> modifications = MODIFICATIONS.get(level.dimension());
 		if (modifications == null) {
 			return;
 		}
-		
-		BiomeSource source = level.getChunkSource().getGenerator().getBiomeSource();
-		Set<Biome> biomes = source.possibleBiomes();
 		
 		biomes.forEach(biome -> {
 			ResourceLocation biomeID = getBiomeID(biome);
@@ -564,6 +609,25 @@ public class BiomeAPI {
 		carvers.put(stage, carverList);
 		carverList.add(() -> carver);
 		accessor.bclib_setCarvers(carvers);
+	}
+	
+	/**
+	 * Adds surface rule to specified biome.
+	 * @param biomeID biome {@link ResourceLocation}.
+	 * @param source {@link SurfaceRules.RuleSource}.
+	 */
+	public static void addSurfaceRule(ResourceLocation biomeID, SurfaceRules.RuleSource source) {
+		SURFACE_RULES.put(biomeID, source);
+	}
+	
+	/**
+	 * Get surface rule for the biome using its {@link ResourceLocation} ID as a key.
+	 * @param biomeID {@link ResourceLocation} biome ID.
+	 * @return {@link SurfaceRules.RuleSource}.
+	 */
+	@Nullable
+	public static SurfaceRules.RuleSource getSurfaceRule(ResourceLocation biomeID) {
+		return SURFACE_RULES.get(biomeID);
 	}
 	
 	/**
