@@ -13,15 +13,19 @@ import ru.bclib.api.biomes.BiomeAPI;
 public class SurfaceRuleDataMixin {
 	@Inject(method = "nether", at = @At("RETURN"), cancellable = true)
 	private static void bclib_addNetherRuleSource(CallbackInfoReturnable<SurfaceRules.RuleSource> info) {
-		RuleSource source = info.getReturnValue();
-		source = SurfaceRules.sequence(source, BiomeAPI.getNetherRuleSource());
-		info.setReturnValue(source);
+		if (BiomeAPI.getNetherRuleSource() != null) {
+			RuleSource source = info.getReturnValue();
+			source = SurfaceRules.sequence(source, BiomeAPI.getNetherRuleSource());
+			info.setReturnValue(source);
+		}
 	}
 	
 	@Inject(method = "end", at = @At("RETURN"), cancellable = true)
 	private static void bclib_addEndRuleSource(CallbackInfoReturnable<SurfaceRules.RuleSource> info) {
-		RuleSource source = info.getReturnValue();
-		source = SurfaceRules.sequence(source, BiomeAPI.getEndRuleSource());
-		info.setReturnValue(source);
+		if (BiomeAPI.getEndRuleSource() != null) {
+			RuleSource source = info.getReturnValue();
+			source = SurfaceRules.sequence(source, BiomeAPI.getEndRuleSource());
+			info.setReturnValue(source);
+		}
 	}
 }

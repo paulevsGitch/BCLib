@@ -33,6 +33,7 @@ import net.minecraft.world.level.levelgen.GenerationStep.Carving;
 import net.minecraft.world.level.levelgen.GenerationStep.Decoration;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
 import net.minecraft.world.level.levelgen.SurfaceRules;
+import net.minecraft.world.level.levelgen.SurfaceRules.RuleSource;
 import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
@@ -442,24 +443,14 @@ public class BiomeAPI {
 		Set<Biome> biomes = source.possibleBiomes();
 		
 		if (level.dimension() == Level.NETHER) {
-			Set<ResourceLocation> biomeIDs = biomes.stream().map(biome -> getBiomeID(biome)).collect(Collectors.toSet());
-			List<SurfaceRules.RuleSource> rules = Lists.newArrayList();
-			SURFACE_RULES.forEach((biomeID, rule) -> {
-				if (biomeIDs.contains(biomeID)) {
-					rules.add(rule);
-				}
-			});
-			netherRuleSource = SurfaceRules.sequence(rules.toArray(new SurfaceRules.RuleSource[rules.size()]));
+			RuleSource[] rules = getRuleSources(biomes);
+			netherRuleSource = rules.length > 0 ? SurfaceRules.sequence(rules) : null;
+			System.out.println("Adding nether sources! " + rules.length);
 		}
 		else if (level.dimension() == Level.END) {
-			Set<ResourceLocation> biomeIDs = biomes.stream().map(biome -> getBiomeID(biome)).collect(Collectors.toSet());
-			List<SurfaceRules.RuleSource> rules = Lists.newArrayList();
-			SURFACE_RULES.forEach((biomeID, rule) -> {
-				if (biomeIDs.contains(biomeID)) {
-					rules.add(rule);
-				}
-			});
-			endRuleSource = SurfaceRules.sequence(rules.toArray(new SurfaceRules.RuleSource[rules.size()]));
+			RuleSource[] rules = getRuleSources(biomes);
+			endRuleSource = rules.length > 0 ? SurfaceRules.sequence(rules) : null;
+			System.out.println("Adding end sources! " + rules.length);
 		}
 		
 		List<BiConsumer<ResourceLocation, Biome>> modifications = MODIFICATIONS.get(level.dimension());
@@ -483,6 +474,17 @@ public class BiomeAPI {
 				});
 			}
 		});
+	}
+	
+	private static SurfaceRules.RuleSource[] getRuleSources(Set<Biome> biomes) {
+		Set<ResourceLocation> biomeIDs = biomes.stream().map(biome -> getBiomeID(biome)).collect(Collectors.toSet());
+		List<SurfaceRules.RuleSource> rules = Lists.newArrayList();
+		SURFACE_RULES.forEach((biomeID, rule) -> {
+			if (biomeIDs.contains(biomeID)) {
+				rules.add(rule);
+			}
+		});
+		return rules.toArray(new SurfaceRules.RuleSource[rules.size()]);
 	}
 	
 	/**
