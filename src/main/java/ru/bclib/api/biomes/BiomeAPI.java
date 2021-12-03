@@ -476,9 +476,16 @@ public class BiomeAPI {
 	 * @param features array of {@link BCLFeature} to add.
 	 */
 	public static void addBiomeFeatures(Biome biome, BCLFeature... features) {
+		BiomeGenerationSettingsAccessor accessor = (BiomeGenerationSettingsAccessor) biome.getGenerationSettings();
+		List<List<Supplier<PlacedFeature>>> allFeatures = CollectionsUtil.getMutable(accessor.bclib_getFeatures());
+		Set<PlacedFeature> set = CollectionsUtil.getMutable(accessor.bclib_getFeatureSet());
 		for (BCLFeature feature: features) {
-			addBiomeFeature(biome, feature.getPlacedFeature(), feature.getDecoration());
+			List<Supplier<PlacedFeature>> featureList = getFeaturesList(allFeatures, feature.getDecoration());
+			featureList.add(() -> feature.getPlacedFeature());
+			set.add(feature.getPlacedFeature());
 		}
+		accessor.bclib_setFeatures(allFeatures);
+		accessor.bclib_setFeatureSet(set);
 	}
 	
 	/**
