@@ -16,7 +16,6 @@ import net.minecraft.core.Registry;
 import net.minecraft.data.BuiltinRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.random.WeightedRandomList;
 import net.minecraft.world.entity.EntityType;
@@ -28,8 +27,10 @@ import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.biome.Climate;
 import net.minecraft.world.level.biome.MobSpawnSettings.SpawnerData;
+import net.minecraft.world.level.levelgen.GenerationStep.Carving;
 import net.minecraft.world.level.levelgen.GenerationStep.Decoration;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
+import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
 import net.minecraft.world.level.levelgen.feature.StructureFeature;
@@ -49,9 +50,7 @@ import ru.bclib.world.generator.BiomePicker;
 import ru.bclib.world.structures.BCLStructureFeature;
 
 import java.util.ArrayList;
-import java.util.EnumMap;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -93,10 +92,9 @@ public class BiomeAPI {
 	
 	/**
 	 * Initialize registry for current server.
-	 *
-	 * @param server - {@link MinecraftServer}
+	 * @param biomeRegistry - {@link Registry} for {@link Biome}.
 	 */
-	public static void initRegistry( Registry<Biome> biomeRegistry) {
+	public static void initRegistry(Registry<Biome> biomeRegistry) {
 		BiomeAPI.biomeRegistry = biomeRegistry;
 		CLIENT.clear();
 	}
@@ -503,21 +501,16 @@ public class BiomeAPI {
 	 * @param structure {@link ConfiguredStructureFeature} to add.
 	 */
 	public static void addBiomeStructure(ResourceKey biomeKey, ConfiguredStructureFeature structure) {
-		//BiomeStructureStartsImpl.addStart(registries, structure, getBiomeID(biome));
 		changeStructureStarts(structureMap -> {
 			Multimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>> configuredMap = structureMap.computeIfAbsent(structure.feature, k -> HashMultimap.create());
 			
 			configuredMap.put(structure, biomeKey);
 		});
-		
-		
 	}
 	
 	public static void addBiomeStructure(Biome biome, ConfiguredStructureFeature structure) {
-		//BiomeStructureStartsImpl.addStart(registries, structure, getBiomeID(biome));
 		changeStructureStarts(structureMap -> {
 			Multimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>> configuredMap = structureMap.computeIfAbsent(structure.feature, k -> HashMultimap.create());
-			
 			var key = getBiomeKey(biome);
 			if (key!=null) {
 				configuredMap.put(structure, key);
@@ -525,10 +518,7 @@ public class BiomeAPI {
 				BCLib.LOGGER.error("Unable to find Biome " + getBiomeID(biome));
 			}
 		});
-		
-		
 	}
-	
 	
 	private static void changeStructureStarts(Consumer<Map<StructureFeature<?>, Multimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>>>> modifier) {
 		Registry<NoiseGeneratorSettings> chunkGenSettingsRegistry = BuiltinRegistries.NOISE_GENERATOR_SETTINGS;
@@ -539,10 +529,7 @@ public class BiomeAPI {
 			modifier.accept(structureMap);
 			setMutableStructureConfig(entry.getValue(), structureMap);
 		}
-		
-		
 	}
-	
 	
 	/**
 	 * Adds new structure feature to existing biome.
@@ -552,7 +539,6 @@ public class BiomeAPI {
 	public static void addBiomeStructure(ResourceKey biomeKey, BCLStructureFeature structure) {
 		addBiomeStructure(biomeKey, structure.getFeatureConfigured());
 	}
-	
 
 	/**
 	 * Adds new structure features to existing biome.
@@ -566,6 +552,21 @@ public class BiomeAPI {
 	}
 	
 	/**
+	 * Adds new carver into existing biome.
+	 * @param biome {@link Biome} to add carver in.
+	 * @param carver {@link ConfiguredWorldCarver} to add.
+	 * @param stage {@link Carving} stage.
+	 */
+	public static void addBiomeCarver(Biome biome, ConfiguredWorldCarver carver, Carving stage) {
+		BiomeGenerationSettingsAccessor accessor = (BiomeGenerationSettingsAccessor) biome.getGenerationSettings();
+		Map<Carving, List<Supplier<ConfiguredWorldCarver<?>>>> carvers = CollectionsUtil.getMutable(accessor.bclib_getCarvers());
+		List<Supplier<ConfiguredWorldCarver<?>>> carverList = CollectionsUtil.getMutable(carvers.getOrDefault(stage, new ArrayList<>()));
+		carvers.put(stage, carverList);
+		carverList.add(() -> carver);
+		accessor.bclib_setCarvers(carvers);
+	}
+	
+	/**
 	 * Adds mob spawning to specified biome.
 	 * @param biome {@link Biome} to add mob spawning.
 	 * @param entityType {@link EntityType} mob type.
@@ -576,8 +577,8 @@ public class BiomeAPI {
 	public static <M extends Mob> void addBiomeMobSpawn(Biome biome, EntityType<M> entityType, int weight, int minGroupCount, int maxGroupCount) {
 		final MobCategory category = entityType.getCategory();
 		MobSpawnSettingsAccessor accessor = (MobSpawnSettingsAccessor) biome.getMobSettings();
-		Map<MobCategory, WeightedRandomList<SpawnerData>> spawners = getMutableMap(accessor.bcl_getSpawners());
-		List<SpawnerData> mobs = spawners.containsKey(category) ? getMutableList(spawners.get(category).unwrap()) : Lists.newArrayList();
+		Map<MobCategory, WeightedRandomList<SpawnerData>> spawners = CollectionsUtil.getMutable(accessor.bcl_getSpawners());
+		List<SpawnerData> mobs = spawners.containsKey(category) ? CollectionsUtil.getMutable(spawners.get(category).unwrap()) : Lists.newArrayList();
 		mobs.add(new SpawnerData(entityType, weight, minGroupCount, maxGroupCount));
 		spawners.put(category, WeightedRandomList.create(mobs));
 		accessor.bcl_setSpawners(spawners);
@@ -603,22 +604,9 @@ public class BiomeAPI {
 				lists.add(Lists.newArrayList());
 			}
 		}
-		List<Supplier<PlacedFeature>> list = getMutableList(lists.get(index));
+		List<Supplier<PlacedFeature>> list = CollectionsUtil.getMutable(lists.get(index));
 		lists.set(index, list);
 		return list;
-	}
-	
-	private static <T extends Object> List<T> getMutableList(List<T> input) {
-		if (input!=null) {
-			System.out.println("getMutableList: " + input.getClass().getName());
-			for (Class cl : input.getClass().getInterfaces()){
-				System.out.println("   - " + cl.getName());
-			}
-		}
-		if (/*input instanceof ImmutableList ||*/ !(input instanceof ArrayList || input instanceof LinkedList)) {
-			return Lists.newArrayList(input);
-		}
-		return input;
 	}
 	
 	private static List<Supplier<PlacedFeature>> getFeaturesList(List<List<Supplier<PlacedFeature>>> features, Decoration step) {
@@ -629,13 +617,6 @@ public class BiomeAPI {
 		List<Supplier<PlacedFeature>> mutable = CollectionsUtil.getMutable(features.get(index));
 		features.set(index, mutable);
 		return mutable;
-	}
-	
-	private static <K extends Object, V extends Object> Map<K, V> getMutableMap(Map<K, V> input) {
-		if (/*input instanceof ImmutableMap*/ !(input instanceof HashMap ||input instanceof EnumMap)) {
-			return Maps.newHashMap(input);
-		}
-		return input;
 	}
 	
 	//inspired by net.fabricmc.fabric.impl.biome.modification.BiomeStructureStartsImpl
@@ -653,11 +634,12 @@ public class BiomeAPI {
 	
 	//inspired by net.fabricmc.fabric.impl.biome.modification.BiomeStructureStartsImpl
 	private static void setMutableStructureConfig(NoiseGeneratorSettings settings, Map<StructureFeature<?>, Multimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>>> structureStarts) {
-		final StructureSettingsAccessor access = (StructureSettingsAccessor)settings.structureSettings();
-		access.bcl_setStructureConfig(structureStarts.entrySet().stream()
-													 .collect(ImmutableMap.toImmutableMap(
-														 Map.Entry::getKey,
-														 e -> ImmutableMultimap.copyOf(e.getValue())
-													 )));
+		final StructureSettingsAccessor access = (StructureSettingsAccessor) settings.structureSettings();
+		access.bcl_setStructureConfig(
+			structureStarts
+				.entrySet()
+				.stream()
+				.collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, e -> ImmutableMultimap.copyOf(e.getValue())))
+		);
 	}
 }

@@ -1,7 +1,6 @@
 package ru.bclib.api.biomes;
 
 import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
-import net.minecraft.core.Registry;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.data.BuiltinRegistries;
 import net.minecraft.data.worldgen.BiomeDefaultFeatures;
