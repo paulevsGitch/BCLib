@@ -116,8 +116,8 @@ public class SurfaceRuleBuilder {
 	
 	/**
 	 * Allows to add custom rule.
-	 * @param rule
-	 * @return
+	 * @param rule custom {@link SurfaceRules.RuleSource}.
+	 * @return same {@link SurfaceRuleBuilder} instance.
 	 */
 	public SurfaceRuleBuilder rule(SurfaceRules.RuleSource rule) {
 		return rule(7, rule);

@@ -5,9 +5,13 @@
 	"compatibilityLevel": "JAVA_17",
 	"mixins": [
 		"SimpleReloadableResourceManagerMixin",
+		"BiomeGenerationSettingsAccessor",
 		"shears.DiggingEnchantmentMixin",
 		"LayerLightSectionStorageMixin",
+		"NoiseGeneratorSettingsMixin",
 		"shears.TripWireBlockMixin",
+		"StructureSettingsAccessor",
+		"MobSpawnSettingsAccessor",
 		"shears.BeehiveBlockMixin",
 		"shears.PumpkinBlockMixin",
 		"shears.MushroomCowMixin",
@@ -34,11 +38,7 @@
 		"AnvilBlockMixin",
 		"AnvilMenuMixin",
 		"TagLoaderMixin",
-		"MainMixin",
-		"BiomeGenerationSettingsAccessor",
-		"MobSpawnSettingsAccessor",
-		"StructureSettingsAccessor",
-		"NoiseGeneratorSettingsMixin"
+		"MainMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
