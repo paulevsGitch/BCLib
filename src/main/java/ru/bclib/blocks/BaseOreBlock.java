@@ -1,6 +1,8 @@
 package ru.bclib.blocks;
 
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
+import net.fabricmc.fabric.api.tool.attribute.v1.FabricToolTags;
+import net.fabricmc.fabric.impl.object.builder.FabricBlockInternals;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
@@ -17,6 +19,7 @@ import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
+import ru.bclib.api.TagAPI;
 import ru.bclib.interfaces.BlockModelProvider;
 import ru.bclib.util.MHelper;
 
@@ -29,16 +32,30 @@ public class BaseOreBlock extends OreBlock implements BlockModelProvider {
 	private final int maxCount;
 	
 	public BaseOreBlock(Item drop, int minCount, int maxCount, int experience) {
-		this(drop, minCount, maxCount, experience, FabricBlockSettings.of(Material.STONE, MaterialColor.SAND)
-								 .destroyTime(3F)
-								 .explosionResistance(9F)
-								 .requiresCorrectToolForDrops()
-								 .sound(SoundType.STONE));
+		this(drop, minCount, maxCount, experience, 0);
 		
 	}
 	
-	public BaseOreBlock(Item drop, int minCount, int maxCount, int experience, Properties properties) {
-		super(properties, UniformInt.of(experience>0?1:0, experience));
+	public BaseOreBlock(Item drop, int minCount, int maxCount, int experience, int miningLevel) {
+		this(drop, minCount, maxCount, experience, miningLevel, FabricBlockSettings.of(Material.STONE, MaterialColor.SAND)
+																	  .requiresTool()
+																	  .destroyTime(3F)
+																	  .explosionResistance(9F)
+																	  .sound(SoundType.STONE));
+		
+	}
+	
+	private static Properties makeProps(Properties properties, int level){
+		FabricBlockInternals.computeExtraData(properties).addMiningLevel(FabricToolTags.PICKAXES, level);
+		return properties;
+	}
+	
+	public BaseOreBlock(Item drop, int minCount, int maxCount, int experience,  Properties properties) {
+		this(drop, minCount, maxCount, experience, 0, properties);
+	}
+	
+	public BaseOreBlock(Item drop, int minCount, int maxCount, int experience, int miningLevel, Properties properties) {
+		super(makeProps(properties, miningLevel), UniformInt.of(experience>0?1:0, experience));
 		this.dropItem = drop;
 		this.minCount = minCount;
 		this.maxCount = maxCount;
