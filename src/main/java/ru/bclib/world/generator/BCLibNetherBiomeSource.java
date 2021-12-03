@@ -52,6 +52,7 @@ public class BCLibNetherBiomeSource extends BiomeSource {
 	public BCLibNetherBiomeSource(Registry<Biome> biomeRegistry, long seed) {
 		super(getBiomes(biomeRegistry));
 		
+		BiomeAPI.initRegistry(biomeRegistry);
 		BiomeAPI.NETHER_BIOME_PICKER.clearMutables();
 		
 		this.possibleBiomes().forEach(biome -> {

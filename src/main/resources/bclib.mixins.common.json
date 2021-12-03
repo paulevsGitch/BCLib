@@ -30,6 +30,7 @@
 		"shears.SheepMixin",
 		"PortalShapeMixin",
 		"ServerLevelMixin",
+		"WorldPresetMixin",
 		"AnvilBlockMixin",
 		"AnvilMenuMixin",
 		"TagLoaderMixin",

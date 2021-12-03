@@ -50,6 +50,7 @@ public class BCLibEndBiomeSource extends BiomeSource {
 	public BCLibEndBiomeSource(Registry<Biome> biomeRegistry, long seed) {
 		super(getBiomes(biomeRegistry));
 		
+		BiomeAPI.initRegistry(biomeRegistry);
 		BiomeAPI.END_LAND_BIOME_PICKER.clearMutables();
 		BiomeAPI.END_VOID_BIOME_PICKER.clearMutables();
 		

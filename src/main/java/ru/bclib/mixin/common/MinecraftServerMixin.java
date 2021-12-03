@@ -56,7 +56,7 @@ public class MinecraftServerMixin {
     @Inject(method = "loadLevel", at = @At(value = "RETURN"), cancellable = true)
     private void bclib_loadLevel(CallbackInfo info) {
         bclib_injectRecipes();
-        BiomeAPI.initRegistry(MinecraftServer.class.cast(this));
+        //BiomeAPI.initRegistry(MinecraftServer.class.cast(this));
     }
 
     private void bclib_injectRecipes() {
