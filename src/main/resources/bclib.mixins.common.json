@@ -38,7 +38,7 @@
 		"BiomeGenerationSettingsAccessor",
 		"MobSpawnSettingsAccessor",
 		"StructureSettingsAccessor",
-		"SurfaceRuleDataMixin"
+		"NoiseGeneratorSettingsMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

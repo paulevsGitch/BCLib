@@ -31,7 +31,6 @@ import net.minecraft.world.level.levelgen.GenerationStep.Carving;
 import net.minecraft.world.level.levelgen.GenerationStep.Decoration;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
 import net.minecraft.world.level.levelgen.SurfaceRules;
-import net.minecraft.world.level.levelgen.SurfaceRules.RuleSource;
 import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
@@ -40,6 +39,7 @@ import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import org.jetbrains.annotations.Nullable;
 import ru.bclib.BCLib;
 import ru.bclib.config.Configs;
+import ru.bclib.interfaces.SurfaceRuleProvider;
 import ru.bclib.mixin.common.BiomeGenerationSettingsAccessor;
 import ru.bclib.mixin.common.MobSpawnSettingsAccessor;
 import ru.bclib.mixin.common.StructureSettingsAccessor;
@@ -93,9 +93,6 @@ public class BiomeAPI {
 	
 	public static final BCLBiome END_BARRENS = registerEndVoidBiome(getFromRegistry(new ResourceLocation("end_barrens")));
 	public static final BCLBiome SMALL_END_ISLANDS = registerEndVoidBiome(getFromRegistry(new ResourceLocation("small_end_islands")));
-	
-	private static SurfaceRules.RuleSource netherRuleSource;
-	private static SurfaceRules.RuleSource endRuleSource;
 	
 	/**
 	 * Initialize registry for current server.
@@ -297,8 +294,10 @@ public class BiomeAPI {
 	 * @param biome - {@link Biome} from server world.
 	 * @return biome {@link ResourceKey} or {@code null}.
 	 */
+	@Nullable
 	public static ResourceKey getBiomeKey(Biome biome) {
-		return biomeRegistry.getResourceKey(biome).orElse(null);
+		ResourceKey key = BuiltinRegistries.BIOME.getResourceKey(biome).orElse(null);
+		return key != null ? key : biomeRegistry != null ? biomeRegistry.getResourceKey(biome).orElse(null) : null;
 	}
 	
 	/**
@@ -307,7 +306,10 @@ public class BiomeAPI {
 	 * @return biome {@link ResourceLocation}.
 	 */
 	public static ResourceLocation getBiomeID(Biome biome) {
-		ResourceLocation id = biomeRegistry.getKey(biome);
+		ResourceLocation id = BuiltinRegistries.BIOME.getKey(biome);
+		if (id == null && biomeRegistry != null) {
+			id = biomeRegistry.getKey(biome);
+		}
 		return id == null ? EMPTY_BIOME.getID() : id;
 	}
 	
@@ -417,22 +419,6 @@ public class BiomeAPI {
 	}
 	
 	/**
-	 * Returns surface rule source for the Nether.
-	 * @return {@link SurfaceRules.RuleSource}.
-	 */
-	public static SurfaceRules.RuleSource getNetherRuleSource() {
-		return netherRuleSource;
-	}
-	
-	/**
-	 * Returns surface rule source for the End.
-	 * @return {@link SurfaceRules.RuleSource}.
-	 */
-	public static SurfaceRules.RuleSource getEndRuleSource() {
-		return endRuleSource;
-	}
-	
-	/**
 	 * Will apply biome modifications to world, internal usage only.
 	 * @param level
 	 */
@@ -440,15 +426,24 @@ public class BiomeAPI {
 		BiomeSource source = level.getChunkSource().getGenerator().getBiomeSource();
 		Set<Biome> biomes = source.possibleBiomes();
 		
+		NoiseGeneratorSettings generator = null;
 		if (level.dimension() == Level.NETHER) {
-			RuleSource[] rules = getRuleSources(biomes, level.dimension());
-			netherRuleSource = rules.length > 0 ? SurfaceRules.sequence(rules) : null;
-			System.out.println("Adding nether sources! " + rules.length);
+			generator = BuiltinRegistries.NOISE_GENERATOR_SETTINGS.get(NoiseGeneratorSettings.NETHER);
 		}
 		else if (level.dimension() == Level.END) {
-			RuleSource[] rules = getRuleSources(biomes, level.dimension());
-			endRuleSource = rules.length > 0 ? SurfaceRules.sequence(rules) : null;
-			System.out.println("Adding end sources! " + rules.length);
+			generator = BuiltinRegistries.NOISE_GENERATOR_SETTINGS.get(NoiseGeneratorSettings.END);
+		}
+		
+		if (generator != null) {
+			List<SurfaceRules.RuleSource> rules = getRuleSources(biomes, level.dimension());
+			SurfaceRuleProvider provider = SurfaceRuleProvider.class.cast(generator);
+			if (rules.size() > 0) {
+				rules.add(provider.getSurfaceRule());
+				provider.setSurfaceRule(SurfaceRules.sequence(rules.toArray(new SurfaceRules.RuleSource[rules.size()])));
+			}
+			else {
+				provider.setSurfaceRule(null);
+			}
 		}
 		
 		List<BiConsumer<ResourceLocation, Biome>> modifications = MODIFICATIONS.get(level.dimension());
@@ -474,7 +469,7 @@ public class BiomeAPI {
 		});
 	}
 	
-	private static SurfaceRules.RuleSource[] getRuleSources(Set<Biome> biomes, ResourceKey<Level> dimensionType) {
+	private static List<SurfaceRules.RuleSource> getRuleSources(Set<Biome> biomes, ResourceKey<Level> dimensionType) {
 		Set<ResourceLocation> biomeIDs = biomes.stream().map(biome -> getBiomeID(biome)).collect(Collectors.toSet());
 		List<SurfaceRules.RuleSource> rules = Lists.newArrayList();
 		SURFACE_RULES.forEach((biomeID, rule) -> {
@@ -506,7 +501,7 @@ public class BiomeAPI {
 			}
 		}*/
 		
-		return rules.toArray(new SurfaceRules.RuleSource[rules.size()]);
+		return rules;
 	}
 	
 	/**
