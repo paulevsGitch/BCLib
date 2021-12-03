@@ -19,7 +19,7 @@ public class SpawnRuleEntry<M extends Mob> implements Comparable<SpawnRuleEntry>
 		this.rule = rule;
 	}
 	
-	boolean canSpawn(EntityType<M> type, LevelAccessor world, MobSpawnType spawnReason, BlockPos pos, Random random) {
+	protected boolean canSpawn(EntityType<M> type, LevelAccessor world, MobSpawnType spawnReason, BlockPos pos, Random random) {
 		return rule.canSpawn(type, world, spawnReason, pos, random);
 	}
 	
