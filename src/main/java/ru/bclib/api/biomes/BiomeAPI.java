@@ -425,14 +425,34 @@ public class BiomeAPI {
 	
 	/**
 	 * Adds new features to existing biome.
+	 * @param biomeID {@link ResourceLocation} for the {@link Biome} to add features in.
+	 * @param feature {@link ConfiguredFeature} to add.
+	 *
+	 */
+	public static void addBiomeFeature(ResourceLocation biomeID, BCLFeature feature) {
+		addBiomeFeature(biomeID, feature.getPlacedFeature(), feature.getDecoration());
+	}
+	
+	/**
+	 * Adds new features to existing biome.
 	 * @param biome {@link Biome} to add features in.
 	 * @param feature {@link ConfiguredFeature} to add.
 	 * @param step a {@link Decoration} step for the feature.
 	 */
 	public static void addBiomeFeature(Biome biome, PlacedFeature feature, Decoration step) {
+		addBiomeFeature(getBiomeID(biome), feature, step);
+	}
+	
+	/**
+	 * Adds new features to existing biome.
+	 * @param biomeID {@link ResourceLocation} of the {@link Biome} to add features in.
+	 * @param feature {@link ConfiguredFeature} to add.
+	 * @param step a {@link Decoration} step for the feature.
+	 */
+	private static void addBiomeFeature(ResourceLocation biomeID, PlacedFeature feature, Decoration step) {
 		BuiltinRegistries.PLACED_FEATURE
 			.getResourceKey(feature)
-			.ifPresent(key -> BiomeModifications.addFeature(ctx -> ctx.getBiomeKey().equals(BuiltinRegistries.BIOME.getKey(biome)), step, key));
+			.ifPresent(key -> BiomeModifications.addFeature(ctx -> ctx.getBiomeKey().location().equals(biomeID), step, key));
 	}
 	
 	/**
@@ -446,17 +466,26 @@ public class BiomeAPI {
 		}
 	}
 	
-	// TODO: 1.18 There are no more StructureFeatures in the Biomes, they are in a separate registry now
 	/**
 	 * Adds new structure feature to existing biome.
 	 * @param biome {@link Biome} to add structure feature in.
 	 * @param structure {@link ConfiguredStructureFeature} to add.
 	 */
 	public static void addBiomeStructure(Biome biome, ConfiguredStructureFeature structure) {
+		addBiomeStructure(getBiomeID(biome), structure);
+	}
+	
+	/**
+	 * Adds new structure feature to existing biome.
+	 * @param biomeID {@link ResourceLocation} of the {@link Biome} to add structure feature in.
+	 * @param structure {@link ConfiguredStructureFeature} to add.
+	 */
+	public static void addBiomeStructure(ResourceLocation biomeID, ConfiguredStructureFeature structure) {
 		BuiltinRegistries.CONFIGURED_STRUCTURE_FEATURE
 			.getResourceKey(structure)
-			.ifPresent(key -> BiomeModifications.addStructure(ctx -> ctx.getBiomeKey().location().equals(BuiltinRegistries.BIOME.getKey(biome)), key));
+			.ifPresent(key -> BiomeModifications.addStructure(ctx -> ctx.getBiomeKey().location().equals(biomeID), key));
 	}
+	
 	/**
 	 * Adds new structure feature to existing biome.
 	 * @param biome {@link Biome} to add structure feature in.
@@ -464,6 +493,15 @@ public class BiomeAPI {
 	 */
 	public static void addBiomeStructure(Biome biome, BCLStructureFeature structure) {
 		addBiomeStructure(biome, structure.getFeatureConfigured());
+	}
+	
+	/**
+	 * Adds new structure feature to existing biome.
+	 * @param biomeID {@link ResourceLocation} of the {@link Biome} to add structure feature in.
+	 * @param structure {@link BCLStructureFeature} to add.
+	 */
+	public static void addBiomeStructure(ResourceLocation biomeID, BCLStructureFeature structure) {
+		addBiomeStructure(biomeID, structure.getFeatureConfigured());
 	}
 
 	/**
@@ -486,14 +524,21 @@ public class BiomeAPI {
 	 * @param maxGroupCount maximum mobs in group.
 	 */
 	public static <M extends Mob> void addBiomeMobSpawn(Biome biome, EntityType<M> entityType, int weight, int minGroupCount, int maxGroupCount) {
-		ResourceLocation biomeKey = BuiltinRegistries.BIOME.getKey(biome);
+		addBiomeMobSpawn(getBiomeID(biome), entityType, weight, minGroupCount, maxGroupCount);
+	}
+	
+	/**
+	 * Adds mob spawning to specified biome.
+	 * @param biomeID {@link ResourceLocation} of the {@link Biome }to add mob spawning.
+	 * @param entityType {@link EntityType} mob type.
+	 * @param weight spawn weight.
+	 * @param minGroupCount minimum mobs in group.
+	 * @param maxGroupCount maximum mobs in group.
+	 */
+	public static <M extends Mob> void addBiomeMobSpawn(ResourceLocation biomeID, EntityType<M> entityType, int weight, int minGroupCount, int maxGroupCount) {
 		BiomeModifications.addSpawn(
-			ctx -> ctx.getBiomeKey().equals(biomeKey),
-			entityType.getCategory(),
-			entityType,
-			weight,
-			minGroupCount,
-			maxGroupCount
+			ctx -> ctx.getBiomeKey().location().equals(biomeID),
+			entityType.getCategory(), entityType, weight, minGroupCount, maxGroupCount
 		);
 	}
 	
