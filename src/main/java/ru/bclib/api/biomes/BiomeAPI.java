@@ -32,6 +32,7 @@ import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import org.jetbrains.annotations.Nullable;
 import ru.bclib.config.Configs;
 import ru.bclib.mixin.common.BiomeGenerationSettingsAccessor;
+import ru.bclib.util.CollectionsUtil;
 import ru.bclib.util.MHelper;
 import ru.bclib.world.biomes.BCLBiome;
 import ru.bclib.world.biomes.FabricBiomesData;
@@ -450,9 +451,13 @@ public class BiomeAPI {
 	 */
 	public static void addBiomeFeature(Biome biome, PlacedFeature feature, Decoration step) {
 		BiomeGenerationSettingsAccessor accessor = (BiomeGenerationSettingsAccessor) biome.getGenerationSettings();
-		List<List<Supplier<PlacedFeature>>> allFeatures = getMutable(accessor.bclib_getFeatures());
+		List<List<Supplier<PlacedFeature>>> allFeatures = CollectionsUtil.getMutable(accessor.bclib_getFeatures());
+		Set<PlacedFeature> set = CollectionsUtil.getMutable(accessor.bclib_getFeatureSet());
 		List<Supplier<PlacedFeature>> features = getFeaturesList(allFeatures, step);
 		features.add(() -> feature);
+		set.add(feature);
+		accessor.bclib_setFeatures(allFeatures);
+		accessor.bclib_setFeatureSet(set);
 	}
 	
 	/**
@@ -559,19 +564,12 @@ public class BiomeAPI {
 		biome.setGenChance(chance).setFogDensity(fog);
 	}
 	
-	private static <O extends Object> List<O> getMutable(List<O> list) {
-		if (list instanceof ArrayList) {
-			return list;
-		}
-		return new ArrayList<>(list);
-	}
-	
 	private static List<Supplier<PlacedFeature>> getFeaturesList(List<List<Supplier<PlacedFeature>>> features, Decoration step) {
 		int index = step.ordinal();
 		while (features.size() <= index) {
 			features.add(Lists.newArrayList());
 		}
-		List<Supplier<PlacedFeature>> mutable = getMutable(features.get(index));
+		List<Supplier<PlacedFeature>> mutable = CollectionsUtil.getMutable(features.get(index));
 		features.set(index, mutable);
 		return mutable;
 	}
