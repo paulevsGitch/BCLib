@@ -7,15 +7,21 @@ import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
 import java.util.List;
+import java.util.Set;
 import java.util.function.Supplier;
 
 @Mixin(BiomeGenerationSettings.class)
 public interface BiomeGenerationSettingsAccessor {
 	@Accessor("features")
-	List<List<Supplier<PlacedFeature>>> bcl_getFeatures();
+	List<List<Supplier<PlacedFeature>>> bclib_getFeatures();
 	
 	@Accessor("features")
 	@Mutable
-	void bcl_setFeatures(List<List<Supplier<PlacedFeature>>> value);
+	void bclib_setFeatures(List<List<Supplier<PlacedFeature>>> value);
+	
+	@Accessor("featureSet")
+	Set<PlacedFeature> bclib_getFeatureSet();
+	
+	@Accessor("featureSet")
+	void bclib_setFeatureSet(Set<PlacedFeature> features);
 }
-
