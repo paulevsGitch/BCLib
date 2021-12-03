@@ -24,6 +24,7 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.Biome.BiomeCategory;
 import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.biome.Climate;
@@ -57,6 +58,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 import java.util.function.BiConsumer;
@@ -443,12 +445,12 @@ public class BiomeAPI {
 		Set<Biome> biomes = source.possibleBiomes();
 		
 		if (level.dimension() == Level.NETHER) {
-			RuleSource[] rules = getRuleSources(biomes);
+			RuleSource[] rules = getRuleSources(biomes, level.dimension());
 			netherRuleSource = rules.length > 0 ? SurfaceRules.sequence(rules) : null;
 			System.out.println("Adding nether sources! " + rules.length);
 		}
 		else if (level.dimension() == Level.END) {
-			RuleSource[] rules = getRuleSources(biomes);
+			RuleSource[] rules = getRuleSources(biomes, level.dimension());
 			endRuleSource = rules.length > 0 ? SurfaceRules.sequence(rules) : null;
 			System.out.println("Adding end sources! " + rules.length);
 		}
@@ -476,7 +478,7 @@ public class BiomeAPI {
 		});
 	}
 	
-	private static SurfaceRules.RuleSource[] getRuleSources(Set<Biome> biomes) {
+	private static SurfaceRules.RuleSource[] getRuleSources(Set<Biome> biomes, ResourceKey<Level> dimensionType) {
 		Set<ResourceLocation> biomeIDs = biomes.stream().map(biome -> getBiomeID(biome)).collect(Collectors.toSet());
 		List<SurfaceRules.RuleSource> rules = Lists.newArrayList();
 		SURFACE_RULES.forEach((biomeID, rule) -> {
@@ -484,6 +486,30 @@ public class BiomeAPI {
 				rules.add(rule);
 			}
 		});
+		
+		// Try handle biomes from other dimension, may work not as expected
+		// Will not work
+		/*Optional<Biome> optional = biomes
+			.stream()
+			.filter(biome -> biome.getBiomeCategory() != BiomeCategory.THEEND && biome.getBiomeCategory() != BiomeCategory.NETHER)
+			.findAny();
+		if (optional.isPresent()) {
+			rules.add(SurfaceRuleData.overworld());
+		}
+		
+		if (dimensionType == Level.NETHER) {
+			optional = biomes.stream().filter(biome -> biome.getBiomeCategory() != BiomeCategory.THEEND).findAny();
+			if (optional.isPresent()) {
+				rules.add(SurfaceRuleData.end());
+			}
+		}
+		else if (dimensionType == Level.END) {
+			optional = biomes.stream().filter(biome -> biome.getBiomeCategory() != BiomeCategory.NETHER).findAny();
+			if (optional.isPresent()) {
+				rules.add(SurfaceRuleData.end());
+			}
+		}*/
+		
 		return rules.toArray(new SurfaceRules.RuleSource[rules.size()]);
 	}
 	
