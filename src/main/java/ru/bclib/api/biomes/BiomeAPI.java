@@ -37,6 +37,7 @@ import ru.bclib.world.features.BCLFeature;
 import ru.bclib.world.generator.BiomePicker;
 import ru.bclib.world.structures.BCLStructureFeature;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -406,13 +407,19 @@ public class BiomeAPI {
 		applyModifications(biomes, level.dimension());
 	}
 	
+	private static final Set<ResourceLocation> modifiedBiomes = new HashSet<>();
 	/**
 	 * Will apply biome modifications to world, internal usage only.
 	 * @param registryAccess
 	 */
 	public static void applyModifications(RegistryAccess registryAccess) {
 		Registry<Biome> biomeReg = registryAccess.registryOrThrow(Registry.BIOME_REGISTRY);
-		Set<Biome> biomes = biomeReg.entrySet().stream().map(e -> e.getValue()).collect(Collectors.toSet());
+		Set<Biome> biomes = biomeReg
+			.entrySet()
+			.stream()
+			.map(e -> e.getValue())
+			.filter(b -> modifiedBiomes.add(getBiomeID(b)))
+			.collect(Collectors.toSet());
 		
 		applyModifications(
 			biomes.stream().filter(b->b.getBiomeCategory().equals(BiomeCategory.NETHER)).collect(Collectors.toSet()),
