@@ -5,6 +5,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.biome.v1.BiomeModificationContext.GenerationSettingsContext;
 import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
 import net.fabricmc.fabric.impl.biome.NetherBiomeData;
 import net.fabricmc.fabric.impl.biome.TheEndBiomeData;
@@ -30,6 +31,7 @@ import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import org.jetbrains.annotations.Nullable;
 import ru.bclib.config.Configs;
+import ru.bclib.mixin.common.BiomeGenerationSettingsAccessor;
 import ru.bclib.util.MHelper;
 import ru.bclib.world.biomes.BCLBiome;
 import ru.bclib.world.biomes.FabricBiomesData;
@@ -37,12 +39,14 @@ import ru.bclib.world.features.BCLFeature;
 import ru.bclib.world.generator.BiomePicker;
 import ru.bclib.world.structures.BCLStructureFeature;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.function.BiConsumer;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class BiomeAPI {
@@ -401,7 +405,7 @@ public class BiomeAPI {
 		Set<Biome> biomes = source.possibleBiomes();
 		
 		biomes.forEach(biome -> {
-			ResourceLocation biomeID =  getBiomeID(biome);
+			ResourceLocation biomeID = getBiomeID(biome);
 			boolean modify = isDatapackBiome(biomeID);
 			if (biome != BuiltinRegistries.BIOME.get(biomeID)) {
 				modify = true;
@@ -445,7 +449,10 @@ public class BiomeAPI {
 	 * @param step a {@link Decoration} step for the feature.
 	 */
 	public static void addBiomeFeature(Biome biome, PlacedFeature feature, Decoration step) {
-		addBiomeFeature(getBiomeID(biome), feature, step);
+		BiomeGenerationSettingsAccessor accessor = (BiomeGenerationSettingsAccessor) biome.getGenerationSettings();
+		List<List<Supplier<PlacedFeature>>> allFeatures = getMutable(accessor.bclib_getFeatures());
+		List<Supplier<PlacedFeature>> features = getFeaturesList(allFeatures, step);
+		features.add(() -> feature);
 	}
 	
 	/**
@@ -455,9 +462,7 @@ public class BiomeAPI {
 	 * @param step a {@link Decoration} step for the feature.
 	 */
 	private static void addBiomeFeature(ResourceLocation biomeID, PlacedFeature feature, Decoration step) {
-		BuiltinRegistries.PLACED_FEATURE
-			.getResourceKey(feature)
-			.ifPresent(key -> BiomeModifications.addFeature(ctx -> ctx.getBiomeKey().location().equals(biomeID), step, key));
+		addBiomeFeature(BuiltinRegistries.BIOME.get(biomeID), feature, step);
 	}
 	
 	/**
@@ -552,5 +557,22 @@ public class BiomeAPI {
 		chance = Configs.BIOMES_CONFIG.getFloat(group, "generation_chance", chance);
 		fog = Configs.BIOMES_CONFIG.getFloat(group, "fog_density", fog);
 		biome.setGenChance(chance).setFogDensity(fog);
+	}
+	
+	private static <O extends Object> List<O> getMutable(List<O> list) {
+		if (list instanceof ArrayList) {
+			return list;
+		}
+		return new ArrayList<>(list);
+	}
+	
+	private static List<Supplier<PlacedFeature>> getFeaturesList(List<List<Supplier<PlacedFeature>>> features, Decoration step) {
+		int index = step.ordinal();
+		while (features.size() <= index) {
+			features.add(Lists.newArrayList());
+		}
+		List<Supplier<PlacedFeature>> mutable = getMutable(features.get(index));
+		features.set(index, mutable);
+		return mutable;
 	}
 }
