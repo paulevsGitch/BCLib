@@ -4,6 +4,7 @@ import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.data.BuiltinRegistries;
 import net.minecraft.data.worldgen.BiomeDefaultFeatures;
+import net.minecraft.data.worldgen.SurfaceRuleData;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.Music;
 import net.minecraft.sounds.SoundEvent;
@@ -21,8 +22,10 @@ import net.minecraft.world.level.biome.BiomeGenerationSettings;
 import net.minecraft.world.level.biome.BiomeSpecialEffects;
 import net.minecraft.world.level.biome.MobSpawnSettings;
 import net.minecraft.world.level.biome.MobSpawnSettings.SpawnerData;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.GenerationStep.Decoration;
+import net.minecraft.world.level.levelgen.SurfaceRules;
 import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
 import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
@@ -481,6 +484,17 @@ public class BCLBiomeBuilder {
 		return this;
 	}
 	
+	private List<SurfaceRules.RuleSource> surfaceRules = new ArrayList<>(2);
+	/**
+	 * Adds new world surface rule for the given block
+	 * @param surfaceBlock {@link Block} to use.
+	 * @return same {@link BCLBiomeBuilder} instance.
+	 */
+	public BCLBiomeBuilder surface(Block surfaceBlock) {
+		surfaceRules.add(SurfaceRules.ifTrue(SurfaceRules.ON_FLOOR, SurfaceRules.state(surfaceBlock.defaultBlockState())));
+		return this;
+	}
+	
 	/**
 	 * Finalize biome creation.
 	 * @return created {@link BCLBiome} instance.
@@ -515,6 +529,7 @@ public class BCLBiomeBuilder {
 		
 		final T res = biomeConstructor.apply(biomeID, builder.build());
 		res.attachedStructures = structures;
+		surfaceRules.forEach(s -> BiomeAPI.addSurfaceRule(BiomeAPI.getBiomeID(res.getBiome()), s));
 		res.setFogDensity(fogDensity);
 		return res;
 	}
