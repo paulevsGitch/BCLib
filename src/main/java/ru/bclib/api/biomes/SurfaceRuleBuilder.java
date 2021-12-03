@@ -90,6 +90,40 @@ public class SurfaceRuleBuilder {
 	}
 	
 	/**
+	 * Set biome ceiling with specified {@link BlockState}. Example - block of sandstone in the Overworld desert in air pockets.
+	 * @param state {@link BlockState} for the ground cover.
+	 * @return same {@link SurfaceRuleBuilder} instance.
+	 */
+	public SurfaceRuleBuilder ceil(BlockState state) {
+		entryInstance = getFromCache("ceil_" + state.toString(), () -> {
+			RuleSource rule = SurfaceRules.state(state);
+			return new SurfaceRuleEntry(1, SurfaceRules.ifTrue(SurfaceRules.ON_CEILING, rule));
+		});
+		rules.add(entryInstance);
+		return this;
+	}
+	
+	/**
+	 * Allows to add custom rule.
+	 * @param priority rule priority, lower values = higher priority (rule will be applied before others).
+	 * @param rule custom {@link SurfaceRules.RuleSource}.
+	 * @return same {@link SurfaceRuleBuilder} instance.
+	 */
+	public SurfaceRuleBuilder rule(int priority, SurfaceRules.RuleSource rule) {
+		rules.add(new SurfaceRuleEntry(priority, rule));
+		return this;
+	}
+	
+	/**
+	 * Allows to add custom rule.
+	 * @param rule
+	 * @return
+	 */
+	public SurfaceRuleBuilder rule(SurfaceRules.RuleSource rule) {
+		return rule(7, rule);
+	}
+	
+	/**
 	 * Finalise rule building process.
 	 * @return {@link SurfaceRules.RuleSource}.
 	 */
