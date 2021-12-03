@@ -24,9 +24,11 @@ import net.minecraft.world.level.biome.MobSpawnSettings.SpawnerData;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.GenerationStep.Decoration;
+import net.minecraft.world.level.levelgen.Noises;
 import net.minecraft.world.level.levelgen.SurfaceRules;
 import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
 import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
+import net.minecraft.world.level.levelgen.placement.CaveSurface;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import ru.bclib.util.ColorUtil;
 import ru.bclib.world.biomes.BCLBiome;
@@ -40,6 +42,7 @@ import java.util.function.Consumer;
 
 public class BCLBiomeBuilder {
 	private static final BCLBiomeBuilder INSTANCE = new BCLBiomeBuilder();
+	private static final SurfaceRules.ConditionSource SURFACE_NOISE = SurfaceRules.noiseCondition(Noises.SOUL_SAND_LAYER, -0.012);
 	
 	private List<ConfiguredStructureFeature> structures = new ArrayList<>(16);
 	private BiomeGenerationSettings.Builder generationSettings;
@@ -492,6 +495,21 @@ public class BCLBiomeBuilder {
 	 */
 	public BCLBiomeBuilder surface(Block surfaceBlock) {
 		return surface(SurfaceRules.ifTrue(SurfaceRules.ON_FLOOR, SurfaceRules.state(surfaceBlock.defaultBlockState())));
+	}
+	
+	/**
+	 * Adds blocks to the biome surface and below it (with specified depth).
+	 * @param surfaceBlock {@link Block} that will cover biome.
+	 * @param subterrainBlock {@link Block} below it with specified depth.
+	 * @param depth thickness of bottom block layer.
+	 * @return same {@link BCLBiomeBuilder} instance.
+	 */
+	public BCLBiomeBuilder surface(Block surfaceBlock, Block subterrainBlock, int depth) {
+		SurfaceRules.RuleSource topRule = SurfaceRules.state(surfaceBlock.defaultBlockState());
+		SurfaceRules.RuleSource subterrainRule = SurfaceRules.state(subterrainBlock.defaultBlockState());
+		topRule = SurfaceRules.ifTrue(SurfaceRules.ON_FLOOR, topRule);
+		subterrainRule = SurfaceRules.ifTrue(SurfaceRules.stoneDepthCheck(depth, false, false, CaveSurface.FLOOR), subterrainRule);
+		return surface(SurfaceRules.sequence(topRule, subterrainRule));
 	}
 	
 	/**

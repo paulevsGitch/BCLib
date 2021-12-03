@@ -4,6 +4,8 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.levelgen.Noises;
+import net.minecraft.world.level.levelgen.SurfaceRules;
 import ru.bclib.api.TagAPI;
 import ru.bclib.api.WorldDataAPI;
 import ru.bclib.api.dataexchange.DataExchangeAPI;
@@ -40,11 +42,11 @@ public class BCLib implements ModInitializer {
 		DataExchangeAPI.registerMod(MOD_ID);
 		
 		DataExchangeAPI.registerDescriptors(List.of(
-				HelloClient.DESCRIPTOR,
-				HelloServer.DESCRIPTOR,
-				RequestFiles.DESCRIPTOR,
-				SendFiles.DESCRIPTOR,
-				Chunker.DESCRIPTOR
+			HelloClient.DESCRIPTOR,
+			HelloServer.DESCRIPTOR,
+			RequestFiles.DESCRIPTOR,
+			SendFiles.DESCRIPTOR,
+			Chunker.DESCRIPTOR
 		));
 		
 		BCLibPatch.register();
@@ -61,5 +63,10 @@ public class BCLib implements ModInitializer {
 	
 	public static ResourceLocation makeID(String path) {
 		return new ResourceLocation(MOD_ID, path);
+	}
+	
+	private static SurfaceRules.ConditionSource surfaceNoiseAbove(double d) {
+		
+		return SurfaceRules.noiseCondition(Noises.SURFACE, d / 8.25, Double.MAX_VALUE);
 	}
 }
