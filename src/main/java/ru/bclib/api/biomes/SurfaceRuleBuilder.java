@@ -6,11 +6,8 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.SurfaceRules;
-import net.minecraft.world.level.levelgen.SurfaceRules.ConditionSource;
 import net.minecraft.world.level.levelgen.SurfaceRules.RuleSource;
 import net.minecraft.world.level.levelgen.placement.CaveSurface;
-import ru.bclib.api.spawning.SpawnRuleBuilder;
-import ru.bclib.api.spawning.SpawnRuleEntry;
 
 import java.util.Collections;
 import java.util.List;
@@ -61,6 +58,7 @@ public class SurfaceRuleBuilder {
 			RuleSource rule = SurfaceRules.state(state);
 			return new SurfaceRuleEntry(1, SurfaceRules.ifTrue(SurfaceRules.ON_FLOOR, rule));
 		});
+		rules.add(entryInstance);
 		return this;
 	}
 	
@@ -76,6 +74,7 @@ public class SurfaceRuleBuilder {
 			rule = SurfaceRules.ifTrue(SurfaceRules.stoneDepthCheck(depth, false, false, CaveSurface.FLOOR), rule);
 			return new SurfaceRuleEntry(2, SurfaceRules.ifTrue(SurfaceRules.ON_FLOOR, rule));
 		});
+		rules.add(entryInstance);
 		return this;
 	}
 	
@@ -85,9 +84,8 @@ public class SurfaceRuleBuilder {
 	 * @return same {@link SurfaceRuleBuilder} instance.
 	 */
 	public SurfaceRuleBuilder filler(BlockState state) {
-		entryInstance = getFromCache("fill_" + state.toString(), () -> {
-			return new SurfaceRuleEntry(3, SurfaceRules.state(state));
-		});
+		entryInstance = getFromCache("fill_" + state.toString(), () -> new SurfaceRuleEntry(3, SurfaceRules.state(state)));
+		rules.add(entryInstance);
 		return this;
 	}
 	
