@@ -96,8 +96,8 @@ public class BiomeAPI {
 	 *
 	 * @param server - {@link MinecraftServer}
 	 */
-	public static void initRegistry(MinecraftServer server) {
-		biomeRegistry = server.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY);
+	public static void initRegistry( Registry<Biome> biomeRegistry) {
+		BiomeAPI.biomeRegistry = biomeRegistry;
 		CLIENT.clear();
 	}
 	
