@@ -1,7 +1,6 @@
 package ru.bclib.blocks;
 
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
-import net.fabricmc.fabric.api.tool.attribute.v1.FabricToolTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.WorldGenLevel;
@@ -18,12 +17,14 @@ public abstract class UnderwaterPlantWithAgeBlock extends UnderwaterPlantBlock {
 	public static final IntegerProperty AGE = BlockProperties.AGE;
 	
 	public UnderwaterPlantWithAgeBlock() {
-		super(FabricBlockSettings.of(Material.WATER_PLANT)
-								 .breakByTool(FabricToolTags.SHEARS)
-								 .breakByHand(true)
-								 .sound(SoundType.WET_GRASS)
-								 .randomTicks()
-								 .noCollission());
+		super(
+			FabricBlockSettings
+				.of(Material.WATER_PLANT)
+				.breakByHand(true)
+				.sound(SoundType.WET_GRASS)
+				.randomTicks()
+				.noCollission()
+		);
 	}
 	
 	@Override

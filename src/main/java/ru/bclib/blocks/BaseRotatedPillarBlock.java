@@ -27,7 +27,7 @@ public class BaseRotatedPillarBlock extends RotatedPillarBlock implements BlockM
 	}
 	
 	public BaseRotatedPillarBlock(Block block) {
-		super(FabricBlockSettings.copyOf(block));
+		this(FabricBlockSettings.copyOf(block));
 	}
 	
 	@Override

@@ -36,25 +36,28 @@ import ru.bclib.interfaces.RenderLayerProvider;
 import java.util.List;
 import java.util.Random;
 
-@SuppressWarnings("deprecation")
 public abstract class UnderwaterPlantBlock extends BaseBlockNotFull implements RenderLayerProvider, BonemealableBlock, LiquidBlockContainer {
 	private static final VoxelShape SHAPE = Block.box(4, 0, 4, 12, 14, 12);
 	
 	public UnderwaterPlantBlock() {
-		super(FabricBlockSettings.of(Material.WATER_PLANT)
-								 .breakByTool(FabricToolTags.SHEARS)
-								 .breakByHand(true)
-								 .sound(SoundType.WET_GRASS)
-								 .noCollission());
+		this(
+			FabricBlockSettings
+				.of(Material.WATER_PLANT)
+				.breakByHand(true)
+				.sound(SoundType.WET_GRASS)
+				.noCollission()
+		);
 	}
 	
 	public UnderwaterPlantBlock(int light) {
-		super(FabricBlockSettings.of(Material.WATER_PLANT)
-								 .breakByTool(FabricToolTags.SHEARS)
-								 .breakByHand(true)
-								 .luminance(light)
-								 .sound(SoundType.WET_GRASS)
-								 .noCollission());
+		this(
+			FabricBlockSettings
+				.of(Material.WATER_PLANT)
+				.breakByHand(true)
+				.luminance(light)
+				.sound(SoundType.WET_GRASS)
+				.noCollission()
+		);
 	}
 	
 	public UnderwaterPlantBlock(Properties settings) {
@@ -62,6 +65,7 @@ public abstract class UnderwaterPlantBlock extends BaseBlockNotFull implements R
 	}
 	
 	@Override
+	@SuppressWarnings("deprecation")
 	public VoxelShape getShape(BlockState state, BlockGetter view, BlockPos pos, CollisionContext ePos) {
 		Vec3 vec3d = state.getOffset(view, pos);
 		return SHAPE.move(vec3d.x, vec3d.y, vec3d.z);
@@ -73,6 +77,7 @@ public abstract class UnderwaterPlantBlock extends BaseBlockNotFull implements R
 	}
 	
 	@Override
+	@SuppressWarnings("deprecation")
 	public boolean canSurvive(BlockState state, LevelReader world, BlockPos pos) {
 		BlockState down = world.getBlockState(pos.below());
 		state = world.getBlockState(pos);
@@ -82,6 +87,7 @@ public abstract class UnderwaterPlantBlock extends BaseBlockNotFull implements R
 	protected abstract boolean isTerrain(BlockState state);
 	
 	@Override
+	@SuppressWarnings("deprecation")
 	public BlockState updateShape(BlockState state, Direction facing, BlockState neighborState, LevelAccessor world, BlockPos pos, BlockPos neighborPos) {
 		if (!canSurvive(state, world, pos)) {
 			world.destroyBlock(pos, true);
@@ -144,6 +150,7 @@ public abstract class UnderwaterPlantBlock extends BaseBlockNotFull implements R
 	}
 	
 	@Override
+	@SuppressWarnings("deprecation")
 	public FluidState getFluidState(BlockState state) {
 		return Fluids.WATER.getSource(false);
 	}

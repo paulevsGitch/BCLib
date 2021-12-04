@@ -1,7 +1,6 @@
 package ru.bclib.blocks;
 
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
-import net.fabricmc.fabric.api.tool.attribute.v1.FabricToolTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.LevelAccessor;
@@ -15,22 +14,25 @@ import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.material.Material;
 
 public abstract class BaseUnderwaterWallPlantBlock extends BaseWallPlantBlock implements LiquidBlockContainer {
-	
 	public BaseUnderwaterWallPlantBlock() {
-		super(FabricBlockSettings.of(Material.WATER_PLANT)
-								 .breakByTool(FabricToolTags.SHEARS)
-								 .breakByHand(true)
-								 .sound(SoundType.WET_GRASS)
-								 .noCollission());
+		this(
+			FabricBlockSettings
+				.of(Material.WATER_PLANT)
+				.breakByHand(true)
+				.sound(SoundType.WET_GRASS)
+				.noCollission()
+		);
 	}
 	
 	public BaseUnderwaterWallPlantBlock(int light) {
-		super(FabricBlockSettings.of(Material.WATER_PLANT)
-								 .breakByTool(FabricToolTags.SHEARS)
-								 .breakByHand(true)
-								 .luminance(light)
-								 .sound(SoundType.WET_GRASS)
-								 .noCollission());
+		this(
+			FabricBlockSettings
+				.of(Material.WATER_PLANT)
+				.breakByHand(true)
+				.luminance(light)
+				.sound(SoundType.WET_GRASS)
+				.noCollission()
+		);
 	}
 	
 	public BaseUnderwaterWallPlantBlock(Properties settings) {

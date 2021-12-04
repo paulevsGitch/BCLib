@@ -50,12 +50,18 @@ public class BaseVineBlock extends BaseBlockNotFull implements RenderLayerProvid
 	}
 	
 	public BaseVineBlock(int light, boolean bottomOnly) {
-		super(FabricBlockSettings.of(Material.PLANT)
-								 .breakByTool(FabricToolTags.SHEARS)
-								 .breakByHand(true)
-								 .sound(SoundType.GRASS)
-								 .lightLevel((state) -> bottomOnly ? state.getValue(SHAPE) == TripleShape.BOTTOM ? light : 0 : light)
-								 .noCollission());
+		this(
+			FabricBlockSettings
+				.of(Material.PLANT)
+				.breakByHand(true)
+				.sound(SoundType.GRASS)
+				.lightLevel((state) -> bottomOnly ? state.getValue(SHAPE) == TripleShape.BOTTOM ? light : 0 : light)
+				.noCollission()
+		);
+	}
+	
+	public BaseVineBlock(BlockBehaviour.Properties properties) {
+		super(properties);
 		this.registerDefaultState(this.stateDefinition.any().setValue(SHAPE, TripleShape.BOTTOM));
 	}
 	

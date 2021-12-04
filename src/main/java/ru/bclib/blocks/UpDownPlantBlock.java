@@ -17,6 +17,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.storage.loot.LootContext;
@@ -28,26 +29,32 @@ import ru.bclib.interfaces.RenderLayerProvider;
 
 import java.util.List;
 
-@SuppressWarnings("deprecation")
 public abstract class UpDownPlantBlock extends BaseBlockNotFull implements RenderLayerProvider {
 	private static final VoxelShape SHAPE = Block.box(4, 0, 4, 12, 16, 12);
 	
 	public UpDownPlantBlock() {
-		super(FabricBlockSettings.of(Material.PLANT)
-								 .breakByTool(FabricToolTags.SHEARS)
-								 .breakByHand(true)
-								 .sound(SoundType.GRASS)
-								 .noCollission());
+		this(FabricBlockSettings
+			.of(Material.PLANT)
+			.breakByHand(true)
+			.sound(SoundType.GRASS)
+			.noCollission()
+		);
+	}
+	
+	public UpDownPlantBlock(BlockBehaviour.Properties properties) {
+		super(properties);
 	}
 	
 	protected abstract boolean isTerrain(BlockState state);
 	
 	@Override
+	@SuppressWarnings("deprecation")
 	public VoxelShape getShape(BlockState state, BlockGetter view, BlockPos pos, CollisionContext ePos) {
 		return SHAPE;
 	}
 	
 	@Override
+	@SuppressWarnings("deprecation")
 	public boolean canSurvive(BlockState state, LevelReader world, BlockPos pos) {
 		BlockState down = world.getBlockState(pos.below());
 		BlockState up = world.getBlockState(pos.above());
@@ -59,6 +66,7 @@ public abstract class UpDownPlantBlock extends BaseBlockNotFull implements Rende
 	}
 	
 	@Override
+	@SuppressWarnings("deprecation")
 	public BlockState updateShape(BlockState state, Direction facing, BlockState neighborState, LevelAccessor world, BlockPos pos, BlockPos neighborPos) {
 		if (!canSurvive(state, world, pos)) {
 			return Blocks.AIR.defaultBlockState();

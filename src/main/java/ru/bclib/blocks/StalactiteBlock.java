@@ -22,6 +22,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LiquidBlockContainer;
 import net.minecraft.world.level.block.SimpleWaterloggedBlock;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -50,11 +51,12 @@ public class StalactiteBlock extends BaseBlockNotFull implements SimpleWaterlogg
 	private static final VoxelShape[] SHAPES;
 	
 	public StalactiteBlock(Block source) {
-		super(FabricBlockSettings.copy(source).noOcclusion());
-		this.registerDefaultState(getStateDefinition().any()
-													  .setValue(SIZE, 0)
-													  .setValue(IS_FLOOR, true)
-													  .setValue(WATERLOGGED, false));
+		this(FabricBlockSettings.copy(source).noOcclusion());
+	}
+	
+	public StalactiteBlock(BlockBehaviour.Properties properties) {
+		super(properties);
+		this.registerDefaultState(getStateDefinition().any().setValue(SIZE, 0).setValue(IS_FLOOR, true).setValue(WATERLOGGED, false));
 	}
 	
 	@Override
