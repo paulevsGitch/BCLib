@@ -30,7 +30,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
 
-public class BaseOreBlock extends OreBlock implements BlockModelProvider, TagProvider {
+public class BaseOreBlock extends OreBlock implements BlockModelProvider {
 	private final Supplier<Item> dropItem;
 	private final int minCount;
 	private final int maxCount;
@@ -100,10 +100,5 @@ public class BaseOreBlock extends OreBlock implements BlockModelProvider, TagPro
 	@Override
 	public BlockModel getItemModel(ResourceLocation resourceLocation) {
 		return getBlockModel(resourceLocation, defaultBlockState());
-	}
-	
-	@Override
-	public void addTags(List<Named<Block>> blockTags, List<Named<Item>> itemTags) {
-		blockTags.add(TagAPI.MINEABLE_PICKAXE);
 	}
 }
