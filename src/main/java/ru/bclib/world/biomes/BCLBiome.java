@@ -228,6 +228,11 @@ public class BCLBiome {
 		if (!this.structures.isEmpty()) {
 			structures.forEach(s -> BiomeAPI.addBiomeStructure(BiomeAPI.getBiomeKey(actualBiome), s));
 		}
+		
+		if (this.surface!=null){
+			ResourceKey key = BiomeAPI.getBiomeKey(actualBiome);
+			BiomeAPI.addSurfaceRule(biomeID, SurfaceRules.ifTrue(SurfaceRules.isBiome(key), surface));
+		}
 	}
 	
 	/**
@@ -313,8 +318,6 @@ public class BCLBiome {
 	 * @param surface {@link SurfaceRules.RuleSource} rule.
 	 */
 	public void setSurface(SurfaceRules.RuleSource surface) {
-		ResourceKey key = BiomeAPI.getBiomeKey(biome);
-		BiomeAPI.addSurfaceRule(biomeID, SurfaceRules.ifTrue(SurfaceRules.isBiome(key), surface));
 		this.surface = surface;
 	}
 }
