@@ -18,9 +18,7 @@ import ru.bclib.world.biomes.BCLBiome;
 import ru.bclib.world.generator.map.hex.HexBiomeMap;
 import ru.bclib.world.generator.map.square.SquareBiomeMap;
 
-import java.util.LinkedList;
 import java.util.List;
-import java.util.function.Consumer;
 
 public class BCLibNetherBiomeSource extends BiomeSource {    
 	public static final Codec<BCLibNetherBiomeSource> CODEC = RecordCodecBuilder.create((instance) -> {
@@ -45,9 +43,6 @@ public class BCLibNetherBiomeSource extends BiomeSource {
     public static void setForceLegacyGeneration(boolean val){
         forceLegacyGenerator = val;
     }
-	
-	@Deprecated(forRemoval = true)
-	public static final List<Consumer<BCLibNetherBiomeSource>> onInit = new LinkedList<>();
 	
 	public BCLibNetherBiomeSource(Registry<Biome> biomeRegistry, long seed) {
 		super(getBiomes(biomeRegistry));
@@ -87,8 +82,6 @@ public class BCLibNetherBiomeSource extends BiomeSource {
 		
 		this.biomeRegistry = biomeRegistry;
 		this.seed = seed;
-
-		onInit.forEach(consumer->consumer.accept(this));
 	}
 	
 	private static List<Biome> getBiomes(Registry<Biome> biomeRegistry) {

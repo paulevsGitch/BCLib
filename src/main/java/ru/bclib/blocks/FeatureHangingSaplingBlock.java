@@ -8,7 +8,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-public abstract class FeatureHangingSaplingBlock extends FeatureSaplingBlockCommon{
+public abstract class FeatureHangingSaplingBlock extends FeatureSaplingBlock {
 	private static final VoxelShape SHAPE = Block.box(4, 2, 4, 12, 16, 12);
 	public FeatureHangingSaplingBlock() {
 		super();

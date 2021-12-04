@@ -77,8 +77,6 @@ public class BCLFeature {
 				PlacementUtils.HEIGHTMAP,
 				BiomeFilter.biome()
 			);
-			//.decorated(BCLDecorators.HEIGHTMAP_SQUARE)
-			//.countRandom(density);
 		return new BCLFeature(id, feature, Decoration.VEGETAL_DECORATION, configured);
 	}
 	/**
@@ -129,12 +127,6 @@ public class BCLFeature {
 					)
 				),
 				BiomeFilter.biome());
-//			.rangeUniform(
-//				VerticalAnchor.absolute(minY),
-//				VerticalAnchor.absolute(maxY)
-//			)
-//			.squared()
-//			.count(veins);
 		return new BCLFeature(
 			net.minecraft.world.level.levelgen.feature.Feature.ORE,
 			Registry.register(BuiltinRegistries.PLACED_FEATURE, id, oreFeature),
@@ -153,7 +145,6 @@ public class BCLFeature {
 		PlacedFeature configured = feature
 			.configured(FeatureConfiguration.NONE)
 			.placed(CountPlacement.of(1));
-			//.decorated(FeatureDecorator.COUNT.configured(new CountConfiguration(1)));
 		return new BCLFeature(id, feature, step, configured);
 	}
 	
@@ -169,7 +160,6 @@ public class BCLFeature {
 		PlacedFeature configured = feature
 			.configured(FeatureConfiguration.NONE)
 			.placed(RarityFilter.onAverageOnceEvery(chance));
-			//.decorated(FeatureDecorator.CHANCE.configured(new ChanceDecoratorConfiguration(chance)));
 		return new BCLFeature(id, feature, step, configured);
 	}
 	
@@ -199,35 +189,5 @@ public class BCLFeature {
 	public static BCLFeature makeFeatureConfigured(ResourceLocation id, Decoration step, Feature<NoneFeatureConfiguration> feature) {
 		PlacedFeature configured = feature.configured(FeatureConfiguration.NONE).placed();
 		return new BCLFeature(id, feature, step, configured);
-	}
-	
-	@Deprecated(forRemoval = true)
-	public static BCLFeature makeOreFeature(ResourceLocation id, Block blockOre, Block hostBlock, int veins, int veinSize, int offset, int minY, int maxY) {
-		return makeOreFeature(id, blockOre, hostBlock, veins, veinSize, minY, maxY);
-	}
-	
-	@Deprecated(forRemoval = true)
-	public static BCLFeature makeRawGenFeature(ResourceLocation id, Feature<NoneFeatureConfiguration> feature, int chance) {
-		return makeChancedFeature(id, Decoration.RAW_GENERATION, feature, chance);
-	}
-	
-	@Deprecated(forRemoval = true)
-	public static BCLFeature makeChunkFeature(ResourceLocation id, Feature<NoneFeatureConfiguration> feature) {
-		return makeChunkFeature(id, Decoration.LOCAL_MODIFICATIONS, feature);
-	}
-	
-	@Deprecated(forRemoval = true)
-	public static BCLFeature makeChansedFeature(ResourceLocation id, Feature<NoneFeatureConfiguration> feature, int chance) {
-		return makeChancedFeature(id, Decoration.SURFACE_STRUCTURES, feature, chance);
-	}
-	
-	@Deprecated(forRemoval = true)
-	public static BCLFeature makeCountRawFeature(ResourceLocation id, Feature<NoneFeatureConfiguration> feature, int chance) {
-		return makeCountFeature(id, Decoration.RAW_GENERATION, feature, chance);
-	}
-	
-	@Deprecated(forRemoval = true)
-	public static BCLFeature makeFeatureConfigured(ResourceLocation id, Feature<NoneFeatureConfiguration> feature) {
-		return makeFeatureConfigured(id, Decoration.RAW_GENERATION, feature);
 	}
 }
