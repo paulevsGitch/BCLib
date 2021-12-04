@@ -1,12 +1,15 @@
 package ru.bclib.blocks;
 
 import com.google.common.collect.Lists;
+import net.fabricmc.fabric.api.mininglevel.v1.FabricMineableTags;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.tool.attribute.v1.FabricToolTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.tags.Tag.Named;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
@@ -30,13 +33,15 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import ru.bclib.api.TagAPI;
 import ru.bclib.client.render.BCLRenderLayer;
 import ru.bclib.interfaces.RenderLayerProvider;
+import ru.bclib.interfaces.TagProvider;
 
 import java.util.List;
 import java.util.Random;
 
-public abstract class UnderwaterPlantBlock extends BaseBlockNotFull implements RenderLayerProvider, BonemealableBlock, LiquidBlockContainer {
+public abstract class UnderwaterPlantBlock extends BaseBlockNotFull implements RenderLayerProvider, BonemealableBlock, LiquidBlockContainer, TagProvider {
 	private static final VoxelShape SHAPE = Block.box(4, 0, 4, 12, 14, 12);
 	
 	public UnderwaterPlantBlock() {
@@ -153,5 +158,11 @@ public abstract class UnderwaterPlantBlock extends BaseBlockNotFull implements R
 	@SuppressWarnings("deprecation")
 	public FluidState getFluidState(BlockState state) {
 		return Fluids.WATER.getSource(false);
+	}
+	
+	@Override
+	public void addTags(List<Named<Block>> blockTags, List<Named<Item>> itemTags) {
+		blockTags.add(FabricMineableTags.SHEARS_MINEABLE);
+		blockTags.add(TagAPI.MINEABLE_HOE);
 	}
 }
