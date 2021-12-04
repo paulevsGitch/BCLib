@@ -138,7 +138,7 @@ public class BCLFeature {
 	 * @param veins     iterations per chunk.
 	 * @param veinSize  size of ore vein.
 	 * @param placement {@link net.minecraft.world.level.levelgen.placement.PlacementModifier} for the ore distribution,
-	 *                  for example {@Code PlacementUtils.FULL_RANGE}, {@Code PlacementUtils.RANGE_10_10}
+	 *                  for example {@code PlacementUtils.FULL_RANGE}, {@code PlacementUtils.RANGE_10_10}
 	 * @param rare      when true, this is placed as a rare resource
 	 * @return new BCLFeature instance.
 	 */
