@@ -63,7 +63,8 @@ public class BCLib implements ModInitializer {
 			.filler(Blocks.STONE.defaultBlockState())
 			.subsurface(Blocks.DIRT.defaultBlockState(), 3)
 			.surface(Blocks.GRASS_BLOCK.defaultBlockState())
-			.ceil(Blocks.DEEPSLATE.defaultBlockState())
+			.aboveCeil(Blocks.DEEPSLATE.defaultBlockState(), 4)
+			.ceil(Blocks.BASALT.defaultBlockState())
 			.build();
 		BiomeAPI.addSurfaceRule(Biomes.END_HIGHLANDS.location(), rule);
 	}

@@ -105,6 +105,22 @@ public class SurfaceRuleBuilder {
 	}
 	
 	/**
+	 * Set biome ceiling material with specified {@link BlockState} and height. Example - sandstone in the Overworld deserts.
+	 * @param state {@link BlockState} for the subterrain layer.
+	 * @param height block layer height.
+	 * @return same {@link SurfaceRuleBuilder} instance.
+	 */
+	public SurfaceRuleBuilder aboveCeil(BlockState state, int height) {
+		entryInstance = getFromCache("above_ceil_" + height + "_" + state.toString(), () -> {
+			RuleSource rule = SurfaceRules.state(state);
+			rule = SurfaceRules.ifTrue(SurfaceRules.stoneDepthCheck(height, false, false, CaveSurface.CEILING), rule);
+			return new SurfaceRuleEntry(2, rule);
+		});
+		rules.add(entryInstance);
+		return this;
+	}
+	
+	/**
 	 * Allows to add custom rule.
 	 * @param priority rule priority, lower values = higher priority (rule will be applied before others).
 	 * @param rule custom {@link SurfaceRules.RuleSource}.
