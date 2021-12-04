@@ -1,6 +1,5 @@
 package ru.bclib.util;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -44,18 +43,4 @@ public class CollectionsUtil {
 		}
 		return new HashMap<>(map);
 	}
-	
-	/**
-	 * Converts list into array.
-	 * @param list {@link List} to convert.
-	 * @return array of list elements. If list is empty will return empty {@link Object} array.
-	 */
-	public static <E> E[] toArray(List<E> list) {
-		if (list.isEmpty()) {
-			return (E[]) new Object[0];
-		}
-		E[] result = (E[]) Array.newInstance(list.get(0).getClass(), list.size());
-		result = list.toArray(result);
-		return result;
-	};
 }

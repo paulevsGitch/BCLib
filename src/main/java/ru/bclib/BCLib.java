@@ -4,10 +4,15 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.biome.Biomes;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.Noises;
 import net.minecraft.world.level.levelgen.SurfaceRules;
+import net.minecraft.world.level.levelgen.SurfaceRules.RuleSource;
 import ru.bclib.api.TagAPI;
 import ru.bclib.api.WorldDataAPI;
+import ru.bclib.api.biomes.BiomeAPI;
+import ru.bclib.api.biomes.SurfaceRuleBuilder;
 import ru.bclib.api.dataexchange.DataExchangeAPI;
 import ru.bclib.api.dataexchange.handler.autosync.Chunker;
 import ru.bclib.api.dataexchange.handler.autosync.HelloClient;
@@ -51,6 +56,16 @@ public class BCLib implements ModInitializer {
 		
 		BCLibPatch.register();
 		Configs.save();
+		
+		RuleSource rule = SurfaceRuleBuilder
+			.start()
+			.biome(Biomes.END_HIGHLANDS)
+			.filler(Blocks.STONE.defaultBlockState())
+			.subsurface(Blocks.DIRT.defaultBlockState(), 3)
+			.surface(Blocks.GRASS_BLOCK.defaultBlockState())
+			.ceil(Blocks.DEEPSLATE.defaultBlockState())
+			.build();
+		BiomeAPI.addSurfaceRule(Biomes.END_HIGHLANDS.location(), rule);
 	}
 	
 	public static boolean isDevEnvironment() {
@@ -63,10 +78,5 @@ public class BCLib implements ModInitializer {
 	
 	public static ResourceLocation makeID(String path) {
 		return new ResourceLocation(MOD_ID, path);
-	}
-	
-	private static SurfaceRules.ConditionSource surfaceNoiseAbove(double d) {
-		
-		return SurfaceRules.noiseCondition(Noises.SURFACE, d / 8.25, Double.MAX_VALUE);
 	}
 }

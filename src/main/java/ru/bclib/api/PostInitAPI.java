@@ -21,7 +21,6 @@ import ru.bclib.interfaces.PostInitable;
 import ru.bclib.interfaces.RenderLayerProvider;
 import ru.bclib.interfaces.TagProvider;
 import ru.bclib.registry.BaseBlockEntities;
-import ru.bclib.util.CollectionsUtil;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -93,8 +92,8 @@ public class PostInitAPI {
 		}
 		if (block instanceof TagProvider) {
 			TagProvider.class.cast(block).addTags(blockTags, itemTags);
-			TagAPI.addTags(block, CollectionsUtil.toArray(blockTags));
-			TagAPI.addTags(block, CollectionsUtil.toArray(itemTags));
+			blockTags.forEach(tag -> TagAPI.addTag(tag, block));
+			itemTags.forEach(tag -> TagAPI.addTag(tag, block));
 			blockTags.clear();
 			itemTags.clear();
 		}

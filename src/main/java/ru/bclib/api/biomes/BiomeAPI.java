@@ -439,7 +439,7 @@ public class BiomeAPI {
 			SurfaceRuleProvider provider = SurfaceRuleProvider.class.cast(generator);
 			if (rules.size() > 0) {
 				rules.add(provider.getSurfaceRule());
-				provider.setSurfaceRule(SurfaceRules.sequence(CollectionsUtil.toArray(rules)));
+				provider.setSurfaceRule(SurfaceRules.sequence(rules.toArray(new SurfaceRules.RuleSource[rules.size()])));
 			}
 			else {
 				provider.setSurfaceRule(null);

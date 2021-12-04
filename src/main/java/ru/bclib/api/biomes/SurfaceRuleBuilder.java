@@ -8,7 +8,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.SurfaceRules;
 import net.minecraft.world.level.levelgen.SurfaceRules.RuleSource;
 import net.minecraft.world.level.levelgen.placement.CaveSurface;
-import ru.bclib.util.CollectionsUtil;
 
 import java.util.Collections;
 import java.util.List;
@@ -57,7 +56,8 @@ public class SurfaceRuleBuilder {
 	public SurfaceRuleBuilder surface(BlockState state) {
 		entryInstance = getFromCache("surface_" + state.toString(), () -> {
 			RuleSource rule = SurfaceRules.state(state);
-			return new SurfaceRuleEntry(1, SurfaceRules.ifTrue(SurfaceRules.ON_FLOOR, rule));
+			rule = SurfaceRules.ifTrue(SurfaceRules.ON_FLOOR, rule);
+			return new SurfaceRuleEntry(1, rule);
 		});
 		rules.add(entryInstance);
 		return this;
@@ -73,7 +73,7 @@ public class SurfaceRuleBuilder {
 		entryInstance = getFromCache("subsurface_" + depth + "_" + state.toString(), () -> {
 			RuleSource rule = SurfaceRules.state(state);
 			rule = SurfaceRules.ifTrue(SurfaceRules.stoneDepthCheck(depth, false, false, CaveSurface.FLOOR), rule);
-			return new SurfaceRuleEntry(2, SurfaceRules.ifTrue(SurfaceRules.ON_FLOOR, rule));
+			return new SurfaceRuleEntry(2, rule);
 		});
 		rules.add(entryInstance);
 		return this;
@@ -131,7 +131,7 @@ public class SurfaceRuleBuilder {
 	public SurfaceRules.RuleSource build() {
 		Collections.sort(rules);
 		List<SurfaceRules.RuleSource> ruleList = rules.stream().map(entry -> entry.getRule()).toList();
-		SurfaceRules.RuleSource[] ruleArray = CollectionsUtil.toArray(ruleList);
+		SurfaceRules.RuleSource[] ruleArray = ruleList.toArray(new SurfaceRules.RuleSource[ruleList.size()]);
 		SurfaceRules.RuleSource rule = SurfaceRules.sequence(ruleArray);
 		if (biomeKey != null) {
 			rule = SurfaceRules.ifTrue(SurfaceRules.isBiome(biomeKey), rule);
