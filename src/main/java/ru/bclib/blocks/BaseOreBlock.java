@@ -5,6 +5,7 @@ import net.fabricmc.fabric.api.tool.attribute.v1.FabricToolTags;
 import net.fabricmc.fabric.impl.object.builder.FabricBlockInternals;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.Tag.Named;
 import net.minecraft.util.Mth;
 import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.item.Item;
@@ -12,6 +13,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.OreBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -19,14 +21,16 @@ import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
+import ru.bclib.api.TagAPI;
 import ru.bclib.interfaces.BlockModelProvider;
+import ru.bclib.interfaces.TagProvider;
 import ru.bclib.util.MHelper;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
 
-public class BaseOreBlock extends OreBlock implements BlockModelProvider {
+public class BaseOreBlock extends OreBlock implements BlockModelProvider, TagProvider {
 	private final Supplier<Item> dropItem;
 	private final int minCount;
 	private final int maxCount;
@@ -96,5 +100,10 @@ public class BaseOreBlock extends OreBlock implements BlockModelProvider {
 	@Override
 	public BlockModel getItemModel(ResourceLocation resourceLocation) {
 		return getBlockModel(resourceLocation, defaultBlockState());
+	}
+	
+	@Override
+	public void addTags(List<Named<Block>> blockTags, List<Named<Item>> itemTags) {
+		blockTags.add(TagAPI.MINEABLE_PICKAXE);
 	}
 }
