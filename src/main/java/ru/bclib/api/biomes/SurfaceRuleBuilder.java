@@ -8,6 +8,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.SurfaceRules;
 import net.minecraft.world.level.levelgen.SurfaceRules.RuleSource;
 import net.minecraft.world.level.levelgen.placement.CaveSurface;
+import ru.bclib.util.CollectionsUtil;
 
 import java.util.Collections;
 import java.util.List;
@@ -129,7 +130,8 @@ public class SurfaceRuleBuilder {
 	 */
 	public SurfaceRules.RuleSource build() {
 		Collections.sort(rules);
-		SurfaceRules.RuleSource[] ruleArray = rules.toArray(new SurfaceRules.RuleSource[rules.size()]);
+		List<SurfaceRules.RuleSource> ruleList = rules.stream().map(entry -> entry.getRule()).toList();
+		SurfaceRules.RuleSource[] ruleArray = CollectionsUtil.toArray(ruleList);
 		SurfaceRules.RuleSource rule = SurfaceRules.sequence(ruleArray);
 		if (biomeKey != null) {
 			rule = SurfaceRules.ifTrue(SurfaceRules.isBiome(biomeKey), rule);
