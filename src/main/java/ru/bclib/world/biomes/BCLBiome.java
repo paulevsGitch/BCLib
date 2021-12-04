@@ -8,6 +8,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.SurfaceRules;
+import net.minecraft.world.level.levelgen.SurfaceRules.RuleSource;
 import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
 import org.jetbrains.annotations.Nullable;
 import ru.bclib.api.biomes.BiomeAPI;
@@ -16,6 +17,8 @@ import ru.bclib.util.WeightedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class BCLBiome {
 	private final List<ConfiguredStructureFeature> structures = Lists.newArrayList();
@@ -24,7 +27,7 @@ public class BCLBiome {
 	private final ResourceLocation biomeID;
 	private final Biome biome;
 	
-	private SurfaceRules.RuleSource surface;
+	private Runnable surfaceInit;
 	private BCLBiome biomeParent;
 	private Biome actualBiome;
 	private BCLBiome edge;
@@ -229,9 +232,8 @@ public class BCLBiome {
 			structures.forEach(s -> BiomeAPI.addBiomeStructure(BiomeAPI.getBiomeKey(actualBiome), s));
 		}
 		
-		if (this.surface!=null){
-			ResourceKey key = BiomeAPI.getBiomeKey(actualBiome);
-			BiomeAPI.addSurfaceRule(biomeID, SurfaceRules.ifTrue(SurfaceRules.isBiome(key), surface));
+		if (this.surfaceInit != null){
+			surfaceInit.run();
 		}
 	}
 	
@@ -317,7 +319,10 @@ public class BCLBiome {
 	 * Sets biome surface rule.
 	 * @param surface {@link SurfaceRules.RuleSource} rule.
 	 */
-	public void setSurface(SurfaceRules.RuleSource surface) {
-		this.surface = surface;
+	public void setSurface(RuleSource surface) {
+		this.surfaceInit = () -> {
+			ResourceKey key = BiomeAPI.getBiomeKey(biome);
+			BiomeAPI.addSurfaceRule(biomeID, SurfaceRules.ifTrue(SurfaceRules.isBiome(key), surface));
+		};
 	}
 }
