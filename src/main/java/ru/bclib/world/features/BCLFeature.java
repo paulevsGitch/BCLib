@@ -18,6 +18,7 @@ import net.minecraft.world.level.levelgen.placement.CountPlacement;
 import net.minecraft.world.level.levelgen.placement.HeightRangePlacement;
 import net.minecraft.world.level.levelgen.placement.InSquarePlacement;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
+import net.minecraft.world.level.levelgen.placement.PlacementModifier;
 import net.minecraft.world.level.levelgen.placement.RarityFilter;
 import net.minecraft.world.level.levelgen.structure.templatesystem.BlockMatchTest;
 
@@ -86,12 +87,27 @@ public class BCLFeature {
 	 * @param hostBlock {@link Block} to generate feature in.
 	 * @param veins iterations per chunk.
 	 * @param veinSize size of ore vein.
-	 * @param minY minimum height.
+	 * @param minY minimum height
 	 * @param maxY maximum height.
 	 * @return new BCLFeature instance.
 	 */
 	public static BCLFeature makeOreFeature(ResourceLocation id, Block blockOre, Block hostBlock, int veins, int veinSize, int minY, int maxY) {
-		//TODO: 1.18 See if this still works
+		return makeOreFeature(id, blockOre, hostBlock, veins, veinSize, VerticalAnchor.absolute(minY), VerticalAnchor.absolute(maxY), false);
+	}
+	
+	/**
+	 * Will create a basic ore feature.
+	 * @param id {@link ResourceLocation} feature ID.
+	 * @param blockOre {@link Decoration} feature step.
+	 * @param hostBlock {@link Block} to generate feature in.
+	 * @param veins iterations per chunk.
+	 * @param veinSize size of ore vein.
+	 * @param minY A {@link VerticalAnchor} for the minimum height, for example
+	 *                {@code VerticalAnchor.bottom()}, {@code VerticalAnchor.absolute(10)}, {@code VerticalAnchor.aboveBottom(10)}
+	 * @param maxY A {@link VerticalAnchor} for the maximum height.
+	 * @return new BCLFeature instance.
+	 */
+	public static BCLFeature makeOreFeature(ResourceLocation id, Block blockOre, Block hostBlock, int veins, int veinSize, VerticalAnchor minY, VerticalAnchor maxY) {
 		return makeOreFeature(id, blockOre, hostBlock, veins, veinSize, minY, maxY, false);
 	}
 	
@@ -103,12 +119,30 @@ public class BCLFeature {
 	 * @param hostBlock {@link Block} to generate feature in.
 	 * @param veins     iterations per chunk.
 	 * @param veinSize  size of ore vein.
-	 * @param minY      minimum height.
-	 * @param maxY      maximum height.
+	 * @param minY A {@link VerticalAnchor} for the minimum height, for example
+	 *                {@code VerticalAnchor.bottom()}, {@code VerticalAnchor.absolute(10)}, {@code VerticalAnchor.aboveBottom(10)}
+	 * @param maxY A {@link VerticalAnchor} for the maximum height.
 	 * @param rare      when true, this is placed as a rare resource
 	 * @return new BCLFeature instance.
 	 */
-	public static BCLFeature makeOreFeature(ResourceLocation id, Block blockOre, Block hostBlock, int veins, int veinSize, int minY, int maxY, boolean rare) {
+	public static BCLFeature makeOreFeature(ResourceLocation id, Block blockOre, Block hostBlock, int veins, int veinSize, VerticalAnchor minY, VerticalAnchor maxY, boolean rare) {
+		return makeOreFeature(id, blockOre, hostBlock, veins, veinSize, HeightRangePlacement.uniform(minY, maxY), rare);
+	}
+	
+	/**
+	 * Will create a basic ore feature.
+	 *
+	 * @param id        {@link ResourceLocation} feature ID.
+	 * @param blockOre  {@link Decoration} feature step.
+	 * @param hostBlock {@link Block} to generate feature in.
+	 * @param veins     iterations per chunk.
+	 * @param veinSize  size of ore vein.
+	 * @param placement {@link net.minecraft.world.level.levelgen.placement.PlacementModifier} for the ore distribution,
+	 *                  for example {@Code PlacementUtils.FULL_RANGE}, {@Code PlacementUtils.RANGE_10_10}
+	 * @param rare      when true, this is placed as a rare resource
+	 * @return new BCLFeature instance.
+	 */
+	public static BCLFeature makeOreFeature(ResourceLocation id, Block blockOre, Block hostBlock, int veins, int veinSize, PlacementModifier placement, boolean rare) {
 		OreConfiguration featureConfig = new OreConfiguration(
 			new BlockMatchTest(hostBlock),
 			blockOre.defaultBlockState(),
@@ -120,12 +154,7 @@ public class BCLFeature {
 			.placed(
 				InSquarePlacement.spread(),
 				rare ? RarityFilter.onAverageOnceEvery(veins) : CountPlacement.of(veins),
-				HeightRangePlacement.of(
-					UniformHeight.of(
-						VerticalAnchor.absolute(minY),
-						VerticalAnchor.absolute(maxY)
-					)
-				),
+				placement,
 				BiomeFilter.biome());
 		return new BCLFeature(
 			net.minecraft.world.level.levelgen.feature.Feature.ORE,
