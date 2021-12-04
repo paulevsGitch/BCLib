@@ -189,7 +189,7 @@ public class Chunker extends DataHandler.FromServer {
 	public static final int MAX_PACKET_SIZE = 1024*1024;
 	private static final int MAX_PAYLOAD_SIZE = MAX_PACKET_SIZE - HEADER_SIZE;
 	
-	public static DataHandlerDescriptor DESCRIPTOR = new DataHandlerDescriptor(new ResourceLocation(BCLib.MOD_ID, "chunker"), Chunker::new, false, false);
+	public static final DataHandlerDescriptor DESCRIPTOR = new DataHandlerDescriptor(new ResourceLocation(BCLib.MOD_ID, "chunker"), Chunker::new, false, false);
 	
 	private int serialNo;
 	private UUID uuid;

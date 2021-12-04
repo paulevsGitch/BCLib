@@ -2,7 +2,9 @@ package ru.bclib.api;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import net.fabricmc.fabric.api.tag.TagFactory;
 import net.fabricmc.fabric.api.tag.TagRegistry;
+import net.fabricmc.fabric.impl.tag.extension.TagDelegate;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -75,7 +77,8 @@ public class TagAPI {
 	 */
 	public static <T> Tag.Named<T> makeTag(Supplier<TagCollection<T>> containerSupplier, ResourceLocation id) {
 		Tag<T> tag = containerSupplier.get().getTag(id);
-		return tag == null ? TagRegistry.create(id, containerSupplier) : (Named<T>) tag;
+		//return tag == null ? TagRegistry.create(id, containerSupplier) : (Named<T>) tag;
+		return tag == null ? new TagDelegate<>(id, containerSupplier) : (Named<T>) tag;
 	}
 	
 	/**
@@ -131,7 +134,8 @@ public class TagAPI {
 	public static Tag.Named<Block> getMCBlockTag(String name) {
 		ResourceLocation id = new ResourceLocation(name);
 		Tag<Block> tag = BlockTags.getAllTags().getTag(id);
-		return tag == null ? (Named<Block>) TagRegistry.block(id) : (Named<Block>) tag;
+		//return tag == null ? (Named<Block>) TagRegistry.block(id) : (Named<Block>) tag;
+		return tag == null ? (Named<Block>) TagFactory.BLOCK.create(id): (Named<Block>) tag;
 	}
 	
 	/**

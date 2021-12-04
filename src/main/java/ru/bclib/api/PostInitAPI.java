@@ -6,7 +6,10 @@ import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.Registry;
+import net.minecraft.tags.Tag;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
+import ru.bclib.api.biomes.BiomeAPI;
 import ru.bclib.blocks.BaseBarrelBlock;
 import ru.bclib.blocks.BaseChestBlock;
 import ru.bclib.blocks.BaseFurnaceBlock;
@@ -16,6 +19,7 @@ import ru.bclib.client.render.BaseChestBlockEntityRenderer;
 import ru.bclib.client.render.BaseSignBlockEntityRenderer;
 import ru.bclib.interfaces.PostInitable;
 import ru.bclib.interfaces.RenderLayerProvider;
+import ru.bclib.interfaces.TagProvider;
 import ru.bclib.registry.BaseBlockEntities;
 
 import java.util.List;
@@ -23,6 +27,8 @@ import java.util.function.Consumer;
 
 public class PostInitAPI {
 	private static List<Consumer<Boolean>> postInitFunctions = Lists.newArrayList();
+	private static List<Tag.Named<Block>> blockTags = Lists.newArrayList();
+	private static List<Tag.Named<Item>> itemTags = Lists.newArrayList();
 	
 	/**
 	 * Register a new function which will be called after all mods are initiated. Will be called on both client and server.
@@ -48,6 +54,8 @@ public class PostInitAPI {
 			}
 		});
 		postInitFunctions = null;
+		blockTags = null;
+		itemTags = null;
 		BiomeAPI.loadFabricAPIBiomes();
 	}
 	
@@ -81,6 +89,13 @@ public class PostInitAPI {
 		}
 		else if (block instanceof BaseFurnaceBlock) {
 			BaseBlockEntities.FURNACE.registerBlock(block);
+		}
+		if (block instanceof TagProvider) {
+			TagProvider.class.cast(block).addTags(blockTags, itemTags);
+			blockTags.forEach(tag -> TagAPI.addTag(tag, block));
+			itemTags.forEach(tag -> TagAPI.addTag(tag, block));
+			blockTags.clear();
+			itemTags.clear();
 		}
 	}
 }

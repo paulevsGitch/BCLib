@@ -64,10 +64,7 @@ public class BaseSignBlock extends SignBlock implements BlockModelProvider, Cust
 	
 	public BaseSignBlock(Block source) {
 		super(FabricBlockSettings.copyOf(source).strength(1.0F, 1.0F).noCollission().noOcclusion(), WoodType.OAK);
-		this.registerDefaultState(this.stateDefinition.any()
-													  .setValue(ROTATION, 0)
-													  .setValue(FLOOR, false)
-													  .setValue(WATERLOGGED, false));
+		this.registerDefaultState(this.stateDefinition.any().setValue(ROTATION, 0).setValue(FLOOR, false).setValue(WATERLOGGED, false));
 		this.parent = source;
 	}
 	
@@ -105,7 +102,7 @@ public class BaseSignBlock extends SignBlock implements BlockModelProvider, Cust
 	@Override
 	public BlockState updateShape(BlockState state, Direction facing, BlockState neighborState, LevelAccessor world, BlockPos pos, BlockPos neighborPos) {
 		if (state.getValue(WATERLOGGED)) {
-			world.getLiquidTicks().scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(world));
+			world.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(world));
 		}
 		if (!canSurvive(state, world, pos)) {
 			return state.getValue(WATERLOGGED) ? state.getFluidState()
@@ -181,18 +178,16 @@ public class BaseSignBlock extends SignBlock implements BlockModelProvider, Cust
 	
 	@Override
 	public boolean canPlaceLiquid(BlockGetter world, BlockPos pos, BlockState state, Fluid fluid) {
-		// TODO Auto-generated method stub
 		return super.canPlaceLiquid(world, pos, state, fluid);
 	}
 	
 	@Override
 	public boolean placeLiquid(LevelAccessor world, BlockPos pos, BlockState state, FluidState fluidState) {
-		// TODO Auto-generated method stub
 		return super.placeLiquid(world, pos, state, fluidState);
 	}
 	
 	@Override
 	public BlockItem getCustomItem(ResourceLocation blockID, FabricItemSettings settings) {
-		return new BlockItem(this, settings.maxCount(16));
+		return new BlockItem(this, settings.stacksTo(16));
 	}
 }

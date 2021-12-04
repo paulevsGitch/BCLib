@@ -25,7 +25,6 @@ import java.util.Map;
 import java.util.Optional;
 
 public abstract class BaseButtonBlock extends ButtonBlock implements BlockModelProvider {
-	
 	private final Block parent;
 	
 	protected BaseButtonBlock(Block parent, Properties properties, boolean sensitive) {

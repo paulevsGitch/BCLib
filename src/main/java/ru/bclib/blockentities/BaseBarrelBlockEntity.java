@@ -35,14 +35,15 @@ public class BaseBarrelBlockEntity extends RandomizableContainerBlockEntity {
 	public BaseBarrelBlockEntity(BlockPos blockPos, BlockState blockState) {
 		this(BaseBlockEntities.BARREL, blockPos, blockState);
 	}
-	
-	public CompoundTag save(CompoundTag tag) {
-		super.save(tag);
+
+	@Override
+	public void saveAdditional(CompoundTag tag) {
+		super.saveAdditional(tag);
 		if (!this.trySaveLootTable(tag)) {
 			ContainerHelper.saveAllItems(tag, this.inventory);
 		}
 		
-		return tag;
+		//return tag;
 	}
 	
 	public void load(CompoundTag tag) {
@@ -93,7 +94,7 @@ public class BaseBarrelBlockEntity extends RandomizableContainerBlockEntity {
 	}
 	
 	private void scheduleUpdate() {
-		level.getBlockTicks().scheduleTick(getBlockPos(), getBlockState().getBlock(), 5);
+		level.scheduleTick(getBlockPos(), getBlockState().getBlock(), 5);
 	}
 	
 	public void tick() {

@@ -20,7 +20,7 @@ public class BaseStripableLogBlock extends BaseRotatedPillarBlock {
 	private final Block striped;
 	
 	public BaseStripableLogBlock(MaterialColor color, Block striped) {
-		super(FabricBlockSettings.copyOf(striped).mapColor(color));
+		super(FabricBlockSettings.copyOf(striped).color(color));
 		this.striped = striped;
 	}
 	

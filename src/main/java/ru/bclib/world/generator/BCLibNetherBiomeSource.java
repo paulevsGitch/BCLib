@@ -8,17 +8,19 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biome.BiomeCategory;
 import net.minecraft.world.level.biome.BiomeSource;
+import net.minecraft.world.level.biome.Climate;
 import ru.bclib.BCLib;
-import ru.bclib.api.BiomeAPI;
+import ru.bclib.api.biomes.BiomeAPI;
 import ru.bclib.config.ConfigKeeper.StringArrayEntry;
 import ru.bclib.config.Configs;
+import ru.bclib.interfaces.BiomeMap;
 import ru.bclib.world.biomes.BCLBiome;
+import ru.bclib.world.generator.map.hex.HexBiomeMap;
+import ru.bclib.world.generator.map.square.SquareBiomeMap;
 
-import java.util.LinkedList;
 import java.util.List;
-import java.util.function.Consumer;
 
-public class BCLibNetherBiomeSource extends BiomeSource {
+public class BCLibNetherBiomeSource extends BiomeSource {    
 	public static final Codec<BCLibNetherBiomeSource> CODEC = RecordCodecBuilder.create((instance) -> {
 		return instance.group(RegistryLookupCodec.create(Registry.BIOME_REGISTRY).forGetter((theEndBiomeSource) -> {
 			return theEndBiomeSource.biomeRegistry;
@@ -29,24 +31,37 @@ public class BCLibNetherBiomeSource extends BiomeSource {
 	private final Registry<Biome> biomeRegistry;
 	private BiomeMap biomeMap;
 	private final long seed;
-	
-	@Deprecated(forRemoval = true)
-	public static final List<Consumer<BCLibNetherBiomeSource>> onInit = new LinkedList<>();
+    private static boolean forceLegacyGenerator = false;
+
+    /**
+     * When true, the older square generator is used for the nether.
+	 *
+	 * This override is used (for example) by BetterNether to force the legacy generation for worlds
+	 * that were created before 1.18
+     * @param val wether or not you want to force the old generatore.
+     */
+    public static void setForceLegacyGeneration(boolean val){
+        forceLegacyGenerator = val;
+    }
 	
 	public BCLibNetherBiomeSource(Registry<Biome> biomeRegistry, long seed) {
 		super(getBiomes(biomeRegistry));
 		
+		BiomeAPI.initRegistry(biomeRegistry);
 		BiomeAPI.NETHER_BIOME_PICKER.clearMutables();
 		
-		this.possibleBiomes.forEach(biome -> {
+		this.possibleBiomes().forEach(biome -> {
 			ResourceLocation key = biomeRegistry.getKey(biome);
 			if (!BiomeAPI.hasBiome(key)) {
-				BCLBiome bclBiome = new BCLBiome(key, biome, 1, 1);
+				String group = key.getNamespace() + "." + key.getPath();
+				float chance = Configs.BIOMES_CONFIG.getFloat(group, "generation_chance", 1.0F);
+				float fog = Configs.BIOMES_CONFIG.getFloat(group, "fog_density", 1.0F);
+				BCLBiome bclBiome = new BCLBiome(key, biome).setGenChance(chance).setFogDensity(fog);
 				BiomeAPI.NETHER_BIOME_PICKER.addBiomeMutable(bclBiome);
 			}
 			else {
 				BCLBiome bclBiome = BiomeAPI.getBiome(key);
-				if (bclBiome != BiomeAPI.EMPTY_BIOME && !bclBiome.hasParentBiome()) {
+				if (bclBiome != BiomeAPI.EMPTY_BIOME && bclBiome.getParentBiome() == null) {
 					if (!BiomeAPI.NETHER_BIOME_PICKER.containsImmutable(key)) {
 						BiomeAPI.NETHER_BIOME_PICKER.addBiomeMutable(bclBiome);
 					}
@@ -58,11 +73,15 @@ public class BCLibNetherBiomeSource extends BiomeSource {
 		BiomeAPI.NETHER_BIOME_PICKER.getBiomes().forEach(biome -> biome.updateActualBiomes(biomeRegistry));
 		BiomeAPI.NETHER_BIOME_PICKER.rebuild();
 		
-		this.biomeMap = new BiomeMap(seed, GeneratorOptions.getBiomeSizeNether(), BiomeAPI.NETHER_BIOME_PICKER);
+		if (GeneratorOptions.useOldBiomeGenerator() || forceLegacyGenerator) {
+			this.biomeMap = new SquareBiomeMap(seed, GeneratorOptions.getBiomeSizeNether(), BiomeAPI.NETHER_BIOME_PICKER);
+		}
+		else {
+			this.biomeMap = new HexBiomeMap(seed, GeneratorOptions.getBiomeSizeNether(), BiomeAPI.NETHER_BIOME_PICKER);
+		}
+		
 		this.biomeRegistry = biomeRegistry;
 		this.seed = seed;
-
-		onInit.forEach(consumer->consumer.accept(this));
 	}
 	
 	private static List<Biome> getBiomes(Registry<Biome> biomeRegistry) {
@@ -81,7 +100,7 @@ public class BCLibNetherBiomeSource extends BiomeSource {
 			
 			BCLBiome bclBiome = BiomeAPI.getBiome(key);
 			if (bclBiome != BiomeAPI.EMPTY_BIOME) {
-				if (bclBiome.hasParentBiome()) {
+				if (bclBiome.getParentBiome() != null) {
 					bclBiome = bclBiome.getParentBiome();
 				}
 				key = bclBiome.getID();
@@ -91,7 +110,7 @@ public class BCLibNetherBiomeSource extends BiomeSource {
 	}
 	
 	@Override
-	public Biome getNoiseBiome(int biomeX, int biomeY, int biomeZ) {
+	public Biome getNoiseBiome(int biomeX, int biomeY, int biomeZ, Climate.Sampler var4) {
 		if ((biomeX & 63) == 0 && (biomeZ & 63) == 0) {
 			biomeMap.clearCache();
 		}

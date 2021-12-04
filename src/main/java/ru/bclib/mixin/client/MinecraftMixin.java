@@ -22,6 +22,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import ru.bclib.api.LifeCycleAPI;
 import ru.bclib.api.dataexchange.DataExchangeAPI;
 import ru.bclib.api.datafixer.DataFixerAPI;
 import ru.bclib.interfaces.CustomColorProvider;
@@ -61,14 +62,18 @@ public abstract class MinecraftMixin {
 		DataExchangeAPI.prepareServerside();
 		
 		if (DataFixerAPI.fixData(this.levelSource, levelID, true, (appliedFixes) -> {
+			LifeCycleAPI._runBeforeLevelLoad();
 			this.doLoadLevel(levelID, RegistryAccess.builtin(), Minecraft::loadDataPacks, Minecraft::loadWorldData, false, appliedFixes?ExperimentalDialogType.NONE:ExperimentalDialogType.BACKUP);
 		})) {
 			ci.cancel();
+		} else {
+			LifeCycleAPI._runBeforeLevelLoad();
 		}
 	}
 	
 	@Inject(method = "createLevel", at = @At("HEAD"))
 	private void bclib_initPatchData(String levelID, LevelSettings levelSettings, RegistryHolder registryHolder, WorldGenSettings worldGenSettings, CallbackInfo ci) {
 		DataFixerAPI.initializeWorldData(this.levelSource, levelID, true);
+		LifeCycleAPI._runBeforeLevelLoad();
 	}
 }

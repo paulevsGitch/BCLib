@@ -9,15 +9,20 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biome.BiomeCategory;
 import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.biome.Biomes;
+import net.minecraft.world.level.biome.Climate;
 import net.minecraft.world.level.biome.TheEndBiomeSource;
+import net.minecraft.world.level.levelgen.LegacyRandomSource;
 import net.minecraft.world.level.levelgen.WorldgenRandom;
 import net.minecraft.world.level.levelgen.synth.SimplexNoise;
 import ru.bclib.BCLib;
-import ru.bclib.api.BiomeAPI;
+import ru.bclib.api.biomes.BiomeAPI;
 import ru.bclib.config.ConfigKeeper.StringArrayEntry;
 import ru.bclib.config.Configs;
+import ru.bclib.interfaces.BiomeMap;
 import ru.bclib.noise.OpenSimplexNoise;
 import ru.bclib.world.biomes.BCLBiome;
+import ru.bclib.world.generator.map.hex.HexBiomeMap;
+import ru.bclib.world.generator.map.square.SquareBiomeMap;
 
 import java.awt.Point;
 import java.util.List;
@@ -45,20 +50,35 @@ public class BCLibEndBiomeSource extends BiomeSource {
 	public BCLibEndBiomeSource(Registry<Biome> biomeRegistry, long seed) {
 		super(getBiomes(biomeRegistry));
 		
+		BiomeAPI.initRegistry(biomeRegistry);
 		BiomeAPI.END_LAND_BIOME_PICKER.clearMutables();
 		BiomeAPI.END_VOID_BIOME_PICKER.clearMutables();
 		
-		this.possibleBiomes.forEach(biome -> {
+		List<String> includeVoid = Configs.BIOMES_CONFIG.getEntry("force_include", "end_void_biomes", StringArrayEntry.class).getValue();
+		this.possibleBiomes().forEach(biome -> {
 			ResourceLocation key = biomeRegistry.getKey(biome);
 			if (!BiomeAPI.hasBiome(key)) {
-				BCLBiome bclBiome = new BCLBiome(key, biome, 1, 1);
-				BiomeAPI.END_LAND_BIOME_PICKER.addBiomeMutable(bclBiome);
+				String group = key.getNamespace() + "." + key.getPath();
+				float chance = Configs.BIOMES_CONFIG.getFloat(group, "generation_chance", 1.0F);
+				float fog = Configs.BIOMES_CONFIG.getFloat(group, "fog_density", 1.0F);
+				BCLBiome bclBiome = new BCLBiome(key, biome).setGenChance(chance).setFogDensity(fog);
+				if (includeVoid.contains(key.toString())) {
+					BiomeAPI.END_VOID_BIOME_PICKER.addBiomeMutable(bclBiome);
+				}
+				else {
+					BiomeAPI.END_LAND_BIOME_PICKER.addBiomeMutable(bclBiome);
+				}
 			}
 			else {
 				BCLBiome bclBiome = BiomeAPI.getBiome(key);
-				if (bclBiome != BiomeAPI.EMPTY_BIOME && !bclBiome.hasParentBiome()) {
+				if (bclBiome != BiomeAPI.EMPTY_BIOME && bclBiome.getParentBiome() == null) {
 					if (!BiomeAPI.END_LAND_BIOME_PICKER.containsImmutable(key) && !BiomeAPI.END_VOID_BIOME_PICKER.containsImmutable(key)) {
-						BiomeAPI.END_LAND_BIOME_PICKER.addBiomeMutable(bclBiome);
+						if (includeVoid.contains(key.toString())) {
+							BiomeAPI.END_VOID_BIOME_PICKER.addBiomeMutable(bclBiome);
+						}
+						else {
+							BiomeAPI.END_LAND_BIOME_PICKER.addBiomeMutable(bclBiome);
+						}
 					}
 				}
 			}
@@ -72,14 +92,21 @@ public class BCLibEndBiomeSource extends BiomeSource {
 		BiomeAPI.END_LAND_BIOME_PICKER.rebuild();
 		BiomeAPI.END_VOID_BIOME_PICKER.rebuild();
 		
-		this.mapLand = new BiomeMap(seed, GeneratorOptions.getBiomeSizeEndLand(), BiomeAPI.END_LAND_BIOME_PICKER);
-		this.mapVoid = new BiomeMap(seed, GeneratorOptions.getBiomeSizeEndVoid(), BiomeAPI.END_VOID_BIOME_PICKER);
+		if (GeneratorOptions.useOldBiomeGenerator()) {
+			this.mapLand = new SquareBiomeMap(seed, GeneratorOptions.getBiomeSizeEndLand(), BiomeAPI.END_LAND_BIOME_PICKER);
+			this.mapVoid = new SquareBiomeMap(seed, GeneratorOptions.getBiomeSizeEndVoid(), BiomeAPI.END_VOID_BIOME_PICKER);
+		}
+		else {
+			this.mapLand = new HexBiomeMap(seed, GeneratorOptions.getBiomeSizeEndLand(), BiomeAPI.END_LAND_BIOME_PICKER);
+			this.mapVoid = new HexBiomeMap(seed, GeneratorOptions.getBiomeSizeEndVoid(), BiomeAPI.END_VOID_BIOME_PICKER);
+		}
+		
 		this.centerBiome = biomeRegistry.getOrThrow(Biomes.THE_END);
 		this.barrens = biomeRegistry.getOrThrow(Biomes.END_BARRENS);
 		this.biomeRegistry = biomeRegistry;
 		this.seed = seed;
 		
-		WorldgenRandom chunkRandom = new WorldgenRandom(seed);
+		WorldgenRandom chunkRandom = new WorldgenRandom(new LegacyRandomSource(seed));
 		chunkRandom.consumeCount(17292);
 		this.noise = new SimplexNoise(chunkRandom);
 		
@@ -88,12 +115,13 @@ public class BCLibEndBiomeSource extends BiomeSource {
 	}
 	
 	private static List<Biome> getBiomes(Registry<Biome> biomeRegistry) {
-		List<String> include = Configs.BIOMES_CONFIG.getEntry("force_include", "end_biomes", StringArrayEntry.class).getValue();
+		List<String> includeLand = Configs.BIOMES_CONFIG.getEntry("force_include", "end_land_biomes", StringArrayEntry.class).getValue();
+		List<String> includeVoid = Configs.BIOMES_CONFIG.getEntry("force_include", "end_void_biomes", StringArrayEntry.class).getValue();
 		
 		return biomeRegistry.stream().filter(biome -> {
 			ResourceLocation key = biomeRegistry.getKey(biome);
 			
-			if (include.contains(key.toString())) {
+			if (includeLand.contains(key.toString()) || includeVoid.contains(key.toString())) {
 				return true;
 			}
 			
@@ -103,7 +131,7 @@ public class BCLibEndBiomeSource extends BiomeSource {
 			
 			BCLBiome bclBiome = BiomeAPI.getBiome(key);
 			if (bclBiome != BiomeAPI.EMPTY_BIOME) {
-				if (bclBiome.hasParentBiome()) {
+				if (bclBiome.getParentBiome() != null) {
 					bclBiome = bclBiome.getParentBiome();
 				}
 				key = bclBiome.getID();
@@ -113,7 +141,7 @@ public class BCLibEndBiomeSource extends BiomeSource {
 	}
 	
 	@Override
-	public Biome getNoiseBiome(int biomeX, int biomeY, int biomeZ) {
+	public Biome getNoiseBiome(int biomeX, int biomeY, int biomeZ, Climate.Sampler sampler) {
 		long i = (long) biomeX * (long) biomeX;
 		long j = (long) biomeZ * (long) biomeZ;
 		long check = GeneratorOptions.isFarEndBiomes() ? 65536L : 625L;

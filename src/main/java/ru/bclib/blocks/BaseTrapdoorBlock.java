@@ -10,6 +10,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.TrapDoorBlock;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Half;
 import net.minecraft.world.level.storage.loot.LootContext;
@@ -29,7 +30,11 @@ import java.util.Optional;
 
 public class BaseTrapdoorBlock extends TrapDoorBlock implements RenderLayerProvider, BlockModelProvider {
 	public BaseTrapdoorBlock(Block source) {
-		super(FabricBlockSettings.copyOf(source).strength(3.0F, 3.0F).noOcclusion());
+		this(FabricBlockSettings.copyOf(source).strength(3.0F, 3.0F).noOcclusion());
+	}
+	
+	public BaseTrapdoorBlock(BlockBehaviour.Properties properties) {
+		super(properties);
 	}
 	
 	@Override

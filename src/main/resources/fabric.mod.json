@@ -28,15 +28,14 @@
 		],
         "modmenu": [ "ru.bclib.gui.modmenu.EntryPoint::entrypointObject" ]
 	},
-    "accessWidener" : "bclib.accesswidener",
-	"mixins": [
+    "mixins": [
 		"bclib.mixins.common.json",
 		"bclib.mixins.client.json"
 	],
 	"depends": {
-		"fabricloader": ">=0.11.6",
-		"fabric": ">=0.41.0",
-		"minecraft": ">=1.17.1"
+		"fabricloader": ">=0.12.6",
+		"fabric": ">=0.43.0",
+		"minecraft": ">=1.18"
 	},    
     "custom":{
         "modmenu":{

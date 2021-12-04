@@ -20,7 +20,7 @@ public class StripableBarkBlock extends BaseBarkBlock {
 	private final Block striped;
 	
 	public StripableBarkBlock(MaterialColor color, Block striped) {
-		super(FabricBlockSettings.copyOf(striped).mapColor(color));
+		super(FabricBlockSettings.copyOf(striped).color(color));
 		this.striped = striped;
 	}
 	

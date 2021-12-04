@@ -22,6 +22,7 @@ import net.minecraft.world.level.block.BarrelBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.phys.BlockHitResult;
@@ -40,7 +41,11 @@ import java.util.Random;
 
 public class BaseBarrelBlock extends BarrelBlock implements BlockModelProvider {
 	public BaseBarrelBlock(Block source) {
-		super(FabricBlockSettings.copyOf(source).noOcclusion());
+		this(FabricBlockSettings.copyOf(source).noOcclusion());
+	}
+	
+	public BaseBarrelBlock(BlockBehaviour.Properties properties) {
+		super(properties);
 	}
 	
 	@Override

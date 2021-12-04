@@ -2,33 +2,38 @@ package ru.bclib.world.features;
 
 import net.minecraft.core.Registry;
 import net.minecraft.data.BuiltinRegistries;
+import net.minecraft.data.worldgen.placement.PlacementUtils;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.levelgen.GenerationStep.Decoration;
 import net.minecraft.world.level.levelgen.VerticalAnchor;
-import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.Feature;
-import net.minecraft.world.level.levelgen.feature.configurations.CountConfiguration;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
 import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
 import net.minecraft.world.level.levelgen.feature.configurations.OreConfiguration;
-import net.minecraft.world.level.levelgen.placement.ChanceDecoratorConfiguration;
-import net.minecraft.world.level.levelgen.placement.FeatureDecorator;
+import net.minecraft.world.level.levelgen.heightproviders.UniformHeight;
+import net.minecraft.world.level.levelgen.placement.BiomeFilter;
+import net.minecraft.world.level.levelgen.placement.CountPlacement;
+import net.minecraft.world.level.levelgen.placement.HeightRangePlacement;
+import net.minecraft.world.level.levelgen.placement.InSquarePlacement;
+import net.minecraft.world.level.levelgen.placement.PlacedFeature;
+import net.minecraft.world.level.levelgen.placement.RarityFilter;
 import net.minecraft.world.level.levelgen.structure.templatesystem.BlockMatchTest;
 
 public class BCLFeature {
-	private ConfiguredFeature<?, ?> featureConfigured;
+	private PlacedFeature placedFeature;
 	private Decoration featureStep;
 	private Feature<?> feature;
 	
-	public BCLFeature(Feature<?> feature, ConfiguredFeature<?, ?> configuredFeature, Decoration featureStep) {
-		this.featureConfigured = configuredFeature;
+	public BCLFeature(Feature<?> feature, PlacedFeature placedFeature, Decoration featureStep) {
+		this.placedFeature = placedFeature;
 		this.featureStep = featureStep;
 		this.feature = feature;
 	}
 	
-	public BCLFeature(ResourceLocation id, Feature<NoneFeatureConfiguration> feature, Decoration featureStep, ConfiguredFeature<?, ?> configuredFeature) {
-		this.featureConfigured = Registry.register(BuiltinRegistries.CONFIGURED_FEATURE, id, configuredFeature);
+	public BCLFeature(ResourceLocation id, Feature<NoneFeatureConfiguration> feature, Decoration featureStep, PlacedFeature placedFeature) {
+		this.placedFeature = Registry.register(BuiltinRegistries.PLACED_FEATURE, id, placedFeature);
 		this.feature = Registry.register(Registry.FEATURE, id, feature);
 		this.featureStep = featureStep;
 	}
@@ -43,20 +48,19 @@ public class BCLFeature {
 	
 	/**
 	 * Get configured feature.
-	 * @return {@link ConfiguredFeature}.
+	 * @return {@link PlacedFeature}.
 	 */
-	public ConfiguredFeature<?, ?> getFeatureConfigured() {
-		return featureConfigured;
+	public PlacedFeature getPlacedFeature() {
+		return placedFeature;
 	}
 	
 	/**
 	 * Get feature decoration step.
 	 * @return {@link Decoration}.
 	 */
-	public Decoration getFeatureStep() {
+	public Decoration getDecoration() {
 		return featureStep;
 	}
-	
 	/**
 	 * Will create a basic plant feature.
 	 * @param id {@link ResourceLocation} feature ID.
@@ -65,13 +69,16 @@ public class BCLFeature {
 	 * @return new BCLFeature instance.
 	 */
 	public static BCLFeature makeVegetationFeature(ResourceLocation id, Feature<NoneFeatureConfiguration> feature, int density) {
-		ConfiguredFeature<?, ?> configured = feature
+		PlacedFeature configured = feature
 			.configured(FeatureConfiguration.NONE)
-			.decorated(BCLDecorators.HEIGHTMAP_SQUARE)
-			.countRandom(density);
+			.placed(
+				CountPlacement.of(UniformInt.of(0, 4)),
+				InSquarePlacement.spread(),
+				PlacementUtils.HEIGHTMAP,
+				BiomeFilter.biome()
+			);
 		return new BCLFeature(id, feature, Decoration.VEGETAL_DECORATION, configured);
 	}
-	
 	/**
 	 * Will create a basic ore feature.
 	 * @param id {@link ResourceLocation} feature ID.
@@ -84,22 +91,45 @@ public class BCLFeature {
 	 * @return new BCLFeature instance.
 	 */
 	public static BCLFeature makeOreFeature(ResourceLocation id, Block blockOre, Block hostBlock, int veins, int veinSize, int minY, int maxY) {
+		//TODO: 1.18 See if this still works
+		return makeOreFeature(id, blockOre, hostBlock, veins, veinSize, minY, maxY, false);
+	}
+	
+	/**
+	 * Will create a basic ore feature.
+	 *
+	 * @param id        {@link ResourceLocation} feature ID.
+	 * @param blockOre  {@link Decoration} feature step.
+	 * @param hostBlock {@link Block} to generate feature in.
+	 * @param veins     iterations per chunk.
+	 * @param veinSize  size of ore vein.
+	 * @param minY      minimum height.
+	 * @param maxY      maximum height.
+	 * @param rare      when true, this is placed as a rare resource
+	 * @return new BCLFeature instance.
+	 */
+	public static BCLFeature makeOreFeature(ResourceLocation id, Block blockOre, Block hostBlock, int veins, int veinSize, int minY, int maxY, boolean rare) {
 		OreConfiguration featureConfig = new OreConfiguration(
 			new BlockMatchTest(hostBlock),
 			blockOre.defaultBlockState(),
 			veinSize
 		);
-		ConfiguredFeature<?, ?> oreFeature = Feature.ORE
+		
+		PlacedFeature oreFeature = Feature.ORE
 			.configured(featureConfig)
-			.rangeUniform(
-				VerticalAnchor.absolute(minY),
-				VerticalAnchor.absolute(maxY)
-			)
-			.squared()
-			.count(veins);
+			.placed(
+				InSquarePlacement.spread(),
+				rare ? RarityFilter.onAverageOnceEvery(veins) : CountPlacement.of(veins),
+				HeightRangePlacement.of(
+					UniformHeight.of(
+						VerticalAnchor.absolute(minY),
+						VerticalAnchor.absolute(maxY)
+					)
+				),
+				BiomeFilter.biome());
 		return new BCLFeature(
-			Feature.ORE,
-			Registry.register(BuiltinRegistries.CONFIGURED_FEATURE, id, oreFeature),
+			net.minecraft.world.level.levelgen.feature.Feature.ORE,
+			Registry.register(BuiltinRegistries.PLACED_FEATURE, id, oreFeature),
 			Decoration.UNDERGROUND_ORES
 		);
 	}
@@ -112,9 +142,9 @@ public class BCLFeature {
 	 * @return new BCLFeature instance.
 	 */
 	public static BCLFeature makeChunkFeature(ResourceLocation id, Decoration step, Feature<NoneFeatureConfiguration> feature) {
-		ConfiguredFeature<?, ?> configured = feature
+		PlacedFeature configured = feature
 			.configured(FeatureConfiguration.NONE)
-			.decorated(FeatureDecorator.COUNT.configured(new CountConfiguration(1)));
+			.placed(CountPlacement.of(1));
 		return new BCLFeature(id, feature, step, configured);
 	}
 	
@@ -127,9 +157,9 @@ public class BCLFeature {
 	 * @return new BCLFeature instance.
 	 */
 	public static BCLFeature makeChancedFeature(ResourceLocation id, Decoration step, Feature<NoneFeatureConfiguration> feature, int chance) {
-		ConfiguredFeature<?, ?> configured = feature
+		PlacedFeature configured = feature
 			.configured(FeatureConfiguration.NONE)
-			.decorated(FeatureDecorator.CHANCE.configured(new ChanceDecoratorConfiguration(chance)));
+			.placed(RarityFilter.onAverageOnceEvery(chance));
 		return new BCLFeature(id, feature, step, configured);
 	}
 	
@@ -142,9 +172,10 @@ public class BCLFeature {
 	 * @return new BCLFeature instance.
 	 */
 	public static BCLFeature makeCountFeature(ResourceLocation id, Decoration step, Feature<NoneFeatureConfiguration> feature, int count) {
-		ConfiguredFeature<?, ?> configured = feature
+		PlacedFeature configured = feature
 			.configured(FeatureConfiguration.NONE)
-			.decorated(FeatureDecorator.COUNT.configured(new CountConfiguration(count)));
+			.placed(CountPlacement.of(count));
+			//.decorated(FeatureDecorator.COUNT.configured(new CountConfiguration(count)));
 		return new BCLFeature(id, feature, step, configured);
 	}
 	
@@ -156,37 +187,7 @@ public class BCLFeature {
 	 * @return new BCLFeature instance.
 	 */
 	public static BCLFeature makeFeatureConfigured(ResourceLocation id, Decoration step, Feature<NoneFeatureConfiguration> feature) {
-		ConfiguredFeature<?, ?> configured = feature.configured(FeatureConfiguration.NONE);
+		PlacedFeature configured = feature.configured(FeatureConfiguration.NONE).placed();
 		return new BCLFeature(id, feature, step, configured);
-	}
-	
-	@Deprecated(forRemoval = true)
-	public static BCLFeature makeOreFeature(ResourceLocation id, Block blockOre, Block hostBlock, int veins, int veinSize, int offset, int minY, int maxY) {
-		return makeOreFeature(id, blockOre, hostBlock, veins, veinSize, minY, maxY);
-	}
-	
-	@Deprecated(forRemoval = true)
-	public static BCLFeature makeRawGenFeature(ResourceLocation id, Feature<NoneFeatureConfiguration> feature, int chance) {
-		return makeChancedFeature(id, Decoration.RAW_GENERATION, feature, chance);
-	}
-	
-	@Deprecated(forRemoval = true)
-	public static BCLFeature makeChunkFeature(ResourceLocation id, Feature<NoneFeatureConfiguration> feature) {
-		return makeChunkFeature(id, Decoration.LOCAL_MODIFICATIONS, feature);
-	}
-	
-	@Deprecated(forRemoval = true)
-	public static BCLFeature makeChansedFeature(ResourceLocation id, Feature<NoneFeatureConfiguration> feature, int chance) {
-		return makeChancedFeature(id, Decoration.SURFACE_STRUCTURES, feature, chance);
-	}
-	
-	@Deprecated(forRemoval = true)
-	public static BCLFeature makeCountRawFeature(ResourceLocation id, Feature<NoneFeatureConfiguration> feature, int chance) {
-		return makeCountFeature(id, Decoration.RAW_GENERATION, feature, chance);
-	}
-	
-	@Deprecated(forRemoval = true)
-	public static BCLFeature makeFeatureConfigured(ResourceLocation id, Feature<NoneFeatureConfiguration> feature) {
-		return makeFeatureConfigured(id, Decoration.RAW_GENERATION, feature);
 	}
 }

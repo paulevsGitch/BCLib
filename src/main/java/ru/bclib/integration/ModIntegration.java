@@ -1,6 +1,6 @@
 package ru.bclib.integration;
 
-import net.fabricmc.fabric.api.tag.TagRegistry;
+import net.fabricmc.fabric.api.tag.TagFactory;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.Registry;
 import net.minecraft.data.BuiltinRegistries;
@@ -17,6 +17,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.Feature;
+import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import ru.bclib.BCLib;
 import ru.bclib.world.features.BCLFeature;
 
@@ -58,9 +59,9 @@ public abstract class ModIntegration {
 		return FabricLoader.getInstance().isModLoaded(modID);
 	}
 	
-	public BCLFeature getFeature(String featureID, String configuredFeatureID, GenerationStep.Decoration featureStep) {
+	public BCLFeature getFeature(String featureID, String placedFeatureID, GenerationStep.Decoration featureStep) {
 		Feature<?> feature = Registry.FEATURE.get(getID(featureID));
-		ConfiguredFeature<?, ?> featureConfigured = BuiltinRegistries.CONFIGURED_FEATURE.get(getID(configuredFeatureID));
+		PlacedFeature featureConfigured = BuiltinRegistries.PLACED_FEATURE.get(getID(placedFeatureID));
 		return new BCLFeature(feature, featureConfigured, featureStep);
 	}
 	
@@ -198,12 +199,15 @@ public abstract class ModIntegration {
 	public Tag.Named<Item> getItemTag(String name) {
 		ResourceLocation id = getID(name);
 		Tag<Item> tag = ItemTags.getAllTags().getTag(id);
-		return tag == null ? (Named<Item>) TagRegistry.item(id) : (Named<Item>) tag;
+
+		//return tag == null ? (Named<Item>) TagRegistry.item(id) : (Named<Item>) tag;
+		return tag == null ? (Named<Item>) TagFactory.ITEM.create(id) : (Named<Item>) tag;
 	}
 	
 	public Tag.Named<Block> getBlockTag(String name) {
 		ResourceLocation id = getID(name);
 		Tag<Block> tag = BlockTags.getAllTags().getTag(id);
-		return tag == null ? (Named<Block>) TagRegistry.block(id) : (Named<Block>) tag;
+		//return tag == null ? (Named<Block>) TagRegistry.block(id) : (Named<Block>) tag;
+		return tag == null ? (Named<Block>) TagFactory.BLOCK.create(id) : (Named<Block>) tag;
 	}
 }

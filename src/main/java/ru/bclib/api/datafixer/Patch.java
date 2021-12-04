@@ -13,8 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 public abstract class Patch {
-	
-	private static List<Patch> ALL = new ArrayList<>(10);
+	private static final List<Patch> ALL = new ArrayList<>(10);
 	
 	/**
 	 * The Patch-Level derived from {@link #version}
@@ -50,12 +49,7 @@ public abstract class Patch {
 	 * @return The highest Patch-Version that was found
 	 */
 	public static String maxPatchVersion(@NotNull String modID) {
-		return ALL.stream()
-				  .filter(p -> p.modID
-								.equals(modID))
-				  .map(p -> p.version)
-				  .reduce((p, c) -> c)
-				  .orElse("0.0.0");
+		return ALL.stream().filter(p -> p.modID.equals(modID)).map(p -> p.version).reduce((p, c) -> c).orElse("0.0.0");
 	}
 	
 	/**
@@ -66,12 +60,7 @@ public abstract class Patch {
 	 * @return The highest Patch-Level that was found
 	 */
 	public static int maxPatchLevel(@NotNull String modID) {
-		return ALL.stream()
-				  .filter(p -> p.modID
-								.equals(modID))
-				  .mapToInt(p -> p.level)
-				  .max()
-				  .orElse(0);
+		return ALL.stream().filter(p -> p.modID.equals(modID)).mapToInt(p -> p.level).max().orElse(0);
 	}
 	
 	/**
@@ -103,21 +92,18 @@ public abstract class Patch {
 	 */
 	Patch(@NotNull String modID, String version, boolean alwaysApply) {
 		//Patchlevels need to be unique and registered in ascending order
-		if (modID == null || "".equals(modID)) {
+		if (modID == null || modID.isEmpty()) {
 			throw new RuntimeException("[INTERNAL ERROR] Patches need a valid modID!");
 		}
 		
-		if (version == null || "".equals(version)) {
+		if (version == null || version.isEmpty()) {
 			throw new RuntimeException("Invalid Mod-Version");
 		}
 		
 		this.version = version;
 		this.alwaysApply = alwaysApply;
 		this.level = ModUtil.convertModVersion(version);
-		if (!ALL.stream()
-				.filter(p -> p.modID
-							  .equals(modID))
-				.noneMatch(p -> p.level >= this.level) || this.level <= 0) {
+		if (!ALL.stream().filter(p -> p.modID.equals(modID)).noneMatch(p -> p.level >= this.level) || this.level <= 0) {
 			throw new RuntimeException("[INTERNAL ERROR] Patch-levels need to be created in ascending order beginning with 1.");
 		}
 		
@@ -239,5 +225,4 @@ public abstract class Patch {
 	public List<String> getWorldDataIDPaths() {
 		return null;
 	}
-	
 }

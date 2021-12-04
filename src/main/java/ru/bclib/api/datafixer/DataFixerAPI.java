@@ -35,6 +35,7 @@ import java.io.DataOutputStream;
 import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -459,9 +460,10 @@ public class DataFixerAPI {
 
 	private static void fixRegion(MigrationProfile data, State state, File file) {
 		try {
-			LOGGER.info("Inspecting " + file);
+			Path path = file.toPath();
+			LOGGER.info("Inspecting " + path);
 			boolean[] changed = new boolean[1];
-			RegionFile region = new RegionFile(file, file.getParentFile(), true);
+			RegionFile region = new RegionFile(path, path.getParent(), true);
 			
 			for (int x = 0; x < 32; x++) {
 				for (int z = 0; z < 32; z++) {

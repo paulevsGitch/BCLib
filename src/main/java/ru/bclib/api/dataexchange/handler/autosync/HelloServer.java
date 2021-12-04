@@ -57,7 +57,7 @@ import java.io.File;
  * </table>
  */
 public class HelloServer extends DataHandler.FromClient {
-	public static DataHandlerDescriptor DESCRIPTOR = new DataHandlerDescriptor(new ResourceLocation(BCLib.MOD_ID, "hello_server"), HelloServer::new, true, false);
+	public static final DataHandlerDescriptor DESCRIPTOR = new DataHandlerDescriptor(new ResourceLocation(BCLib.MOD_ID, "hello_server"), HelloServer::new, true, false);
 	
 	protected String bclibVersion = "0.0.0";
 	

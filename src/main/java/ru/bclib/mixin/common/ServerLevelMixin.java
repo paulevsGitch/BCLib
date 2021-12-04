@@ -1,9 +1,5 @@
 package ru.bclib.mixin.common;
 
-import java.util.List;
-import java.util.concurrent.Executor;
-import java.util.function.Supplier;
-
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -13,15 +9,19 @@ import net.minecraft.world.level.CustomSpawner;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.dimension.DimensionType;
-import net.minecraft.world.level.storage.LevelStorageSource;
+import net.minecraft.world.level.storage.LevelStorageSource.LevelStorageAccess;
 import net.minecraft.world.level.storage.ServerLevelData;
 import net.minecraft.world.level.storage.WritableLevelData;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import ru.bclib.api.BiomeAPI;
 import ru.bclib.api.LifeCycleAPI;
+import ru.bclib.api.biomes.BiomeAPI;
+
+import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.function.Supplier;
 
 @Mixin(ServerLevel.class)
 public abstract class ServerLevelMixin extends Level {
@@ -32,18 +32,18 @@ public abstract class ServerLevelMixin extends Level {
 	}
 
 	@Inject(method = "<init>*", at = @At("TAIL"))
-	private void bclib_onServerWorldInit(MinecraftServer server, Executor workerExecutor, LevelStorageSource.LevelStorageAccess session, ServerLevelData properties, ResourceKey<Level> registryKey, DimensionType dimensionType, ChunkProgressListener worldGenerationProgressListener, ChunkGenerator chunkGenerator, boolean debugWorld, long l, List<CustomSpawner> list, boolean bl, CallbackInfo info) {
+	private void bclib_onServerWorldInit(MinecraftServer server, Executor executor, LevelStorageAccess levelStorageAccess, ServerLevelData serverLevelData, ResourceKey<Level> resourceKey, DimensionType dimensionType, ChunkProgressListener chunkProgressListener, ChunkGenerator chunkGenerator, boolean bl, long l, List<CustomSpawner> list, boolean bl2, CallbackInfo info) {
 		ServerLevel world = ServerLevel.class.cast(this);
-		LifeCycleAPI._runLevelLoad(world, server, workerExecutor, session, properties, registryKey, dimensionType, worldGenerationProgressListener, chunkGenerator, debugWorld, l, list, bl);
+		LifeCycleAPI._runLevelLoad(world, server, executor, levelStorageAccess, serverLevelData, resourceKey, dimensionType, chunkProgressListener, chunkGenerator, bl, l, list, bl2);
 		
-		BiomeAPI.initRegistry(server);
+		//BiomeAPI.initRegistry(server);
 		BiomeAPI.applyModifications(ServerLevel.class.cast(this));
 		
-		if (bclib_lastWorld != null && bclib_lastWorld.equals(session.getLevelId())) {
+		if (bclib_lastWorld != null && bclib_lastWorld.equals(levelStorageAccess.getLevelId())) {
 			return;
 		}
 		
-		bclib_lastWorld = session.getLevelId();
+		bclib_lastWorld = levelStorageAccess.getLevelId();
 		
 		
 	}

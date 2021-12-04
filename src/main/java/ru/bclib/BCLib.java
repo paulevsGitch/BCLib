@@ -20,7 +20,6 @@ import ru.bclib.util.Logger;
 import ru.bclib.world.generator.BCLibEndBiomeSource;
 import ru.bclib.world.generator.BCLibNetherBiomeSource;
 import ru.bclib.world.generator.GeneratorOptions;
-import ru.bclib.world.surface.BCLSurfaceBuilders;
 
 import java.util.List;
 
@@ -33,7 +32,6 @@ public class BCLib implements ModInitializer {
 		BaseRegistry.register();
 		GeneratorOptions.init();
 		BaseBlockEntities.register();
-		BCLSurfaceBuilders.register();
 		BCLibEndBiomeSource.register();
 		BCLibNetherBiomeSource.register();
 		TagAPI.init();
@@ -42,11 +40,11 @@ public class BCLib implements ModInitializer {
 		DataExchangeAPI.registerMod(MOD_ID);
 		
 		DataExchangeAPI.registerDescriptors(List.of(
-				HelloClient.DESCRIPTOR,
-				HelloServer.DESCRIPTOR,
-				RequestFiles.DESCRIPTOR,
-				SendFiles.DESCRIPTOR,
-				Chunker.DESCRIPTOR
+			HelloClient.DESCRIPTOR,
+			HelloServer.DESCRIPTOR,
+			RequestFiles.DESCRIPTOR,
+			SendFiles.DESCRIPTOR,
+			Chunker.DESCRIPTOR
 		));
 		
 		BCLibPatch.register();

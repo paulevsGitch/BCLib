@@ -27,7 +27,6 @@ import java.util.Map;
 import java.util.Optional;
 
 public class BaseStairsBlock extends StairBlock implements BlockModelProvider {
-	
 	private final Block parent;
 	
 	public BaseStairsBlock(Block source) {

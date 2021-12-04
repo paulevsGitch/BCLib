@@ -1,5 +1,6 @@
 package ru.bclib.registry;
 
+import net.fabricmc.fabric.api.mininglevel.v1.FabricMineableTags;
 import net.fabricmc.fabric.api.registry.FlammableBlockRegistry;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
@@ -10,6 +11,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import ru.bclib.api.TagAPI;
 import ru.bclib.blocks.BaseLeavesBlock;
+import ru.bclib.blocks.BaseOreBlock;
 import ru.bclib.blocks.FeatureSaplingBlock;
 import ru.bclib.config.PathConfig;
 import ru.bclib.interfaces.CustomItemProvider;
@@ -41,10 +43,12 @@ public class BlockRegistry extends BaseRegistry<Block> {
 		getModBlocks(id.getNamespace()).add(block);
 
 		if (block instanceof BaseLeavesBlock){
-			TagAPI.addTags(block, TagAPI.BLOCK_LEAVES);
+			TagAPI.addTags(block, TagAPI.BLOCK_LEAVES, TagAPI.MINEABLE_HOE, FabricMineableTags.SHEARS_MINEABLE);
 			if (item != null){
 				TagAPI.addTags(item, TagAPI.ITEM_LEAVES);
 			}
+		} else if (block instanceof BaseOreBlock){
+			TagAPI.addTags(block, TagAPI.MINEABLE_PICKAXE);
 		} else if (block instanceof FeatureSaplingBlock){
 			TagAPI.addTags(block, TagAPI.BLOCK_SAPLINGS);
 			if (item != null){

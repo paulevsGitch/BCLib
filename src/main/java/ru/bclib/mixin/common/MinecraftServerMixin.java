@@ -12,7 +12,6 @@ import net.minecraft.server.level.progress.ChunkProgressListenerFactory;
 import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.server.players.GameProfileCache;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.LevelStorageSource.LevelStorageAccess;
 import net.minecraft.world.level.storage.WorldData;
 import org.spongepowered.asm.mixin.Final;
@@ -22,7 +21,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import ru.bclib.api.BiomeAPI;
 import ru.bclib.api.dataexchange.DataExchangeAPI;
 import ru.bclib.recipes.BCLRecipeManager;
 
@@ -49,15 +47,6 @@ public class MinecraftServerMixin {
         DataExchangeAPI.prepareServerside();
     }
 
-    @Inject(method = "convertFromRegionFormatIfNeeded", at = @At("HEAD"))
-    private static void bclib_applyPatches(LevelStorageSource.LevelStorageAccess session, CallbackInfo ci) {
-		
-		/*File levelPath = session.getLevelPath(LevelResource.ROOT).toFile();
-		WorldDataAPI.load(new File(levelPath, "data"));
-		DataFixerAPI.fixData(levelPath, session.getLevelId());*/
-    }
-
-
     @Inject(method = "reloadResources", at = @At(value = "RETURN"), cancellable = true)
     private void bclib_reloadResources(Collection<String> collection, CallbackInfoReturnable<CompletableFuture<Void>> info) {
         bclib_injectRecipes();
@@ -66,7 +55,7 @@ public class MinecraftServerMixin {
     @Inject(method = "loadLevel", at = @At(value = "RETURN"), cancellable = true)
     private void bclib_loadLevel(CallbackInfo info) {
         bclib_injectRecipes();
-        BiomeAPI.initRegistry(MinecraftServer.class.cast(this));
+        //BiomeAPI.initRegistry(MinecraftServer.class.cast(this));
     }
 
     private void bclib_injectRecipes() {
