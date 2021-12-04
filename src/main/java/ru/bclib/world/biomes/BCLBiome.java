@@ -27,7 +27,7 @@ public class BCLBiome {
 	private final ResourceLocation biomeID;
 	private final Biome biome;
 	
-	private Runnable surfaceInit;
+	private Consumer<Biome> surfaceInit;
 	private BCLBiome biomeParent;
 	private Biome actualBiome;
 	private BCLBiome edge;
@@ -232,8 +232,8 @@ public class BCLBiome {
 			structures.forEach(s -> BiomeAPI.addBiomeStructure(BiomeAPI.getBiomeKey(actualBiome), s));
 		}
 		
-		if (this.surfaceInit != null){
-			surfaceInit.run();
+		if (this.surfaceInit != null) {
+			surfaceInit.accept(actualBiome);
 		}
 	}
 	
@@ -320,8 +320,8 @@ public class BCLBiome {
 	 * @param surface {@link SurfaceRules.RuleSource} rule.
 	 */
 	public void setSurface(RuleSource surface) {
-		this.surfaceInit = () -> {
-			ResourceKey key = BiomeAPI.getBiomeKey(biome);
+		this.surfaceInit = (actualBiome) -> {
+			ResourceKey key = BiomeAPI.getBiomeKey(actualBiome);
 			BiomeAPI.addSurfaceRule(biomeID, SurfaceRules.ifTrue(SurfaceRules.isBiome(key), surface));
 		};
 	}
