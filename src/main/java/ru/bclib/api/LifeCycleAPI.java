@@ -89,7 +89,6 @@ public class LifeCycleAPI {
 	
 	/**
 	 * For internal use, You should not call this method!
-	 * @param src
 	 */
 	public static void _runBeforeLevelLoad(){
 		beforeLoadLevel.forEach(c -> c.beforeLoad());
