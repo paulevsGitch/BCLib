@@ -28,7 +28,6 @@ import net.minecraft.world.level.levelgen.Noises;
 import net.minecraft.world.level.levelgen.SurfaceRules;
 import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
 import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
-import net.minecraft.world.level.levelgen.placement.CaveSurface;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import ru.bclib.util.ColorUtil;
 import ru.bclib.world.biomes.BCLBiome;
@@ -494,7 +493,7 @@ public class BCLBiomeBuilder {
 	 * @return same {@link BCLBiomeBuilder} instance.
 	 */
 	public BCLBiomeBuilder surface(Block surfaceBlock) {
-		return surface(SurfaceRules.ifTrue(SurfaceRules.ON_FLOOR, SurfaceRules.state(surfaceBlock.defaultBlockState())));
+		return surface(SurfaceRuleBuilder.start().surface(surfaceBlock.defaultBlockState()).build());
 	}
 	
 	/**
@@ -505,11 +504,11 @@ public class BCLBiomeBuilder {
 	 * @return same {@link BCLBiomeBuilder} instance.
 	 */
 	public BCLBiomeBuilder surface(Block surfaceBlock, Block subterrainBlock, int depth) {
-		SurfaceRules.RuleSource topRule = SurfaceRules.state(surfaceBlock.defaultBlockState());
-		SurfaceRules.RuleSource subterrainRule = SurfaceRules.state(subterrainBlock.defaultBlockState());
-		topRule = SurfaceRules.ifTrue(SurfaceRules.ON_FLOOR, topRule);
-		subterrainRule = SurfaceRules.ifTrue(SurfaceRules.stoneDepthCheck(depth, false, false, CaveSurface.FLOOR), subterrainRule);
-		return surface(SurfaceRules.sequence(topRule, subterrainRule));
+		return surface(SurfaceRuleBuilder
+			.start()
+			.surface(surfaceBlock.defaultBlockState())
+			.subsurface(subterrainBlock.defaultBlockState(), depth)
+			.build());
 	}
 	
 	/**

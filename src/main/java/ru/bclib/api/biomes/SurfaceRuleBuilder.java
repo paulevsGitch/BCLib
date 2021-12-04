@@ -57,7 +57,7 @@ public class SurfaceRuleBuilder {
 		entryInstance = getFromCache("surface_" + state.toString(), () -> {
 			RuleSource rule = SurfaceRules.state(state);
 			rule = SurfaceRules.ifTrue(SurfaceRules.ON_FLOOR, rule);
-			return new SurfaceRuleEntry(1, rule);
+			return new SurfaceRuleEntry(2, rule);
 		});
 		rules.add(entryInstance);
 		return this;
@@ -73,7 +73,7 @@ public class SurfaceRuleBuilder {
 		entryInstance = getFromCache("subsurface_" + depth + "_" + state.toString(), () -> {
 			RuleSource rule = SurfaceRules.state(state);
 			rule = SurfaceRules.ifTrue(SurfaceRules.stoneDepthCheck(depth, false, false, CaveSurface.FLOOR), rule);
-			return new SurfaceRuleEntry(2, rule);
+			return new SurfaceRuleEntry(3, rule);
 		});
 		rules.add(entryInstance);
 		return this;
@@ -98,7 +98,7 @@ public class SurfaceRuleBuilder {
 	public SurfaceRuleBuilder ceil(BlockState state) {
 		entryInstance = getFromCache("ceil_" + state.toString(), () -> {
 			RuleSource rule = SurfaceRules.state(state);
-			return new SurfaceRuleEntry(1, SurfaceRules.ifTrue(SurfaceRules.ON_CEILING, rule));
+			return new SurfaceRuleEntry(2, SurfaceRules.ifTrue(SurfaceRules.ON_CEILING, rule));
 		});
 		rules.add(entryInstance);
 		return this;
@@ -114,7 +114,25 @@ public class SurfaceRuleBuilder {
 		entryInstance = getFromCache("above_ceil_" + height + "_" + state.toString(), () -> {
 			RuleSource rule = SurfaceRules.state(state);
 			rule = SurfaceRules.ifTrue(SurfaceRules.stoneDepthCheck(height, false, false, CaveSurface.CEILING), rule);
-			return new SurfaceRuleEntry(2, rule);
+			return new SurfaceRuleEntry(3, rule);
+		});
+		rules.add(entryInstance);
+		return this;
+	}
+	
+	/**
+	 * Will cover steep areas (with large terrain angle). Example - Overworld mountains.
+	 * @param state {@link BlockState} for the steep layer.
+	 * @param depth layer depth
+	 * @return
+	 */
+	public SurfaceRuleBuilder steep(BlockState state, int depth) {
+		entryInstance = getFromCache("steep_" + depth + "_" + state.toString(), () -> {
+			RuleSource rule = SurfaceRules.state(state);
+			rule = SurfaceRules.ifTrue(SurfaceRules.stoneDepthCheck(depth, false, false, CaveSurface.FLOOR), rule);
+			rule = SurfaceRules.ifTrue(SurfaceRules.steep(), rule);
+			int priority = depth < 1 ? 0 : 1;
+			return new SurfaceRuleEntry(priority, rule);
 		});
 		rules.add(entryInstance);
 		return this;
