@@ -138,7 +138,6 @@ public class BiomeAPI {
 		NETHER_BIOME_PICKER.addBiome(biome);
 		Random random = new Random(biome.getID().hashCode());
 		
-		//TODO: 1.18 Check parameters, depth was previously called altitude
 		//temperature, humidity, continentalness, erosion, depth, weirdness, offset
         Climate.ParameterPoint parameters = Climate.parameters(
 			MHelper.randRange(-1.5F, 1.5F, random),

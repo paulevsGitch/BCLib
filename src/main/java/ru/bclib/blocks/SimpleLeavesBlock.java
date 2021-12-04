@@ -49,8 +49,6 @@ public class SimpleLeavesBlock extends BaseBlockNotFull implements RenderLayerPr
 	
 	public SimpleLeavesBlock(BlockBehaviour.Properties properties) {
 		super(properties);
-		// TODO handle all tags instead of adding them like this
-		TagAPI.addTags(this, TagAPI.BLOCK_LEAVES);
 	}
 	
 	@Override
