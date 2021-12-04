@@ -41,7 +41,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
-@SuppressWarnings("deprecation")
 public abstract class BasePlantBlock extends BaseBlockNotFull implements RenderLayerProvider, BonemealableBlock {
 	private static final VoxelShape SHAPE = Block.box(4, 0, 4, 12, 14, 12);
 	
@@ -54,20 +53,24 @@ public abstract class BasePlantBlock extends BaseBlockNotFull implements RenderL
 	}
 	
 	public BasePlantBlock(boolean replaceable) {
-		super(FabricBlockSettings.of(replaceable ? Material.REPLACEABLE_PLANT : Material.PLANT)
-								 .breakByTool(FabricToolTags.SHEARS)
-								 .breakByHand(true)
-								 .sound(SoundType.GRASS)
-								 .noCollission());
+		this(
+			FabricBlockSettings
+				.of(replaceable ? Material.REPLACEABLE_PLANT : Material.PLANT)
+				.breakByHand(true)
+				.sound(SoundType.GRASS)
+				.noCollission()
+		);
 	}
 	
 	public BasePlantBlock(boolean replaceable, int light) {
-		super(FabricBlockSettings.of(replaceable ? Material.REPLACEABLE_PLANT : Material.PLANT)
-								 .breakByTool(FabricToolTags.SHEARS)
-								 .breakByHand(true)
-								 .luminance(light)
-								 .sound(SoundType.GRASS)
-								 .noCollission());
+		this(
+			FabricBlockSettings
+				.of(replaceable ? Material.REPLACEABLE_PLANT : Material.PLANT)
+				.breakByHand(true)
+				.luminance(light)
+				.sound(SoundType.GRASS)
+				.noCollission()
+		);
 	}
 	
 	public BasePlantBlock(Properties settings) {
@@ -77,6 +80,7 @@ public abstract class BasePlantBlock extends BaseBlockNotFull implements RenderL
 	protected abstract boolean isTerrain(BlockState state);
 	
 	@Override
+	@SuppressWarnings("deprecation")
 	public VoxelShape getShape(BlockState state, BlockGetter view, BlockPos pos, CollisionContext ePos) {
 		Vec3 vec3d = state.getOffset(view, pos);
 		return SHAPE.move(vec3d.x, vec3d.y, vec3d.z);
@@ -88,12 +92,14 @@ public abstract class BasePlantBlock extends BaseBlockNotFull implements RenderL
 	}
 	
 	@Override
+	@SuppressWarnings("deprecation")
 	public boolean canSurvive(BlockState state, LevelReader world, BlockPos pos) {
 		BlockState down = world.getBlockState(pos.below());
 		return isTerrain(down);
 	}
 	
 	@Override
+	@SuppressWarnings("deprecation")
 	public BlockState updateShape(BlockState state, Direction facing, BlockState neighborState, LevelAccessor world, BlockPos pos, BlockPos neighborPos) {
 		if (!canSurvive(state, world, pos)) {
 			return Blocks.AIR.defaultBlockState();

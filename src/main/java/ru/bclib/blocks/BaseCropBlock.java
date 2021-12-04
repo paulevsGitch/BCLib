@@ -2,7 +2,6 @@ package ru.bclib.blocks;
 
 import com.google.common.collect.Lists;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
-import net.fabricmc.fabric.api.tool.attribute.v1.FabricToolTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
@@ -31,19 +30,25 @@ import java.util.List;
 import java.util.Random;
 
 public class BaseCropBlock extends BasePlantBlock {
-	private static final VoxelShape SHAPE = Block.box(2, 0, 2, 14, 14, 14);
 	public static final IntegerProperty AGE = IntegerProperty.create("age", 0, 3);
+	private static final VoxelShape SHAPE = Block.box(2, 0, 2, 14, 14, 14);
 	
 	private final Block[] terrain;
 	private final Item drop;
 	
 	public BaseCropBlock(Item drop, Block... terrain) {
-		super(FabricBlockSettings.of(Material.PLANT)
-								 .breakByTool(FabricToolTags.HOES)
-								 .breakByHand(true)
-								 .sound(SoundType.GRASS)
-								 .randomTicks()
-								 .noCollission());
+		this(
+			FabricBlockSettings.of(Material.PLANT)
+				.breakByHand(true)
+				.sound(SoundType.GRASS)
+				.randomTicks()
+				.noCollission(),
+			drop, terrain
+		);
+	}
+	
+	public BaseCropBlock(BlockBehaviour.Properties properties, Item drop, Block... terrain) {
+		super(properties);
 		this.drop = drop;
 		this.terrain = terrain;
 		this.registerDefaultState(defaultBlockState().setValue(AGE, 0));

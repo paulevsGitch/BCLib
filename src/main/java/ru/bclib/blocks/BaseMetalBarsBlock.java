@@ -12,6 +12,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.IronBarsBlock;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootContext;
 import org.jetbrains.annotations.Nullable;
@@ -29,7 +30,11 @@ import java.util.Optional;
 
 public class BaseMetalBarsBlock extends IronBarsBlock implements BlockModelProvider, RenderLayerProvider {
 	public BaseMetalBarsBlock(Block source) {
-		super(FabricBlockSettings.copyOf(source).strength(5.0F, 6.0F).noOcclusion());
+		this(FabricBlockSettings.copyOf(source).strength(5.0F, 6.0F).noOcclusion());
+	}
+	
+	public BaseMetalBarsBlock(BlockBehaviour.Properties properties) {
+		super(properties);
 	}
 	
 	@Override

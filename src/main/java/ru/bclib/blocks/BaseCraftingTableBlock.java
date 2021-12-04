@@ -8,6 +8,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.CraftingTableBlock;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootContext;
 import org.jetbrains.annotations.Nullable;
@@ -23,7 +24,11 @@ import java.util.Optional;
 
 public class BaseCraftingTableBlock extends CraftingTableBlock implements BlockModelProvider {
 	public BaseCraftingTableBlock(Block source) {
-		super(FabricBlockSettings.copyOf(source));
+		this(FabricBlockSettings.copyOf(source));
+	}
+	
+	public BaseCraftingTableBlock(BlockBehaviour.Properties properties) {
+		super(properties);
 	}
 	
 	@Override

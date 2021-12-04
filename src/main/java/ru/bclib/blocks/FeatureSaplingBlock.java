@@ -65,8 +65,8 @@ public class FeatureSaplingBlock extends SaplingBlock implements RenderLayerProv
 		);
 	}
 	
-	public FeatureSaplingBlock(BlockBehaviour.Properties settings, Function<BlockState, Feature<?>> featureSupplier) {
-		super(null, settings);
+	public FeatureSaplingBlock(BlockBehaviour.Properties properties, Function<BlockState, Feature<?>> featureSupplier) {
+		super(null, properties);
 		this.feature = featureSupplier;
 	}
 	

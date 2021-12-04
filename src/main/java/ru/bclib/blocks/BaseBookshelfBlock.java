@@ -10,6 +10,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
@@ -24,7 +25,11 @@ import java.util.Optional;
 
 public class BaseBookshelfBlock extends BaseBlock {
 	public BaseBookshelfBlock(Block source) {
-		super(FabricBlockSettings.copyOf(source));
+		this(FabricBlockSettings.copyOf(source));
+	}
+	
+	public BaseBookshelfBlock(BlockBehaviour.Properties properties) {
+		super(properties);
 	}
 	
 	@Override

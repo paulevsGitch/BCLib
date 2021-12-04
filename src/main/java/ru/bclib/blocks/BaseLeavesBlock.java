@@ -2,7 +2,6 @@ package ru.bclib.blocks;
 
 import com.google.common.collect.Lists;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
-import net.fabricmc.fabric.api.tool.attribute.v1.FabricToolTags;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -28,14 +27,13 @@ public class BaseLeavesBlock extends LeavesBlock implements BlockModelProvider, 
 	protected final Block sapling;
 	
 	private static FabricBlockSettings makeLeaves(MaterialColor color) {
-		return FabricBlockSettings.copyOf(Blocks.OAK_LEAVES)
-								  .mapColor(color)
-								  .requiresTool()
-								  .breakByTool(FabricToolTags.SHEARS)
-								  .breakByTool(FabricToolTags.HOES)
-								  .allowsSpawning((state, world, pos, type) -> false)
-								  .suffocates((state, world, pos) -> false)
-								  .blockVision((state, world, pos) -> false);
+		return FabricBlockSettings
+			.copyOf(Blocks.OAK_LEAVES)
+			.mapColor(color)
+			.requiresTool()
+			.allowsSpawning((state, world, pos, type) -> false)
+			.suffocates((state, world, pos) -> false)
+			.blockVision((state, world, pos) -> false);
 	}
 
 	public BaseLeavesBlock(Block sapling, MaterialColor color, Consumer<FabricBlockSettings> customizeProperties) {

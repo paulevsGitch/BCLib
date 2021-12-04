@@ -15,6 +15,7 @@ import net.minecraft.world.item.PickaxeItem;
 import net.minecraft.world.level.block.AnvilBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
@@ -40,7 +41,11 @@ public abstract class BaseAnvilBlock extends AnvilBlock implements BlockModelPro
 	public IntegerProperty durability;
 	
 	public BaseAnvilBlock(MaterialColor color) {
-		super(FabricBlockSettings.copyOf(Blocks.ANVIL).color(color));
+		this(FabricBlockSettings.copyOf(Blocks.ANVIL).color(color));
+	}
+	
+	public BaseAnvilBlock(BlockBehaviour.Properties properties) {
+		super(properties);
 	}
 	
 	@Override

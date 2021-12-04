@@ -9,6 +9,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.LadderBlock;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootContext;
 import org.jetbrains.annotations.Nullable;
@@ -26,7 +27,11 @@ import java.util.Optional;
 
 public class BaseLadderBlock extends LadderBlock implements RenderLayerProvider, BlockModelProvider {
 	public BaseLadderBlock(Block block) {
-		super(FabricBlockSettings.copyOf(block).noOcclusion());
+		this(FabricBlockSettings.copyOf(block).noOcclusion());
+	}
+	
+	public BaseLadderBlock(BlockBehaviour.Properties properties) {
+		super(properties);
 	}
 	
 	@Override

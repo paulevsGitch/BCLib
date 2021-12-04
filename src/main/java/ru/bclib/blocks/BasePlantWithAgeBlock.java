@@ -1,7 +1,6 @@
 package ru.bclib.blocks;
 
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
-import net.fabricmc.fabric.api.tool.attribute.v1.FabricToolTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
@@ -19,12 +18,13 @@ public abstract class BasePlantWithAgeBlock extends BasePlantBlock {
 	public static final IntegerProperty AGE = BlockProperties.AGE;
 	
 	public BasePlantWithAgeBlock() {
-		this(FabricBlockSettings.of(Material.PLANT)
-								.breakByTool(FabricToolTags.SHEARS)
-								.breakByHand(true)
-								.sound(SoundType.GRASS)
-								.randomTicks()
-								.noCollission());
+		this(
+			FabricBlockSettings.of(Material.PLANT)
+				.breakByHand(true)
+				.sound(SoundType.GRASS)
+				.randomTicks()
+				.noCollission()
+		);
 	}
 	
 	public BasePlantWithAgeBlock(Properties settings) {

@@ -37,28 +37,32 @@ import ru.bclib.util.BlocksHelper;
 import java.util.List;
 import java.util.Random;
 
-@SuppressWarnings("deprecation")
 public abstract class BaseDoublePlantBlock extends BaseBlockNotFull implements RenderLayerProvider, BonemealableBlock {
 	private static final VoxelShape SHAPE = Block.box(4, 2, 4, 12, 16, 12);
 	public static final IntegerProperty ROTATION = BlockProperties.ROTATION;
 	public static final BooleanProperty TOP = BooleanProperty.create("top");
 	
 	public BaseDoublePlantBlock() {
-		super(FabricBlockSettings.of(Material.PLANT)
-								 .breakByTool(FabricToolTags.SHEARS)
-								 .breakByHand(true)
-								 .sound(SoundType.WET_GRASS)
-								 .noCollission());
-		this.registerDefaultState(this.stateDefinition.any().setValue(TOP, false));
+		this(
+			FabricBlockSettings.of(Material.PLANT)
+				.breakByHand(true)
+				.sound(SoundType.GRASS)
+				.noCollission()
+		);
 	}
 	
 	public BaseDoublePlantBlock(int light) {
-		super(FabricBlockSettings.of(Material.PLANT)
-								 .breakByTool(FabricToolTags.SHEARS)
-								 .breakByHand(true)
-								 .sound(SoundType.WET_GRASS)
-								 .lightLevel((state) -> state.getValue(TOP) ? light : 0)
-								 .noCollission());
+		this(
+			FabricBlockSettings.of(Material.PLANT)
+				.breakByHand(true)
+				.sound(SoundType.GRASS)
+				.lightLevel((state) -> state.getValue(TOP) ? light : 0)
+				.noCollission()
+		);
+	}
+	
+	public BaseDoublePlantBlock(BlockBehaviour.Properties properties) {
+		super(properties);
 		this.registerDefaultState(this.stateDefinition.any().setValue(TOP, false));
 	}
 	
@@ -68,6 +72,7 @@ public abstract class BaseDoublePlantBlock extends BaseBlockNotFull implements R
 	}
 	
 	@Override
+	@SuppressWarnings("deprecation")
 	public VoxelShape getShape(BlockState state, BlockGetter view, BlockPos pos, CollisionContext ePos) {
 		Vec3 vec3d = state.getOffset(view, pos);
 		return SHAPE.move(vec3d.x, vec3d.y, vec3d.z);
@@ -79,6 +84,7 @@ public abstract class BaseDoublePlantBlock extends BaseBlockNotFull implements R
 	}
 	
 	@Override
+	@SuppressWarnings("deprecation")
 	public boolean canSurvive(BlockState state, LevelReader world, BlockPos pos) {
 		BlockState down = world.getBlockState(pos.below());
 		BlockState up = world.getBlockState(pos.above());
@@ -94,6 +100,7 @@ public abstract class BaseDoublePlantBlock extends BaseBlockNotFull implements R
 	protected abstract boolean isTerrain(BlockState state);
 	
 	@Override
+	@SuppressWarnings("deprecation")
 	public BlockState updateShape(BlockState state, Direction facing, BlockState neighborState, LevelAccessor world, BlockPos pos, BlockPos neighborPos) {
 		if (!canStayAt(state, world, pos)) {
 			return Blocks.AIR.defaultBlockState();

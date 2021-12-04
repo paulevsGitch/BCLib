@@ -12,6 +12,7 @@ import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.DoorBlock;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.DoorHingeSide;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
@@ -31,7 +32,11 @@ import java.util.Optional;
 
 public class BaseDoorBlock extends DoorBlock implements RenderLayerProvider, BlockModelProvider {
 	public BaseDoorBlock(Block source) {
-		super(FabricBlockSettings.copyOf(source).strength(3F, 3F).noOcclusion());
+		this(FabricBlockSettings.copyOf(source).strength(3F, 3F).noOcclusion());
+	}
+	
+	public BaseDoorBlock(BlockBehaviour.Properties properties) {
+		super(properties);
 	}
 	
 	@Override

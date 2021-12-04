@@ -10,6 +10,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.ChainBlock;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.MaterialColor;
 import net.minecraft.world.level.storage.loot.LootContext;
@@ -28,7 +29,11 @@ import java.util.Optional;
 
 public class BaseChainBlock extends ChainBlock implements BlockModelProvider, RenderLayerProvider {
 	public BaseChainBlock(MaterialColor color) {
-		super(FabricBlockSettings.copyOf(Blocks.CHAIN).color(color));
+		this(FabricBlockSettings.copyOf(Blocks.CHAIN).color(color));
+	}
+	
+	public BaseChainBlock(BlockBehaviour.Properties properties) {
+		super(properties);
 	}
 	
 	@Override

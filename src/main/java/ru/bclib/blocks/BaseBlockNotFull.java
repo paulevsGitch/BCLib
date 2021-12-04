@@ -6,7 +6,6 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class BaseBlockNotFull extends BaseBlock {
-	
 	public BaseBlockNotFull(Properties settings) {
 		super(settings);
 	}
