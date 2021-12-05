@@ -1,4 +1,4 @@
-package ru.bclib.mixin.common;
+package ru.bclib.mixin.client;
 
 import net.minecraft.client.gui.screens.worldselection.WorldPreset;
 import net.minecraft.core.Registry;
