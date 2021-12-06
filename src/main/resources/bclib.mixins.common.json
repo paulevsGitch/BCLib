@@ -8,6 +8,7 @@
 		"BiomeGenerationSettingsAccessor",
 		"shears.DiggingEnchantmentMixin",
 		"LayerLightSectionStorageMixin",
+		"NoiseBasedChunkGeneratorMixin",
 		"NoiseGeneratorSettingsMixin",
 		"shears.TripWireBlockMixin",
 		"StructureSettingsAccessor",

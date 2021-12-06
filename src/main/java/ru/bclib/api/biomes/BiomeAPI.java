@@ -12,6 +12,7 @@ import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.impl.biome.NetherBiomeData;
 import net.fabricmc.fabric.impl.biome.TheEndBiomeData;
 import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.data.BuiltinRegistries;
 import net.minecraft.resources.ResourceKey;
@@ -27,8 +28,12 @@ import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.biome.Climate;
 import net.minecraft.world.level.biome.MobSpawnSettings.SpawnerData;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.GenerationStep.Carving;
 import net.minecraft.world.level.levelgen.GenerationStep.Decoration;
+import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
 import net.minecraft.world.level.levelgen.SurfaceRules;
 import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
@@ -39,6 +44,7 @@ import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import org.jetbrains.annotations.Nullable;
 import ru.bclib.BCLib;
 import ru.bclib.config.Configs;
+import ru.bclib.interfaces.SurfaceProvider;
 import ru.bclib.interfaces.SurfaceRuleProvider;
 import ru.bclib.mixin.common.BiomeGenerationSettingsAccessor;
 import ru.bclib.mixin.common.MobSpawnSettingsAccessor;
@@ -664,6 +670,15 @@ public class BiomeAPI {
 		mobs.add(new SpawnerData(entityType, weight, minGroupCount, maxGroupCount));
 		spawners.put(category, WeightedRandomList.create(mobs));
 		accessor.bcl_setSpawners(spawners);
+	}
+	
+	public static BlockState getBiomeSurfaceBlock(BlockPos pos, Biome biome, ServerLevel level) {
+		ChunkGenerator generator = level.getChunkSource().getGenerator();
+		if (generator instanceof NoiseBasedChunkGenerator) {
+			SurfaceProvider provider = SurfaceProvider.class.cast(generator);
+			return provider.getSurface(pos, biome, level);
+		}
+		return Blocks.AIR.defaultBlockState();
 	}
 	
 	private static void configureBiome(BCLBiome biome, float chance, float fog) {
