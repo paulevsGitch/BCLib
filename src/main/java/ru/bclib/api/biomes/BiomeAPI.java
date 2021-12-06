@@ -672,6 +672,13 @@ public class BiomeAPI {
 		accessor.bcl_setSpawners(spawners);
 	}
 	
+	/**
+	 * Get biome surface block. Can be used to get terrain material for features or other things.
+	 * @param pos {@link BlockPos} position to get block.
+	 * @param biome {@link Biome} to get block from.
+	 * @param level {@link ServerLevel} current server level.
+	 * @return {@link BlockState} with the biome surface or AIR if it fails.
+	 */
 	public static BlockState getBiomeSurfaceBlock(BlockPos pos, Biome biome, ServerLevel level) {
 		ChunkGenerator generator = level.getChunkSource().getGenerator();
 		if (generator instanceof NoiseBasedChunkGenerator) {
