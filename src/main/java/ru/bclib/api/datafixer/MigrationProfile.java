@@ -96,12 +96,59 @@ public class MigrationProfile {
 			try {
 				CompoundTag root = NbtIo.readCompressed(file);
 				boolean[] changed = {false};
+				int spawnerIdx = -1;
 				if (root.contains("palette")){
 					ListTag items = root.getList("palette", Tag.TAG_COMPOUND);
-					items.forEach(inTag -> {
-						CompoundTag tag = (CompoundTag)inTag;
+					for (int idx=0; idx<items.size(); idx++){
+						final CompoundTag tag = (CompoundTag)items.get(idx);
+						if (tag.contains("Name") && tag.getString("Name").equals("minecraft:spawner"))
+							spawnerIdx = idx;
 						changed[0] |= profile.replaceStringFromIDs(tag, "Name");
-					});
+					}
+				}
+				
+				if (spawnerIdx>=0 && root.contains("blocks")){
+					ListTag items = root.getList("blocks", Tag.TAG_COMPOUND);
+					for (int idx=0; idx<items.size(); idx++){
+						final CompoundTag blockTag = (CompoundTag)items.get(idx);
+						if (blockTag.contains("state") && blockTag.getInt("state")==spawnerIdx && blockTag.contains("nbt")){
+							CompoundTag nbt = blockTag.getCompound("nbt");
+							if (nbt.contains("SpawnData")) {
+								final CompoundTag entity = nbt.getCompound("SpawnData");
+								if (!entity.contains("entity")) {
+									CompoundTag data = new CompoundTag();
+									data.put("entity", entity);
+									nbt.put("SpawnData", data);
+									
+									changed[0] = true;
+								}
+							}
+							if (nbt.contains("SpawnPotentials")) {
+								ListTag pots = (ListTag) nbt.getList("SpawnPotentials", Tag.TAG_COMPOUND);
+								for (Tag potItemIn : pots) {
+									final CompoundTag potItem = (CompoundTag) potItemIn;
+									if (potItem.contains("Weight")) {
+										int weight = potItem.getInt("Weight");
+										potItem.putInt("weight", weight);
+										potItem.remove("Weight");
+										
+										changed[0] = true;
+									}
+									
+									if (potItem.contains("Entity")) {
+										CompoundTag entity = potItem.getCompound("Entity");
+										CompoundTag data = new CompoundTag();
+										data.put("entity", entity);
+										
+										potItem.put("data", data);
+										potItem.remove("Entity");
+										
+										changed[0] = true;
+									}
+								}
+							}
+						}
+					}
 				}
 				
 				if (changed[0]){
