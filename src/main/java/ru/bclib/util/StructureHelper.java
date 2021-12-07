@@ -54,7 +54,7 @@ public class StructureHelper {
 					long normalSize = entry.getSize();
 					String type = entry.isDirectory() ? "DIR" : "FILE";
 					
-					System.out.println(name);
+					//System.out.println(name);
 					System.out.format("\t %s - %d - %d\n", type, compressedSize, normalSize);
 				}
 				zipFile.close();

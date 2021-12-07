@@ -509,12 +509,6 @@ public class BiomeAPI {
 	}
 	
 	private static <T extends Object> List<T> getMutableList(List<T> input) {
-		if (input!=null) {
-			System.out.println("getMutableList: " + input.getClass().getName());
-			for (Class cl : input.getClass().getInterfaces()){
-				System.out.println("   - " + cl.getName());
-			}
-		}
 		if (/*input instanceof ImmutableList ||*/ !(input instanceof ArrayList || input instanceof LinkedList)) {
 			return Lists.newArrayList(input);
 		}
