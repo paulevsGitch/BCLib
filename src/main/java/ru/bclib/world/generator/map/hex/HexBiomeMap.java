@@ -64,7 +64,7 @@ public class HexBiomeMap implements BiomeMap {
 		offset *= scale;
 		for (byte i = 0; i < 8; i++) {
 			if (!getRawBiome(x + offset * EDGE_CIRCLE_X[i], z + offset * EDGE_CIRCLE_Z[i]).isSame(biome)) {
-				return biome.getEdge();
+				return edge;
 			}
 		}
 		
