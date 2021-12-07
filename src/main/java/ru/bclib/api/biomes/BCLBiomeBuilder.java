@@ -1,5 +1,10 @@
 package ru.bclib.api.biomes;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
+
 import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.data.BuiltinRegistries;
@@ -34,11 +39,6 @@ import ru.bclib.world.biomes.BCLBiome;
 import ru.bclib.world.features.BCLFeature;
 import ru.bclib.world.structures.BCLStructureFeature;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
-
 public class BCLBiomeBuilder {
 	private static final BCLBiomeBuilder INSTANCE = new BCLBiomeBuilder();
 	private static final SurfaceRules.ConditionSource SURFACE_NOISE = SurfaceRules.noiseCondition(Noises.SOUL_SAND_LAYER, -0.012);
@@ -53,6 +53,7 @@ public class BCLBiomeBuilder {
 	private BiomeCategory category;
 	private float temperature;
 	private float fogDensity;
+	private float genChance;
 	private float downfall;
 	
 	/**
@@ -71,6 +72,7 @@ public class BCLBiomeBuilder {
 		INSTANCE.temperature = 1.0F;
 		INSTANCE.fogDensity = 1.0F;
 		INSTANCE.downfall = 1.0F;
+		INSTANCE.genChance = 1.0F;
 		return INSTANCE;
 	}
 	
@@ -193,6 +195,16 @@ public class BCLBiomeBuilder {
 	 */
 	public BCLBiomeBuilder fogDensity(float density) {
 		this.fogDensity = density;
+		return this;
+	}
+
+	/**
+	 * Sets generation chance for this biome.
+	 * @param genChance
+	 * @return same {@link BCLBiomeBuilder}.
+	 */
+	public BCLBiomeBuilder genChance(float genChance) {
+		this.genChance = genChance;
 		return this;
 	}
 	
@@ -510,6 +522,18 @@ public class BCLBiomeBuilder {
 			.subsurface(subterrainBlock.defaultBlockState(), depth)
 			.build());
 	}
+
+	public BCLBiomeBuilder chancedSurface(SurfaceRules.RuleSource surfaceBlockA, SurfaceRules.RuleSource surfaceBlockB, SurfaceRules.RuleSource underBlock){
+		return surface(SurfaceRules.sequence(
+						SurfaceRules.ifTrue(SurfaceRules.ON_FLOOR,
+								SurfaceRules.sequence(
+										SurfaceRules.ifTrue(SurfaceRules.noiseCondition(Noises.SURFACE, -0.1818, 0.1818), surfaceBlockA),
+										surfaceBlockB
+								)
+						),
+						underBlock
+				));
+	}
 	
 	/**
 	 * Adds surface rule to this biome.
@@ -541,7 +565,7 @@ public class BCLBiomeBuilder {
 			.temperature(temperature)
 			.downfall(downfall);
 		
-		if (spawnSettings != null) {
+		if (getSpawns() != null) {
 			builder.mobSpawnSettings(spawnSettings.build());
 		}
 		
@@ -557,6 +581,7 @@ public class BCLBiomeBuilder {
 		res.attachStructures(structures);
 		res.setSurface(surfaceRule);
 		res.setFogDensity(fogDensity);
+		res.setGenChance(genChance);
 		return res;
 	}
 	
