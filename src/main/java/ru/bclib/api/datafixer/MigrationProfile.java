@@ -103,6 +103,12 @@ public class MigrationProfile {
 						final CompoundTag tag = (CompoundTag)items.get(idx);
 						if (tag.contains("Name") && tag.getString("Name").equals("minecraft:spawner"))
 							spawnerIdx = idx;
+						if (tag.contains("Name") && (tag.getString("Name").equals("minecraft:") || tag.getString("Name").equals(""))){
+							System.out.println("Empty Name");
+						}
+						if (tag.contains("id") && (tag.getString("id").equals("minecraft:") || tag.getString("id").equals(""))){
+							System.out.println("Empty ID");
+						}
 						changed[0] |= profile.replaceStringFromIDs(tag, "Name");
 					}
 				}
