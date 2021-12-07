@@ -105,17 +105,21 @@ public class BiomeAPI {
 	
 	public static void init() {
 		MutableInt integer = new MutableInt(0);
-		BuiltinRegistries.BIOME.entrySet().forEach(entry -> {
-			Biome biome = entry.getValue();
-			BiomeGenerationSettingsAccessor accessor = BiomeGenerationSettingsAccessor.class.cast(biome.getGenerationSettings());
-			List<List<Supplier<PlacedFeature>>> features = accessor.bclib_getFeatures();
-			features.forEach(step -> {
-				step.forEach(provider -> {
-					PlacedFeature feature = provider.get();
-					FEATURE_ORDER.computeIfAbsent(feature, f -> integer.getAndIncrement());
+		BuiltinRegistries.BIOME
+			.entrySet()
+			.stream()
+			.filter(entry -> entry.getKey().location().getNamespace().equals("minecraft"))
+			.map(entry -> entry.getValue())
+			.forEach(biome -> {
+				BiomeGenerationSettingsAccessor accessor = BiomeGenerationSettingsAccessor.class.cast(biome.getGenerationSettings());
+				List<List<Supplier<PlacedFeature>>> features = accessor.bclib_getFeatures();
+				features.forEach(step -> {
+					step.forEach(provider -> {
+						PlacedFeature feature = provider.get();
+						FEATURE_ORDER.computeIfAbsent(feature, f -> integer.getAndIncrement());
+					});
 				});
 			});
-		});
 	}
 	
 	/**
