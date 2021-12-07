@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
 import net.minecraft.core.particles.ParticleOptions;
@@ -34,6 +35,8 @@ import net.minecraft.world.level.levelgen.SurfaceRules;
 import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
 import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
+import ru.bclib.mixin.common.BiomeGenerationSettingsAccessor;
+import ru.bclib.util.CollectionsUtil;
 import ru.bclib.util.ColorUtil;
 import ru.bclib.world.biomes.BCLBiome;
 import ru.bclib.world.features.BCLFeature;
@@ -576,7 +579,17 @@ public class BCLBiomeBuilder {
 		}
 		
 		if (generationSettings != null) {
-			builder.generationSettings(generationSettings.build());
+			BiomeGenerationSettings settings = generationSettings.build();
+			BiomeGenerationSettingsAccessor accessor = BiomeGenerationSettingsAccessor.class.cast(settings);
+			List<List<Supplier<PlacedFeature>>> featureLists = CollectionsUtil.getMutable(accessor.bclib_getFeatures());
+			final int size = featureLists.size();
+			for (int i = 0; i < size; i++) {
+				List<Supplier<PlacedFeature>> list = CollectionsUtil.getMutable(featureLists.get(i));
+				BiomeAPI.sortFeatures(list);
+				featureLists.add(i, list);
+			}
+			accessor.bclib_setFeatures(featureLists);
+			builder.generationSettings(settings);
 		}
 		
 		final T res = biomeConstructor.apply(biomeID, builder.build());

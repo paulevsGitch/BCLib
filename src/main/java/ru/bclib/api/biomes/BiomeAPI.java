@@ -41,6 +41,7 @@ import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
 import net.minecraft.world.level.levelgen.feature.StructureFeature;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
+import org.apache.commons.lang3.mutable.MutableInt;
 import org.jetbrains.annotations.Nullable;
 import ru.bclib.BCLib;
 import ru.bclib.config.Configs;
@@ -83,6 +84,8 @@ public class BiomeAPI {
 	private static final Map<Biome, BCLBiome> CLIENT = Maps.newHashMap();
 	private static Registry<Biome> biomeRegistry;
 	
+	private static final Map<PlacedFeature, Integer> FEATURE_ORDER = Maps.newHashMap();
+	
 	private static final Map<ResourceKey, List<BiConsumer<ResourceLocation, Biome>>> MODIFICATIONS = Maps.newHashMap();
 	private static final Map<ResourceLocation, SurfaceRules.RuleSource> SURFACE_RULES = Maps.newHashMap();
 	private static final Set<ResourceLocation> MODIFIED_BIOMES = Sets.newHashSet();
@@ -99,6 +102,21 @@ public class BiomeAPI {
 	
 	public static final BCLBiome END_BARRENS = registerEndVoidBiome(getFromRegistry(new ResourceLocation("end_barrens")));
 	public static final BCLBiome SMALL_END_ISLANDS = registerEndVoidBiome(getFromRegistry(new ResourceLocation("small_end_islands")));
+	
+	public static void init() {
+		MutableInt integer = new MutableInt(0);
+		BuiltinRegistries.BIOME.entrySet().forEach(entry -> {
+			Biome biome = entry.getValue();
+			BiomeGenerationSettingsAccessor accessor = BiomeGenerationSettingsAccessor.class.cast(biome.getGenerationSettings());
+			List<List<Supplier<PlacedFeature>>> features = accessor.bclib_getFeatures();
+			features.forEach(step -> {
+				step.forEach(provider -> {
+					PlacedFeature feature = provider.get();
+					FEATURE_ORDER.computeIfAbsent(feature, f -> integer.getAndIncrement());
+				});
+			});
+		});
+	}
 	
 	/**
 	 * Initialize registry for current server.
@@ -686,6 +704,14 @@ public class BiomeAPI {
 			return provider.getSurface(pos, biome, level);
 		}
 		return Blocks.AIR.defaultBlockState();
+	}
+	
+	public static void sortFeatures(List<Supplier<PlacedFeature>> features) {
+		features.sort((f1, f2) -> {
+			int v1 = FEATURE_ORDER.getOrDefault(f1.get(), 0);
+			int v2 = FEATURE_ORDER.getOrDefault(f2.get(), 0);
+			return Integer.compare(v1, v2);
+		});
 	}
 	
 	private static void configureBiome(BCLBiome biome) {
