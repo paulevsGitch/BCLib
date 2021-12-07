@@ -712,8 +712,8 @@ public class BiomeAPI {
 	
 	public static void sortFeatures(List<Supplier<PlacedFeature>> features) {
 		features.sort((f1, f2) -> {
-			int v1 = FEATURE_ORDER.getOrDefault(f1.get(), 0);
-			int v2 = FEATURE_ORDER.getOrDefault(f2.get(), 0);
+			int v1 = FEATURE_ORDER.getOrDefault(f1.get(), 2048);
+			int v2 = FEATURE_ORDER.getOrDefault(f2.get(), 2048);
 			return Integer.compare(v1, v2);
 		});
 	}
