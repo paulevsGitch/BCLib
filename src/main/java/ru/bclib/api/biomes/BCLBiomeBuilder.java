@@ -1,7 +1,6 @@
 package ru.bclib.api.biomes;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -35,7 +34,6 @@ import net.minecraft.world.level.levelgen.SurfaceRules;
 import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
 import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
-import org.jetbrains.annotations.NotNull;
 import ru.bclib.util.ColorUtil;
 import ru.bclib.world.biomes.BCLBiome;
 import ru.bclib.world.features.BCLFeature;
@@ -46,8 +44,6 @@ public class BCLBiomeBuilder {
 	private static final SurfaceRules.ConditionSource SURFACE_NOISE = SurfaceRules.noiseCondition(Noises.SOUL_SAND_LAYER, -0.012);
 	
 	private List<ConfiguredStructureFeature> structures = new ArrayList<>(16);
-	private List<FeatureInfo> features = new ArrayList<>(32);
-	
 	private BiomeGenerationSettings.Builder generationSettings;
 	private BiomeSpecialEffects.Builder effectsBuilder;
 	private MobSpawnSettings.Builder spawnSettings;
@@ -73,7 +69,6 @@ public class BCLBiomeBuilder {
 		INSTANCE.effectsBuilder = null;
 		INSTANCE.spawnSettings = null;
 		INSTANCE.structures.clear();
-		INSTANCE.features.clear();
 		INSTANCE.temperature = 1.0F;
 		INSTANCE.fogDensity = 1.0F;
 		INSTANCE.downfall = 1.0F;
@@ -433,8 +428,7 @@ public class BCLBiomeBuilder {
 	 * @return same {@link BCLBiomeBuilder} instance.
 	 */
 	public BCLBiomeBuilder feature(Decoration decoration, PlacedFeature feature) {
-		//getGeneration().addFeature(decoration, feature);
-		features.add(new FeatureInfo(feature, decoration));
+		getGeneration().addFeature(decoration, feature);
 		return this;
 	}
 	
@@ -442,7 +436,6 @@ public class BCLBiomeBuilder {
 	 * Adds vanilla Mushrooms.
 	 * @return same {@link BCLBiomeBuilder} instance.
 	 */
-	@Deprecated
 	public BCLBiomeBuilder defaultMushrooms() {
 		return feature(BiomeDefaultFeatures::addDefaultMushrooms);
 	}
@@ -451,7 +444,6 @@ public class BCLBiomeBuilder {
 	 * Adds vanilla Nether Ores.
 	 * @return same {@link BCLBiomeBuilder} instance.
 	 */
-	@Deprecated
 	public BCLBiomeBuilder netherDefaultOres() {
 		return feature(BiomeDefaultFeatures::addNetherDefaultOres);
 	}
@@ -461,7 +453,6 @@ public class BCLBiomeBuilder {
 	 * @param featureAdd {@link Consumer} with {@link BiomeGenerationSettings.Builder}.
 	 * @return same {@link BCLBiomeBuilder} instance.
 	 */
-	@Deprecated
 	public BCLBiomeBuilder feature(Consumer<BiomeGenerationSettings.Builder> featureAdd) {
 		featureAdd.accept(getGeneration());
 		return this;
@@ -570,11 +561,6 @@ public class BCLBiomeBuilder {
 	 * @return created {@link BCLBiome} instance.
 	 */
 	public <T extends BCLBiome> T build(BiFunction<ResourceLocation, Biome, T> biomeConstructor) {
-		if (!features.isEmpty()) {
-			Collections.sort(features);
-			features.forEach(info -> getGeneration().addFeature(info.step, info.feature));
-		}
-		
 		BiomeBuilder builder = new BiomeBuilder()
 			.precipitation(precipitation)
 			.biomeCategory(category)
@@ -636,20 +622,5 @@ public class BCLBiomeBuilder {
 			generationSettings = new BiomeGenerationSettings.Builder();
 		}
 		return generationSettings;
-	}
-	
-	private class FeatureInfo implements Comparable<FeatureInfo> {
-		final PlacedFeature feature;
-		final Decoration step;
-		
-		FeatureInfo(PlacedFeature feature, Decoration step) {
-			this.feature = feature;
-			this.step = step;
-		}
-		
-		@Override
-		public int compareTo(FeatureInfo info) {
-			return 0;
-		}
 	}
 }
