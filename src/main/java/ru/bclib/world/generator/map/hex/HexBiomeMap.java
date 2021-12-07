@@ -31,7 +31,7 @@ public class HexBiomeMap implements BiomeMap {
 	
 	public HexBiomeMap(long seed, int size, BiomePicker picker) {
 		this.picker = picker;
-		this.scale = (float) size / HexBiomeChunk.SCALE;
+		this.scale = HexBiomeChunk.scaleMap(size);
 		Random random = new Random(seed);
 		noises[0] = new OpenSimplexNoise(random.nextInt());
 		noises[1] = new OpenSimplexNoise(random.nextInt());
@@ -49,14 +49,25 @@ public class HexBiomeMap implements BiomeMap {
 	@Override
 	public BCLBiome getBiome(double x, double z) {
 		BCLBiome biome = getRawBiome(x, z);
-		if (biome.getEdge() != null) {
-			float offset = scale * biome.getEdgeSize();
-			for (byte i = 0; i < 8; i++) {
-				if (getRawBiome(x + offset * EDGE_CIRCLE_X[i], z + offset * EDGE_CIRCLE_Z[i]) != biome) {
-					return biome.getEdge();
-				}
+		BCLBiome edge = biome.getEdge();
+		float offset = biome.getEdgeSize();
+		
+		if (edge == null && biome.getParentBiome() != null) {
+			edge = biome.getParentBiome().getEdge();
+			offset = biome.getParentBiome().getEdgeSize();
+		}
+		
+		if (edge == null) {
+			return biome;
+		}
+		
+		offset *= scale;
+		for (byte i = 0; i < 8; i++) {
+			if (!getRawBiome(x + offset * EDGE_CIRCLE_X[i], z + offset * EDGE_CIRCLE_Z[i]).isSame(biome)) {
+				return biome.getEdge();
 			}
 		}
+		
 		return biome;
 	}
 	
