@@ -3,40 +3,47 @@ package ru.bclib.world.generator.map.hex;
 import ru.bclib.world.biomes.BCLBiome;
 import ru.bclib.world.generator.BiomePicker;
 
+import java.util.Arrays;
 import java.util.Random;
 
 public class HexBiomeChunk {
 	private static final short SIDE = 32;
+	private static final byte SIDE_PRE = 4;
 	private static final short SIZE = SIDE * SIDE;
+	private static final short MAX_SIDE = SIZE - SIDE;
+	private static final byte SCALE_PRE = SIDE / SIDE_PRE;
+	private static final byte SIZE_PRE = SIDE_PRE * SIDE_PRE;
 	private static final byte SIDE_MASK = SIDE - 1;
+	private static final byte SIDE_PRE_MASK = SIDE_PRE - 1;
 	private static final byte SIDE_OFFSET = (byte) Math.round(Math.log(SIDE) / Math.log(2));
+	private static final byte SIDE_PRE_OFFSET = (byte) Math.round(Math.log(SIDE_PRE) / Math.log(2));
 	private static final short[][] NEIGHBOURS;
-	public static final short SCALE = SIDE / 4;
+	private static final BCLBiome[][] BUFFERS = new BCLBiome[2][SIZE];
 	
-	private final BCLBiome[] biomes;
+	private final BCLBiome[] biomes = new BCLBiome[SIZE];
 	
 	public HexBiomeChunk(Random random, BiomePicker picker) {
-		BCLBiome[][] buffers = new BCLBiome[2][SIZE];
-		
-		byte scale = SIDE / 4;
-		for (byte x = 0; x < 4; x++) {
-			for (byte z = 0; z < 4; z++) {
-				byte px = (byte) (x * scale + random.nextInt(scale));
-				byte pz = (byte) (z * scale + random.nextInt(scale));
-				circle(buffers[0], getIndex(px, pz), picker.getBiome(random), null);
-			}
+		for (BCLBiome[] buffer: BUFFERS) {
+			Arrays.fill(buffer, null);
 		}
 		
-		short maxSide = SIZE - SIDE;
+		for (byte index = 0; index < SIZE_PRE; index++) {
+			byte px = (byte) (index >> SIDE_PRE_OFFSET);
+			byte pz = (byte) (index & SIDE_PRE_MASK);
+			px = (byte) (px * SCALE_PRE + random.nextInt(SCALE_PRE));
+			pz = (byte) (pz * SCALE_PRE + random.nextInt(SCALE_PRE));
+			circle(BUFFERS[0], getIndex(px, pz), picker.getBiome(random), null);
+		}
+		
 		boolean hasEmptyCells = true;
 		byte bufferIndex = 0;
 		while (hasEmptyCells) {
-			BCLBiome[] inBuffer = buffers[bufferIndex];
+			BCLBiome[] inBuffer = BUFFERS[bufferIndex];
 			bufferIndex = (byte) ((bufferIndex + 1) & 1);
-			BCLBiome[] outBuffer = buffers[bufferIndex];
+			BCLBiome[] outBuffer = BUFFERS[bufferIndex];
 			hasEmptyCells = false;
 			
-			for (short index = SIDE; index < maxSide; index++) {
+			for (short index = SIDE; index < MAX_SIDE; index++) {
 				byte z = (byte) (index & SIDE_MASK);
 				if (z == 0 || z == SIDE_MASK) {
 					continue;
@@ -55,7 +62,7 @@ public class HexBiomeChunk {
 			}
 		}
 		
-		BCLBiome[] outBuffer = buffers[bufferIndex];
+		BCLBiome[] outBuffer = BUFFERS[bufferIndex];
 		byte preN = (byte) (SIDE_MASK - 2);
 		for (byte index = 0; index < SIDE; index++) {
 			outBuffer[getIndex(index, (byte) 0)] = outBuffer[getIndex(index, (byte) 2)];
@@ -73,7 +80,7 @@ public class HexBiomeChunk {
 			}
 		}
 		
-		this.biomes = outBuffer;
+		System.arraycopy(outBuffer, 0, this.biomes, 0, SIZE);
 	}
 	
 	private void circle(BCLBiome[] buffer, short center, BCLBiome biome, BCLBiome mask) {
@@ -111,6 +118,10 @@ public class HexBiomeChunk {
 	
 	private short[] getNeighbours(int z) {
 		return NEIGHBOURS[z & 1];
+	}
+	
+	public static float scaleMap(float size) {
+		return size / (SIDE >> 2);
 	}
 	
 	static {

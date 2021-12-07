@@ -17,6 +17,7 @@ import ru.bclib.blocks.BaseSignBlock;
 import ru.bclib.client.render.BCLRenderLayer;
 import ru.bclib.client.render.BaseChestBlockEntityRenderer;
 import ru.bclib.client.render.BaseSignBlockEntityRenderer;
+import ru.bclib.config.Configs;
 import ru.bclib.interfaces.PostInitable;
 import ru.bclib.interfaces.RenderLayerProvider;
 import ru.bclib.interfaces.TagProvider;
@@ -57,6 +58,7 @@ public class PostInitAPI {
 		blockTags = null;
 		itemTags = null;
 		BiomeAPI.loadFabricAPIBiomes();
+		Configs.BIOMES_CONFIG.saveChanges();
 	}
 	
 	@Environment(EnvType.CLIENT)
