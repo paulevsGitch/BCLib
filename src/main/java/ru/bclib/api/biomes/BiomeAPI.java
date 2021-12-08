@@ -514,7 +514,7 @@ public class BiomeAPI {
 		});
 	}
 	
-	private static void sortBiomeFeatures(Biome biome) {
+	public static void sortBiomeFeatures(Biome biome) {
 		BiomeGenerationSettings settings = biome.getGenerationSettings();
 		BiomeGenerationSettingsAccessor accessor = BiomeGenerationSettingsAccessor.class.cast(settings);
 		List<List<Supplier<PlacedFeature>>> featureList = CollectionsUtil.getMutable(accessor.bclib_getFeatures());
