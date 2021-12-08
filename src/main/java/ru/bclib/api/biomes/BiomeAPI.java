@@ -732,10 +732,20 @@ public class BiomeAPI {
 	
 	private static void sortFeatures(List<Supplier<PlacedFeature>> features) {
 		initFeatureOrder();
+		
+		Set<PlacedFeature> featuresWithoutDuplicates = Sets.newHashSet();
+		features.forEach(provider -> featuresWithoutDuplicates.add(provider.get()));
+		
+		if (featuresWithoutDuplicates.size() != features.size()) {
+			features.clear();
+			featuresWithoutDuplicates.forEach(feature -> features.add(() -> feature));
+		}
+		
 		features.forEach(provider -> {
 			PlacedFeature feature = provider.get();
 			FEATURE_ORDER.computeIfAbsent(feature, f -> FEATURE_ORDER_ID.getAndIncrement());
 		});
+		
 		features.sort((f1, f2) -> {
 			int v1 = FEATURE_ORDER.getOrDefault(f1.get(), 70000);
 			int v2 = FEATURE_ORDER.getOrDefault(f2.get(), 70000);
