@@ -105,6 +105,11 @@ public class BiomeAPI {
 	public static final BCLBiome SMALL_END_ISLANDS = registerEndVoidBiome(getFromRegistry(new ResourceLocation("small_end_islands")));
 
 	public static void init() {
+	}
+
+	private static boolean didInitFeatureOrder = false;
+	private static void initFeatureOrder() {
+		didInitFeatureOrder = true;
 		BuiltinRegistries.BIOME
 			.entrySet()
 			.stream()
