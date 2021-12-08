@@ -39,6 +39,7 @@ import ru.bclib.util.ColorUtil;
 import ru.bclib.world.biomes.BCLBiome;
 import ru.bclib.world.features.BCLFeature;
 import ru.bclib.world.structures.BCLStructureFeature;
+import ru.bclib.world.surface.DoubleBlockSurfaceNoiseCondition;
 
 public class BCLBiomeBuilder {
 	private static final BCLBiomeBuilder INSTANCE = new BCLBiomeBuilder();
@@ -538,7 +539,7 @@ public class BCLBiomeBuilder {
 			SurfaceRules.sequence(
 				SurfaceRules.ifTrue(SurfaceRules.ON_FLOOR,
 					SurfaceRules.sequence(
-						SurfaceRules.ifTrue(SurfaceRules.noiseCondition(Noises.SURFACE, -0.1818, 0.1818), surfaceBlockA),
+						SurfaceRules.ifTrue(DoubleBlockSurfaceNoiseCondition.CONDITION, surfaceBlockA),
 						surfaceBlockB
 					)
 				),
