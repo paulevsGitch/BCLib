@@ -570,9 +570,9 @@ public class BCLBiomeBuilder {
 			.temperature(temperature)
 			.downfall(downfall);
 		
-		if (spawnSettings != null) {
-			builder.mobSpawnSettings(spawnSettings.build());
-		}
+		//Some biomes may not spawn entities, without this creation will due to a null spawn object
+		builder.mobSpawnSettings(getSpawns().build());
+
 		
 		if (effectsBuilder != null) {
 			builder.specialEffects(effectsBuilder.build());
