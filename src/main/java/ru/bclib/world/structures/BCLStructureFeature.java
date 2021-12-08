@@ -1,16 +1,21 @@
 package ru.bclib.world.structures;
 
+import java.util.List;
+import java.util.Random;
+
 import com.google.common.collect.Lists;
+
 import net.fabricmc.fabric.api.structure.v1.FabricStructureBuilder;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.QuartPos;
 import net.minecraft.data.BuiltinRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
 import net.minecraft.world.level.levelgen.feature.StructureFeature;
+import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
 import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
-
-import java.util.List;
-import java.util.Random;
+import net.minecraft.world.level.levelgen.structure.pieces.PieceGeneratorSupplier;
 
 public class BCLStructureFeature {
 	private static final Random RANDOM = new Random(354);
@@ -33,8 +38,37 @@ public class BCLStructureFeature {
 		//TODO: 1.18 check if structures are added correctly
 		//FlatChunkGeneratorConfigAccessor.getStructureToFeatures().put(this.structure, this.featureConfigured);
 	}
-	
-	public StructureFeature<NoneFeatureConfiguration> getStructure() {
+
+	/**
+	 * runs the {@link PieceGeneratorSupplier.Context::validBiome} from the given context at
+	 * height=5 in the middle of the chunk.
+	 *
+	 * @param context The context to test with.
+	 * @param <C> The FeatureConfiguration of the Context
+	 * @return true, if this feature can spawn in the current biome
+	 */
+	public static <C extends FeatureConfiguration> boolean isValidBiome(PieceGeneratorSupplier.Context<C> context) {
+		return isValidBiome(context, 5);
+	}
+	/**
+	 * runs the {@link PieceGeneratorSupplier.Context::validBiome} from the given context at the
+	 * given height in the middle of the chunk.
+	 *
+	 * @param context The context to test with.
+	 * @param yPos The Height to test for
+	 * @param <C> The FeatureConfiguration of the Context
+	 * @return true, if this feature can spawn in the current biome
+	 */
+    public static <C extends FeatureConfiguration> boolean isValidBiome(PieceGeneratorSupplier.Context<C> context, int yPos) {
+        BlockPos blockPos = context.chunkPos().getMiddleBlockPosition(yPos);
+
+        return
+                context.validBiome().test(
+                        context.chunkGenerator().getNoiseBiome(QuartPos.fromBlock(blockPos.getX()), QuartPos.fromBlock(blockPos.getY()), QuartPos.fromBlock(blockPos.getZ()))
+                );
+    }
+
+    public StructureFeature<NoneFeatureConfiguration> getStructure() {
 		return structure;
 	}
 	
