@@ -85,6 +85,7 @@ public class BiomeAPI {
 	private static Registry<Biome> biomeRegistry;
 	
 	private static final Map<PlacedFeature, Integer> FEATURE_ORDER = Maps.newHashMap();
+	private static final MutableInt FEATURE_ORDER_ID = new MutableInt(0);
 	
 	private static final Map<ResourceKey, List<BiConsumer<ResourceLocation, Biome>>> MODIFICATIONS = Maps.newHashMap();
 	private static final Map<ResourceLocation, SurfaceRules.RuleSource> SURFACE_RULES = Maps.newHashMap();
@@ -104,7 +105,6 @@ public class BiomeAPI {
 	public static final BCLBiome SMALL_END_ISLANDS = registerEndVoidBiome(getFromRegistry(new ResourceLocation("small_end_islands")));
 	
 	public static void init() {
-		MutableInt integer = new MutableInt(0);
 		BuiltinRegistries.BIOME
 			.entrySet()
 			.stream()
@@ -116,7 +116,7 @@ public class BiomeAPI {
 				features.forEach(step -> {
 					step.forEach(provider -> {
 						PlacedFeature feature = provider.get();
-						FEATURE_ORDER.computeIfAbsent(feature, f -> integer.getAndIncrement());
+						FEATURE_ORDER.computeIfAbsent(feature, f -> FEATURE_ORDER_ID.getAndIncrement());
 					});
 				});
 			});
@@ -711,6 +711,10 @@ public class BiomeAPI {
 	}
 	
 	public static void sortFeatures(List<Supplier<PlacedFeature>> features) {
+		features.forEach(provider -> {
+			PlacedFeature feature = provider.get();
+			FEATURE_ORDER.computeIfAbsent(feature, f -> FEATURE_ORDER_ID.getAndIncrement());
+		});
 		features.sort((f1, f2) -> {
 			int v1 = FEATURE_ORDER.getOrDefault(f1.get(), 2048);
 			int v2 = FEATURE_ORDER.getOrDefault(f2.get(), 2048);
