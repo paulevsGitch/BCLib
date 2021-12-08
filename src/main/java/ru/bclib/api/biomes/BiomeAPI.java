@@ -24,6 +24,7 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.BiomeGenerationSettings;
 import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.biome.Climate;
@@ -479,6 +480,7 @@ public class BiomeAPI {
 		
 		List<BiConsumer<ResourceLocation, Biome>> modifications = MODIFICATIONS.get(level.dimension());
 		if (modifications == null) {
+			biomes.forEach(biome -> sortBiomeFeatures(biome));
 			return;
 		}
 		
@@ -497,7 +499,21 @@ public class BiomeAPI {
 					consumer.accept(biomeID, biome);
 				});
 			}
+			sortBiomeFeatures(biome);
 		});
+	}
+	
+	private static void sortBiomeFeatures(Biome biome) {
+		BiomeGenerationSettings settings = biome.getGenerationSettings();
+		BiomeGenerationSettingsAccessor accessor = BiomeGenerationSettingsAccessor.class.cast(settings);
+		List<List<Supplier<PlacedFeature>>> featureList = CollectionsUtil.getMutable(accessor.bclib_getFeatures());
+		final int size = featureList.size();
+		for (int i = 0; i < size; i++) {
+			List<Supplier<PlacedFeature>> features = CollectionsUtil.getMutable(featureList.get(i));
+			sortFeatures(features);
+			featureList.add(i, features);
+		}
+		accessor.bclib_setFeatures(featureList);
 	}
 	
 	private static List<SurfaceRules.RuleSource> getRuleSources(Set<Biome> biomes, ResourceKey<Level> dimensionType) {
@@ -615,17 +631,6 @@ public class BiomeAPI {
 		});
 	}
 	
-	private static void changeStructureStarts(Consumer<Map<StructureFeature<?>, Multimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>>>> modifier) {
-		Registry<NoiseGeneratorSettings> chunkGenSettingsRegistry = BuiltinRegistries.NOISE_GENERATOR_SETTINGS;
-		
-		for (Map.Entry<ResourceKey<NoiseGeneratorSettings>, NoiseGeneratorSettings> entry : chunkGenSettingsRegistry.entrySet()) {
-			Map<StructureFeature<?>, Multimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>>> structureMap = getMutableStructureConfig(entry.getValue());
-			
-			modifier.accept(structureMap);
-			setMutableStructureConfig(entry.getValue(), structureMap);
-		}
-	}
-	
 	/**
 	 * Adds new structure feature to existing biome.
 	 * @param biomeKey {@link ResourceKey} for the {@link Biome} to add structure feature in.
@@ -714,7 +719,18 @@ public class BiomeAPI {
 		return Blocks.AIR.defaultBlockState();
 	}
 	
-	public static void sortFeatures(List<Supplier<PlacedFeature>> features) {
+	private static void changeStructureStarts(Consumer<Map<StructureFeature<?>, Multimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>>>> modifier) {
+		Registry<NoiseGeneratorSettings> chunkGenSettingsRegistry = BuiltinRegistries.NOISE_GENERATOR_SETTINGS;
+		
+		for (Map.Entry<ResourceKey<NoiseGeneratorSettings>, NoiseGeneratorSettings> entry : chunkGenSettingsRegistry.entrySet()) {
+			Map<StructureFeature<?>, Multimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>>> structureMap = getMutableStructureConfig(entry.getValue());
+			
+			modifier.accept(structureMap);
+			setMutableStructureConfig(entry.getValue(), structureMap);
+		}
+	}
+	
+	private static void sortFeatures(List<Supplier<PlacedFeature>> features) {
 		initFeatureOrder();
 		features.forEach(provider -> {
 			PlacedFeature feature = provider.get();
