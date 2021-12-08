@@ -1,5 +1,18 @@
 package ru.bclib.api.biomes;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+
+import org.jetbrains.annotations.Nullable;
+
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultimap;
@@ -7,6 +20,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
+
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.impl.biome.NetherBiomeData;
@@ -42,7 +56,6 @@ import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
 import net.minecraft.world.level.levelgen.feature.StructureFeature;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import org.apache.commons.lang3.mutable.MutableInt;
-import org.jetbrains.annotations.Nullable;
 import ru.bclib.BCLib;
 import ru.bclib.config.Configs;
 import ru.bclib.interfaces.SurfaceProvider;
@@ -57,17 +70,6 @@ import ru.bclib.world.biomes.FabricBiomesData;
 import ru.bclib.world.features.BCLFeature;
 import ru.bclib.world.generator.BiomePicker;
 import ru.bclib.world.structures.BCLStructureFeature;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 public class BiomeAPI {
 	/**
@@ -102,8 +104,15 @@ public class BiomeAPI {
 	
 	public static final BCLBiome END_BARRENS = registerEndVoidBiome(getFromRegistry(new ResourceLocation("end_barrens")));
 	public static final BCLBiome SMALL_END_ISLANDS = registerEndVoidBiome(getFromRegistry(new ResourceLocation("small_end_islands")));
-	
+
 	public static void init() {
+
+	}
+
+	private static boolean didInitFeatureOrder = false;
+	public static void initFeatureOrder() {
+		didInitFeatureOrder = true;
+
 		MutableInt integer = new MutableInt(0);
 		BuiltinRegistries.BIOME
 			.entrySet()
@@ -711,9 +720,12 @@ public class BiomeAPI {
 	}
 	
 	public static void sortFeatures(List<Supplier<PlacedFeature>> features) {
+		if (!didInitFeatureOrder){
+			initFeatureOrder();
+		}
 		features.sort((f1, f2) -> {
-			int v1 = FEATURE_ORDER.getOrDefault(f1.get(), 2048);
-			int v2 = FEATURE_ORDER.getOrDefault(f2.get(), 2048);
+			int v1 = FEATURE_ORDER.getOrDefault(f1.get(), FEATURE_ORDER.size());
+			int v2 = FEATURE_ORDER.getOrDefault(f2.get(), FEATURE_ORDER.size());
 			return Integer.compare(v1, v2);
 		});
 	}
