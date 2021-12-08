@@ -511,7 +511,7 @@ public class BiomeAPI {
 		for (int i = 0; i < size; i++) {
 			List<Supplier<PlacedFeature>> features = CollectionsUtil.getMutable(featureList.get(i));
 			sortFeatures(features);
-			featureList.add(i, features);
+			featureList.set(i, features);
 		}
 		accessor.bclib_setFeatures(featureList);
 	}
