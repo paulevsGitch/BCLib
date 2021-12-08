@@ -1,5 +1,10 @@
 package ru.bclib.api.biomes;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
+
 import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.data.BuiltinRegistries;
@@ -22,6 +27,7 @@ import net.minecraft.world.level.biome.BiomeSpecialEffects;
 import net.minecraft.world.level.biome.MobSpawnSettings;
 import net.minecraft.world.level.biome.MobSpawnSettings.SpawnerData;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.GenerationStep.Decoration;
 import net.minecraft.world.level.levelgen.Noises;
@@ -33,11 +39,6 @@ import ru.bclib.util.ColorUtil;
 import ru.bclib.world.biomes.BCLBiome;
 import ru.bclib.world.features.BCLFeature;
 import ru.bclib.world.structures.BCLStructureFeature;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
 
 public class BCLBiomeBuilder {
 	private static final BCLBiomeBuilder INSTANCE = new BCLBiomeBuilder();
@@ -505,7 +506,16 @@ public class BCLBiomeBuilder {
 	 * @return same {@link BCLBiomeBuilder} instance.
 	 */
 	public BCLBiomeBuilder surface(Block surfaceBlock) {
-		return surface(SurfaceRuleBuilder.start().surface(surfaceBlock.defaultBlockState()).build());
+		return surface(surfaceBlock.defaultBlockState());
+	}
+
+	/**
+	 * Adds new world surface rule for the given block
+	 * @param surfaceBlock {@link BlockState} to use.
+	 * @return same {@link BCLBiomeBuilder} instance.
+	 */
+	public BCLBiomeBuilder surface(BlockState surfaceBlock) {
+		return surface(SurfaceRuleBuilder.start().surface(surfaceBlock).build());
 	}
 	
 	/**
