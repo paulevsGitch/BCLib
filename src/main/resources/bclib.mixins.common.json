@@ -38,7 +38,8 @@
 		"AnvilBlockMixin",
 		"AnvilMenuMixin",
 		"TagLoaderMixin",
-		"MainMixin"
+		"MainMixin",
+		"SurfaceRulesContextAccessor"
 	],
 	"injectors": {
 		"defaultRequire": 1
