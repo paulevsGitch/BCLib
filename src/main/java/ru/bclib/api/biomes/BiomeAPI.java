@@ -103,13 +103,12 @@ public class BiomeAPI {
 	
 	public static final BCLBiome END_BARRENS = registerEndVoidBiome(getFromRegistry(new ResourceLocation("end_barrens")));
 	public static final BCLBiome SMALL_END_ISLANDS = registerEndVoidBiome(getFromRegistry(new ResourceLocation("small_end_islands")));
-
-	public static void init() {
-	}
-
-	private static boolean didInitFeatureOrder = false;
+	
 	private static void initFeatureOrder() {
-		didInitFeatureOrder = true;
+		if (!FEATURE_ORDER.isEmpty()) {
+			return;
+		}
+		
 		BuiltinRegistries.BIOME
 			.entrySet()
 			.stream()
@@ -716,9 +715,7 @@ public class BiomeAPI {
 	}
 	
 	public static void sortFeatures(List<Supplier<PlacedFeature>> features) {
-		if (!didInitFeatureOrder){
-			initFeatureOrder();
-		}
+		initFeatureOrder();
 		features.forEach(provider -> {
 			PlacedFeature feature = provider.get();
 			FEATURE_ORDER.computeIfAbsent(feature, f -> FEATURE_ORDER_ID.getAndIncrement());

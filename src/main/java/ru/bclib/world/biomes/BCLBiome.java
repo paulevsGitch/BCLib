@@ -1,15 +1,7 @@
 package ru.bclib.world.biomes;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.function.Consumer;
-
-import org.jetbrains.annotations.Nullable;
-
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-
 import net.minecraft.core.Registry;
 import net.minecraft.data.BuiltinRegistries;
 import net.minecraft.resources.ResourceKey;
@@ -18,8 +10,14 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.SurfaceRules;
 import net.minecraft.world.level.levelgen.SurfaceRules.RuleSource;
 import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
+import org.jetbrains.annotations.Nullable;
 import ru.bclib.api.biomes.BiomeAPI;
 import ru.bclib.util.WeightedList;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.function.Consumer;
 
 public class BCLBiome {
 	private final List<ConfiguredStructureFeature> structures = Lists.newArrayList();
