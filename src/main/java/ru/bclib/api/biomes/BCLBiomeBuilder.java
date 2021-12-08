@@ -570,27 +570,20 @@ public class BCLBiomeBuilder {
 			.temperature(temperature)
 			.downfall(downfall);
 		
-		if (spawnSettings != null) {
-			builder.mobSpawnSettings(spawnSettings.build());
-		}
+		builder.mobSpawnSettings(getSpawns().build());
+		builder.specialEffects(getEffects().build());
 		
-		if (effectsBuilder != null) {
-			builder.specialEffects(effectsBuilder.build());
+		BiomeGenerationSettings settings = getGeneration().build();
+		BiomeGenerationSettingsAccessor accessor = BiomeGenerationSettingsAccessor.class.cast(settings);
+		List<List<Supplier<PlacedFeature>>> featureLists = CollectionsUtil.getMutable(accessor.bclib_getFeatures());
+		final int size = featureLists.size();
+		for (int i = 0; i < size; i++) {
+			List<Supplier<PlacedFeature>> list = CollectionsUtil.getMutable(featureLists.get(i));
+			BiomeAPI.sortFeatures(list);
+			featureLists.add(i, list);
 		}
-		
-		if (generationSettings != null) {
-			BiomeGenerationSettings settings = generationSettings.build();
-			BiomeGenerationSettingsAccessor accessor = BiomeGenerationSettingsAccessor.class.cast(settings);
-			List<List<Supplier<PlacedFeature>>> featureLists = CollectionsUtil.getMutable(accessor.bclib_getFeatures());
-			final int size = featureLists.size();
-			for (int i = 0; i < size; i++) {
-				List<Supplier<PlacedFeature>> list = CollectionsUtil.getMutable(featureLists.get(i));
-				BiomeAPI.sortFeatures(list);
-				featureLists.add(i, list);
-			}
-			accessor.bclib_setFeatures(featureLists);
-			builder.generationSettings(settings);
-		}
+		accessor.bclib_setFeatures(featureLists);
+		builder.generationSettings(settings);
 		
 		final T res = biomeConstructor.apply(biomeID, builder.build());
 		res.attachStructures(structures);
