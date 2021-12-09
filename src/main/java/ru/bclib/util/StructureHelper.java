@@ -1,6 +1,16 @@
 package ru.bclib.util;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Enumeration;
+import java.util.Random;
+import java.util.Set;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+
 import com.google.common.collect.Sets;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.BlockPos.MutableBlockPos;
 import net.minecraft.core.Direction;
@@ -20,15 +30,7 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemp
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.Vec3;
 import ru.bclib.api.TagAPI;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Enumeration;
-import java.util.Random;
-import java.util.Set;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
+import ru.bclib.api.biomes.BiomeAPI;
 
 public class StructureHelper {
 	private static final Direction[] DIR = BlocksHelper.makeHorizontal();
@@ -372,15 +374,13 @@ public class StructureHelper {
 			.isInvulnerable(state, world, pos);
 	}
 	
-	public static void cover(WorldGenLevel world, BoundingBox bounds, Random random) {
+	public static void cover(WorldGenLevel world, BoundingBox bounds, Random random, BlockState defaultBlock) {
 		MutableBlockPos mut = new MutableBlockPos();
 		for (int x = bounds.minX(); x <= bounds.maxX(); x++) {
 			mut.setX(x);
 			for (int z = bounds.minZ(); z <= bounds.maxZ(); z++) {
 				mut.setZ(z);
-				BlockState top = Blocks.PURPLE_CONCRETE.defaultBlockState();
-					//TODO: 1.18 find another way to get the Top Materiel
-					//world.getBiome(mut).getGenerationSettings().getSurfaceBuilderConfig().getTopMaterial();
+				BlockState top = BiomeAPI.findTopMaterial(world.getBiome(mut)).orElse(defaultBlock);
 				for (int y = bounds.maxY(); y >= bounds.minY(); y--) {
 					mut.setY(y);
 					BlockState state = world.getBlockState(mut);

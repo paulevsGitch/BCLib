@@ -1,5 +1,19 @@
 package ru.bclib.api.biomes;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Random;
+import java.util.Set;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+
+import org.jetbrains.annotations.Nullable;
+
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultimap;
@@ -7,6 +21,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
+
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.impl.biome.NetherBiomeData;
@@ -23,6 +38,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeGenerationSettings;
 import net.minecraft.world.level.biome.BiomeSource;
@@ -43,9 +59,9 @@ import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
 import net.minecraft.world.level.levelgen.feature.StructureFeature;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import org.apache.commons.lang3.mutable.MutableInt;
-import org.jetbrains.annotations.Nullable;
 import ru.bclib.BCLib;
 import ru.bclib.config.Configs;
+import ru.bclib.interfaces.SurfaceMaterialProvider;
 import ru.bclib.interfaces.SurfaceProvider;
 import ru.bclib.interfaces.SurfaceRuleProvider;
 import ru.bclib.mixin.common.BiomeGenerationSettingsAccessor;
@@ -58,17 +74,6 @@ import ru.bclib.world.biomes.FabricBiomesData;
 import ru.bclib.world.features.BCLFeature;
 import ru.bclib.world.generator.BiomePicker;
 import ru.bclib.world.structures.BCLStructureFeature;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 public class BiomeAPI {
 	/**
@@ -726,6 +731,36 @@ public class BiomeAPI {
 			return provider.getSurface(pos, biome, level);
 		}
 		return Blocks.AIR.defaultBlockState();
+	}
+
+	public static Optional<BlockState> findTopMaterial(WorldGenLevel world, BlockPos pos){
+		return findTopMaterial(getBiome(world.getBiome(pos)));
+	}
+
+	public static Optional<BlockState> findTopMaterial(Biome biome){
+		return findTopMaterial(getBiome(biome));
+	}
+
+	public static Optional<BlockState> findTopMaterial(BCLBiome biome){
+		if (biome instanceof SurfaceMaterialProvider smp){
+			return Optional.of(smp.getTopMaterial());
+		}
+		return Optional.empty();
+	}
+
+	public static Optional<BlockState> findUnderMaterial(WorldGenLevel world, BlockPos pos){
+		return findUnderMaterial(getBiome(world.getBiome(pos)));
+	}
+
+	public static Optional<BlockState> findUnderMaterial(Biome biome){
+		return findUnderMaterial(getBiome(biome));
+	}
+
+	public static Optional<BlockState> findUnderMaterial(BCLBiome biome){
+		if (biome instanceof SurfaceMaterialProvider smp){
+			return Optional.of(smp.getUnderMaterial());
+		}
+		return Optional.empty();
 	}
 	
 	private static void changeStructureStarts(Consumer<Map<StructureFeature<?>, Multimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>>>> modifier) {

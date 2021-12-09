@@ -1,5 +1,9 @@
 package ru.bclib.world.features;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Random;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.BlockPos.MutableBlockPos;
 import net.minecraft.core.Direction;
@@ -10,7 +14,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.state.BlockState;
@@ -24,11 +27,12 @@ import ru.bclib.api.biomes.BiomeAPI;
 import ru.bclib.util.BlocksHelper;
 import ru.bclib.world.processors.DestructionStructureProcessor;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Random;
-
 public abstract class NBTStructureFeature extends DefaultFeature {
+	private final BlockState defaultBlock;
+	public NBTStructureFeature(BlockState defaultBlock){
+		this.defaultBlock = defaultBlock;
+	}
+
 	protected static final DestructionStructureProcessor DESTRUCTION = new DestructionStructureProcessor();
 	
 	protected abstract StructureTemplate getStructure(WorldGenLevel world, BlockPos pos, Random random);
@@ -142,14 +146,9 @@ public abstract class NBTStructureFeature extends DefaultFeature {
 							BlockState stateSt = world.getBlockState(mut);
 							if (!stateSt.is(TagAPI.BLOCK_GEN_TERRAIN)) {
 								if (merge == TerrainMerge.SURFACE) {
-//									SurfaceBuilderConfiguration config = world.getBiome(mut)
-//																			  .getGenerationSettings()
-//																			  .getSurfaceBuilderConfig();
 									boolean isTop = mut.getY() == surfMax && state.getMaterial().isSolidBlocking();
-									BlockState top =
-										Blocks.PURPLE_CONCRETE.defaultBlockState();
-									   //TODO: 1.18 find another way to get the Top/Bottom Materiel
-										//isTop ? config.getTopMaterial() : config.getUnderMaterial();
+									Biome b = world.getBiome(mut);
+									BlockState top = (isTop ? BiomeAPI.findTopMaterial(b) : BiomeAPI.findUnderMaterial(b)).orElse(defaultBlock);
 									BlocksHelper.setWithoutUpdate(world, mut, top);
 								}
 								else {
@@ -159,12 +158,8 @@ public abstract class NBTStructureFeature extends DefaultFeature {
 							else {
 								if (stateSt.is(TagAPI.BLOCK_END_GROUND) && state.getMaterial().isSolidBlocking()) {
 									if (merge == TerrainMerge.SURFACE) {
-//										SurfaceBuilderConfiguration config = world.getBiome(mut)
-//																				  .getGenerationSettings()
-//																				  .getSurfaceBuilderConfig();
-										BlockState bottom = Blocks.PURPLE_CONCRETE.defaultBlockState();
-										//TODO: 1.18 find another way to get the Top Material
-										//config.getUnderMaterial()
+										Biome b = world.getBiome(mut);
+										BlockState bottom = BiomeAPI.findUnderMaterial(b).orElse(defaultBlock);
 										BlocksHelper.setWithoutUpdate(world, mut, bottom);
 									}
 									else {
