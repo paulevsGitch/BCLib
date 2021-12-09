@@ -146,7 +146,14 @@ public class BCLibNetherBiomeSource extends BiomeSource {
 		boolean useLegacy = GeneratorOptions.useOldBiomeGenerator() || forceLegacyGenerator;
 		TriFunction<Long, Integer, BiomePicker, BiomeMap> mapConstructor = useLegacy ? SquareBiomeMap::new : HexBiomeMap::new;
 		if (worldHeight > 128 && GeneratorOptions.useVerticalBiomes()) {
-			this.biomeMap = new MapStack(seed, GeneratorOptions.getBiomeSizeNether(), BiomeAPI.NETHER_BIOME_PICKER, 86, worldHeight, mapConstructor);
+			this.biomeMap = new MapStack(
+				seed,
+				GeneratorOptions.getBiomeSizeNether(),
+				BiomeAPI.NETHER_BIOME_PICKER,
+				GeneratorOptions.getVerticalBiomeSizeNether(),
+				worldHeight,
+				mapConstructor
+			);
 		}
 		else {
 			this.biomeMap = mapConstructor.apply(seed, GeneratorOptions.getBiomeSizeNether(), BiomeAPI.NETHER_BIOME_PICKER);
