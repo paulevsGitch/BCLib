@@ -34,6 +34,7 @@ public class BCLibNetherBiomeSource extends BiomeSource {
 	private BiomeMap biomeMap;
 	private final long seed;
     private static boolean forceLegacyGenerator = false;
+	private static int lastWorldHeight;
 	private static int worldHeight;
 
     /**
@@ -84,14 +85,7 @@ public class BCLibNetherBiomeSource extends BiomeSource {
 		BiomeAPI.NETHER_BIOME_PICKER.getBiomes().forEach(biome -> biome.updateActualBiomes(biomeRegistry));
 		BiomeAPI.NETHER_BIOME_PICKER.rebuild();
 		
-		boolean useLegacy = GeneratorOptions.useOldBiomeGenerator() || forceLegacyGenerator;
-		TriFunction<Long, Integer, BiomePicker, BiomeMap> mapConstructor = useLegacy ? SquareBiomeMap::new : HexBiomeMap::new;
-		if (worldHeight > 128) {
-			this.biomeMap = new MapStack(seed, GeneratorOptions.getBiomeSizeNether(), BiomeAPI.NETHER_BIOME_PICKER, 86, worldHeight, mapConstructor);
-		}
-		else {
-			this.biomeMap = mapConstructor.apply(seed, GeneratorOptions.getBiomeSizeNether(), BiomeAPI.NETHER_BIOME_PICKER);
-		}
+		initMap();
 		
 		this.biomeRegistry = biomeRegistry;
 		this.seed = seed;
@@ -124,6 +118,10 @@ public class BCLibNetherBiomeSource extends BiomeSource {
 	
 	@Override
 	public Biome getNoiseBiome(int biomeX, int biomeY, int biomeZ, Climate.Sampler var4) {
+		if (lastWorldHeight != worldHeight) {
+			lastWorldHeight = worldHeight;
+			initMap();
+		}
 		if ((biomeX & 63) == 0 && (biomeZ & 63) == 0) {
 			biomeMap.clearCache();
 		}
@@ -142,5 +140,16 @@ public class BCLibNetherBiomeSource extends BiomeSource {
 	
 	public static void register() {
 		Registry.register(Registry.BIOME_SOURCE, BCLib.makeID("nether_biome_source"), CODEC);
+	}
+	
+	private void initMap() {
+		boolean useLegacy = GeneratorOptions.useOldBiomeGenerator() || forceLegacyGenerator;
+		TriFunction<Long, Integer, BiomePicker, BiomeMap> mapConstructor = useLegacy ? SquareBiomeMap::new : HexBiomeMap::new;
+		if (worldHeight > 128) {
+			this.biomeMap = new MapStack(seed, GeneratorOptions.getBiomeSizeNether(), BiomeAPI.NETHER_BIOME_PICKER, 86, worldHeight, mapConstructor);
+		}
+		else {
+			this.biomeMap = mapConstructor.apply(seed, GeneratorOptions.getBiomeSizeNether(), BiomeAPI.NETHER_BIOME_PICKER);
+		}
 	}
 }

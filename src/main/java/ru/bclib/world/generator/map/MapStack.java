@@ -15,9 +15,11 @@ public class MapStack implements BiomeMap {
 	private final int worldHeight;
 	private final int minValue;
 	private final int maxValue;
+	private final int maxIndex;
 	
 	public MapStack(long seed, int size, BiomePicker picker, int mapHeight, int worldHeight, TriFunction<Long, Integer, BiomePicker, BiomeMap> mapConstructor) {
 		final int mapCount = Mth.ceil((float) worldHeight / mapHeight);
+		this.maxIndex = mapCount - 1;
 		this.worldHeight = worldHeight;
 		minValue = Mth.floor(mapHeight * 0.5F + 0.5F);
 		maxValue = Mth.floor(worldHeight - mapHeight * 0.5F + 0.5F);
@@ -44,10 +46,11 @@ public class MapStack implements BiomeMap {
 			mapIndex = 0;
 		}
 		else if (y > maxValue) {
-			mapIndex = maps.length - 1;
+			mapIndex = maxIndex;
 		}
 		else {
-			mapIndex = Mth.floor((y + noise.eval(x * 0.03, z * 0.03) * 8) / worldHeight * maps.length + 0.5F);
+			mapIndex = Mth.floor((y + noise.eval(x * 0.03, z * 0.03) * 8) / worldHeight * maxIndex + 0.5F);
+			mapIndex = Mth.clamp(mapIndex, 0, maxIndex);
 		}
 		
 		return maps[mapIndex].getBiome(x, y, z);
