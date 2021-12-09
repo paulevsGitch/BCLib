@@ -103,8 +103,10 @@ public class SquareBiomeMap implements BiomeMap {
 		ChunkPos cpos = new ChunkPos(MHelper.floor(x / SquareBiomeChunk.WIDTH), MHelper.floor(z / SquareBiomeChunk.WIDTH));
 		SquareBiomeChunk chunk = maps.get(cpos);
 		if (chunk == null) {
-			random.setLargeFeatureWithSalt(0, cpos.x, cpos.z, 0);
-			chunk = new SquareBiomeChunk(random, picker);
+			synchronized (random) {
+				random.setLargeFeatureWithSalt(0, cpos.x, cpos.z, 0);
+				chunk = new SquareBiomeChunk(random, picker);
+			}
 			maps.put(cpos, chunk);
 		}
 		

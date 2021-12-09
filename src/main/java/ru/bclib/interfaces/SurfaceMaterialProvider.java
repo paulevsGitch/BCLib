@@ -1,4 +1,4 @@
-package ru.bclib.api.biomes;
+package ru.bclib.interfaces;
 
 import net.minecraft.world.level.block.state.BlockState;
 
