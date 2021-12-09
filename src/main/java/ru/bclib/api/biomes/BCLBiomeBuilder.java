@@ -30,6 +30,7 @@ import net.minecraft.world.level.levelgen.SurfaceRules;
 import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
 import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
+import ru.bclib.entity.BCLEntityWrapper;
 import ru.bclib.util.ColorUtil;
 import ru.bclib.world.biomes.BCLBiome;
 import ru.bclib.world.features.BCLFeature;
@@ -128,6 +129,22 @@ public class BCLBiomeBuilder {
 	 */
 	public <M extends Mob> BCLBiomeBuilder spawn(EntityType<M> entityType, int weight, int minGroupCount, int maxGroupCount) {
 		getSpawns().addSpawn(entityType.getCategory(), new SpawnerData(entityType, weight, minGroupCount, maxGroupCount));
+		return this;
+	}
+	
+	/**
+	 * Adds mob spawning to biome.
+	 * @param wrapper {@link BCLEntityWrapper} mob type.
+	 * @param weight spawn weight.
+	 * @param minGroupCount minimum mobs in group.
+	 * @param maxGroupCount maximum mobs in group.
+	 * @return same {@link BCLBiomeBuilder} instance.
+	 */
+	public <M extends Mob> BCLBiomeBuilder spawn(BCLEntityWrapper<M> wrapper, int weight, int minGroupCount, int maxGroupCount) {
+		if (wrapper.canSpawn()) {
+			return spawn(wrapper.type(), weight, minGroupCount, maxGroupCount);
+		}
+		
 		return this;
 	}
 	

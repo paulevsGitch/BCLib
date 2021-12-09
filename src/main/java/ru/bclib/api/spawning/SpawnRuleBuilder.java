@@ -13,6 +13,7 @@ import net.minecraft.world.entity.SpawnPlacements.Type;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.levelgen.Heightmap.Types;
 import net.minecraft.world.phys.AABB;
+import ru.bclib.entity.BCLEntityWrapper;
 import ru.bclib.interfaces.SpawnRule;
 
 import java.util.Arrays;
@@ -33,12 +34,22 @@ public class SpawnRuleBuilder<M extends Mob> {
 	
 	/**
 	 * Starts new rule building process.
+	 * @param entityType The entity you want to build a rule for
 	 * @return prepared {@link SpawnRuleBuilder} instance.
 	 */
 	public static SpawnRuleBuilder start(EntityType<? extends Mob> entityType) {
 		INSTANCE.entityType = entityType;
 		INSTANCE.rules.clear();
 		return INSTANCE;
+	}
+	
+	/**
+	 * Starts new rule building process.
+	 * @param entityType The entity you want to build a rule for
+	 * @return prepared {@link SpawnRuleBuilder} instance.
+	 */
+	public static SpawnRuleBuilder start(BCLEntityWrapper<? extends Mob> entityType) {
+		return start(entityType.type());
 	}
 	
 	/**

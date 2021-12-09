@@ -61,6 +61,7 @@ import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import org.apache.commons.lang3.mutable.MutableInt;
 import ru.bclib.BCLib;
 import ru.bclib.config.Configs;
+import ru.bclib.entity.BCLEntityWrapper;
 import ru.bclib.interfaces.SurfaceMaterialProvider;
 import ru.bclib.interfaces.SurfaceProvider;
 import ru.bclib.interfaces.SurfaceRuleProvider;
@@ -626,6 +627,10 @@ public class BiomeAPI {
 	 * @param structure {@link ConfiguredStructureFeature} to add.
 	 */
 	public static void addBiomeStructure(ResourceKey biomeKey, ConfiguredStructureFeature structure) {
+		if (biomeKey==null){
+			BCLib.LOGGER.error("null is not a valid biomeKey for " + structure);
+			return;
+		}
 		changeStructureStarts(structureMap -> {
 			Multimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>> configuredMap = structureMap.computeIfAbsent(structure.feature, k -> HashMultimap.create());
 			
@@ -697,6 +702,20 @@ public class BiomeAPI {
 	@Nullable
 	public static SurfaceRules.RuleSource getSurfaceRule(ResourceLocation biomeID) {
 		return SURFACE_RULES.get(biomeID);
+	}
+	
+	/**
+	 * Adds mob spawning to specified biome.
+	 * @param biome {@link Biome} to add mob spawning.
+	 * @param entityType {@link BCLEntityWrapper} mob type.
+	 * @param weight spawn weight.
+	 * @param minGroupCount minimum mobs in group.
+	 * @param maxGroupCount maximum mobs in group.
+	 */
+	public static <M extends Mob> void addBiomeMobSpawn(Biome biome, BCLEntityWrapper<M> entityType, int weight, int minGroupCount, int maxGroupCount) {
+		if (entityType.canSpawn()){
+			addBiomeMobSpawn(biome, entityType.type(), weight, minGroupCount, maxGroupCount);
+		}
 	}
 	
 	/**

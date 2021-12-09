@@ -11,6 +11,7 @@ import net.minecraft.world.level.levelgen.SurfaceRules;
 import net.minecraft.world.level.levelgen.SurfaceRules.RuleSource;
 import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
 import org.jetbrains.annotations.Nullable;
+import ru.bclib.BCLib;
 import ru.bclib.api.biomes.BiomeAPI;
 import ru.bclib.util.WeightedList;
 
@@ -226,6 +227,9 @@ public class BCLBiome {
 			edge.updateActualBiomes(biomeRegistry);
 		}
 		this.actualBiome = biomeRegistry.get(biomeID);
+		if (actualBiome==null) {
+			BCLib.LOGGER.error("Unable to find actual Biome for " + biomeID);
+		}
 		
 		if (!this.structures.isEmpty()) {
 			structures.forEach(s -> BiomeAPI.addBiomeStructure(BiomeAPI.getBiomeKey(actualBiome), s));
