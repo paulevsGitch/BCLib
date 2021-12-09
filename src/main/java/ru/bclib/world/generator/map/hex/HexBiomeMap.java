@@ -47,7 +47,7 @@ public class HexBiomeMap implements BiomeMap {
 	}
 	
 	@Override
-	public BCLBiome getBiome(double x, double z) {
+	public BCLBiome getBiome(double x, double y, double z) {
 		BCLBiome biome = getRawBiome(x, z);
 		BCLBiome edge = biome.getEdge();
 		float offset = biome.getEdgeSize();

@@ -9,12 +9,14 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biome.BiomeCategory;
 import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.biome.Climate;
+import org.apache.commons.lang3.function.TriFunction;
 import ru.bclib.BCLib;
 import ru.bclib.api.biomes.BiomeAPI;
 import ru.bclib.config.ConfigKeeper.StringArrayEntry;
 import ru.bclib.config.Configs;
 import ru.bclib.interfaces.BiomeMap;
 import ru.bclib.world.biomes.BCLBiome;
+import ru.bclib.world.generator.map.MapStack;
 import ru.bclib.world.generator.map.hex.HexBiomeMap;
 import ru.bclib.world.generator.map.square.SquareBiomeMap;
 
@@ -32,6 +34,7 @@ public class BCLibNetherBiomeSource extends BiomeSource {
 	private BiomeMap biomeMap;
 	private final long seed;
     private static boolean forceLegacyGenerator = false;
+	private static int worldHeight;
 
     /**
      * When true, the older square generator is used for the nether.
@@ -43,6 +46,14 @@ public class BCLibNetherBiomeSource extends BiomeSource {
     public static void setForceLegacyGeneration(boolean val){
         forceLegacyGenerator = val;
     }
+	
+	/**
+	 * Set world height, used when Nether is larger than vanilla 128 blocks tall.
+	 * @param worldHeight height of the Nether ceiling.
+	 */
+	public static void setWorldHeight(int worldHeight) {
+		BCLibNetherBiomeSource.worldHeight = worldHeight;
+	}
 	
 	public BCLibNetherBiomeSource(Registry<Biome> biomeRegistry, long seed) {
 		super(getBiomes(biomeRegistry));
@@ -73,11 +84,13 @@ public class BCLibNetherBiomeSource extends BiomeSource {
 		BiomeAPI.NETHER_BIOME_PICKER.getBiomes().forEach(biome -> biome.updateActualBiomes(biomeRegistry));
 		BiomeAPI.NETHER_BIOME_PICKER.rebuild();
 		
-		if (GeneratorOptions.useOldBiomeGenerator() || forceLegacyGenerator) {
-			this.biomeMap = new SquareBiomeMap(seed, GeneratorOptions.getBiomeSizeNether(), BiomeAPI.NETHER_BIOME_PICKER);
+		boolean useLegacy = GeneratorOptions.useOldBiomeGenerator() || forceLegacyGenerator;
+		TriFunction<Long, Integer, BiomePicker, BiomeMap> mapConstructor = useLegacy ? SquareBiomeMap::new : HexBiomeMap::new;
+		if (worldHeight > 128) {
+			this.biomeMap = new MapStack(seed, GeneratorOptions.getBiomeSizeNether(), BiomeAPI.NETHER_BIOME_PICKER, 86, worldHeight, mapConstructor);
 		}
 		else {
-			this.biomeMap = new HexBiomeMap(seed, GeneratorOptions.getBiomeSizeNether(), BiomeAPI.NETHER_BIOME_PICKER);
+			this.biomeMap = mapConstructor.apply(seed, GeneratorOptions.getBiomeSizeNether(), BiomeAPI.NETHER_BIOME_PICKER);
 		}
 		
 		this.biomeRegistry = biomeRegistry;
@@ -114,7 +127,7 @@ public class BCLibNetherBiomeSource extends BiomeSource {
 		if ((biomeX & 63) == 0 && (biomeZ & 63) == 0) {
 			biomeMap.clearCache();
 		}
-		return biomeMap.getBiome(biomeX << 2, biomeZ << 2).getActualBiome();
+		return biomeMap.getBiome(biomeX << 2, biomeY << 2, biomeZ << 2).getActualBiome();
 	}
 	
 	@Override

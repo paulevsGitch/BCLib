@@ -5,5 +5,5 @@ import ru.bclib.world.biomes.BCLBiome;
 public interface BiomeMap {
 	void clearCache();
 	
-	BCLBiome getBiome(double x, double z);
+	BCLBiome getBiome(double x, double y, double z);
 }

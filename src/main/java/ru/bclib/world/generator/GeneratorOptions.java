@@ -11,12 +11,12 @@ public class GeneratorOptions {
 	private static int biomeSizeEndLand;
 	private static int biomeSizeEndVoid;
 	private static Function<Point, Boolean> endLandFunction;
-	private static boolean farEndBiomes = true;
 	private static boolean customNetherBiomeSource = true;
 	private static boolean customEndBiomeSource = true;
 	private static boolean addNetherBiomesByCategory = false;
 	private static boolean addEndBiomesByCategory = false;
-	private static boolean useOldBiomeGenerator = false;    
+	private static boolean useOldBiomeGenerator = false;
+	private static long farEndBiomesSqr = 1000000;
 	
 	public static void init() {
 		biomeSizeNether = Configs.GENERATOR_CONFIG.getInt("nether.biomeMap", "biomeSize", 256);
@@ -49,12 +49,16 @@ public class GeneratorOptions {
 		return endLandFunction;
 	}
 	
-	public static boolean isFarEndBiomes() {
-		return farEndBiomes;
+	public static long getFarEndBiomes() {
+		return farEndBiomesSqr;
 	}
 	
-	public static void setFarEndBiomes(boolean farEndBiomes) {
-		GeneratorOptions.farEndBiomes = farEndBiomes;
+	/**
+	 * Set distance of far End biomes generation, in blocks
+	 * @param distance
+	 */
+	public static void setFarEndBiomes(int distance) {
+		GeneratorOptions.farEndBiomesSqr = (long) distance * (long) distance;
 	}
 	
 	public static boolean customNetherBiomeSource() {

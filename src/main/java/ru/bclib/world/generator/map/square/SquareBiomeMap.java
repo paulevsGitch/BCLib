@@ -19,7 +19,6 @@ public class SquareBiomeMap implements BiomeMap {
 	private final WorldgenRandom random;
 	private final BiomePicker picker;
 	
-	private final long seed;
 	private final int sizeXZ;
 	private final int depth;
 	private final int size;
@@ -33,7 +32,6 @@ public class SquareBiomeMap implements BiomeMap {
 		depth = (int) Math.ceil(Math.log(size) / Math.log(2)) - 2;
 		this.size = 1 << depth;
 		this.picker = picker;
-		this.seed = seed;
 	}
 	
 	@Override
@@ -44,7 +42,7 @@ public class SquareBiomeMap implements BiomeMap {
 	}
 	
 	@Override
-	public BCLBiome getBiome(double x, double z) {
+	public BCLBiome getBiome(double x, double y, double z) {
 		BCLBiome biome = getRawBiome(x, z);
 		
 		if (biome.getEdge() != null || (biome.getParentBiome() != null && biome.getParentBiome().getEdge() != null)) {
