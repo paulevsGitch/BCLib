@@ -39,7 +39,7 @@ public class BCLStructureFeature {
 	}
 
 	/**
-	 * runs the {@link PieceGeneratorSupplier.Context::validBiome} from the given context at
+	 * runs the {@code PieceGeneratorSupplier.Context::validBiome} from the given context at
 	 * height=5 in the middle of the chunk.
 	 *
 	 * @param context The context to test with.
@@ -50,7 +50,7 @@ public class BCLStructureFeature {
 		return isValidBiome(context, 5);
 	}
 	/**
-	 * runs the {@link PieceGeneratorSupplier.Context::validBiome} from the given context at the
+	 * runs the {@code PieceGeneratorSupplier.Context::validBiome} from the given context at the
 	 * given height in the middle of the chunk.
 	 *
 	 * @param context The context to test with.
