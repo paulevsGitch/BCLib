@@ -45,11 +45,27 @@ public class SpawnRuleBuilder<M extends Mob> {
 	
 	/**
 	 * Starts new rule building process.
-	 * @param entityType The entity you want to build a rule for
+	 * @param wrapper The entity you want to build a rule for
 	 * @return prepared {@link SpawnRuleBuilder} instance.
 	 */
-	public static SpawnRuleBuilder start(BCLEntityWrapper<? extends Mob> entityType) {
-		return start(entityType.type());
+	public static SpawnRuleBuilder start(BCLEntityWrapper<? extends Mob> wrapper) {
+		SpawnRuleBuilder builder = start(wrapper.type());
+		if (!wrapper.canSpawn()){
+			builder.preventSpawn();
+		}
+		return builder;
+	}
+	
+	/**
+	 * Stop entity spawn entierly
+	 * @return same {@link SpawnRuleBuilder} instance.
+	 */
+	public SpawnRuleBuilder preventSpawn() {
+		entryInstance = getFromCache("prevent", () -> {
+			return new SpawnRuleEntry(-1, (type, world, spawnReason, pos, random) -> false);
+		});
+		rules.add(entryInstance);
+		return this;
 	}
 	
 	/**
