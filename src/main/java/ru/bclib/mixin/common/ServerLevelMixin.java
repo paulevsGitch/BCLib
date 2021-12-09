@@ -18,6 +18,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import ru.bclib.api.LifeCycleAPI;
 import ru.bclib.api.biomes.BiomeAPI;
+import ru.bclib.world.generator.BCLibNetherBiomeSource;
 
 import java.util.List;
 import java.util.concurrent.Executor;
@@ -33,18 +34,20 @@ public abstract class ServerLevelMixin extends Level {
 
 	@Inject(method = "<init>*", at = @At("TAIL"))
 	private void bclib_onServerWorldInit(MinecraftServer server, Executor executor, LevelStorageAccess levelStorageAccess, ServerLevelData serverLevelData, ResourceKey<Level> resourceKey, DimensionType dimensionType, ChunkProgressListener chunkProgressListener, ChunkGenerator chunkGenerator, boolean bl, long l, List<CustomSpawner> list, boolean bl2, CallbackInfo info) {
-		ServerLevel world = ServerLevel.class.cast(this);
-		LifeCycleAPI._runLevelLoad(world, server, executor, levelStorageAccess, serverLevelData, resourceKey, dimensionType, chunkProgressListener, chunkGenerator, bl, l, list, bl2);
+		ServerLevel level = ServerLevel.class.cast(this);
+		LifeCycleAPI._runLevelLoad(level, server, executor, levelStorageAccess, serverLevelData, resourceKey, dimensionType, chunkProgressListener, chunkGenerator, bl, l, list, bl2);
 		
 		//BiomeAPI.initRegistry(server);
 		BiomeAPI.applyModifications(ServerLevel.class.cast(this));
+		
+		if (level.dimension() == Level.NETHER) {
+			BCLibNetherBiomeSource.setWorldHeight(level.getChunkSource().getGenerator().getGenDepth());
+		}
 		
 		if (bclib_lastWorld != null && bclib_lastWorld.equals(levelStorageAccess.getLevelId())) {
 			return;
 		}
 		
 		bclib_lastWorld = levelStorageAccess.getLevelId();
-		
-		
 	}
 }

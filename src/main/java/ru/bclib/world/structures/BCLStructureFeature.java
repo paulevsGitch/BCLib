@@ -1,10 +1,6 @@
 package ru.bclib.world.structures;
 
-import java.util.List;
-import java.util.Random;
-
 import com.google.common.collect.Lists;
-
 import net.fabricmc.fabric.api.structure.v1.FabricStructureBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.QuartPos;
@@ -16,6 +12,9 @@ import net.minecraft.world.level.levelgen.feature.StructureFeature;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
 import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
 import net.minecraft.world.level.levelgen.structure.pieces.PieceGeneratorSupplier;
+
+import java.util.List;
+import java.util.Random;
 
 public class BCLStructureFeature {
 	private static final Random RANDOM = new Random(354);

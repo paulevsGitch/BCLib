@@ -1,10 +1,5 @@
 package ru.bclib.api.biomes;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
-
 import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.data.BuiltinRegistries;
@@ -40,6 +35,11 @@ import ru.bclib.world.biomes.BCLBiome;
 import ru.bclib.world.features.BCLFeature;
 import ru.bclib.world.structures.BCLStructureFeature;
 import ru.bclib.world.surface.DoubleBlockSurfaceNoiseCondition;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
 
 public class BCLBiomeBuilder {
 	private static final BCLBiomeBuilder INSTANCE = new BCLBiomeBuilder();
