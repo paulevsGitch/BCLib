@@ -1,5 +1,9 @@
 package ru.bclib.world.generator;
 
+import java.awt.Point;
+import java.util.List;
+import java.util.function.Function;
+
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.Registry;
@@ -24,11 +28,7 @@ import ru.bclib.world.biomes.BCLBiome;
 import ru.bclib.world.generator.map.hex.HexBiomeMap;
 import ru.bclib.world.generator.map.square.SquareBiomeMap;
 
-import java.awt.Point;
-import java.util.List;
-import java.util.function.Function;
-
-public class BCLibEndBiomeSource extends BiomeSource {
+public class BCLibEndBiomeSource extends BCLBiomeSource {
 	public static final Codec<BCLibEndBiomeSource> CODEC = RecordCodecBuilder.create((instance) -> {
 		return instance.group(RegistryLookupCodec.create(Registry.BIOME_REGISTRY).forGetter((theEndBiomeSource) -> {
 			return theEndBiomeSource.biomeRegistry;
@@ -38,19 +38,17 @@ public class BCLibEndBiomeSource extends BiomeSource {
 	});
 	private static final OpenSimplexNoise SMALL_NOISE = new OpenSimplexNoise(8324);
 	private Function<Point, Boolean> endLandFunction;
-	private final Registry<Biome> biomeRegistry;
+
 	private final SimplexNoise noise;
 	private final Biome centerBiome;
 	private final Biome barrens;
 	private BiomeMap mapLand;
 	private BiomeMap mapVoid;
-	private final long seed;
 	private final Point pos;
 	
 	public BCLibEndBiomeSource(Registry<Biome> biomeRegistry, long seed) {
-		super(getBiomes(biomeRegistry));
-		
-		BiomeAPI.initRegistry(biomeRegistry);
+		super(biomeRegistry, seed, getBiomes(biomeRegistry));
+
 		BiomeAPI.END_LAND_BIOME_PICKER.clearMutables();
 		BiomeAPI.END_VOID_BIOME_PICKER.clearMutables();
 		
@@ -103,9 +101,7 @@ public class BCLibEndBiomeSource extends BiomeSource {
 		
 		this.centerBiome = biomeRegistry.getOrThrow(Biomes.THE_END);
 		this.barrens = biomeRegistry.getOrThrow(Biomes.END_BARRENS);
-		this.biomeRegistry = biomeRegistry;
-		this.seed = seed;
-		
+
 		WorldgenRandom chunkRandom = new WorldgenRandom(new LegacyRandomSource(seed));
 		chunkRandom.consumeCount(17292);
 		this.noise = new SimplexNoise(chunkRandom);

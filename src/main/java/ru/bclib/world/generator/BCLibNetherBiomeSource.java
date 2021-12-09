@@ -1,5 +1,7 @@
 package ru.bclib.world.generator;
 
+import java.util.List;
+
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.Registry;
@@ -20,9 +22,7 @@ import ru.bclib.world.generator.map.MapStack;
 import ru.bclib.world.generator.map.hex.HexBiomeMap;
 import ru.bclib.world.generator.map.square.SquareBiomeMap;
 
-import java.util.List;
-
-public class BCLibNetherBiomeSource extends BiomeSource {    
+public class BCLibNetherBiomeSource extends BCLBiomeSource {
 	public static final Codec<BCLibNetherBiomeSource> CODEC = RecordCodecBuilder.create((instance) -> {
 		return instance.group(RegistryLookupCodec.create(Registry.BIOME_REGISTRY).forGetter((theEndBiomeSource) -> {
 			return theEndBiomeSource.biomeRegistry;
@@ -30,9 +30,8 @@ public class BCLibNetherBiomeSource extends BiomeSource {
 			return theEndBiomeSource.seed;
 		})).apply(instance, instance.stable(BCLibNetherBiomeSource::new));
 	});
-	private final Registry<Biome> biomeRegistry;
 	private BiomeMap biomeMap;
-	private final long seed;
+
     private static boolean forceLegacyGenerator = false;
 	private static int lastWorldHeight;
 	private static int worldHeight;
@@ -57,9 +56,9 @@ public class BCLibNetherBiomeSource extends BiomeSource {
 	}
 	
 	public BCLibNetherBiomeSource(Registry<Biome> biomeRegistry, long seed) {
-		super(getBiomes(biomeRegistry));
+		super(biomeRegistry, seed, getBiomes(biomeRegistry));
 		
-		BiomeAPI.initRegistry(biomeRegistry);
+
 		BiomeAPI.NETHER_BIOME_PICKER.clearMutables();
 		
 		this.possibleBiomes().forEach(biome -> {
@@ -86,9 +85,6 @@ public class BCLibNetherBiomeSource extends BiomeSource {
 		BiomeAPI.NETHER_BIOME_PICKER.rebuild();
 		
 		initMap();
-		
-		this.biomeRegistry = biomeRegistry;
-		this.seed = seed;
 	}
 	
 	private static List<Biome> getBiomes(Registry<Biome> biomeRegistry) {
