@@ -58,16 +58,14 @@ public class BCLStructureFeature {
 	 * @param <C> The FeatureConfiguration of the Context
 	 * @return true, if this feature can spawn in the current biome
 	 */
-    public static <C extends FeatureConfiguration> boolean isValidBiome(PieceGeneratorSupplier.Context<C> context, int yPos) {
-        BlockPos blockPos = context.chunkPos().getMiddleBlockPosition(yPos);
+	public static <C extends FeatureConfiguration> boolean isValidBiome(PieceGeneratorSupplier.Context<C> context, int yPos) {
+		BlockPos blockPos = context.chunkPos().getMiddleBlockPosition(yPos);
+		return context.validBiome().test(
+			context.chunkGenerator().getNoiseBiome(QuartPos.fromBlock(blockPos.getX()), QuartPos.fromBlock(blockPos.getY()), QuartPos.fromBlock(blockPos.getZ()))
+		);
+	}
 
-        return
-                context.validBiome().test(
-                        context.chunkGenerator().getNoiseBiome(QuartPos.fromBlock(blockPos.getX()), QuartPos.fromBlock(blockPos.getY()), QuartPos.fromBlock(blockPos.getZ()))
-                );
-    }
-
-    public StructureFeature<NoneFeatureConfiguration> getStructure() {
+	public StructureFeature<NoneFeatureConfiguration> getStructure() {
 		return structure;
 	}
 	
