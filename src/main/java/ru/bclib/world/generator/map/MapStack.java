@@ -12,6 +12,7 @@ import java.util.Random;
 public class MapStack implements BiomeMap {
 	private final OpenSimplexNoise noise;
 	private final BiomeMap[] maps;
+	private final double layerDistortion;
 	private final int worldHeight;
 	private final int minValue;
 	private final int maxValue;
@@ -21,6 +22,7 @@ public class MapStack implements BiomeMap {
 		final int mapCount = Mth.ceil((float) worldHeight / mapHeight);
 		this.maxIndex = mapCount - 1;
 		this.worldHeight = worldHeight;
+		this.layerDistortion = mapHeight * 0.1;
 		minValue = Mth.floor(mapHeight * 0.5F + 0.5F);
 		maxValue = Mth.floor(worldHeight - mapHeight * 0.5F + 0.5F);
 		maps = new BiomeMap[mapCount];
@@ -49,7 +51,7 @@ public class MapStack implements BiomeMap {
 			mapIndex = maxIndex;
 		}
 		else {
-			mapIndex = Mth.floor((y + noise.eval(x * 0.03, z * 0.03) * 8) / worldHeight * maxIndex + 0.5F);
+			mapIndex = Mth.floor((y + noise.eval(x * 0.03, z * 0.03) * layerDistortion) / worldHeight * maxIndex + 0.5F);
 			mapIndex = Mth.clamp(mapIndex, 0, maxIndex);
 		}
 		
