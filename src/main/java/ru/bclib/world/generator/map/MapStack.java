@@ -70,8 +70,6 @@ public class MapStack implements BiomeMap {
 	}
 	
 	private void onChunkCreation(int cx, int cz, int side) {
-		System.out.println("Creation " + cx + " " + cz);
-		
 		BCLBiome[][] biomeMap = new BCLBiome[side][side];
 		BiomeChunk[] chunks = new BiomeChunk[maps.length];
 		
