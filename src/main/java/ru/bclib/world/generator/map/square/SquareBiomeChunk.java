@@ -1,11 +1,12 @@
 package ru.bclib.world.generator.map.square;
 
+import ru.bclib.interfaces.BiomeChunk;
 import ru.bclib.world.biomes.BCLBiome;
 import ru.bclib.world.generator.BiomePicker;
 
 import java.util.Random;
 
-public class SquareBiomeChunk {
+public class SquareBiomeChunk implements BiomeChunk {
 	private static final int BIT_OFFSET = 4;
 	protected static final int WIDTH = 1 << BIT_OFFSET;
 	private static final int SM_WIDTH = WIDTH >> 1;
@@ -37,8 +38,19 @@ public class SquareBiomeChunk {
 		}
 	}
 	
+	@Override
 	public BCLBiome getBiome(int x, int z) {
 		return biomes[getIndex(x & MASK_WIDTH, z & MASK_WIDTH)];
+	}
+	
+	@Override
+	public void setBiome(int x, int z, BCLBiome biome) {
+		biomes[getIndex(x & MASK_WIDTH, z & MASK_WIDTH)] = biome;
+	}
+	
+	@Override
+	public int getSide() {
+		return WIDTH;
 	}
 	
 	private int offsetXZ(int x, Random random) {

@@ -4,7 +4,9 @@ import com.google.common.collect.Maps;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.levelgen.LegacyRandomSource;
 import net.minecraft.world.level.levelgen.WorldgenRandom;
+import ru.bclib.interfaces.BiomeChunk;
 import ru.bclib.interfaces.BiomeMap;
+import ru.bclib.interfaces.TriConsumer;
 import ru.bclib.noise.OpenSimplexNoise;
 import ru.bclib.util.MHelper;
 import ru.bclib.world.biomes.BCLBiome;
@@ -22,6 +24,8 @@ public class SquareBiomeMap implements BiomeMap {
 	private final int sizeXZ;
 	private final int depth;
 	private final int size;
+	
+	private TriConsumer<Integer, Integer, Integer> processor;
 	
 	public SquareBiomeMap(long seed, int size, BiomePicker picker) {
 		maps.clear();
@@ -69,18 +73,40 @@ public class SquareBiomeMap implements BiomeMap {
 		return biome;
 	}
 	
+	@Override
+	public void setChunkProcessor(TriConsumer<Integer, Integer, Integer> processor) {
+		this.processor = processor;
+	}
+	
+	@Override
+	public BiomeChunk getChunk(int cx, int cz, boolean update) {
+		ChunkPos cpos = new ChunkPos(cx, cz);
+		SquareBiomeChunk chunk = maps.get(cpos);
+		if (chunk == null) {
+			synchronized (random) {
+				random.setLargeFeatureWithSalt(0, cpos.x, cpos.z, 0);
+				chunk = new SquareBiomeChunk(random, picker);
+			}
+			maps.put(cpos, chunk);
+			
+			if (update && processor != null) {
+				processor.accept(cx, cz, chunk.getSide());
+			}
+		}
+		
+		return chunk;
+	}
+	
 	private BCLBiome getRawBiome(double bx, double bz) {
 		double x = bx * size / sizeXZ;
 		double z = bz * size / sizeXZ;
-		double nx = x;
-		double nz = z;
 		
 		double px = bx * 0.2;
 		double pz = bz * 0.2;
 		
 		for (int i = 0; i < depth; i++) {
-			nx = (x + noiseX.eval(px, pz)) / 2F;
-			nz = (z + noiseZ.eval(px, pz)) / 2F;
+			double nx = (x + noiseX.eval(px, pz)) / 2F;
+			double nz = (z + noiseZ.eval(px, pz)) / 2F;
 			
 			x = nx;
 			z = nz;
@@ -91,6 +117,7 @@ public class SquareBiomeMap implements BiomeMap {
 		
 		int ix = MHelper.floor(x);
 		int iz = MHelper.floor(z);
+		
 		if ((ix & SquareBiomeChunk.MASK_WIDTH) == SquareBiomeChunk.MASK_WIDTH) {
 			x += (iz / 2) & 1;
 		}

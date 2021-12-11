@@ -1,7 +1,6 @@
 package ru.bclib;
 
 import net.minecraft.nbt.CompoundTag;
-import org.jetbrains.annotations.NotNull;
 import ru.bclib.api.datafixer.DataFixerAPI;
 import ru.bclib.api.datafixer.ForcedLevelPatch;
 import ru.bclib.api.datafixer.MigrationProfile;

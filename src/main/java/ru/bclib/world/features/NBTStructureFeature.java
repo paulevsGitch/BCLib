@@ -1,9 +1,5 @@
 package ru.bclib.world.features;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Random;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.BlockPos.MutableBlockPos;
 import net.minecraft.core.Direction;
@@ -26,6 +22,10 @@ import ru.bclib.api.TagAPI;
 import ru.bclib.api.biomes.BiomeAPI;
 import ru.bclib.util.BlocksHelper;
 import ru.bclib.world.processors.DestructionStructureProcessor;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Random;
 
 public abstract class NBTStructureFeature extends DefaultFeature {
 	private final BlockState defaultBlock;

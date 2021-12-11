@@ -1,12 +1,13 @@
 package ru.bclib.world.generator.map.hex;
 
+import ru.bclib.interfaces.BiomeChunk;
 import ru.bclib.world.biomes.BCLBiome;
 import ru.bclib.world.generator.BiomePicker;
 
 import java.util.Arrays;
 import java.util.Random;
 
-public class HexBiomeChunk {
+public class HexBiomeChunk implements BiomeChunk {
 	private static final short SIDE = 32;
 	private static final byte SIDE_PRE = 4;
 	private static final short SIZE = SIDE * SIDE;
@@ -104,8 +105,19 @@ public class HexBiomeChunk {
 		return (short) ((short) x << SIDE_OFFSET | z);
 	}
 	
+	@Override
 	public BCLBiome getBiome(int x, int z) {
 		return biomes[getIndex(wrap(x), wrap(z))];
+	}
+	
+	@Override
+	public void setBiome(int x, int z, BCLBiome biome) {
+		biomes[getIndex(wrap(x), wrap(z))] = biome;
+	}
+	
+	@Override
+	public int getSide() {
+		return SIDE;
 	}
 	
 	public static int scaleCoordinate(int value) {

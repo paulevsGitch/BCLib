@@ -36,6 +36,7 @@ public class BCLBiome {
 	private float fogDensity = 1.0F;
 	private float genChance = 1.0F;
 	private float edgeSize = 0.0F;
+	private boolean vertical;
 	
 	/**
 	 * Create wrapper for existing biome using its {@link ResourceLocation} identifier.
@@ -289,6 +290,32 @@ public class BCLBiome {
 	 */
 	public float getTerrainHeight() {
 		return terrainHeight;
+	}
+	
+	/**
+	 * Set biome vertical distribution (for tall Nether only).
+	 * @return same {@link BCLBiome}.
+	 */
+	public BCLBiome setVertical() {
+		return setVertical(true);
+	}
+	
+	/**
+	 * Set biome vertical distribution (for tall Nether only).
+	 * @param vertical {@code boolean} value.
+	 * @return same {@link BCLBiome}.
+	 */
+	public BCLBiome setVertical(boolean vertical) {
+		this.vertical = vertical;
+		return this;
+	}
+	
+	/**
+	 * Checks if biome is vertical, for tall Nether only (or for custom generators).
+	 * @return is biome vertical or not.
+	 */
+	public boolean isVertical() {
+		return vertical;
 	}
 	
 	@Override

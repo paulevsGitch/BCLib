@@ -1,7 +1,5 @@
 package ru.bclib.world.generator;
 
-import java.util.List;
-
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.Registry;
@@ -21,6 +19,8 @@ import ru.bclib.world.biomes.BCLBiome;
 import ru.bclib.world.generator.map.MapStack;
 import ru.bclib.world.generator.map.hex.HexBiomeMap;
 import ru.bclib.world.generator.map.square.SquareBiomeMap;
+
+import java.util.List;
 
 public class BCLibNetherBiomeSource extends BCLBiomeSource {
 	public static final Codec<BCLibNetherBiomeSource> CODEC = RecordCodecBuilder.create((instance) -> {

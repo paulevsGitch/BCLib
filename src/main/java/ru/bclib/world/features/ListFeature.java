@@ -1,8 +1,5 @@
 package ru.bclib.world.features;
 
-import java.util.List;
-import java.util.Random;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.Mirror;
@@ -11,6 +8,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import ru.bclib.util.StructureHelper;
+
+import java.util.List;
+import java.util.Random;
 
 public class ListFeature extends NBTStructureFeature {
 	private final List<StructureInfo> list;

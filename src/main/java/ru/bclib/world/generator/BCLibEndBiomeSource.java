@@ -1,9 +1,5 @@
 package ru.bclib.world.generator;
 
-import java.awt.Point;
-import java.util.List;
-import java.util.function.Function;
-
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.Registry;
@@ -27,6 +23,10 @@ import ru.bclib.noise.OpenSimplexNoise;
 import ru.bclib.world.biomes.BCLBiome;
 import ru.bclib.world.generator.map.hex.HexBiomeMap;
 import ru.bclib.world.generator.map.square.SquareBiomeMap;
+
+import java.awt.Point;
+import java.util.List;
+import java.util.function.Function;
 
 public class BCLibEndBiomeSource extends BCLBiomeSource {
 	public static final Codec<BCLibEndBiomeSource> CODEC = RecordCodecBuilder.create((instance) -> {

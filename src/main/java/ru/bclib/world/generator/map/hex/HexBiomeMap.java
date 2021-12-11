@@ -1,6 +1,8 @@
 package ru.bclib.world.generator.map.hex;
 
+import ru.bclib.interfaces.BiomeChunk;
 import ru.bclib.interfaces.BiomeMap;
+import ru.bclib.interfaces.TriConsumer;
 import ru.bclib.noise.OpenSimplexNoise;
 import ru.bclib.util.MHelper;
 import ru.bclib.world.biomes.BCLBiome;
@@ -25,6 +27,7 @@ public class HexBiomeMap implements BiomeMap {
 	private final BiomePicker picker;
 	
 	private final OpenSimplexNoise[] noises = new OpenSimplexNoise[2];
+	private TriConsumer<Integer, Integer, Integer> processor;
 	private final byte noiseIterations;
 	private final float scale;
 	private final int seed;
@@ -69,6 +72,35 @@ public class HexBiomeMap implements BiomeMap {
 		}
 		
 		return biome;
+	}
+	
+	@Override
+	public BiomeChunk getChunk(int cx, int cz, boolean update) {
+		HexBiomeChunk chunk;
+		
+		synchronized (selector) {
+			selector.setLocation(cx, cz);
+			chunk = chunks.get(selector);
+		}
+		
+		if (chunk == null) {
+			synchronized (RANDOM) {
+				RANDOM.setSeed(MHelper.getSeed(seed, cx, cz));
+				chunk = new HexBiomeChunk(RANDOM, picker);
+			}
+			chunks.put(new Point(cx, cz), chunk);
+			
+			if (update && processor != null) {
+				processor.accept(cx, cz, chunk.getSide());
+			}
+		}
+		
+		return chunk;
+	}
+	
+	@Override
+	public void setChunkProcessor(TriConsumer<Integer, Integer, Integer> processor) {
+		this.processor = processor;
 	}
 	
 	private BCLBiome getRawBiome(double x, double z) {
@@ -123,21 +155,7 @@ public class HexBiomeMap implements BiomeMap {
 			cz += 1;
 		}
 		
-		HexBiomeChunk chunk;
-		synchronized (selector) {
-			selector.setLocation(cx, cz);
-			chunk = chunks.get(selector);
-		}
-		
-		if (chunk == null) {
-			synchronized (RANDOM) {
-				RANDOM.setSeed(MHelper.getSeed(seed, cx, cz));
-				chunk = new HexBiomeChunk(RANDOM, picker);
-			}
-			chunks.put(new Point(cx, cz), chunk);
-		}
-		
-		return chunk.getBiome(x, z);
+		return getChunk(cx, cz, true).getBiome(x, z);
 	}
 	
 	private boolean insideHexagon(float centerX, float centerZ, float radius, float x, float z) {

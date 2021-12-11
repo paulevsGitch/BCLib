@@ -1,16 +1,6 @@
 package ru.bclib.util;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Enumeration;
-import java.util.Random;
-import java.util.Set;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-
 import com.google.common.collect.Sets;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.BlockPos.MutableBlockPos;
 import net.minecraft.core.Direction;
@@ -31,6 +21,15 @@ import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.Vec3;
 import ru.bclib.api.TagAPI;
 import ru.bclib.api.biomes.BiomeAPI;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Enumeration;
+import java.util.Random;
+import java.util.Set;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 public class StructureHelper {
 	private static final Direction[] DIR = BlocksHelper.makeHorizontal();

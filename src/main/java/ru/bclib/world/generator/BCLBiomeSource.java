@@ -1,11 +1,11 @@
 package ru.bclib.world.generator;
 
-import java.util.List;
-
 import net.minecraft.core.Registry;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeSource;
 import ru.bclib.api.biomes.BiomeAPI;
+
+import java.util.List;
 
 public abstract class BCLBiomeSource extends BiomeSource {
     protected final Registry<Biome> biomeRegistry;

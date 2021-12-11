@@ -2,7 +2,9 @@ package ru.bclib.world.generator.map;
 
 import net.minecraft.util.Mth;
 import org.apache.commons.lang3.function.TriFunction;
+import ru.bclib.interfaces.BiomeChunk;
 import ru.bclib.interfaces.BiomeMap;
+import ru.bclib.interfaces.TriConsumer;
 import ru.bclib.noise.OpenSimplexNoise;
 import ru.bclib.world.biomes.BCLBiome;
 import ru.bclib.world.generator.BiomePicker;
@@ -29,6 +31,7 @@ public class MapStack implements BiomeMap {
 		Random random = new Random(seed);
 		for (int i = 0; i < mapCount; i++) {
 			maps[i] = mapConstructor.apply(random.nextLong(), size, picker);
+			maps[i].setChunkProcessor(this::onChunkCreation);
 		}
 		noise = new OpenSimplexNoise(random.nextInt());
 	}
@@ -38,6 +41,14 @@ public class MapStack implements BiomeMap {
 		for (BiomeMap map: maps) {
 			map.clearCache();
 		}
+	}
+	
+	@Override
+	public void setChunkProcessor(TriConsumer<Integer, Integer, Integer> processor) {}
+	
+	@Override
+	public BiomeChunk getChunk(int cx, int cz, boolean update) {
+		return null;
 	}
 	
 	@Override
@@ -56,5 +67,40 @@ public class MapStack implements BiomeMap {
 		}
 		
 		return maps[mapIndex].getBiome(x, y, z);
+	}
+	
+	private void onChunkCreation(int cx, int cz, int side) {
+		System.out.println("Creation " + cx + " " + cz);
+		
+		BCLBiome[][] biomeMap = new BCLBiome[side][side];
+		BiomeChunk[] chunks = new BiomeChunk[maps.length];
+		
+		boolean isNoEmpty = false;
+		for (int i = 0; i < maps.length; i++) {
+			chunks[i] = maps[i].getChunk(cx, cz, false);
+			for (int x = 0; x < side; x++) {
+				for (int z = 0; z < side; z++) {
+					if (biomeMap[x][z] == null) {
+						BCLBiome biome = chunks[i].getBiome(x, z);
+						if (biome.isVertical()) {
+							biomeMap[x][z] = biome;
+							isNoEmpty = true;
+						}
+					}
+				}
+			}
+		}
+		
+		if (isNoEmpty) {
+			for (int i = 0; i < maps.length; i++) {
+				for (int x = 0; x < side; x++) {
+					for (int z = 0; z < side; z++) {
+						if (biomeMap[x][z] != null) {
+							chunks[i].setBiome(x, z, biomeMap[x][z]);
+						}
+					}
+				}
+			}
+		}
 	}
 }
