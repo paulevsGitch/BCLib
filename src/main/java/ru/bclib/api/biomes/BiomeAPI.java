@@ -9,6 +9,8 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.event.registry.DynamicRegistrySetupCallback;
+import net.fabricmc.fabric.api.event.registry.RegistryEntryAddedCallback;
 import net.fabricmc.fabric.impl.biome.NetherBiomeData;
 import net.fabricmc.fabric.impl.biome.TheEndBiomeData;
 import net.minecraft.client.Minecraft;
@@ -64,6 +66,7 @@ import ru.bclib.world.structures.BCLStructureFeature;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -631,7 +634,6 @@ public class BiomeAPI {
 		}
 		changeStructureStarts(structureMap -> {
 			Multimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>> configuredMap = structureMap.computeIfAbsent(structure.feature, k -> HashMultimap.create());
-			
 			configuredMap.put(structure, biomeKey);
 		});
 	}
@@ -780,15 +782,43 @@ public class BiomeAPI {
 		return Optional.empty();
 	}
 	
+	private final static List<Consumer<Map<StructureFeature<?>, Multimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>>>>> structureStarts = new LinkedList<>();
+	
+	public static void registerStructureEvents(){
+		DynamicRegistrySetupCallback.EVENT.register(registryManager -> {
+			Optional<? extends Registry<NoiseGeneratorSettings>> v = registryManager.registry(Registry.NOISE_GENERATOR_SETTINGS_REGISTRY);
+			if (v.isPresent()) {
+				RegistryEntryAddedCallback
+					.event(v.get())
+					.register((rawId, id, object) -> {
+						BCLib.LOGGER.info(" #### " + rawId + ", " + object + ", " + id);
+						StructureSettingsAccessor a = (StructureSettingsAccessor)object.structureSettings();
+						structureStarts.forEach(modifier -> changeStructureStarts(a, modifier));
+					});
+			}
+		});
+	}
+	
+	public static void clearStructureStarts(){
+		structureStarts.clear();
+	}
+	
 	private static void changeStructureStarts(Consumer<Map<StructureFeature<?>, Multimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>>>> modifier) {
+		structureStarts.add(modifier);
 		Registry<NoiseGeneratorSettings> chunkGenSettingsRegistry = BuiltinRegistries.NOISE_GENERATOR_SETTINGS;
 		
 		for (Map.Entry<ResourceKey<NoiseGeneratorSettings>, NoiseGeneratorSettings> entry : chunkGenSettingsRegistry.entrySet()) {
-			Map<StructureFeature<?>, Multimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>>> structureMap = getMutableStructureConfig(entry.getValue());
-			
-			modifier.accept(structureMap);
-			setMutableStructureConfig(entry.getValue(), structureMap);
+			final StructureSettingsAccessor access = (StructureSettingsAccessor)  entry.getValue().structureSettings();
+			changeStructureStarts(access, modifier);
 		}
+	}
+	
+	
+	private static void changeStructureStarts(StructureSettingsAccessor access, Consumer<Map<StructureFeature<?>, Multimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>>>> modifier) {
+			Map<StructureFeature<?>, Multimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>>> structureMap;
+			structureMap = getMutableStructureConfig(access);
+			modifier.accept(structureMap);
+			setMutableStructureConfig(access, structureMap);
 	}
 	
 	private static void sortFeatures(List<Supplier<PlacedFeature>> features) {
@@ -850,12 +880,11 @@ public class BiomeAPI {
 	}
 	
 	//inspired by net.fabricmc.fabric.impl.biome.modification.BiomeStructureStartsImpl
-	private static Map<StructureFeature<?>, Multimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>>> getMutableStructureConfig(NoiseGeneratorSettings settings) {
-		final StructureSettingsAccessor access = (StructureSettingsAccessor)settings.structureSettings();
-		ImmutableMap<StructureFeature<?>, ImmutableMultimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>>> immutableMap = access.bcl_getStructureConfig();
-		Map<StructureFeature<?>, Multimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>>> result = new HashMap<>(immutableMap.size());
+	private static Map<StructureFeature<?>, Multimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>>> getMutableStructureConfig(StructureSettingsAccessor access) {
+		ImmutableMap<StructureFeature<?>, ImmutableMultimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>>> configuredStructures = access.bcl_getConfiguredStructures();
+		Map<StructureFeature<?>, Multimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>>> result = new HashMap<>(configuredStructures.size());
 		
-		for (Map.Entry<StructureFeature<?>, ImmutableMultimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>>> entry : immutableMap.entrySet()) {
+		for (Map.Entry<StructureFeature<?>, ImmutableMultimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>>> entry : configuredStructures.entrySet()) {
 			result.put(entry.getKey(), HashMultimap.create(entry.getValue()));
 		}
 		
@@ -863,9 +892,8 @@ public class BiomeAPI {
 	}
 	
 	//inspired by net.fabricmc.fabric.impl.biome.modification.BiomeStructureStartsImpl
-	private static void setMutableStructureConfig(NoiseGeneratorSettings settings, Map<StructureFeature<?>, Multimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>>> structureStarts) {
-		final StructureSettingsAccessor access = (StructureSettingsAccessor) settings.structureSettings();
-		access.bcl_setStructureConfig(
+	private static void setMutableStructureConfig(StructureSettingsAccessor access, Map<StructureFeature<?>, Multimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>>> structureStarts) {
+		access.bcl_setConfiguredStructures(
 			structureStarts
 				.entrySet()
 				.stream()

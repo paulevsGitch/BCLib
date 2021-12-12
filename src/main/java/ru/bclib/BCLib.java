@@ -6,6 +6,7 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.resources.ResourceLocation;
 import ru.bclib.api.TagAPI;
 import ru.bclib.api.WorldDataAPI;
+import ru.bclib.api.biomes.BiomeAPI;
 import ru.bclib.api.dataexchange.DataExchangeAPI;
 import ru.bclib.api.dataexchange.handler.autosync.Chunker;
 import ru.bclib.api.dataexchange.handler.autosync.HelloClient;
@@ -46,6 +47,8 @@ public class BCLib implements ModInitializer {
 			SendFiles.DESCRIPTOR,
 			Chunker.DESCRIPTOR
 		));
+		
+		BiomeAPI.registerStructureEvents();
 		
 		BCLibPatch.register();
 		Configs.save();

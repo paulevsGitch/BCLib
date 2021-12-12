@@ -14,9 +14,9 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 @Mixin(StructureSettings.class)
 public interface StructureSettingsAccessor {
 	@Accessor("configuredStructures")
-	ImmutableMap<StructureFeature<?>, ImmutableMultimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>>> bcl_getStructureConfig();
+	ImmutableMap<StructureFeature<?>, ImmutableMultimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>>> bcl_getConfiguredStructures();
 	
 	@Accessor("configuredStructures")
 	@Mutable
-	void bcl_setStructureConfig(ImmutableMap<StructureFeature<?>, ImmutableMultimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>>> structureConfig);
+	void bcl_setConfiguredStructures(ImmutableMap<StructureFeature<?>, ImmutableMultimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>>> structureConfig);
 }

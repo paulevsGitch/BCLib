@@ -1,6 +1,12 @@
 package ru.bclib.mixin.client;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.Multimap;
 import com.mojang.datafixers.util.Function4;
+import net.fabricmc.fabric.api.event.registry.DynamicRegistrySetupCallback;
+import net.fabricmc.fabric.api.event.registry.RegistryEntryAddedCallback;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Minecraft.ExperimentalDialogType;
 import net.minecraft.client.color.block.BlockColors;
@@ -9,10 +15,17 @@ import net.minecraft.client.main.GameConfig;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.RegistryAccess.RegistryHolder;
+import net.minecraft.data.BuiltinRegistries;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.level.DataPackConfig;
 import net.minecraft.world.level.LevelSettings;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
+import net.minecraft.world.level.levelgen.SurfaceRules;
 import net.minecraft.world.level.levelgen.WorldGenSettings;
+import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
+import net.minecraft.world.level.levelgen.feature.StructureFeature;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.LevelStorageSource.LevelStorageAccess;
 import net.minecraft.world.level.storage.WorldData;
@@ -22,11 +35,18 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import ru.bclib.BCLib;
 import ru.bclib.api.LifeCycleAPI;
+import ru.bclib.api.biomes.BiomeAPI;
 import ru.bclib.api.dataexchange.DataExchangeAPI;
 import ru.bclib.api.datafixer.DataFixerAPI;
 import ru.bclib.interfaces.CustomColorProvider;
+import ru.bclib.mixin.common.StructureSettingsAccessor;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 @Mixin(Minecraft.class)
@@ -60,13 +80,15 @@ public abstract class MinecraftMixin {
 	@Inject(method = "loadLevel", cancellable = true, at = @At("HEAD"))
 	private void bclib_callFixerOnLoad(String levelID, CallbackInfo ci) {
 		DataExchangeAPI.prepareServerside();
+		BiomeAPI.clearStructureStarts();
 		
 		if (DataFixerAPI.fixData(this.levelSource, levelID, true, (appliedFixes) -> {
 			LifeCycleAPI._runBeforeLevelLoad();
-			this.doLoadLevel(levelID, RegistryAccess.builtin(), Minecraft::loadDataPacks, Minecraft::loadWorldData, false, appliedFixes?ExperimentalDialogType.NONE:ExperimentalDialogType.BACKUP);
+			this.doLoadLevel(levelID, RegistryAccess.builtin(), Minecraft::loadDataPacks, Minecraft::loadWorldData, false, appliedFixes ? ExperimentalDialogType.NONE : ExperimentalDialogType.BACKUP);
 		})) {
 			ci.cancel();
-		} else {
+		}
+		else {
 			LifeCycleAPI._runBeforeLevelLoad();
 		}
 	}
