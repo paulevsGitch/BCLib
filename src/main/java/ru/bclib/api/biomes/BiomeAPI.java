@@ -791,7 +791,7 @@ public class BiomeAPI {
 				RegistryEntryAddedCallback
 					.event(v.get())
 					.register((rawId, id, object) -> {
-						BCLib.LOGGER.info(" #### " + rawId + ", " + object + ", " + id);
+						//BCLib.LOGGER.info(" #### " + rawId + ", " + object + ", " + id);
 						StructureSettingsAccessor a = (StructureSettingsAccessor)object.structureSettings();
 						structureStarts.forEach(modifier -> changeStructureStarts(a, modifier));
 					});
