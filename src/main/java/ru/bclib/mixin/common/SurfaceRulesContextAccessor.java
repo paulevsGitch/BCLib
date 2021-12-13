@@ -35,4 +35,10 @@ public interface SurfaceRulesContextAccessor {
 
     @Accessor("noiseChunk")
     NoiseChunk getNoiseChunk();
+    
+    @Accessor("stoneDepthAbove")
+    int getStoneDepthAbove();
+    
+    @Accessor("stoneDepthBelow")
+    int getStoneDepthBelow();
 }

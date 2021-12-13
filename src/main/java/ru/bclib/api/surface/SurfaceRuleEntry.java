@@ -1,4 +1,4 @@
-package ru.bclib.api.biomes;
+package ru.bclib.api.surface;
 
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.level.levelgen.SurfaceRules;

@@ -1,4 +1,4 @@
-package ru.bclib.api.biomes;
+package ru.bclib.api.surface.rules;
 
 import com.mojang.serialization.Codec;
 import net.minecraft.world.level.levelgen.SurfaceRules;
@@ -7,7 +7,6 @@ import net.minecraft.world.level.levelgen.SurfaceRules.ConditionSource;
 import net.minecraft.world.level.levelgen.SurfaceRules.Context;
 import net.minecraft.world.level.levelgen.SurfaceRules.LazyXZCondition;
 import ru.bclib.mixin.common.SurfaceRulesContextAccessor;
-
 
 public abstract class SurfaceNoiseCondition implements SurfaceRules.ConditionSource{
 	@Override

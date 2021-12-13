@@ -1,4 +1,4 @@
-package ru.bclib.api.biomes;
+package ru.bclib.api.surface;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -8,6 +8,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.SurfaceRules;
 import net.minecraft.world.level.levelgen.SurfaceRules.RuleSource;
 import net.minecraft.world.level.levelgen.placement.CaveSurface;
+import ru.bclib.api.biomes.BiomeAPI;
 
 import java.util.Collections;
 import java.util.List;
