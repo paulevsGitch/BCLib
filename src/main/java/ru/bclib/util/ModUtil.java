@@ -137,10 +137,10 @@ public class ModUtil {
 				public ModEnvironment getEnvironment() {
 					JsonElement env = data.get("environment");
 					if (env==null) {
-						BCLib.LOGGER.error("No environment specified in " + sourceFile);
-						return ModEnvironment.UNIVERSAL;
+						BCLib.LOGGER.warning("No environment specified in " + sourceFile);
+						//return ModEnvironment.UNIVERSAL;
 					}
-					final String environment = env.getAsString().toLowerCase(Locale.ROOT);
+					final String environment = env==null?"":env.getAsString().toLowerCase(Locale.ROOT);
 					
 					if (environment.isEmpty() || environment.equals("*") || environment.equals("common")) {
 						JsonElement entrypoints = data.get("entrypoints");
