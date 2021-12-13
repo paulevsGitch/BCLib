@@ -9,6 +9,8 @@ import net.minecraft.world.level.levelgen.SurfaceRules;
 import net.minecraft.world.level.levelgen.SurfaceRules.RuleSource;
 import net.minecraft.world.level.levelgen.placement.CaveSurface;
 import ru.bclib.api.biomes.BiomeAPI;
+import ru.bclib.api.surface.rules.NoiseCondition;
+import ru.bclib.world.surface.DoubleBlockSurfaceNoiseCondition;
 
 import java.util.Collections;
 import java.util.List;
@@ -81,7 +83,7 @@ public class SurfaceRuleBuilder {
 	}
 	
 	/**
-	 * Set biome filler with specified {@link BlockState}. Example - stone in the Overworld biomes.
+	 * Set biome filler with specified {@link BlockState}. Example - stone in the Overworld biomes. The rule is added with priority 3.
 	 * @param state {@link BlockState} for filling.
 	 * @return same {@link SurfaceRuleBuilder} instance.
 	 */
@@ -92,21 +94,68 @@ public class SurfaceRuleBuilder {
 	}
 	
 	/**
-	 * Set biome ceiling with specified {@link BlockState}. Example - block of sandstone in the Overworld desert in air pockets.
+	 * Set biome floor with specified {@link BlockState}. Example - underside of a gravel floor. The rule is added with priority 3.
 	 * @param state {@link BlockState} for the ground cover.
 	 * @return same {@link SurfaceRuleBuilder} instance.
 	 */
-	public SurfaceRuleBuilder ceil(BlockState state) {
-		entryInstance = getFromCache("ceil_" + state.toString(), () -> {
+	public SurfaceRuleBuilder floor(BlockState state) {
+		entryInstance = getFromCache("floor_" + state.toString(), () -> {
 			RuleSource rule = SurfaceRules.state(state);
-			return new SurfaceRuleEntry(2, SurfaceRules.ifTrue(SurfaceRules.ON_CEILING, rule));
+			return new SurfaceRuleEntry(3, SurfaceRules.ifTrue(SurfaceRules.ON_FLOOR, rule));
 		});
 		rules.add(entryInstance);
 		return this;
 	}
 	
 	/**
-	 * Set biome ceiling material with specified {@link BlockState} and height. Example - sandstone in the Overworld deserts.
+	 * Set biome floor material with specified {@link BlockState} and height. The rule is added with priority 3.
+	 * @param state {@link BlockState} for the subterrain layer.
+	 * @param height block layer height.
+	 * @param noise The noise object that is applied
+	 * @return same {@link SurfaceRuleBuilder} instance.
+	 */
+	public SurfaceRuleBuilder belowFloor(BlockState state, int height, NoiseCondition noise) {
+		entryInstance = getFromCache("below_floor_" + height + "_" + state.toString() + "_" + noise.getClass().getSimpleName(), () -> {
+			RuleSource rule = SurfaceRules.state(state);
+			rule = SurfaceRules.ifTrue(SurfaceRules.stoneDepthCheck(height, false, false, CaveSurface.FLOOR), SurfaceRules.ifTrue(noise, rule));
+			return new SurfaceRuleEntry(3, rule);
+		});
+		rules.add(entryInstance);
+		return this;
+	}
+	
+	/**
+	 * Set biome floor material with specified {@link BlockState} and height. The rule is added with priority 3.
+	 * @param state {@link BlockState} for the subterrain layer.
+	 * @param height block layer height.
+	 * @return same {@link SurfaceRuleBuilder} instance.
+	 */
+	public SurfaceRuleBuilder belowFloor(BlockState state, int height) {
+		entryInstance = getFromCache("below_floor_" + height + "_" + state.toString(), () -> {
+			RuleSource rule = SurfaceRules.state(state);
+			rule = SurfaceRules.ifTrue(SurfaceRules.stoneDepthCheck(height, false, false, CaveSurface.FLOOR), rule);
+			return new SurfaceRuleEntry(3, rule);
+		});
+		rules.add(entryInstance);
+		return this;
+	}
+	
+	/**
+	 * Set biome ceiling with specified {@link BlockState}. Example - block of sandstone in the Overworld desert in air pockets. The rule is added with priority 3.
+	 * @param state {@link BlockState} for the ground cover.
+	 * @return same {@link SurfaceRuleBuilder} instance.
+	 */
+	public SurfaceRuleBuilder ceil(BlockState state) {
+		entryInstance = getFromCache("ceil_" + state.toString(), () -> {
+			RuleSource rule = SurfaceRules.state(state);
+			return new SurfaceRuleEntry(3, SurfaceRules.ifTrue(SurfaceRules.ON_CEILING, rule));
+		});
+		rules.add(entryInstance);
+		return this;
+	}
+	
+	/**
+	 * Set biome ceiling material with specified {@link BlockState} and height. Example - sandstone in the Overworld deserts. The rule is added with priority 3.
 	 * @param state {@link BlockState} for the subterrain layer.
 	 * @param height block layer height.
 	 * @return same {@link SurfaceRuleBuilder} instance.
@@ -157,6 +206,39 @@ public class SurfaceRuleBuilder {
 	 */
 	public SurfaceRuleBuilder rule(SurfaceRules.RuleSource rule) {
 		return rule(7, rule);
+	}
+	
+	/**
+	 * Set biome floor with specified {@link BlockState} and the {@link DoubleBlockSurfaceNoiseCondition}. The rule is added with priority 3.
+	 * @param surfaceBlockA {@link BlockState} for the ground cover.
+	 * @param surfaceBlockB {@link BlockState} for the alternative ground cover.
+	 * @return same {@link SurfaceRuleBuilder} instance.
+	 */
+	public SurfaceRuleBuilder chancedFloor(BlockState surfaceBlockA, BlockState surfaceBlockB){
+		return chancedFloor(surfaceBlockA, surfaceBlockB, DoubleBlockSurfaceNoiseCondition.CONDITION);
+	}
+	
+	/**
+	 * Set biome floor with specified {@link BlockState} and the given Noise Function.  The rule is added with priority 3.
+	 * @param surfaceBlockA {@link BlockState} for the ground cover.
+     * @param surfaceBlockB {@link BlockState} for the alternative ground cover.
+	 * @param noise The {@link NoiseCondition}
+	 * @return same {@link SurfaceRuleBuilder} instance.
+	 */
+	public SurfaceRuleBuilder chancedFloor(BlockState surfaceBlockA, BlockState surfaceBlockB, NoiseCondition noise){
+		entryInstance = getFromCache("chancedFloor_" + surfaceBlockA + "_" + surfaceBlockB + "_" + noise.getClass().getSimpleName(), () -> {
+			RuleSource rule =
+				SurfaceRules.ifTrue(SurfaceRules.ON_FLOOR,
+					SurfaceRules.sequence(
+						SurfaceRules.ifTrue(noise, SurfaceRules.state(surfaceBlockA)),
+						SurfaceRules.state(surfaceBlockB)
+					)
+				)
+			;
+			return new SurfaceRuleEntry(4, rule);
+		});
+		rules.add(entryInstance);
+		return this;
 	}
 	
 	/**

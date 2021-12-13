@@ -27,6 +27,7 @@ import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.GenerationStep.Decoration;
 import net.minecraft.world.level.levelgen.Noises;
 import net.minecraft.world.level.levelgen.SurfaceRules;
+import net.minecraft.world.level.levelgen.SurfaceRules.RuleSource;
 import net.minecraft.world.level.levelgen.SurfaceRules.SequenceRuleSource;
 import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
 import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
@@ -552,20 +553,6 @@ public class BCLBiomeBuilder {
 			.subsurface(subterrainBlock.defaultBlockState(), depth)
 			.build());
 	}
-
-	public BCLBiomeBuilder chancedSurface(SurfaceRules.RuleSource surfaceBlockA, SurfaceRules.RuleSource surfaceBlockB, SurfaceRules.RuleSource underBlock){
-		return surface(
-			SurfaceRules.sequence(
-				SurfaceRules.ifTrue(SurfaceRules.ON_FLOOR,
-					SurfaceRules.sequence(
-						SurfaceRules.ifTrue(DoubleBlockSurfaceNoiseCondition.CONDITION, surfaceBlockA),
-						surfaceBlockB
-					)
-				),
-				underBlock
-			)
-		);
-	}
 	
 	/**
 	 * Adds surface rule to this biome.
@@ -573,20 +560,7 @@ public class BCLBiomeBuilder {
 	 * @return same {@link BCLBiomeBuilder} instance.
 	 */
 	public BCLBiomeBuilder surface(SurfaceRules.RuleSource newSurfaceRule) {
-		if (this.surfaceRule==null) {
-			this.surfaceRule = newSurfaceRule;
-		} else {
-			this.surfaceRule = SurfaceRules.sequence(this.surfaceRule, newSurfaceRule);
-		}
-		return this;
-	}
-	
-	/**
-	 * clear all surface rules
-	 * @return same {@link BCLBiomeBuilder} instance.
-	 */
-	public BCLBiomeBuilder clearSurface() {
-		this.surfaceRule = null;
+		this.surfaceRule = newSurfaceRule;
 		return this;
 	}
 	

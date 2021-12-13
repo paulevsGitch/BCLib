@@ -8,7 +8,7 @@ import net.minecraft.world.level.levelgen.SurfaceRules.Context;
 import net.minecraft.world.level.levelgen.SurfaceRules.LazyXZCondition;
 import ru.bclib.mixin.common.SurfaceRulesContextAccessor;
 
-public abstract class SurfaceNoiseCondition implements SurfaceRules.ConditionSource{
+public abstract class SurfaceNoiseCondition implements NoiseCondition{
 	@Override
 	public Codec<? extends ConditionSource> codec() {
 		return SurfaceRules.ConditionSource.CODEC;
