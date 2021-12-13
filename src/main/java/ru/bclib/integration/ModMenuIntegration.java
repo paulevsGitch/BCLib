@@ -1,7 +1,8 @@
 package ru.bclib.integration;
 
 import com.google.common.collect.ImmutableMap;
-import com.terraformersmc.modmenu.util.ModMenuApiMarker;
+import com.terraformersmc.modmenu.api.ConfigScreenFactory;
+import com.terraformersmc.modmenu.api.ModMenuApi;
 import net.minecraft.client.gui.screens.Screen;
 import ru.bclib.integration.ModMenuIntegration.ModMenuScreenFactory;
 
@@ -49,7 +50,7 @@ class ModMenuScreenFactoryImpl {
  * Mod is installed on the Client, and the correct ModMenu-EntryPoint is registered in your <i>fabric.mod.json</i>
  * the screen will show up.
  * <p>
- * You only need to subclass this class, and initialize a static Field of Type {@link ModMenuApiMarker} using
+ * You only need to subclass this class, and initialize a static Field of Type {@link ModMenuApi} using
  * the {@link #createEntrypoint(ModMenuIntegration)}-Method.
  * <p>
  * Example:
@@ -72,7 +73,7 @@ public abstract class ModMenuIntegration {
 	 * @param target The delegate Object that will receive calls from ModMenu
 	 * @return A Proxy that conforms to the ModMenu spec
 	 */
-	public static ModMenuApiMarker createEntrypoint(ModMenuIntegration target) {
+	public static ModMenuApi createEntrypoint(ModMenuIntegration target) {
 		Class<?> iModMenuAPI;
 		//Class<?> iModMenuAPIMarker = null;
 		try {
@@ -89,7 +90,7 @@ public abstract class ModMenuIntegration {
 			new Class[] {iModMenuAPI},
 			new BCLibModMenuInvocationHandler(target));
 		
-		return (ModMenuApiMarker)o;
+		return (ModMenuApi) o;
 	}
 	
 	/**
@@ -156,9 +157,7 @@ public abstract class ModMenuIntegration {
 	 * The Interface matches {@code com.terraformersmc.modmenu.api.ConfigScreenFactory}
 	 */
 	@FunctionalInterface
-	public interface ModMenuScreenFactory  {
-		Screen create(Screen parent);
-	}
+	public interface ModMenuScreenFactory  extends ConfigScreenFactory{}
 	
 	record BCLibModMenuInvocationHandler(ModMenuIntegration target) implements InvocationHandler {
 		@Override
