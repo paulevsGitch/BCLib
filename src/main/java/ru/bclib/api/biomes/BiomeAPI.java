@@ -40,6 +40,7 @@ import net.minecraft.world.level.levelgen.GenerationStep.Decoration;
 import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
 import net.minecraft.world.level.levelgen.SurfaceRules;
+import net.minecraft.world.level.levelgen.SurfaceRules.RuleSource;
 import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
@@ -483,15 +484,9 @@ public class BiomeAPI {
 		}
 		
 		if (generator != null) {
-			List<SurfaceRules.RuleSource> rules = getRuleSources(biomes, level.dimension());
+			List<SurfaceRules.RuleSource> rules = getRuleSources(biomes);
 			SurfaceRuleProvider provider = SurfaceRuleProvider.class.cast(generator);
-			if (rules.size() > 0) {
-				rules.add(provider.getSurfaceRule());
-				provider.setSurfaceRule(SurfaceRules.sequence(rules.toArray(new SurfaceRules.RuleSource[rules.size()])));
-			}
-			else {
-				provider.setSurfaceRule(null);
-			}
+			changeSurfaceRules(rules, provider);
 		}
 		
 		List<BiConsumer<ResourceLocation, Biome>> modifications = MODIFICATIONS.get(level.dimension());
@@ -532,8 +527,14 @@ public class BiomeAPI {
 		accessor.bclib_setFeatures(featureList);
 	}
 	
-	private static List<SurfaceRules.RuleSource> getRuleSources(Set<Biome> biomes, ResourceKey<Level> dimensionType) {
-		Set<ResourceLocation> biomeIDs = biomes.stream().map(biome -> getBiomeID(biome)).collect(Collectors.toSet());
+	private static List<SurfaceRules.RuleSource> getRuleSources(Set<Biome> biomes) {
+		Set<ResourceLocation> biomeIDs = biomes.stream()
+											   .map(biome -> getBiomeID(biome))
+											   .collect(Collectors.toSet());
+		return getRuleSourcesFromIDs(biomeIDs);
+	}
+	
+	private static List<SurfaceRules.RuleSource> getRuleSourcesFromIDs(Set<ResourceLocation> biomeIDs) {
 		List<SurfaceRules.RuleSource> rules = Lists.newArrayList();
 		SURFACE_RULES.forEach((biomeID, rule) -> {
 			if (biomeIDs.contains(biomeID)) {
@@ -792,11 +793,29 @@ public class BiomeAPI {
 					.event(v.get())
 					.register((rawId, id, object) -> {
 						//BCLib.LOGGER.info(" #### " + rawId + ", " + object + ", " + id);
+						
+						//add back modded structures
 						StructureSettingsAccessor a = (StructureSettingsAccessor)object.structureSettings();
 						structureStarts.forEach(modifier -> changeStructureStarts(a, modifier));
+						
+						//add surface rules
+						if (biomeRegistry!=null) {
+							List<SurfaceRules.RuleSource> rules = getRuleSourcesFromIDs(biomeRegistry.keySet());
+							SurfaceRuleProvider provider = SurfaceRuleProvider.class.cast(object);
+							changeSurfaceRules(rules, provider);
+						}
 					});
 			}
 		});
+	}
+	
+	private static void changeSurfaceRules(List<RuleSource> rules, SurfaceRuleProvider provider) {
+		if (rules.size() > 0) {
+			provider.addCustomRules(rules);
+		}
+		else {
+			provider.clearCustomRules();
+		}
 	}
 	
 	public static void clearStructureStarts(){

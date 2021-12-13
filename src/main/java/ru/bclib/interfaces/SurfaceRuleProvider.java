@@ -1,9 +1,10 @@
 package ru.bclib.interfaces;
 
-import net.minecraft.world.level.levelgen.SurfaceRules;
+import net.minecraft.world.level.levelgen.SurfaceRules.RuleSource;
+
+import java.util.List;
 
 public interface SurfaceRuleProvider {
-	void setSurfaceRule(SurfaceRules.RuleSource surfaceRule);
-	
-	SurfaceRules.RuleSource getSurfaceRule();
+	void clearCustomRules();
+	void addCustomRules(List<RuleSource> rules);
 }
