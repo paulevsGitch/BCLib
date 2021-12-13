@@ -27,6 +27,7 @@ import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.GenerationStep.Decoration;
 import net.minecraft.world.level.levelgen.Noises;
 import net.minecraft.world.level.levelgen.SurfaceRules;
+import net.minecraft.world.level.levelgen.SurfaceRules.SequenceRuleSource;
 import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
 import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
@@ -568,11 +569,24 @@ public class BCLBiomeBuilder {
 	
 	/**
 	 * Adds surface rule to this biome.
-	 * @param surfaceRule {link SurfaceRules.RuleSource} surface rule.
+	 * @param newSurfaceRule {link SurfaceRules.RuleSource} surface rule.
 	 * @return same {@link BCLBiomeBuilder} instance.
 	 */
-	public BCLBiomeBuilder surface(SurfaceRules.RuleSource surfaceRule) {
-		this.surfaceRule = surfaceRule;
+	public BCLBiomeBuilder surface(SurfaceRules.RuleSource newSurfaceRule) {
+		if (this.surfaceRule==null) {
+			this.surfaceRule = newSurfaceRule;
+		} else {
+			this.surfaceRule = SurfaceRules.sequence(this.surfaceRule, newSurfaceRule);
+		}
+		return this;
+	}
+	
+	/**
+	 * clear all surface rules
+	 * @return same {@link BCLBiomeBuilder} instance.
+	 */
+	public BCLBiomeBuilder clearSurface() {
+		this.surfaceRule = null;
 		return this;
 	}
 	

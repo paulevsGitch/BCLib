@@ -41,4 +41,10 @@ public interface SurfaceRulesContextAccessor {
     
     @Accessor("stoneDepthBelow")
     int getStoneDepthBelow();
+    
+    @Accessor("lastUpdateY")
+    long getLastUpdateY();
+    
+    @Accessor("lastUpdateXZ")
+    long getLastUpdateXZ();
 }
