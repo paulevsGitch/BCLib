@@ -35,6 +35,7 @@ import net.minecraft.world.level.biome.MobSpawnSettings.SpawnerData;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkGenerator;
+import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.levelgen.GenerationStep.Carving;
 import net.minecraft.world.level.levelgen.GenerationStep.Decoration;
 import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
@@ -496,24 +497,28 @@ public class BiomeAPI {
 		}
 		
 		biomes.forEach(biome -> {
-			ResourceLocation biomeID = getBiomeID(biome);
-			boolean modify = isDatapackBiome(biomeID);
-			if (biome != BuiltinRegistries.BIOME.get(biomeID)) {
-				modify = true;
-			}
-			else if (!modify && !MODIFIED_BIOMES.contains(biomeID)) {
-				MODIFIED_BIOMES.add(biomeID);
-				modify = true;
-			}
-			if (modify) {
-				modifications.forEach(consumer -> {
-					consumer.accept(biomeID, biome);
-				});
-			}
-			sortBiomeFeatures(biome);
+			applyModifications(modifications, biome);
 		});
 	}
-	
+
+	private static void applyModifications(List<BiConsumer<ResourceLocation, Biome>> modifications, Biome biome) {
+		ResourceLocation biomeID = getBiomeID(biome);
+		boolean modify = isDatapackBiome(biomeID);
+		if (biome != BuiltinRegistries.BIOME.get(biomeID)) {
+			modify = true;
+		}
+		else if (!modify && !MODIFIED_BIOMES.contains(biomeID)) {
+			MODIFIED_BIOMES.add(biomeID);
+			modify = true;
+		}
+		if (modify) {
+			modifications.forEach(consumer -> {
+				consumer.accept(biomeID, biome);
+			});
+		}
+		sortBiomeFeatures(biome);
+	}
+
 	public static void sortBiomeFeatures(Biome biome) {
 		BiomeGenerationSettings settings = biome.getGenerationSettings();
 		BiomeGenerationSettingsAccessor accessor = BiomeGenerationSettingsAccessor.class.cast(settings);
@@ -787,22 +792,42 @@ public class BiomeAPI {
 	
 	public static void registerStructureEvents(){
 		DynamicRegistrySetupCallback.EVENT.register(registryManager -> {
-			Optional<? extends Registry<NoiseGeneratorSettings>> v = registryManager.registry(Registry.NOISE_GENERATOR_SETTINGS_REGISTRY);
-			if (v.isPresent()) {
+			Optional<? extends Registry<NoiseGeneratorSettings>> oGeneratorRegistry = registryManager.registry(Registry.NOISE_GENERATOR_SETTINGS_REGISTRY);
+			Optional<? extends Registry<Biome>> oBiomeRegistry = registryManager.registry(Registry.BIOME_REGISTRY);
+			
+			if (oGeneratorRegistry.isPresent()) {
 				RegistryEntryAddedCallback
-					.event(v.get())
-					.register((rawId, id, object) -> {
+					.event(oGeneratorRegistry.get())
+					.register((rawId, id, settings) -> {
 						//BCLib.LOGGER.info(" #### " + rawId + ", " + object + ", " + id);
 						
 						//add back modded structures
-						StructureSettingsAccessor a = (StructureSettingsAccessor)object.structureSettings();
+						StructureSettingsAccessor a = (StructureSettingsAccessor)settings.structureSettings();
 						structureStarts.forEach(modifier -> changeStructureStarts(a, modifier));
 						
 						//add surface rules
 						if (biomeRegistry!=null) {
 							List<SurfaceRules.RuleSource> rules = getRuleSourcesFromIDs(biomeRegistry.keySet());
-							SurfaceRuleProvider provider = SurfaceRuleProvider.class.cast(object);
+							SurfaceRuleProvider provider = SurfaceRuleProvider.class.cast(settings);
 							changeSurfaceRules(rules, provider);
+						}
+					});
+			}
+			
+			if (oBiomeRegistry.isPresent()){
+				RegistryEntryAddedCallback
+					.event(oBiomeRegistry.get())
+					.register((rawId, id, biome)->{
+						//BCLib.LOGGER.info(" #### " + rawId + ", " + biome + ", " + id);
+						
+						for (var dim : MODIFICATIONS.keySet()) {
+							List<BiConsumer<ResourceLocation, Biome>> modifications = MODIFICATIONS.get(dim);
+							if (modifications == null) {
+								sortBiomeFeatures(biome);
+								return;
+							}
+
+							applyModifications(modifications, biome);
 						}
 					});
 			}
