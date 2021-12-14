@@ -71,6 +71,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
@@ -638,14 +639,14 @@ public class BiomeAPI {
 			BCLib.LOGGER.error("null is not a valid biomeKey for " + structure);
 			return;
 		}
-		changeStructureStarts(structureMap -> {
+		changeStructureStarts(biomeKey.location(), structure, structureMap -> {
 			Multimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>> configuredMap = structureMap.computeIfAbsent(structure.feature, k -> HashMultimap.create());
 			configuredMap.put(structure, biomeKey);
 		});
 	}
 	
 	public static void addBiomeStructure(Biome biome, ConfiguredStructureFeature structure) {
-		changeStructureStarts(structureMap -> {
+		changeStructureStarts(BiomeAPI.getBiomeID(biome), structure, structureMap -> {
 			Multimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>> configuredMap = structureMap.computeIfAbsent(structure.feature, k -> HashMultimap.create());
 			var key = getBiomeKey(biome);
 			if (key!=null) {
@@ -788,7 +789,35 @@ public class BiomeAPI {
 		return Optional.empty();
 	}
 	
-	private final static List<Consumer<Map<StructureFeature<?>, Multimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>>>>> structureStarts = new LinkedList<>();
+	static class StructureID {
+		public final ResourceLocation id;
+		public final ConfiguredStructureFeature structure;
+		
+		StructureID(ResourceLocation id, ConfiguredStructureFeature structure){
+			this.id = id;
+			this.structure = structure;
+		}
+
+		@Override
+		public String toString() {
+			return "StructureID{" + "id=" + id + ", structure=" + structure + '}';
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if (this == o) return true;
+			if (o == null || getClass() != o.getClass()) return false;
+			StructureID that = (StructureID) o;
+			return id.equals(that.id) && structure.equals(that.structure);
+		}
+		
+		@Override
+		public int hashCode() {
+			return Objects.hash(id, structure);
+		}
+	}
+	
+	private final static Map<StructureID, Consumer<Map<StructureFeature<?>, Multimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>>>>> structureStarts = new HashMap<>();
 	
 	public static void registerStructureEvents(){
 		DynamicRegistrySetupCallback.EVENT.register(registryManager -> {
@@ -803,7 +832,7 @@ public class BiomeAPI {
 						
 						//add back modded structures
 						StructureSettingsAccessor a = (StructureSettingsAccessor)settings.structureSettings();
-						structureStarts.forEach(modifier -> changeStructureStarts(a, modifier));
+						structureStarts.values().forEach(modifier -> changeStructureStarts(a, modifier));
 						
 						//add surface rules
 						if (biomeRegistry!=null) {
@@ -847,8 +876,8 @@ public class BiomeAPI {
 		structureStarts.clear();
 	}
 	
-	private static void changeStructureStarts(Consumer<Map<StructureFeature<?>, Multimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>>>> modifier) {
-		structureStarts.add(modifier);
+	private static void changeStructureStarts(ResourceLocation id, ConfiguredStructureFeature structure, Consumer<Map<StructureFeature<?>, Multimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>>>> modifier) {
+		structureStarts.put(new StructureID(id, structure), modifier);
 		Registry<NoiseGeneratorSettings> chunkGenSettingsRegistry = BuiltinRegistries.NOISE_GENERATOR_SETTINGS;
 		
 		for (Map.Entry<ResourceKey<NoiseGeneratorSettings>, NoiseGeneratorSettings> entry : chunkGenSettingsRegistry.entrySet()) {
