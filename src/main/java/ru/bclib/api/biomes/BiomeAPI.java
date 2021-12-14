@@ -652,7 +652,7 @@ public class BiomeAPI {
 			if (key!=null) {
 				configuredMap.put(structure, key);
 			} else {
-				BCLib.LOGGER.error("Unable to find Biome " + getBiomeID(biome));
+				BCLib.LOGGER.warning("Unable to find Biome " + getBiomeID(biome));
 			}
 		});
 	}
