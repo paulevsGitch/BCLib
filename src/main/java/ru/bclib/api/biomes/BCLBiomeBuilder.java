@@ -1,9 +1,11 @@
 package ru.bclib.api.biomes;
 
 import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
+import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.data.BuiltinRegistries;
 import net.minecraft.data.worldgen.BiomeDefaultFeatures;
+import net.minecraft.data.worldgen.placement.OrePlacements;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.Music;
 import net.minecraft.sounds.SoundEvent;
@@ -32,15 +34,22 @@ import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import ru.bclib.api.surface.SurfaceRuleBuilder;
 import ru.bclib.entity.BCLEntityWrapper;
+import ru.bclib.mixin.common.BiomeGenerationSettingsAccessor;
 import ru.bclib.util.ColorUtil;
+import ru.bclib.util.Pair;
 import ru.bclib.world.biomes.BCLBiome;
 import ru.bclib.world.features.BCLFeature;
 import ru.bclib.world.structures.BCLStructureFeature;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 public class BCLBiomeBuilder {
 	private static final BCLBiomeBuilder INSTANCE = new BCLBiomeBuilder();
@@ -583,13 +592,33 @@ public class BCLBiomeBuilder {
 		
 		builder.mobSpawnSettings(getSpawns().build());
 		builder.specialEffects(getEffects().build());
-		builder.generationSettings(getGeneration().build());
+		
+		Map<Decoration, List<Supplier<PlacedFeature>>> defferedFeatures = new HashMap<>();
+		BiomeGenerationSettingsAccessor acc = (BiomeGenerationSettingsAccessor)getGeneration().build();
+		if (acc!=null){
+			builder.generationSettings(new BiomeGenerationSettings.Builder().build());
+			var decorations = acc.bclib_getFeatures();
+			
+			for (Decoration d : Decoration.values()){
+				int i = d.ordinal();
+				
+				if (i>=0 && i<decorations.size()) {
+					var features = decorations.get(i);
+					defferedFeatures.put(d, features.stream().collect(Collectors.toList()));
+				} else {
+					defferedFeatures.put(d, new ArrayList<>(0));
+				}
+			}
+		} else {
+			builder.generationSettings(getGeneration().build());
+		}
 		
 		final T res = biomeConstructor.apply(biomeID, builder.build());
 		res.attachStructures(structures);
 		res.setSurface(surfaceRule);
 		res.setFogDensity(fogDensity);
 		res.setGenChance(genChance);
+		res.setFeatures(defferedFeatures);
 		return res;
 	}
 	
