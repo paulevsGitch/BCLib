@@ -12,8 +12,8 @@ import ru.bclib.world.biomes.FabricBiomesData;
 
 @Mixin(value = NetherBiomeData.class, remap = false)
 public class NetherBiomeDataMixin {
-    @Inject(method = "addNetherBiome", at = @At(value = "HEAD"))
-    private static void bclib_addNetherBiome(ResourceKey<Biome> biome, Climate.ParameterPoint spawnNoisePoint, CallbackInfo info) {
-        FabricBiomesData.NETHER_BIOMES.add(biome);
-    }
+	@Inject(method = "addNetherBiome", at = @At(value = "HEAD"))
+	private static void bclib_addNetherBiome(ResourceKey<Biome> biome, Climate.ParameterPoint spawnNoisePoint, CallbackInfo info) {
+		FabricBiomesData.NETHER_BIOMES.add(biome);
+	}
 }

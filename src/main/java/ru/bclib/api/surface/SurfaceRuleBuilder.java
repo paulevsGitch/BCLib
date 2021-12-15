@@ -221,7 +221,7 @@ public class SurfaceRuleBuilder {
 	/**
 	 * Set biome floor with specified {@link BlockState} and the given Noise Function.  The rule is added with priority 3.
 	 * @param surfaceBlockA {@link BlockState} for the ground cover.
-     * @param surfaceBlockB {@link BlockState} for the alternative ground cover.
+	 * @param surfaceBlockB {@link BlockState} for the alternative ground cover.
 	 * @param noise The {@link NoiseCondition}
 	 * @return same {@link SurfaceRuleBuilder} instance.
 	 */

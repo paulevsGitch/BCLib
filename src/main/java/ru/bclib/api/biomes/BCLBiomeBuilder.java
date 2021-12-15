@@ -27,8 +27,6 @@ import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.GenerationStep.Decoration;
 import net.minecraft.world.level.levelgen.Noises;
 import net.minecraft.world.level.levelgen.SurfaceRules;
-import net.minecraft.world.level.levelgen.SurfaceRules.RuleSource;
-import net.minecraft.world.level.levelgen.SurfaceRules.SequenceRuleSource;
 import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
 import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
@@ -38,7 +36,6 @@ import ru.bclib.util.ColorUtil;
 import ru.bclib.world.biomes.BCLBiome;
 import ru.bclib.world.features.BCLFeature;
 import ru.bclib.world.structures.BCLStructureFeature;
-import ru.bclib.world.surface.DoubleBlockSurfaceNoiseCondition;
 
 import java.util.ArrayList;
 import java.util.List;

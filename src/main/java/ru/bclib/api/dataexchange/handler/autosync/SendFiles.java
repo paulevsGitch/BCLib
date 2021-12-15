@@ -74,7 +74,7 @@ public class SendFiles extends DataHandler.FromServer {
 		BCLib.LOGGER.info("Sending " + existingFiles.size() + " Files to Client:");
 		for (AutoFileSyncEntry entry : existingFiles) {
 			int length = entry.serializeContent(buf);
-			BCLib.LOGGER.info("    - " + entry + " (" + PathUtil.humanReadableFileSize(length) + ")");
+			BCLib.LOGGER.info("	- " + entry + " (" + PathUtil.humanReadableFileSize(length) + ")");
 		}
 	}
 	
@@ -112,7 +112,7 @@ public class SendFiles extends DataHandler.FromServer {
 					} else {
 						type = "Ignoring ";
 					}
-					BCLib.LOGGER.info("    - " + type  + p.first + " (" + PathUtil.humanReadableFileSize(p.second.length) + ")");
+					BCLib.LOGGER.info("	- " + type  + p.first + " (" + PathUtil.humanReadableFileSize(p.second.length) + ")");
 				}
 				else {
 					BCLib.LOGGER.error("   - Failed to receive File " + p.third + ", possibly sent from a Mod that is not installed on the client.");
@@ -173,7 +173,7 @@ public class SendFiles extends DataHandler.FromServer {
 			} while (path.toFile().exists());
 		}
 		
-		BCLib.LOGGER.info("    - Writing " + path + " (" + PathUtil.humanReadableFileSize(data.length) + ")");
+		BCLib.LOGGER.info("	- Writing " + path + " (" + PathUtil.humanReadableFileSize(data.length) + ")");
 		try {
 			final File parentFile = path.getParent()
 										.toFile();
@@ -192,7 +192,7 @@ public class SendFiles extends DataHandler.FromServer {
 					collisionFreeName = String.format("%03d", count) + "_" + bakFileName;
 				} while (targetPath.toFile().exists());
 				
-				BCLib.LOGGER.info("    - Moving " + removeAfter + " to " +targetPath);
+				BCLib.LOGGER.info("	- Moving " + removeAfter + " to " +targetPath);
 				removeAfter.toFile().renameTo(targetPath.toFile());
 			}
 			AutoSync.didReceiveFile(e, fileName);
@@ -200,7 +200,7 @@ public class SendFiles extends DataHandler.FromServer {
 			
 		}
 		catch (IOException ioException) {
-			BCLib.LOGGER.error("    --> Writing " + fileName + " failed: " + ioException);
+			BCLib.LOGGER.error("	--> Writing " + fileName + " failed: " + ioException);
 		}
 	}
 	

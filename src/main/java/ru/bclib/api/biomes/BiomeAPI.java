@@ -35,7 +35,6 @@ import net.minecraft.world.level.biome.MobSpawnSettings.SpawnerData;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkGenerator;
-import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.levelgen.GenerationStep.Carving;
 import net.minecraft.world.level.levelgen.GenerationStep.Decoration;
 import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
@@ -68,7 +67,6 @@ import ru.bclib.world.structures.BCLStructureFeature;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -182,7 +180,7 @@ public class BiomeAPI {
 		Random random = new Random(biome.getID().hashCode());
 		
 		//temperature, humidity, continentalness, erosion, depth, weirdness, offset
-        Climate.ParameterPoint parameters = Climate.parameters(
+		Climate.ParameterPoint parameters = Climate.parameters(
 			MHelper.randRange(-1.5F, 1.5F, random),
 			MHelper.randRange(-1.5F, 1.5F, random),
 			MHelper.randRange(-1.5F, 1.5F, random), //new in 1.18

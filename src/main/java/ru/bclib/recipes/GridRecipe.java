@@ -12,7 +12,6 @@ import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.ShapedRecipe;
 import net.minecraft.world.item.crafting.ShapelessRecipe;
 import net.minecraft.world.level.ItemLike;
-import ru.bclib.BCLib;
 import ru.bclib.config.PathConfig;
 
 import java.util.Arrays;
@@ -30,7 +29,7 @@ public class GridRecipe {
 	private String[] shape;
 	private Map<Character, Ingredient> materialKeys = Maps.newHashMap();
 	private int count;
-	private boolean exist = true;
+	private boolean exist;
 	
 	private GridRecipe() {}
 
@@ -114,24 +113,23 @@ public class GridRecipe {
 	}
 	
 	public void build() {
-		if (exist) {
-			int height = shape.length;
-			int width = shape[0].length();
-			ItemStack result = new ItemStack(output, count);
-			NonNullList<Ingredient> materials = this.getMaterials(width, height);
-			
-			CraftingRecipe recipe = shaped ? new ShapedRecipe(
-				id,
-				group,
-				width,
-				height,
-				materials,
-				result
-			) : new ShapelessRecipe(id, group, result, materials);
-			BCLRecipeManager.addRecipe(type, recipe);
+		if (!exist) {
+			return;
 		}
-		else {
-			BCLib.LOGGER.debug("Recipe {} couldn't be added", id);
-		}
+		
+		int height = shape.length;
+		int width = shape[0].length();
+		ItemStack result = new ItemStack(output, count);
+		NonNullList<Ingredient> materials = this.getMaterials(width, height);
+		
+		CraftingRecipe recipe = shaped ? new ShapedRecipe(
+			id,
+			group,
+			width,
+			height,
+			materials,
+			result
+		) : new ShapelessRecipe(id, group, result, materials);
+		BCLRecipeManager.addRecipe(type, recipe);
 	}
 }

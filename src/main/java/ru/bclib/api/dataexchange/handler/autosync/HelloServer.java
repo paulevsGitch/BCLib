@@ -19,7 +19,7 @@ import java.io.File;
  * This message is sent once a player enters the world. It initiates a sequence of Messages that will sync files between both
  * client and server.
  * <table>
- *     <caption>Description</caption>
+ *	 <caption>Description</caption>
  * 	<tr>
  * 		<th>Server</th>
  * 		<th></th>

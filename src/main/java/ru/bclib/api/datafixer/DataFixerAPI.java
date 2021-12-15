@@ -108,7 +108,7 @@ public class DataFixerAPI {
 	 * {@code Minecraft.getInstance().getLevelSource()}
 	 * @param levelID The ID of the Level you want to patch
 	 * @param showUI {@code true}, if you want to present the user with a Screen that offers to backup the world
-	 *                              before applying the patches
+	 *							  before applying the patches
 	 * @param onResume When this method retursn {@code true}, this function will be called when the world is ready
 	 * @return {@code true} if the UI was displayed. The UI is only displayed if {@code showUI} was {@code true} and
 	 * patches were enabled in the config and the Guardian did find any patches that need to be applied to the world.
@@ -123,7 +123,7 @@ public class DataFixerAPI {
 	 *
 	 * @param levelStorageAccess The access class of the level you want to patch
 	 * @param showUI {@code true}, if you want to present the user with a Screen that offers to backup the world
-	 *                              before applying the patches
+	 *							  before applying the patches
 	 * @param onResume When this method retursn {@code true}, this function will be called when the world is ready
 	 * @return {@code true} if the UI was displayed. The UI is only displayed if {@code showUI} was {@code true} and
 	 * patches were enabled in the config and the Guardian did find any patches that need to be applied to the world.

@@ -66,7 +66,7 @@ public final class ConfigKeeper {
 	/**
 	 * Called for content based auto-sync.
 	 *
-	 * @param me    - When called in AutoSync this represents the content of the client.
+	 * @param me	- When called in AutoSync this represents the content of the client.
 	 * @param other - When called in AutoSync, this represents the content of the server
 	 * @return {@code true} if content was changed
 	 */

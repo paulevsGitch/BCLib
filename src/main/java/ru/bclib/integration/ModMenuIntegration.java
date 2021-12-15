@@ -55,16 +55,16 @@ class ModMenuScreenFactoryImpl {
  * <p>
  * Example:
  * <pre>{@code public class ModMenu extends ModMenuIntegration {
- *     public static final ModMenuApiMarker entrypointObject = createEntrypoint(new EntryPoint());
+ *	 public static final ModMenuApiMarker entrypointObject = createEntrypoint(new EntryPoint());
  *
- * 	    public EntryPoint() {
- * 		    super(GridScreen::new);
- *      }
+ * 		public EntryPoint() {
+ * 			super(GridScreen::new);
+ *	  }
  * }}</pre>
  * You'd also need to add the ModMenu-Entrypoint to your <i>fabric.mod.json</i>:
  * <pre>"entrypoints": {
- * 	    ...
- *     "modmenu": [ "your.mod.ModMenu::entrypointObject" ]
+ * 		...
+ *	 "modmenu": [ "your.mod.ModMenu::entrypointObject" ]
  * }</pre>
  */
 public abstract class ModMenuIntegration {
@@ -101,7 +101,7 @@ public abstract class ModMenuIntegration {
 	/**
 	 * Create a new ModMenu delegate
 	 * @param screenFactory A Factory. The Factory receives the currently visible {@code parent}-Screen
-	 *                      and must return a new Screen Object.
+	 *					  and must return a new Screen Object.
 	 */
 	public ModMenuIntegration(ModMenuScreenFactory screenFactory){
 		this.screenFactory = screenFactory;

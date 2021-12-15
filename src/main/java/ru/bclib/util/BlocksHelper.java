@@ -94,7 +94,7 @@ public class BlocksHelper {
 	/**
 	 * Rotates {@link BlockState} horizontally. Used in block classes with {@link Direction} {@link Property} in rotate function.
 	 *
-	 * @param state    - {@link BlockState} to mirror;
+	 * @param state	- {@link BlockState} to mirror;
 	 * @param rotation - {@link Rotation};
 	 * @param facing   - Block {@link Direction} {@link Property}.
 	 * @return Rotated {@link BlockState}.

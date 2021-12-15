@@ -9,7 +9,6 @@ import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.SmeltingRecipe;
 import net.minecraft.world.item.crafting.SmokingRecipe;
 import net.minecraft.world.level.ItemLike;
-import ru.bclib.BCLib;
 import ru.bclib.config.PathConfig;
 
 public class FurnaceRecipe {
@@ -77,54 +76,53 @@ public class FurnaceRecipe {
 	
 	public void build(boolean blasting, boolean campfire, boolean smoker) {
 		if (exist) {
-			SmeltingRecipe recipe = new SmeltingRecipe(
+			return;
+		}
+		
+		SmeltingRecipe recipe = new SmeltingRecipe(
+			id,
+			group,
+			Ingredient.of(input),
+			new ItemStack(output, count),
+			xp,
+			time
+		);
+		BCLRecipeManager.addRecipe(RecipeType.SMELTING, recipe);
+		
+		if (blasting) {
+			BlastingRecipe recipe2 = new BlastingRecipe(
 				id,
 				group,
 				Ingredient.of(input),
 				new ItemStack(output, count),
 				xp,
-				time
+				time / 2
 			);
-			BCLRecipeManager.addRecipe(RecipeType.SMELTING, recipe);
-			
-			if (blasting) {
-				BlastingRecipe recipe2 = new BlastingRecipe(
-					id,
-					group,
-					Ingredient.of(input),
-					new ItemStack(output, count),
-					xp,
-					time / 2
-				);
-				BCLRecipeManager.addRecipe(RecipeType.BLASTING, recipe2);
-			}
-			
-			if (campfire) {
-				CampfireCookingRecipe recipe2 = new CampfireCookingRecipe(
-					id,
-					group,
-					Ingredient.of(input),
-					new ItemStack(output, count),
-					xp,
-					time * 3
-				);
-				BCLRecipeManager.addRecipe(RecipeType.CAMPFIRE_COOKING, recipe2);
-			}
-			
-			if (smoker) {
-				SmokingRecipe recipe2 = new SmokingRecipe(
-					id,
-					group,
-					Ingredient.of(input),
-					new ItemStack(output, count),
-					xp,
-					time / 2
-				);
-				BCLRecipeManager.addRecipe(RecipeType.SMOKING, recipe2);
-			}
+			BCLRecipeManager.addRecipe(RecipeType.BLASTING, recipe2);
 		}
-		else {
-			BCLib.LOGGER.debug("Furnace recipe {} couldn't be added", id);
+		
+		if (campfire) {
+			CampfireCookingRecipe recipe2 = new CampfireCookingRecipe(
+				id,
+				group,
+				Ingredient.of(input),
+				new ItemStack(output, count),
+				xp,
+				time * 3
+			);
+			BCLRecipeManager.addRecipe(RecipeType.CAMPFIRE_COOKING, recipe2);
+		}
+		
+		if (smoker) {
+			SmokingRecipe recipe2 = new SmokingRecipe(
+				id,
+				group,
+				Ingredient.of(input),
+				new ItemStack(output, count),
+				xp,
+				time / 2
+			);
+			BCLRecipeManager.addRecipe(RecipeType.SMOKING, recipe2);
 		}
 	}
 }

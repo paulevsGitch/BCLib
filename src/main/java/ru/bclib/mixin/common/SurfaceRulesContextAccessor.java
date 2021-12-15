@@ -12,39 +12,39 @@ import java.util.function.Supplier;
 
 @Mixin(SurfaceRules.Context.class)
 public interface SurfaceRulesContextAccessor {
-    @Accessor("blockX")
-    int getBlockX();
+	@Accessor("blockX")
+	int getBlockX();
 
-    @Accessor("blockY")
-    int getBlockY();
+	@Accessor("blockY")
+	int getBlockY();
 
-    @Accessor("blockZ")
-    int getBlockZ();
+	@Accessor("blockZ")
+	int getBlockZ();
 
-    @Accessor("surfaceDepth")
-    int getSurfaceDepth();
+	@Accessor("surfaceDepth")
+	int getSurfaceDepth();
 
-    @Accessor("biome")
-    Supplier<Biome> getBiome();
+	@Accessor("biome")
+	Supplier<Biome> getBiome();
 
-    @Accessor("biomeKey")
-    Supplier<ResourceKey<Biome>> getBiomeKey();
+	@Accessor("biomeKey")
+	Supplier<ResourceKey<Biome>> getBiomeKey();
 
-    @Accessor("chunk")
-    ChunkAccess getChunk();
+	@Accessor("chunk")
+	ChunkAccess getChunk();
 
-    @Accessor("noiseChunk")
-    NoiseChunk getNoiseChunk();
-    
-    @Accessor("stoneDepthAbove")
-    int getStoneDepthAbove();
-    
-    @Accessor("stoneDepthBelow")
-    int getStoneDepthBelow();
-    
-    @Accessor("lastUpdateY")
-    long getLastUpdateY();
-    
-    @Accessor("lastUpdateXZ")
-    long getLastUpdateXZ();
+	@Accessor("noiseChunk")
+	NoiseChunk getNoiseChunk();
+	
+	@Accessor("stoneDepthAbove")
+	int getStoneDepthAbove();
+	
+	@Accessor("stoneDepthBelow")
+	int getStoneDepthBelow();
+	
+	@Accessor("lastUpdateY")
+	long getLastUpdateY();
+	
+	@Accessor("lastUpdateXZ")
+	long getLastUpdateXZ();
 }

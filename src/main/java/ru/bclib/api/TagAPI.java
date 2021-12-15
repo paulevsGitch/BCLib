@@ -72,7 +72,7 @@ public class TagAPI {
 	 * Get or create {@link Tag.Named}.
 	 *
 	 * @param containerSupplier - {@link TagCollection} {@link Supplier} tag collection;
-	 * @param id                - {@link ResourceLocation} tag id.
+	 * @param id				- {@link ResourceLocation} tag id.
 	 * @return {@link Tag.Named}.
 	 */
 	public static <T> Tag.Named<T> makeTag(Supplier<TagCollection<T>> containerSupplier, ResourceLocation id) {
@@ -194,7 +194,7 @@ public class TagAPI {
 	 * The call will reserve the Tag. The Tag is added to the blocks once
 	 * {@link #apply(String, Map)} was executed.
 	 *
-	 * @param tag    The new Tag
+	 * @param tag	The new Tag
 	 * @param blocks One or more blocks that should receive the Tag.
 	 */
 	public static void addTag(Tag.Named<Block> tag, Block... blocks) {
@@ -282,7 +282,7 @@ public class TagAPI {
 	 * In most cases there is no need to call this Method manually.
 	 *
 	 * @param directory The name of the Tag-directory. Should be either <i>"tags/blocks"</i> or
-	 *                  <i>"tags/items"</i>.
+	 *				  <i>"tags/items"</i>.
 	 * @param tagsMap   The map that will hold the registered Tags
 	 * @return The {@code tagsMap} Parameter.
 	 */
