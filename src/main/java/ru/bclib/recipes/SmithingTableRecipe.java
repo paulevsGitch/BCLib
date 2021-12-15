@@ -12,7 +12,6 @@ import ru.bclib.BCLib;
 import ru.bclib.config.PathConfig;
 
 public class SmithingTableRecipe {
-	
 	private final static SmithingTableRecipe BUILDER = new SmithingTableRecipe();
 	private final static RecipeType<UpgradeRecipe> TYPE = RecipeType.SMITHING;
 	
@@ -25,7 +24,7 @@ public class SmithingTableRecipe {
 		BUILDER.base = null;
 		BUILDER.addition = null;
 		BUILDER.result = null;
-		BUILDER.alright = true;
+		BUILDER.exist = true;
 		
 		return BUILDER;
 	}
@@ -34,7 +33,6 @@ public class SmithingTableRecipe {
 	private Ingredient base;
 	private Ingredient addition;
 	private ItemStack result;
-	private boolean alright;
 	private boolean exist;
 	
 	private SmithingTableRecipe() {}
@@ -49,13 +47,13 @@ public class SmithingTableRecipe {
 	}
 	
 	public SmithingTableRecipe setResult(ItemLike item, int count) {
-		this.alright &= BCLRecipeManager.exists(item);
+		this.exist &= BCLRecipeManager.exists(item);
 		this.result = new ItemStack(item, count);
 		return this;
 	}
 	
 	public SmithingTableRecipe setBase(ItemLike... items) {
-		this.alright &= BCLRecipeManager.exists(items);
+		this.exist &= BCLRecipeManager.exists(items);
 		this.base = Ingredient.of(items);
 		return this;
 	}
@@ -66,7 +64,7 @@ public class SmithingTableRecipe {
 	}
 	
 	public SmithingTableRecipe setAddition(ItemLike... items) {
-		this.alright &= BCLRecipeManager.exists(items);
+		this.exist &= BCLRecipeManager.exists(items);
 		this.addition = Ingredient.of(items);
 		return this;
 	}
@@ -97,10 +95,7 @@ public class SmithingTableRecipe {
 			BCLib.LOGGER.warning("Can't add Smithing recipe! Id {} already exists!", id);
 			return;
 		}
-		if (!alright) {
-			BCLib.LOGGER.debug("Can't add Smithing recipe {}! Ingeredients or output not exists.", id);
-			return;
-		}
+		
 		BCLRecipeManager.addRecipe(TYPE, new UpgradeRecipe(id, base, addition, result));
 	}
 }
