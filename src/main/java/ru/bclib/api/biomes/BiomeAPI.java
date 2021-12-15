@@ -140,8 +140,34 @@ public class BiomeAPI {
 	 * @param biomeRegistry - {@link Registry} for {@link Biome}.
 	 */
 	public static void initRegistry(Registry<Biome> biomeRegistry) {
-		BiomeAPI.biomeRegistry = biomeRegistry;
-		CLIENT.clear();
+		if (biomeRegistry != BiomeAPI.biomeRegistry) {
+			BiomeAPI.biomeRegistry = biomeRegistry;
+			CLIENT.clear();
+			
+			for (var entry : biomeRegistry.entrySet()){
+				onAddedBiome(entry.getValue());
+			}
+			RegistryEntryAddedCallback
+				.event(biomeRegistry)
+				.register((rawId, id, biome)->{
+					
+					BCLib.LOGGER.info(" #### " + rawId + ", " + biome + ", " + id);
+					
+					onAddedBiome(biome);
+				});
+		}
+	}
+	
+	private static void onAddedBiome(Biome biome) {
+		for (var dim : MODIFICATIONS.keySet()) {
+			List<BiConsumer<ResourceLocation, Biome>> modifications = MODIFICATIONS.get(dim);
+			if (modifications == null) {
+				sortBiomeFeatures(biome);
+				return;
+			}
+			
+			applyModifications(modifications, biome);
+		}
 	}
 	
 	/**
@@ -821,6 +847,10 @@ public class BiomeAPI {
 		DynamicRegistrySetupCallback.EVENT.register(registryManager -> {
 			Optional<? extends Registry<NoiseGeneratorSettings>> oGeneratorRegistry = registryManager.registry(Registry.NOISE_GENERATOR_SETTINGS_REGISTRY);
 			Optional<? extends Registry<Biome>> oBiomeRegistry = registryManager.registry(Registry.BIOME_REGISTRY);
+			if (oBiomeRegistry.isPresent()){
+			
+			
+			}
 			
 			if (oGeneratorRegistry.isPresent()) {
 				RegistryEntryAddedCallback
@@ -841,23 +871,7 @@ public class BiomeAPI {
 					});
 			}
 			
-			if (oBiomeRegistry.isPresent()){
-				RegistryEntryAddedCallback
-					.event(oBiomeRegistry.get())
-					.register((rawId, id, biome)->{
-						//BCLib.LOGGER.info(" #### " + rawId + ", " + biome + ", " + id);
-						
-						for (var dim : MODIFICATIONS.keySet()) {
-							List<BiConsumer<ResourceLocation, Biome>> modifications = MODIFICATIONS.get(dim);
-							if (modifications == null) {
-								sortBiomeFeatures(biome);
-								return;
-							}
-
-							applyModifications(modifications, biome);
-						}
-					});
-			}
+			
 		});
 	}
 	
