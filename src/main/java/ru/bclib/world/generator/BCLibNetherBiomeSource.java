@@ -32,20 +32,20 @@ public class BCLibNetherBiomeSource extends BCLBiomeSource {
 	});
 	private BiomeMap biomeMap;
 
-    private static boolean forceLegacyGenerator = false;
+	private static boolean forceLegacyGenerator = false;
 	private static int lastWorldHeight;
 	private static int worldHeight;
 
-    /**
-     * When true, the older square generator is used for the nether.
+	/**
+	 * When true, the older square generator is used for the nether.
 	 *
 	 * This override is used (for example) by BetterNether to force the legacy generation for worlds
 	 * that were created before 1.18
-     * @param val wether or not you want to force the old generatore.
-     */
-    public static void setForceLegacyGeneration(boolean val){
-        forceLegacyGenerator = val;
-    }
+	 * @param val wether or not you want to force the old generatore.
+	 */
+	public static void setForceLegacyGeneration(boolean val){
+		forceLegacyGenerator = val;
+	}
 	
 	/**
 	 * Set world height, used when Nether is larger than vanilla 128 blocks tall.

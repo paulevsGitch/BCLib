@@ -55,7 +55,7 @@ public class UnbakedQuad {
 			float z = data[dataIndex++]; // Z
 			POS.set(x, y, z, 0);
 			POS.transform(matrix);
-			vertexData[index] = Float.floatToIntBits(POS.x());     // X
+			vertexData[index] = Float.floatToIntBits(POS.x());	 // X
 			vertexData[index | 1] = Float.floatToIntBits(POS.y()); // Y
 			vertexData[index | 2] = Float.floatToIntBits(POS.z()); // Z
 			vertexData[index | 3] = -1; // Unknown constant

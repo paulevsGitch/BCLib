@@ -220,7 +220,7 @@ public class OBJBlockModel implements UnbakedModel, BakedModel {
 						if (member.contains("/")) {
 							String[] sub = member.split("/");
 							vertexIndex.add(Integer.parseInt(sub[0]) - 1); // Vertex
-							uvIndex.add(Integer.parseInt(sub[1]) - 1);     // UV
+							uvIndex.add(Integer.parseInt(sub[1]) - 1);	 // UV
 						}
 						else {
 							vertexIndex.add(Integer.parseInt(member) - 1); // Vertex

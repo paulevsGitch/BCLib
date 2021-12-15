@@ -66,7 +66,7 @@ public class RequestFiles extends DataHandler.FromClient {
 		for (int i = 0; i < size; i++) {
 			AutoSyncID asid = AutoSyncID.deserializeData(buf);
 			files.add(asid);
-			BCLib.LOGGER.info("    - " + asid);
+			BCLib.LOGGER.info("	- " + asid);
 		}
 		
 		

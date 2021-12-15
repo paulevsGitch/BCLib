@@ -5,10 +5,10 @@ BCLib is a library mod for BetterX team mods, developed for Fabric, MC 1.18
 ## Features:
 ### Rendering
 * Emissive textures (with _e suffix)
-    * Can be applied to Solid and Transparent blocks;
-    * Can be changed/added with resourcepacks;
-    * Incompatible with Sodium and Canvas (just will be not rendered);
-    * Incompatible with Iris shaders (Iris without shaders works fine).
+	* Can be applied to Solid and Transparent blocks;
+	* Can be changed/added with resourcepacks;
+	* Incompatible with Sodium and Canvas (just will be not rendered);
+	* Incompatible with Iris shaders (Iris without shaders works fine).
 * Procedural block and item models (from paterns or from code);
 * Block render interfaces.
 

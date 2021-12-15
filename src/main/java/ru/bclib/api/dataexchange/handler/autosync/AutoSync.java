@@ -68,15 +68,15 @@ public class AutoSync {
 	/**
 	 * Registers a File for automatic client syncing.
 	 *
-	 * @param modID          The ID of the calling Mod
+	 * @param modID		  The ID of the calling Mod
 	 * @param needTransfer   If the predicate returns true, the file needs to get copied to the server.
-	 * @param fileName       The name of the File
+	 * @param fileName	   The name of the File
 	 * @param requestContent When {@code true} the content of the file is requested for comparison. This will copy the
-	 *                       entire file from the client to the server.
-	 *                       <p>
-	 *                       You should only use this option, if you need to compare parts of the file in order to decide
-	 *                       If the File needs to be copied. Normally using the {@link SyncFileHash}
-	 *                       for comparison is sufficient.
+	 *					   entire file from the client to the server.
+	 *					   <p>
+	 *					   You should only use this option, if you need to compare parts of the file in order to decide
+	 *					   If the File needs to be copied. Normally using the {@link SyncFileHash}
+	 *					   for comparison is sufficient.
 	 */
 	public static void addAutoSyncFileData(String modID, File fileName, boolean requestContent, NeedTransferPredicate needTransfer) {
 		if (!PathUtil.isChildOf(PathUtil.GAME_FOLDER, fileName.toPath())){
@@ -89,17 +89,17 @@ public class AutoSync {
 	/**
 	 * Registers a File for automatic client syncing.
 	 *
-	 * @param modID          The ID of the calling Mod
-	 * @param uniqueID       A unique Identifier for the File. (see {@link SyncFileHash#uniqueID} for
-	 *                       Details
+	 * @param modID		  The ID of the calling Mod
+	 * @param uniqueID	   A unique Identifier for the File. (see {@link SyncFileHash#uniqueID} for
+	 *					   Details
 	 * @param needTransfer   If the predicate returns true, the file needs to get copied to the server.
-	 * @param fileName       The name of the File
+	 * @param fileName	   The name of the File
 	 * @param requestContent When {@code true} the content of the file is requested for comparison. This will copy the
-	 *                       entire file from the client to the server.
-	 *                       <p>
-	 *                       You should only use this option, if you need to compare parts of the file in order to decide
-	 *                       If the File needs to be copied. Normally using the {@link SyncFileHash}
-	 *                       for comparison is sufficient.
+	 *					   entire file from the client to the server.
+	 *					   <p>
+	 *					   You should only use this option, if you need to compare parts of the file in order to decide
+	 *					   If the File needs to be copied. Normally using the {@link SyncFileHash}
+	 *					   for comparison is sufficient.
 	 */
 	public static void addAutoSyncFileData(String modID, String uniqueID, File fileName, boolean requestContent, NeedTransferPredicate needTransfer) {
 		if (!PathUtil.isChildOf(PathUtil.GAME_FOLDER, fileName.toPath())){

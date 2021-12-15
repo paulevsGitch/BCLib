@@ -3,9 +3,9 @@ buildscript {
 		classpath 'org.kohsuke:github-api:1.114'
 	}
 
-    repositories {
-        gradlePluginPortal()
-    }
+	repositories {
+		gradlePluginPortal()
+	}
 }
 sourceCompatibility = JavaVersion.VERSION_17
 targetCompatibility = JavaVersion.VERSION_17
@@ -15,16 +15,16 @@ version = project.mod_version
 group = project.maven_group
 
 repositories {
-    maven { url "https://maven.dblsaiko.net/" }
-    maven { url "https://server.bbkr.space:8081/artifactory/libs-release/" }
+	maven { url "https://maven.dblsaiko.net/" }
+	maven { url "https://server.bbkr.space:8081/artifactory/libs-release/" }
 	maven { url "https://maven.fabricmc.net/" }	
 	maven { url "https://maven.shedaniel.me/" }
-    maven { url 'https://maven.blamejared.com' } 
+	maven { url 'https://maven.blamejared.com' } 
 	maven { url 'https://jitpack.io' }
 }
 
 loom {
-    accessWidenerPath = file("src/main/resources/bclib.accesswidener")
+	accessWidenerPath = file("src/main/resources/bclib.accesswidener")
 }
 
 dependencies {
@@ -40,7 +40,7 @@ processResources {
 	println "Version: ${project.mod_version}"
 	inputs.property "version", project.mod_version
 	
-    filesMatching("fabric.mod.json") {
+	filesMatching("fabric.mod.json") {
 		expand "version": project.mod_version
 	}
 }
@@ -50,12 +50,12 @@ processResources {
 // see http://yodaconditions.net/blog/fix-for-java-file-encoding-problems-with-gradle.html
 tasks.withType(JavaCompile) {
 	options.encoding = "UTF-8"
-    it.options.release = 17
+	it.options.release = 17
 }
 
 javadoc {
 	options.tags = [ "reason" ]
-    options.stylesheetFile = new File(projectDir, "javadoc.css");
+	options.stylesheetFile = new File(projectDir, "javadoc.css");
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
@@ -134,12 +134,12 @@ publishing {
 }
 
 configurations {
-    dev {
-        canBeResolved = false
-        canBeConsumed = true
-    }
+	dev {
+		canBeResolved = false
+		canBeConsumed = true
+	}
 }
 
 artifacts {
-    dev jar
+	dev jar
 }

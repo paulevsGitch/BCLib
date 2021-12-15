@@ -73,12 +73,12 @@ public class TranslationHelper {
 		if (!missingNames.isEmpty()) {
 			
 			System.out.println("========================================");
-			System.out.println("           MISSING NAMES LIST");
+			System.out.println("		   MISSING NAMES LIST");
 			
 			if (!missingNames.isEmpty()) {
 				if (languageCode.equals("en_us")) {
 					System.out.println("========================================");
-					System.out.println("      AUTO ENGLISH BEAUTIFICATION");
+					System.out.println("	  AUTO ENGLISH BEAUTIFICATION");
 					System.out.println("========================================");
 					missingNames.stream().sorted().forEach(name -> {
 						System.out.println("	\"" + name + "\": \"" + fastTranslateEn(name) + "\",");
@@ -86,7 +86,7 @@ public class TranslationHelper {
 				}
 				else {
 					System.out.println("========================================");
-					System.out.println("           TEMPLATE: [" + languageCode + "]");
+					System.out.println("		   TEMPLATE: [" + languageCode + "]");
 					System.out.println("========================================");
 					missingNames.stream().sorted().forEach(name -> {
 						System.out.println("	\"" + name + "\": \"\",");

@@ -3,7 +3,7 @@
 
 // Value near 254
 bool isEmissive(float alpha) {
-    return 0.9960 < alpha && alpha < 0.9962;
+	return 0.9960 < alpha && alpha < 0.9962;
 }
 
 void frx_startFragment(inout frx_FragmentData fragData) {

@@ -45,9 +45,9 @@ public class PathUtil {
 	/**
 	 * A simple directory walker that ignores dot-files
 	 *
-	 * @param path         The path where you want to start
+	 * @param path		 The path where you want to start
 	 * @param pathConsumer The consumer called for each valid file. The consumer will get an absolute {@link Path}-Object
-	 *                     for each visited file
+	 *					 for each visited file
 	 */
 	public static void fileWalker(File path, Consumer<Path> pathConsumer) {
 		fileWalker(path, true, pathConsumer);
@@ -56,10 +56,10 @@ public class PathUtil {
 	/**
 	 * A simple directory walker that ignores dot-files
 	 *
-	 * @param path         The path where you want to start
-	 * @param recursive    if {@code false}, only the {@code path} is traversed
+	 * @param path		 The path where you want to start
+	 * @param recursive	if {@code false}, only the {@code path} is traversed
 	 * @param pathConsumer The consumer called for each valid file. The consumer will get an absolute {@link Path}-Object
-	 *                     for each visited file
+	 *					 for each visited file
 	 */
 	public static void fileWalker(File path, boolean recursive, Consumer<Path> pathConsumer) {
 		if (!path.exists()) return;

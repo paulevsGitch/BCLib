@@ -31,35 +31,35 @@ import java.util.concurrent.CompletableFuture;
 
 @Mixin(MinecraftServer.class)
 public class MinecraftServerMixin {
-    @Shadow
-    private ServerResources resources;
+	@Shadow
+	private ServerResources resources;
 
-    @Final
-    @Shadow
-    private Map<ResourceKey<Level>, ServerLevel> levels;
+	@Final
+	@Shadow
+	private Map<ResourceKey<Level>, ServerLevel> levels;
 
-    @Final
-    @Shadow
-    protected WorldData worldData;
+	@Final
+	@Shadow
+	protected WorldData worldData;
 
-    @Inject(method = "<init>*", at = @At("TAIL"))
-    private void bclib_onServerInit(Thread thread, RegistryHolder registryHolder, LevelStorageAccess levelStorageAccess, WorldData worldData, PackRepository packRepository, Proxy proxy, DataFixer dataFixer, ServerResources serverResources, MinecraftSessionService minecraftSessionService, GameProfileRepository gameProfileRepository, GameProfileCache gameProfileCache, ChunkProgressListenerFactory chunkProgressListenerFactory, CallbackInfo ci) {
-        DataExchangeAPI.prepareServerside();
-    }
+	@Inject(method = "<init>*", at = @At("TAIL"))
+	private void bclib_onServerInit(Thread thread, RegistryHolder registryHolder, LevelStorageAccess levelStorageAccess, WorldData worldData, PackRepository packRepository, Proxy proxy, DataFixer dataFixer, ServerResources serverResources, MinecraftSessionService minecraftSessionService, GameProfileRepository gameProfileRepository, GameProfileCache gameProfileCache, ChunkProgressListenerFactory chunkProgressListenerFactory, CallbackInfo ci) {
+		DataExchangeAPI.prepareServerside();
+	}
 
-    @Inject(method = "reloadResources", at = @At(value = "RETURN"), cancellable = true)
-    private void bclib_reloadResources(Collection<String> collection, CallbackInfoReturnable<CompletableFuture<Void>> info) {
-        bclib_injectRecipes();
-    }
+	@Inject(method = "reloadResources", at = @At(value = "RETURN"), cancellable = true)
+	private void bclib_reloadResources(Collection<String> collection, CallbackInfoReturnable<CompletableFuture<Void>> info) {
+		bclib_injectRecipes();
+	}
 
-    @Inject(method = "loadLevel", at = @At(value = "RETURN"), cancellable = true)
-    private void bclib_loadLevel(CallbackInfo info) {
-        bclib_injectRecipes();
-        //BiomeAPI.initRegistry(MinecraftServer.class.cast(this));
-    }
+	@Inject(method = "loadLevel", at = @At(value = "RETURN"), cancellable = true)
+	private void bclib_loadLevel(CallbackInfo info) {
+		bclib_injectRecipes();
+		//BiomeAPI.initRegistry(MinecraftServer.class.cast(this));
+	}
 
-    private void bclib_injectRecipes() {
-        RecipeManagerAccessor accessor = (RecipeManagerAccessor) resources.getRecipeManager();
-        accessor.bclib_setRecipes(BCLRecipeManager.getMap(accessor.bclib_getRecipes()));
-    }
+	private void bclib_injectRecipes() {
+		RecipeManagerAccessor accessor = (RecipeManagerAccessor) resources.getRecipeManager();
+		accessor.bclib_setRecipes(BCLRecipeManager.getMap(accessor.bclib_getRecipes()));
+	}
 }

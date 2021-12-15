@@ -19,8 +19,8 @@ import java.util.function.Consumer;
  * <p>
  * This Block-Type will:
  * <ul>
- *     <li>Drop itself</li>
- *     <li>Automatically create an Item-Model from the Block-Model</li>
+ *	 <li>Drop itself</li>
+ *	 <li>Automatically create an Item-Model from the Block-Model</li>
  * </ul>
  */
 public class BaseBlock extends Block implements BlockModelProvider {
@@ -63,7 +63,7 @@ public class BaseBlock extends Block implements BlockModelProvider {
 	 * For example in {@link BaseLeavesBlock#BaseLeavesBlock(Block, MaterialColor, Consumer)}
 	 *
 	 * @param customizeProperties A {@link Consumer} to call with the preset properties
-	 * @param settings            The properties as created by the Block
+	 * @param settings			The properties as created by the Block
 	 * @return The reconfigured {@code settings}
 	 */
 	static FabricBlockSettings acceptAndReturn(Consumer<FabricBlockSettings> customizeProperties, FabricBlockSettings settings) {

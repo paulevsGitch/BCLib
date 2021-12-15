@@ -70,12 +70,12 @@ public abstract class Patch {
 	 * inconsistencies are found.
 	 *
 	 * @param modID   The ID of the Mod you want to register a patch for. This should be your
-	 *                ModID only. The ModID can not be {@code null} or an empty String.
+	 *				ModID only. The ModID can not be {@code null} or an empty String.
 	 * @param version The mod-version that introduces the patch. This needs Semantic-Version String
-	 *                like x.x.x. Developers are responsible for registering their patches in the correct
-	 *                order (with increasing versions). You are not allowed to register a new
-	 *                Patch with a version lower or equal than
-	 *                {@link Patch#maxPatchVersion(String)}
+	 *				like x.x.x. Developers are responsible for registering their patches in the correct
+	 *				order (with increasing versions). You are not allowed to register a new
+	 *				Patch with a version lower or equal than
+	 *				{@link Patch#maxPatchVersion(String)}
 	 */
 	protected Patch(@NotNull String modID, String version) {
 		this(modID, version, false);
@@ -85,10 +85,10 @@ public abstract class Patch {
 	 * Internal Constructor used to create patches that can allways run (no matter what patchlevel a level has)
 	 * @param modID The ID of the Mod
 	 * @param version The mod-version that introduces the patch. When {@Code runAllways} is set, this version will
-	 *                determine the patchlevel that is written to the level
+	 *				determine the patchlevel that is written to the level
 	 * @param alwaysApply When true, this patch is always active, no matter the patchlevel of the world.
-	 *                    This should be used sparingly and just for patches that apply to level.dat (as they only take
-	 *                    effect when changes are detected). Use {@link ForcedLevelPatch} to instatiate.
+	 *					This should be used sparingly and just for patches that apply to level.dat (as they only take
+	 *					effect when changes are detected). Use {@link ForcedLevelPatch} to instatiate.
 	 */
 	Patch(@NotNull String modID, String version, boolean alwaysApply) {
 		//Patchlevels need to be unique and registered in ascending order
@@ -201,11 +201,11 @@ public abstract class Patch {
 	 * a {@link CompoundTag}. If the Path contains a non-leaf {@link net.minecraft.nbt.ListTag}, all members of that
 	 * list will be processed. For example:
 	 * <pre>
-	 *     - global +
-	 *              | - key (String)
-	 *              | - items (List) +
-	 *                               | - { id (String) }
-	 *                               | - { id (String) }
+	 *	 - global +
+	 *			  | - key (String)
+	 *			  | - items (List) +
+	 *							   | - { id (String) }
+	 *							   | - { id (String) }
 	 * </pre>
 	 * The path <b>global.items.id</b> will fix all <i>id</i>-entries in the <i>items</i>-list, while the path
 	 * <b>global.key</b> will only fix the  <i>key</i>-entry.

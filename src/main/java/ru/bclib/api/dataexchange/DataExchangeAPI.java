@@ -111,7 +111,7 @@ public class DataExchangeAPI extends DataExchange {
 	/**
 	 * Registers a File for automatic client syncing.
 	 *
-	 * @param modID    The ID of the calling Mod
+	 * @param modID	The ID of the calling Mod
 	 * @param fileName The name of the File
 	 */
 	public static void addAutoSyncFile(String modID, File fileName) {
@@ -124,9 +124,9 @@ public class DataExchangeAPI extends DataExchange {
 	 * The file is synced of the {@link SyncFileHash} on client and server are not equal. This method will not copy the
 	 * configs content from the client to the server.
 	 *
-	 * @param modID    The ID of the calling Mod
+	 * @param modID	The ID of the calling Mod
 	 * @param uniqueID A unique Identifier for the File. (see {@link SyncFileHash#uniqueID} for
-	 *                 Details
+	 *				 Details
 	 * @param fileName The name of the File
 	 */
 	public static void addAutoSyncFile(String modID, String uniqueID, File fileName) {
@@ -143,8 +143,8 @@ public class DataExchangeAPI extends DataExchange {
 	 * if the File needs to be copied. Normally using the {@link SyncFileHash}
 	 * for comparison is sufficient.
 	 *
-	 * @param modID        The ID of the calling Mod
-	 * @param fileName     The name of the File
+	 * @param modID		The ID of the calling Mod
+	 * @param fileName	 The name of the File
 	 * @param needTransfer If the predicate returns true, the file needs to get copied to the server.
 	 */
 	public static void addAutoSyncFile(String modID, File fileName, NeedTransferPredicate needTransfer) {
@@ -161,10 +161,10 @@ public class DataExchangeAPI extends DataExchange {
 	 * if the File needs to be copied. Normally using the {@link SyncFileHash}
 	 * for comparison is sufficient.
 	 *
-	 * @param modID        The ID of the calling Mod
-	 * @param uniqueID     A unique Identifier for the File. (see {@link SyncFileHash#uniqueID} for
-	 *                     Details
-	 * @param fileName     The name of the File
+	 * @param modID		The ID of the calling Mod
+	 * @param uniqueID	 A unique Identifier for the File. (see {@link SyncFileHash#uniqueID} for
+	 *					 Details
+	 * @param fileName	 The name of the File
 	 * @param needTransfer If the predicate returns true, the file needs to get copied to the server.
 	 */
 	public static void addAutoSyncFile(String modID, String uniqueID, File fileName, NeedTransferPredicate needTransfer) {

@@ -16,7 +16,7 @@
 	"title.bclib.confirmrestart": "재시작 필요",
 	"message.bclib.confirmrestart": "요청한 콘텐츠가 동기화되었습니다. 지금 마인크래프트를 다시 시작해야 합니다.",
 	"title.link.bclib.discord": "디스코드",
-    "title.bclib.modmenu.main": "BCLib 환경설정",
+	"title.bclib.modmenu.main": "BCLib 환경설정",
 	"title.bclib.progress": "진행",
 	"title.bclib.filesync.progress": "파일 전송",
 	"message.bclib.filesync.progress": "파일 내용을 서버와 동기화하는 중",
