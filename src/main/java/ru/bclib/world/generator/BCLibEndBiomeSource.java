@@ -138,10 +138,10 @@ public class BCLibEndBiomeSource extends BCLBiomeSource {
 	
 	@Override
 	public Biome getNoiseBiome(int biomeX, int biomeY, int biomeZ, Climate.Sampler sampler) {
-		long i = (long) biomeX * (long) biomeX;
-		long j = (long) biomeZ * (long) biomeZ;
+		long posX = biomeX << 2;
+		long posZ = biomeZ << 2;
 		long farEndBiomes = GeneratorOptions.getFarEndBiomes();
-		long dist = i + j;
+		long dist = posX * posX + posZ * posZ;
 		
 		if ((biomeX & 63) == 0 && (biomeZ & 63) == 0) {
 			mapLand.clearCache();
@@ -161,19 +161,19 @@ public class BCLibEndBiomeSource extends BCLBiomeSource {
 			}
 			
 			if (height < -10F) {
-				return mapVoid.getBiome(biomeX << 2, biomeY << 2, biomeZ << 2).getActualBiome();
+				return mapVoid.getBiome(posX, biomeY << 2, posZ).getActualBiome();
 			}
 			else {
-				return mapLand.getBiome(biomeX << 2, biomeY << 2, biomeZ << 2).getActualBiome();
+				return mapLand.getBiome(posX, biomeY << 2, posZ).getActualBiome();
 			}
 		}
 		else {
 			pos.setLocation(biomeX, biomeZ);
 			if (endLandFunction.apply(pos)) {
-				return dist <= farEndBiomes ? centerBiome : mapLand.getBiome(biomeX << 2, biomeY << 2, biomeZ << 2).getActualBiome();
+				return dist <= farEndBiomes ? centerBiome : mapLand.getBiome(posX, biomeY << 2, posZ).getActualBiome();
 			}
 			else {
-				return dist <= farEndBiomes ? barrens : mapVoid.getBiome(biomeX << 2, biomeY << 2, biomeZ << 2).getActualBiome();
+				return dist <= farEndBiomes ? barrens : mapVoid.getBiome(posX, biomeY << 2, posZ).getActualBiome();
 			}
 		}
 	}
