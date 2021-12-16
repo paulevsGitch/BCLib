@@ -53,20 +53,19 @@ public class HexBiomeMap implements BiomeMap {
 	public BCLBiome getBiome(double x, double y, double z) {
 		BCLBiome biome = getRawBiome(x, z);
 		BCLBiome edge = biome.getEdge();
-		float offset = biome.getEdgeSize();
+		int size = biome.getEdgeSize();
 		
 		if (edge == null && biome.getParentBiome() != null) {
 			edge = biome.getParentBiome().getEdge();
-			offset = biome.getParentBiome().getEdgeSize();
+			size = biome.getParentBiome().getEdgeSize();
 		}
 		
 		if (edge == null) {
 			return biome;
 		}
 		
-		offset *= scale;
 		for (byte i = 0; i < 8; i++) {
-			if (!getRawBiome(x + offset * EDGE_CIRCLE_X[i], z + offset * EDGE_CIRCLE_Z[i]).isSame(biome)) {
+			if (!getRawBiome(x + size * EDGE_CIRCLE_X[i], z + size * EDGE_CIRCLE_Z[i]).isSame(biome)) {
 				return edge;
 			}
 		}

@@ -54,12 +54,12 @@ public class SquareBiomeMap implements BiomeMap {
 			if (biome.getParentBiome() != null) {
 				search = biome.getParentBiome();
 			}
-			int d = (int) Math.ceil(search.getEdgeSize() / 4F) << 2;
 			
-			boolean edge = !search.isSame(getRawBiome(x + d, z));
-			edge = edge || !search.isSame(getRawBiome(x - d, z));
-			edge = edge || !search.isSame(getRawBiome(x, z + d));
-			edge = edge || !search.isSame(getRawBiome(x, z - d));
+			int size = search.getEdgeSize();
+			boolean edge = !search.isSame(getRawBiome(x + size, z));
+			edge = edge || !search.isSame(getRawBiome(x - size, z));
+			edge = edge || !search.isSame(getRawBiome(x, z + size));
+			edge = edge || !search.isSame(getRawBiome(x, z - size));
 			edge = edge || !search.isSame(getRawBiome(x - 1, z - 1));
 			edge = edge || !search.isSame(getRawBiome(x - 1, z + 1));
 			edge = edge || !search.isSame(getRawBiome(x + 1, z - 1));
