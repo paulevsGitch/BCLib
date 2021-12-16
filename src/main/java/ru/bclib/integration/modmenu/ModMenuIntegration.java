@@ -1,16 +1,19 @@
-package ru.bclib.integration;
+package ru.bclib.integration.modmenu;
 
 import com.google.common.collect.ImmutableMap;
 import com.terraformersmc.modmenu.api.ConfigScreenFactory;
 import com.terraformersmc.modmenu.api.ModMenuApi;
 import net.minecraft.client.gui.screens.Screen;
-import ru.bclib.integration.ModMenuIntegration.ModMenuScreenFactory;
+import ru.bclib.integration.modmenu.ModMenuIntegration.ModMenuScreenFactory;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
+@Deprecated
 class ModMenuScreenFactoryImpl {
 	record ScreenFactoryInvocationHandler(ModMenuScreenFactory act) implements InvocationHandler {
 		@Override
@@ -43,6 +46,7 @@ class ModMenuScreenFactoryImpl {
 	}
 }
 
+@Deprecated
 /**
  * Integration, to provide a custom Screen for ModMenu.
  * <p>
@@ -172,4 +176,5 @@ public abstract class ModMenuIntegration {
 			};
 		}
 	}
+	
 }

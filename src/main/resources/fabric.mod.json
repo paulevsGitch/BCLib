@@ -26,7 +26,9 @@
 		"server": [
 			"ru.bclib.server.BCLibServer"
 		],
-		"modmenu": [ "ru.bclib.gui.modmenu.EntryPoint::entrypointObject" ]
+		"modmenu": [
+			"ru.bclib.integration.modmenu.ModMenuEntryPoint"
+		]
 	},
 	"accessWidener" : "bclib.accesswidener",
 	"mixins": [

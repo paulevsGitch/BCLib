@@ -16,11 +16,11 @@ group = project.maven_group
 
 repositories {
 	maven { url "https://maven.dblsaiko.net/" }
-	maven { url "https://server.bbkr.space:8081/artifactory/libs-release/" }
 	maven { url "https://maven.fabricmc.net/" }	
 	maven { url "https://maven.shedaniel.me/" }
 	maven { url 'https://maven.blamejared.com' } 
 	maven { url 'https://jitpack.io' }
+    maven { url 'https://maven.terraformersmc.com/releases' }
 }
 
 loom {
@@ -32,6 +32,7 @@ dependencies {
 	mappings loom.officialMojangMappings()
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+	modImplementation "com.terraformersmc:modmenu:${project.modmenu_version}"
 	
 	//useApi "vazkii.patchouli:Patchouli:1.16.4-${project.patchouli_version}"
 }
