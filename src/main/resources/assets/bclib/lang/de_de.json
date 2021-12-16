@@ -26,7 +26,7 @@
 	"title.config.bclib.client.auto_sync.acceptConfigs": "Konfiguration von Server annehmen",
 	"title.config.bclib.client.auto_sync.acceptFiles": "Dateien von Server annehmen",
 	"title.config.bclib.client.auto_sync.acceptMods": "Mods von Server annehmen",
-	"title.config.bclib.client.auto_sync.displayModInfo": "Warnung anzeigen wen Mods auf Server/Client unterschiedlich",
+	"title.config.bclib.client.auto_sync.displayModInfo": "Warnung anzeigen, wenn Mods auf Server/Client unterschiedlich",
 	"title.config.bclib.client.auto_sync.debugHashes": "Erweiterete Logausgabe für Auto-Sync",
 	
 	"title.config.bclib.generator.options.useOldBiomeGenerator": "Alten 1.17 Biome Generator verwenden",
