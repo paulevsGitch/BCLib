@@ -7,18 +7,24 @@ import net.minecraft.data.BuiltinRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.levelgen.GenerationStep.Decoration;
 import net.minecraft.world.level.levelgen.SurfaceRules;
 import net.minecraft.world.level.levelgen.SurfaceRules.RuleSource;
 import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
+import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import org.jetbrains.annotations.Nullable;
 import ru.bclib.BCLib;
 import ru.bclib.api.biomes.BiomeAPI;
+import ru.bclib.util.Pair;
 import ru.bclib.util.WeightedList;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class BCLBiome {
 	private final List<ConfiguredStructureFeature> structures = Lists.newArrayList();
@@ -354,5 +360,23 @@ public class BCLBiome {
 			ResourceKey key = BiomeAPI.getBiomeKey(actualBiome);
 			BiomeAPI.addSurfaceRule(biomeID, SurfaceRules.ifTrue(SurfaceRules.isBiome(key), surface));
 		};
+	}
+	
+	private Map<Decoration, List<Supplier<PlacedFeature>>> features = new HashMap<>(0);
+	
+	/**
+	 * Sets the biome features.
+	 * @param features the feature list.
+	 */
+	public void setFeatures(Map<Decoration, List<Supplier<PlacedFeature>>> features) {
+		this.features = features;
+	}
+	
+	/**
+	 * Returns the built-in set of Features for this biome (as they were set with {@link #setFeatures(Map)})
+	 * @return List of all features
+	 */
+	public Map<Decoration, List<Supplier<PlacedFeature>>> getFeatures(){
+		return features;
 	}
 }

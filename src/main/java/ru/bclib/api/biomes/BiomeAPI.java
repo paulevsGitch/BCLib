@@ -140,8 +140,33 @@ public class BiomeAPI {
 	 * @param biomeRegistry - {@link Registry} for {@link Biome}.
 	 */
 	public static void initRegistry(Registry<Biome> biomeRegistry) {
-		BiomeAPI.biomeRegistry = biomeRegistry;
-		CLIENT.clear();
+		if (biomeRegistry != BiomeAPI.biomeRegistry) {
+			BiomeAPI.biomeRegistry = biomeRegistry;
+			CLIENT.clear();
+			
+			for (var entry : biomeRegistry.entrySet()){
+				onAddedBiome(entry.getValue());
+			}
+			RegistryEntryAddedCallback
+				.event(biomeRegistry)
+				.register((rawId, id, biome)->{
+					//BCLib.LOGGER.info(" #### " + rawId + ", " + biome + ", " + id);
+					onAddedBiome(biome);
+				});
+		}
+	}
+	
+	private static void onAddedBiome(Biome biome) {
+		//BCLib.LOGGER.info(" ++++ " + getBiomeID(biome) + ", " + getBiomeKey(biome) + ", " + biome);
+		for (var dim : MODIFICATIONS.keySet()) {
+			List<BiConsumer<ResourceLocation, Biome>> modifications = MODIFICATIONS.get(dim);
+			if (modifications == null) {
+				sortBiomeFeatures(biome);
+				return;
+			}
+			
+			applyModifications(modifications, biome);
+		}
 	}
 	
 	/**
@@ -515,6 +540,12 @@ public class BiomeAPI {
 				consumer.accept(biomeID, biome);
 			});
 		}
+		
+		final BCLBiome bclBiome = BiomeAPI.getBiome(biome);
+		if (bclBiome!=null) {
+			addBiomeFeature(biome, bclBiome.getFeatures());
+		}
+		
 		sortBiomeFeatures(biome);
 	}
 
@@ -579,22 +610,57 @@ public class BiomeAPI {
 	 *
 	 */
 	public static void addBiomeFeature(Biome biome, BCLFeature feature) {
-		addBiomeFeature(biome, feature.getPlacedFeature(), feature.getDecoration());
+		addBiomeFeature(biome, feature.getDecoration(), feature.getPlacedFeature());
 	}
 	
 	/**
 	 * Adds new features to existing biome.
 	 * @param biome {@link Biome} to add features in.
-	 * @param feature {@link ConfiguredFeature} to add.
 	 * @param step a {@link Decoration} step for the feature.
+	 * @param featureList {@link ConfiguredFeature} to add.
 	 */
-	public static void addBiomeFeature(Biome biome, PlacedFeature feature, Decoration step) {
+	public static void addBiomeFeature(Biome biome, Decoration step, PlacedFeature... featureList) {
+		addBiomeFeature(biome, step, List.of(featureList));
+	}
+	
+	/**
+	 * Adds new features to existing biome.
+	 * @param biome {@link Biome} to add features in.
+	 * @param step a {@link Decoration} step for the feature.
+	 * @param featureList List of {@link ConfiguredFeature} to add.
+	 */
+	public static void addBiomeFeature(Biome biome, Decoration step, List<PlacedFeature> featureList) {
 		BiomeGenerationSettingsAccessor accessor = (BiomeGenerationSettingsAccessor) biome.getGenerationSettings();
 		List<List<Supplier<PlacedFeature>>> allFeatures = CollectionsUtil.getMutable(accessor.bclib_getFeatures());
 		Set<PlacedFeature> set = CollectionsUtil.getMutable(accessor.bclib_getFeatureSet());
 		List<Supplier<PlacedFeature>> features = getFeaturesList(allFeatures, step);
-		features.add(() -> feature);
-		set.add(feature);
+		for (var feature : featureList) {
+			features.add(() -> feature);
+			set.add(feature);
+		}
+		accessor.bclib_setFeatures(allFeatures);
+		accessor.bclib_setFeatureSet(set);
+	}
+	
+	/**
+	 * Adds new features to existing biome.
+	 * @param biome {@link Biome} to add features in.
+	 * @param featureMap Map of {@link ConfiguredFeature} to add.
+	 */
+	public static void addBiomeFeature(Biome biome, Map<Decoration, List<Supplier<PlacedFeature>>> featureMap) {
+		BiomeGenerationSettingsAccessor accessor = (BiomeGenerationSettingsAccessor) biome.getGenerationSettings();
+		List<List<Supplier<PlacedFeature>>> allFeatures = CollectionsUtil.getMutable(accessor.bclib_getFeatures());
+		Set<PlacedFeature> set = CollectionsUtil.getMutable(accessor.bclib_getFeatureSet());
+		
+		for (Decoration step: featureMap.keySet()) {
+			List<Supplier<PlacedFeature>> features = getFeaturesList(allFeatures, step);
+			List<Supplier<PlacedFeature>> featureList = featureMap.get(step);
+			
+			for (Supplier<PlacedFeature> feature : featureList) {
+				features.add(feature);
+				set.add(feature.get());
+			}
+		}
 		accessor.bclib_setFeatures(allFeatures);
 		accessor.bclib_setFeatureSet(set);
 	}
@@ -606,7 +672,7 @@ public class BiomeAPI {
 	 * @param step a {@link Decoration} step for the feature.
 	 */
 	private static void addBiomeFeature(ResourceLocation biomeID, PlacedFeature feature, Decoration step) {
-		addBiomeFeature(BuiltinRegistries.BIOME.get(biomeID), feature, step);
+		addBiomeFeature(BuiltinRegistries.BIOME.get(biomeID), step, feature);
 	}
 	
 	/**
@@ -820,7 +886,6 @@ public class BiomeAPI {
 	public static void registerStructureEvents(){
 		DynamicRegistrySetupCallback.EVENT.register(registryManager -> {
 			Optional<? extends Registry<NoiseGeneratorSettings>> oGeneratorRegistry = registryManager.registry(Registry.NOISE_GENERATOR_SETTINGS_REGISTRY);
-			Optional<? extends Registry<Biome>> oBiomeRegistry = registryManager.registry(Registry.BIOME_REGISTRY);
 			
 			if (oGeneratorRegistry.isPresent()) {
 				RegistryEntryAddedCallback
@@ -841,23 +906,7 @@ public class BiomeAPI {
 					});
 			}
 			
-			if (oBiomeRegistry.isPresent()){
-				RegistryEntryAddedCallback
-					.event(oBiomeRegistry.get())
-					.register((rawId, id, biome)->{
-						//BCLib.LOGGER.info(" #### " + rawId + ", " + biome + ", " + id);
-						
-						for (var dim : MODIFICATIONS.keySet()) {
-							List<BiConsumer<ResourceLocation, Biome>> modifications = MODIFICATIONS.get(dim);
-							if (modifications == null) {
-								sortBiomeFeatures(biome);
-								return;
-							}
-
-							applyModifications(modifications, biome);
-						}
-					});
-			}
+			
 		});
 	}
 	

@@ -83,12 +83,12 @@ public class SurfaceRuleBuilder {
 	}
 	
 	/**
-	 * Set biome filler with specified {@link BlockState}. Example - stone in the Overworld biomes. The rule is added with priority 3.
+	 * Set biome filler with specified {@link BlockState}. Example - stone in the Overworld biomes. The rule is added with priority 10.
 	 * @param state {@link BlockState} for filling.
 	 * @return same {@link SurfaceRuleBuilder} instance.
 	 */
 	public SurfaceRuleBuilder filler(BlockState state) {
-		entryInstance = getFromCache("fill_" + state.toString(), () -> new SurfaceRuleEntry(3, SurfaceRules.state(state)));
+		entryInstance = getFromCache("fill_" + state.toString(), () -> new SurfaceRuleEntry(10, SurfaceRules.state(state)));
 		rules.add(entryInstance);
 		return this;
 	}

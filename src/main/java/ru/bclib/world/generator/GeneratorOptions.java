@@ -69,6 +69,14 @@ public class GeneratorOptions {
 		GeneratorOptions.farEndBiomesSqr = (long) distance * (long) distance;
 	}
 	
+	/**
+	 * Set distance of far End biomes generation, in blocks^2
+	 * @param distanceSqr the distance squared
+	 */
+	public static void setFarEndBiomesSqr(long distanceSqr) {
+		GeneratorOptions.farEndBiomesSqr = distanceSqr;
+	}
+	
 	public static boolean customNetherBiomeSource() {
 		return customNetherBiomeSource;
 	}
