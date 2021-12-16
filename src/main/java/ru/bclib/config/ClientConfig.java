@@ -5,6 +5,7 @@ import ru.bclib.api.dataexchange.handler.autosync.AutoSync;
 
 public class ClientConfig extends NamedPathConfig {
 	public static final ConfigToken<Boolean> ENABLED = ConfigToken.Boolean(true, "enabled", AutoSync.SYNC_CATEGORY);
+	
 	@ConfigUI(leftPadding = 8)
 	public static final DependendConfigToken<Boolean> ACCEPT_CONFIGS = DependendConfigToken.Boolean(true, "acceptConfigs", AutoSync.SYNC_CATEGORY, (config) -> config.get(ENABLED));
 	@ConfigUI(leftPadding = 8)

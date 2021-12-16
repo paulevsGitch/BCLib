@@ -28,6 +28,10 @@
 	"title.config.bclib.client.auto_sync.acceptMods": "Mods von Server annehmen",
 	"title.config.bclib.client.auto_sync.displayModInfo": "Warnung anzeigen wen Mods auf Server/Client unterschiedlich",
 	"title.config.bclib.client.auto_sync.debugHashes": "Erweiterete Logausgabe für Auto-Sync",
+	
+	"title.config.bclib.generator.options.useOldBiomeGenerator": "Alten 1.17 Biome Generator verwenden",
+	"title.config.bclib.main.patches.applyPatches": "Automatisches Anwenden von Patches beim Laden eines Levels",
+	"title.config.bclib.main.patches.repairBiomesOnLoad": "Biomesource beim Laden eines Levels reparieren",
 
 	"title.bclib.syncfiles.modInfo": "Mod Info",
 	"title.bclib.syncfiles.modlist": "Mod Information",

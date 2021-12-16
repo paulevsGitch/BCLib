@@ -288,7 +288,7 @@ public class DataFixerAPI {
 	}
 	
 	private static MigrationProfile loadProfileIfNeeded(File levelBaseDir){
-		if (!Configs.MAIN_CONFIG.getBoolean(Configs.MAIN_PATCH_CATEGORY, "applyPatches", true)) {
+		if (!Configs.MAIN_CONFIG.applyPatches()) {
 			LOGGER.info("World Patches are disabled");
 			return null;
 		}

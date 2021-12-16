@@ -13,7 +13,7 @@ import ru.bclib.interfaces.PatchFunction;
 public final class BCLibPatch {
 	public static void register(){
 		DataFixerAPI.registerPatch(BiomeSourcePatch::new);
-		if (Configs.MAIN_CONFIG.getBoolean("data_fixer", "repairBiomesOnLoad", false)) {
+		if (Configs.MAIN_CONFIG.repairBiomes()) {
 			DataFixerAPI.registerPatch(BiomeFixPatch::new);
 		}
 	}

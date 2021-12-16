@@ -22,7 +22,7 @@ import java.util.function.Supplier;
 public class MainScreen extends GridScreen{
 	
 	public MainScreen(@Nullable Screen parent) {
-		super(parent, new TranslatableComponent("title.bclib.modmenu.main"));
+		super(parent, new TranslatableComponent("title.bclib.modmenu.main"), 10, false);
 	}
 	
 	protected <T> TranslatableComponent getComponent(NamedPathConfig config, ConfigTokenDescription<T> option, String type){
@@ -72,6 +72,10 @@ public class MainScreen extends GridScreen{
 	protected void initLayout() {
 		final int BUTTON_HEIGHT = 20;
 		
+		Configs.GENERATOR_CONFIG.getAllOptions().stream().filter(o -> !o.hidden).forEach(o -> addRow(grid, Configs.GENERATOR_CONFIG, o));
+		grid.addSpacerRow(12);
+		Configs.MAIN_CONFIG.getAllOptions().stream().filter(o -> !o.hidden).forEach(o -> addRow(grid, Configs.MAIN_CONFIG, o));
+		grid.addSpacerRow(12);
 		Configs.CLIENT_CONFIG.getAllOptions().stream().filter(o -> !o.hidden).forEach(o -> addRow(grid, Configs.CLIENT_CONFIG, o));
 		
 		grid.addSpacerRow(15);
@@ -79,7 +83,10 @@ public class MainScreen extends GridScreen{
 		row.addFiller();
 		row.addButton(CommonComponents.GUI_DONE, BUTTON_HEIGHT, font, (button)->{
 			Configs.CLIENT_CONFIG.saveChanges();
+			Configs.GENERATOR_CONFIG.saveChanges();
+			Configs.MAIN_CONFIG.saveChanges();
 			onClose();
 		});
+		grid.addSpacerRow(10);
 	}
 }
