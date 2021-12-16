@@ -35,7 +35,7 @@ public class BCLBiome {
 	private float terrainHeight = 0.1F;
 	private float fogDensity = 1.0F;
 	private float genChance = 1.0F;
-	private float edgeSize = 0.0F;
+	private int edgeSize = 0;
 	private boolean vertical;
 	
 	/**
@@ -90,18 +90,18 @@ public class BCLBiome {
 	
 	/**
 	 * Getter for biome edge size.
-	 * @return edge size.
+	 * @return edge size in blocks.
 	 */
-	public float getEdgeSize() {
+	public int getEdgeSize() {
 		return edgeSize;
 	}
 	
 	/**
-	 * Set edges size for this biome. Size is in relative units to work fine with biome scale.
+	 * Set edges size for this biome. Size is in blocks.
 	 * @param size as a float value.
 	 * @return same {@link BCLBiome}.
 	 */
-	public BCLBiome setEdgeSize(float size) {
+	public BCLBiome setEdgeSize(int size) {
 		edgeSize = size;
 		return this;
 	}
