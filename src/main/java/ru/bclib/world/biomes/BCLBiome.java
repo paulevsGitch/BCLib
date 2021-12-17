@@ -15,10 +15,8 @@ import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import org.jetbrains.annotations.Nullable;
 import ru.bclib.BCLib;
 import ru.bclib.api.biomes.BiomeAPI;
-import ru.bclib.util.Pair;
 import ru.bclib.util.WeightedList;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -370,6 +368,7 @@ public class BCLBiome {
 	 */
 	public void setFeatures(Map<Decoration, List<Supplier<PlacedFeature>>> features) {
 		this.features = features;
+		BiomeAPI.addStepFeaturesToBiome(getBiome(), features);
 	}
 	
 	/**

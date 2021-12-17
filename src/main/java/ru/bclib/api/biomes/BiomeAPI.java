@@ -7,12 +7,14 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
+import com.mojang.serialization.Codec;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.event.registry.DynamicRegistrySetupCallback;
 import net.fabricmc.fabric.api.event.registry.RegistryEntryAddedCallback;
 import net.fabricmc.fabric.impl.biome.NetherBiomeData;
 import net.fabricmc.fabric.impl.biome.TheEndBiomeData;
+import net.fabricmc.fabric.impl.structure.FabricStructureImpl;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
@@ -45,16 +47,19 @@ import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
 import net.minecraft.world.level.levelgen.feature.StructureFeature;
+import net.minecraft.world.level.levelgen.feature.configurations.StructureFeatureConfiguration;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.jetbrains.annotations.Nullable;
 import ru.bclib.BCLib;
 import ru.bclib.config.Configs;
 import ru.bclib.entity.BCLEntityWrapper;
+import ru.bclib.interfaces.BiomeSourceAccessor;
 import ru.bclib.interfaces.SurfaceMaterialProvider;
 import ru.bclib.interfaces.SurfaceProvider;
 import ru.bclib.interfaces.SurfaceRuleProvider;
 import ru.bclib.mixin.common.BiomeGenerationSettingsAccessor;
+import ru.bclib.mixin.common.BiomeSourceMixin;
 import ru.bclib.mixin.common.MobSpawnSettingsAccessor;
 import ru.bclib.mixin.common.StructureSettingsAccessor;
 import ru.bclib.util.CollectionsUtil;
@@ -67,14 +72,15 @@ import ru.bclib.world.structures.BCLStructureFeature;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -118,21 +124,19 @@ public class BiomeAPI {
 			return;
 		}
 		
-		BuiltinRegistries.BIOME
-			.entrySet()
-			.stream()
-			.filter(entry -> entry.getKey().location().getNamespace().equals("minecraft"))
-			.map(entry -> entry.getValue())
-			.forEach(biome -> {
-				BiomeGenerationSettingsAccessor accessor = BiomeGenerationSettingsAccessor.class.cast(biome.getGenerationSettings());
-				List<List<Supplier<PlacedFeature>>> features = accessor.bclib_getFeatures();
-				features.forEach(step -> {
-					step.forEach(provider -> {
-						PlacedFeature feature = provider.get();
-						FEATURE_ORDER.computeIfAbsent(feature, f -> FEATURE_ORDER_ID.getAndIncrement());
-					});
-				});
-			});
+		BuiltinRegistries.BIOME.entrySet()
+							   .stream()
+							   .filter(entry -> entry.getKey()
+													 .location()
+													 .getNamespace()
+													 .equals("minecraft"))
+							   .map(Entry::getValue)
+							   .map(biome -> (BiomeGenerationSettingsAccessor) biome.getGenerationSettings())
+							   .map(BiomeGenerationSettingsAccessor::bclib_getFeatures)
+							   .forEach(stepFeatureSuppliers -> stepFeatureSuppliers.forEach(step -> step.forEach(featureSupplier -> {
+								   PlacedFeature feature = featureSupplier.get();
+								   FEATURE_ORDER.computeIfAbsent(feature, f -> FEATURE_ORDER_ID.getAndIncrement());
+							   })));
 	}
 	
 	/**
@@ -156,17 +160,56 @@ public class BiomeAPI {
 		}
 	}
 	
+	private static final Set<BiomeSource> worldSources = new HashSet<>();
+	
+	/**
+	 * For internal use only.
+	 *
+	 * Used by {@link BiomeSourceMixin} to add new BiomeSources to the BiomeAPI. We need to know all
+	 * created Sources in order to rebuild their feature set whenever biomes get recreated
+	 * through a datapack.
+	 * @param source The new {@link BiomeSource}
+	 */
+	public static void registerBiomeSource(BiomeSource source){
+		worldSources.add(source);
+	}
+	
+	/**
+	 * For internal use only.
+	 *
+	 * This method gets called before a world is loaded/created to flush cashes we build. The Method is
+	 * called from  {@link ru.bclib.mixin.client.MinecraftMixin}
+	 */
+	public static void prepareWorldData(){
+		structureStarts.clear();
+		worldSources.clear();
+	}
+	
+	/**
+	 * Registered by {@link #initRegistry(Registry)} as a callback for whenever a new Biome was
+	 * added to our registry
+	 * @param biome The {@link Biome} that got added
+	 */
 	private static void onAddedBiome(Biome biome) {
+		boolean didChange = false;
 		//BCLib.LOGGER.info(" ++++ " + getBiomeID(biome) + ", " + getBiomeKey(biome) + ", " + biome);
 		for (var dim : MODIFICATIONS.keySet()) {
 			List<BiConsumer<ResourceLocation, Biome>> modifications = MODIFICATIONS.get(dim);
 			if (modifications == null) {
 				sortBiomeFeatures(biome);
-				return;
+				continue;
 			}
 			
-			applyModifications(modifications, biome);
+			didChange=true;
+			applyModificationsToBiome(modifications, biome);
 		}
+		
+//		if (didChange) {
+//			worldSources.stream()
+//						.filter(s -> s.possibleBiomes()
+//									  .contains(biome))
+//						.forEach(s -> ((BiomeSourceAccessor) s).bclRebuildFeatures());
+//		}
 	}
 	
 	/**
@@ -214,7 +257,7 @@ public class BiomeAPI {
 			MHelper.randRange(-1.5F, 1.5F, random),
 			random.nextFloat()
 		);
-		ResourceKey<Biome> key = BuiltinRegistries.BIOME.getResourceKey(biome.getBiome()).get();
+		ResourceKey<Biome> key = BuiltinRegistries.BIOME.getResourceKey(biome.getBiome()).orElseThrow();
 		NetherBiomeData.addNetherBiome(key, parameters);
 		return biome;
 	}
@@ -244,7 +287,7 @@ public class BiomeAPI {
 		configureBiome(biome);
 		END_LAND_BIOME_PICKER.addBiome(biome);
 		float weight = biome.getGenChance();
-		ResourceKey<Biome> key = BuiltinRegistries.BIOME.getResourceKey(biome.getBiome()).get();
+		ResourceKey<Biome> key = BuiltinRegistries.BIOME.getResourceKey(biome.getBiome()).orElseThrow();
 		TheEndBiomeData.addEndBiomeReplacement(Biomes.END_HIGHLANDS, key, weight);
 		TheEndBiomeData.addEndBiomeReplacement(Biomes.END_MIDLANDS, key, weight);
 		return biome;
@@ -290,7 +333,7 @@ public class BiomeAPI {
 		configureBiome(biome);
 		END_VOID_BIOME_PICKER.addBiome(biome);
 		float weight = biome.getGenChance();
-		ResourceKey<Biome> key = BuiltinRegistries.BIOME.getResourceKey(biome.getBiome()).get();
+		ResourceKey<Biome> key = BuiltinRegistries.BIOME.getResourceKey(biome.getBiome()).orElseThrow();
 		TheEndBiomeData.addEndBiomeReplacement(Biomes.SMALL_END_ISLANDS, key, weight);
 		return biome;
 	}
@@ -317,7 +360,6 @@ public class BiomeAPI {
 	 * @return {@link BCLBiome}
 	 */
 	public static BCLBiome registerEndVoidBiome(Biome biome, float genChance) {
-		ResourceKey<Biome> key = BuiltinRegistries.BIOME.getResourceKey(biome).get();
 		BCLBiome bclBiome = new BCLBiome(biome).setGenChance(genChance);
 		configureBiome(bclBiome);
 		END_VOID_BIOME_PICKER.addBiome(bclBiome);
@@ -361,8 +403,9 @@ public class BiomeAPI {
 	 */
 	@Nullable
 	public static ResourceKey getBiomeKey(Biome biome) {
-		ResourceKey key = BuiltinRegistries.BIOME.getResourceKey(biome).orElse(null);
-		return key != null ? key : biomeRegistry != null ? biomeRegistry.getResourceKey(biome).orElse(null) : null;
+		return BuiltinRegistries.BIOME.getResourceKey(biome)
+									  .orElseGet(() -> biomeRegistry != null ? biomeRegistry.getResourceKey(biome)
+																							.orElse(null) : null);
 	}
 	
 	/**
@@ -460,11 +503,7 @@ public class BiomeAPI {
 	 * @param modification {@link BiConsumer} with {@link ResourceKey} biome ID and {@link Biome} parameters.
 	 */
 	public static void registerBiomeModification(ResourceKey dimensionID, BiConsumer<ResourceLocation, Biome> modification) {
-		List<BiConsumer<ResourceLocation, Biome>> modifications = MODIFICATIONS.get(dimensionID);
-		if (modifications == null) {
-			modifications = Lists.newArrayList();
-			MODIFICATIONS.put(dimensionID, modifications);
-		}
+		List<BiConsumer<ResourceLocation, Biome>> modifications = MODIFICATIONS.computeIfAbsent(dimensionID, k -> Lists.newArrayList());
 		modifications.add(modification);
 	}
 	
@@ -521,11 +560,13 @@ public class BiomeAPI {
 		}
 		
 		biomes.forEach(biome -> {
-			applyModifications(modifications, biome);
+			applyModificationsToBiome(modifications, biome);
 		});
+		
+		((BiomeSourceAccessor) source).bclRebuildFeatures();
 	}
 
-	private static void applyModifications(List<BiConsumer<ResourceLocation, Biome>> modifications, Biome biome) {
+	private static void applyModificationsToBiome(List<BiConsumer<ResourceLocation, Biome>> modifications, Biome biome) {
 		ResourceLocation biomeID = getBiomeID(biome);
 		boolean modify = isDatapackBiome(biomeID);
 		if (biome != BuiltinRegistries.BIOME.get(biomeID)) {
@@ -543,7 +584,7 @@ public class BiomeAPI {
 		
 		final BCLBiome bclBiome = BiomeAPI.getBiome(biome);
 		if (bclBiome!=null) {
-			addBiomeFeature(biome, bclBiome.getFeatures());
+			addStepFeaturesToBiome(biome, bclBiome.getFeatures());
 		}
 		
 		sortBiomeFeatures(biome);
@@ -551,7 +592,7 @@ public class BiomeAPI {
 
 	public static void sortBiomeFeatures(Biome biome) {
 		BiomeGenerationSettings settings = biome.getGenerationSettings();
-		BiomeGenerationSettingsAccessor accessor = BiomeGenerationSettingsAccessor.class.cast(settings);
+		BiomeGenerationSettingsAccessor accessor = (BiomeGenerationSettingsAccessor) settings;
 		List<List<Supplier<PlacedFeature>>> featureList = CollectionsUtil.getMutable(accessor.bclib_getFeatures());
 		final int size = featureList.size();
 		for (int i = 0; i < size; i++) {
@@ -629,13 +670,13 @@ public class BiomeAPI {
 	 * @param step a {@link Decoration} step for the feature.
 	 * @param featureList List of {@link ConfiguredFeature} to add.
 	 */
-	public static void addBiomeFeature(Biome biome, Decoration step, List<PlacedFeature> featureList) {
+	private static void addBiomeFeature(Biome biome, Decoration step, List<PlacedFeature> featureList) {
 		BiomeGenerationSettingsAccessor accessor = (BiomeGenerationSettingsAccessor) biome.getGenerationSettings();
 		List<List<Supplier<PlacedFeature>>> allFeatures = CollectionsUtil.getMutable(accessor.bclib_getFeatures());
 		Set<PlacedFeature> set = CollectionsUtil.getMutable(accessor.bclib_getFeatureSet());
 		List<Supplier<PlacedFeature>> features = getFeaturesList(allFeatures, step);
 		for (var feature : featureList) {
-			features.add(() -> feature);
+			features.add(() ->  feature);
 			set.add(feature);
 		}
 		accessor.bclib_setFeatures(allFeatures);
@@ -643,11 +684,14 @@ public class BiomeAPI {
 	}
 	
 	/**
-	 * Adds new features to existing biome.
+	 * For internal use only!
+	 *
+	 * Adds new features to existing biome. Called from {@link BCLBiome#setFeatures(Map)} when the Biome is
+	 * first built, and from {@link #onAddedBiome(Biome)} whenever a Biome is readded through a Datapack
 	 * @param biome {@link Biome} to add features in.
 	 * @param featureMap Map of {@link ConfiguredFeature} to add.
 	 */
-	public static void addBiomeFeature(Biome biome, Map<Decoration, List<Supplier<PlacedFeature>>> featureMap) {
+	public static void addStepFeaturesToBiome(Biome biome, Map<Decoration, List<Supplier<PlacedFeature>>> featureMap) {
 		BiomeGenerationSettingsAccessor accessor = (BiomeGenerationSettingsAccessor) biome.getGenerationSettings();
 		List<List<Supplier<PlacedFeature>>> allFeatures = CollectionsUtil.getMutable(accessor.bclib_getFeatures());
 		Set<PlacedFeature> set = CollectionsUtil.getMutable(accessor.bclib_getFeatureSet());
@@ -666,34 +710,6 @@ public class BiomeAPI {
 	}
 	
 	/**
-	 * Adds new features to existing biome.
-	 * @param biomeID {@link ResourceLocation} of the {@link Biome} to add features in.
-	 * @param feature {@link ConfiguredFeature} to add.
-	 * @param step a {@link Decoration} step for the feature.
-	 */
-	private static void addBiomeFeature(ResourceLocation biomeID, PlacedFeature feature, Decoration step) {
-		addBiomeFeature(BuiltinRegistries.BIOME.get(biomeID), step, feature);
-	}
-	
-	/**
-	 * Adds new features to existing biome.
-	 * @param biome {@link Biome} to add features in.
-	 * @param features array of {@link BCLFeature} to add.
-	 */
-	public static void addBiomeFeatures(Biome biome, BCLFeature... features) {
-		BiomeGenerationSettingsAccessor accessor = (BiomeGenerationSettingsAccessor) biome.getGenerationSettings();
-		List<List<Supplier<PlacedFeature>>> allFeatures = CollectionsUtil.getMutable(accessor.bclib_getFeatures());
-		Set<PlacedFeature> set = CollectionsUtil.getMutable(accessor.bclib_getFeatureSet());
-		for (BCLFeature feature: features) {
-			List<Supplier<PlacedFeature>> featureList = getFeaturesList(allFeatures, feature.getDecoration());
-			featureList.add(() -> feature.getPlacedFeature());
-			set.add(feature.getPlacedFeature());
-		}
-		accessor.bclib_setFeatures(allFeatures);
-		accessor.bclib_setFeatureSet(set);
-	}
-	
-	/**
 	 * Adds new structure feature to existing biome.
 	 * @param biomeKey {@link ResourceKey} for the {@link Biome} to add structure feature in.
 	 * @param structure {@link ConfiguredStructureFeature} to add.
@@ -703,17 +719,26 @@ public class BiomeAPI {
 			BCLib.LOGGER.error("null is not a valid biomeKey for " + structure);
 			return;
 		}
-		changeStructureStarts(biomeKey.location(), structure, structureMap -> {
+		changeStructureStarts(biomeKey.location(), structure, (structureMap, configMap) -> {
 			Multimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>> configuredMap = structureMap.computeIfAbsent(structure.feature, k -> HashMultimap.create());
 			configuredMap.put(structure, biomeKey);
+			
+			StructureFeatureConfiguration config = FabricStructureImpl.STRUCTURE_TO_CONFIG_MAP.get(structure.feature);
+			if (config!=null){
+				configMap.put(structure.feature, config);
+			}
 		});
 	}
 	
 	public static void addBiomeStructure(Biome biome, ConfiguredStructureFeature structure) {
-		changeStructureStarts(BiomeAPI.getBiomeID(biome), structure, structureMap -> {
+		changeStructureStarts(BiomeAPI.getBiomeID(biome), structure, (structureMap, configMap) -> {
 			Multimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>> configuredMap = structureMap.computeIfAbsent(structure.feature, k -> HashMultimap.create());
 			var key = getBiomeKey(biome);
 			if (key!=null) {
+				StructureFeatureConfiguration config = FabricStructureImpl.STRUCTURE_TO_CONFIG_MAP.get(structure.feature);
+				if (config!=null){
+					configMap.put(structure.feature, config);
+				}
 				configuredMap.put(structure, key);
 			} else {
 				BCLib.LOGGER.warning("Unable to find Biome " + getBiomeID(biome));
@@ -881,11 +906,13 @@ public class BiomeAPI {
 		}
 	}
 	
-	private final static Map<StructureID, Consumer<Map<StructureFeature<?>, Multimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>>>>> structureStarts = new HashMap<>();
+	private final static Map<StructureID, BiConsumer<Map<StructureFeature<?>, Multimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>>>, Map<StructureFeature<?>, StructureFeatureConfiguration>>> structureStarts = new HashMap<>();
 	
 	public static void registerStructureEvents(){
 		DynamicRegistrySetupCallback.EVENT.register(registryManager -> {
 			Optional<? extends Registry<NoiseGeneratorSettings>> oGeneratorRegistry = registryManager.registry(Registry.NOISE_GENERATOR_SETTINGS_REGISTRY);
+			Optional<? extends Registry<Codec<? extends BiomeSource>>> oBiomeSourceRegistry = registryManager.registry(Registry.BIOME_SOURCE_REGISTRY);
+			
 			
 			if (oGeneratorRegistry.isPresent()) {
 				RegistryEntryAddedCallback
@@ -895,7 +922,7 @@ public class BiomeAPI {
 						
 						//add back modded structures
 						StructureSettingsAccessor a = (StructureSettingsAccessor)settings.structureSettings();
-						structureStarts.values().forEach(modifier -> changeStructureStarts(a, modifier));
+						structureStarts.entrySet().forEach(entry -> changeStructureStarts(a, entry.getValue()));
 						
 						//add surface rules
 						if (biomeRegistry!=null) {
@@ -919,11 +946,7 @@ public class BiomeAPI {
 		}
 	}
 	
-	public static void clearStructureStarts(){
-		structureStarts.clear();
-	}
-	
-	private static void changeStructureStarts(ResourceLocation id, ConfiguredStructureFeature structure, Consumer<Map<StructureFeature<?>, Multimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>>>> modifier) {
+	private static void changeStructureStarts(ResourceLocation id, ConfiguredStructureFeature structure, BiConsumer<Map<StructureFeature<?>, Multimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>>>, Map<StructureFeature<?>, StructureFeatureConfiguration>> modifier) {
 		structureStarts.put(new StructureID(id, structure), modifier);
 		Registry<NoiseGeneratorSettings> chunkGenSettingsRegistry = BuiltinRegistries.NOISE_GENERATOR_SETTINGS;
 		
@@ -934,11 +957,17 @@ public class BiomeAPI {
 	}
 	
 	
-	private static void changeStructureStarts(StructureSettingsAccessor access, Consumer<Map<StructureFeature<?>, Multimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>>>> modifier) {
+	private static void changeStructureStarts(StructureSettingsAccessor access, BiConsumer<Map<StructureFeature<?>, Multimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>>>, Map<StructureFeature<?>, StructureFeatureConfiguration>> modifier) {
 			Map<StructureFeature<?>, Multimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>>> structureMap;
-			structureMap = getMutableStructureConfig(access);
-			modifier.accept(structureMap);
-			setMutableStructureConfig(access, structureMap);
+			Map<StructureFeature<?>, StructureFeatureConfiguration> configMap;
+			
+			structureMap = getMutableConfiguredStructures(access);
+			configMap = getMutableStructureConfig(access);
+			
+			modifier.accept(structureMap, configMap);
+			
+			setMutableConfiguredStructures(access, structureMap);
+			setMutableStructureConfig(access, configMap);
 	}
 	
 	private static void sortFeatures(List<Supplier<PlacedFeature>> features) {
@@ -1000,7 +1029,7 @@ public class BiomeAPI {
 	}
 	
 	//inspired by net.fabricmc.fabric.impl.biome.modification.BiomeStructureStartsImpl
-	private static Map<StructureFeature<?>, Multimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>>> getMutableStructureConfig(StructureSettingsAccessor access) {
+	private static Map<StructureFeature<?>, Multimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>>> getMutableConfiguredStructures(StructureSettingsAccessor access) {
 		ImmutableMap<StructureFeature<?>, ImmutableMultimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>>> configuredStructures = access.bcl_getConfiguredStructures();
 		Map<StructureFeature<?>, Multimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>>> result = new HashMap<>(configuredStructures.size());
 		
@@ -1012,12 +1041,20 @@ public class BiomeAPI {
 	}
 	
 	//inspired by net.fabricmc.fabric.impl.biome.modification.BiomeStructureStartsImpl
-	private static void setMutableStructureConfig(StructureSettingsAccessor access, Map<StructureFeature<?>, Multimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>>> structureStarts) {
+	private static void setMutableConfiguredStructures(StructureSettingsAccessor access, Map<StructureFeature<?>, Multimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>>> structureStarts) {
 		access.bcl_setConfiguredStructures(
 			structureStarts
 				.entrySet()
 				.stream()
 				.collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, e -> ImmutableMultimap.copyOf(e.getValue())))
 		);
+	}
+	
+	private static Map<StructureFeature<?>, StructureFeatureConfiguration> getMutableStructureConfig(StructureSettingsAccessor access) {
+		return CollectionsUtil.getMutable(access.bcl_getStructureConfig());
+	}
+	
+	private static void setMutableStructureConfig(StructureSettingsAccessor access, Map<StructureFeature<?>, StructureFeatureConfiguration> structureConfig) {
+		access.bcl_setStructureConfig(structureConfig);
 	}
 }

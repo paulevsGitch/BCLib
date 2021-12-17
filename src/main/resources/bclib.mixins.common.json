@@ -39,7 +39,8 @@
 		"AnvilMenuMixin",
 		"TagLoaderMixin",
 		"MainMixin",
-		"SurfaceRulesContextAccessor"
+		"SurfaceRulesContextAccessor",
+		"BiomeSourceMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

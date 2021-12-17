@@ -21,7 +21,7 @@ public abstract class BCLBiomeSource extends BiomeSource {
 
 		this.seed = seed;
 		this.biomeRegistry = biomeRegistry;
-
+		
 		BiomeAPI.initRegistry(biomeRegistry);
 	}
 }

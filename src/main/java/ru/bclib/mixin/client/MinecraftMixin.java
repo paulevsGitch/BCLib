@@ -61,7 +61,7 @@ public abstract class MinecraftMixin {
 	@Inject(method = "loadLevel", cancellable = true, at = @At("HEAD"))
 	private void bclib_callFixerOnLoad(String levelID, CallbackInfo ci) {
 		DataExchangeAPI.prepareServerside();
-		BiomeAPI.clearStructureStarts();
+		BiomeAPI.prepareWorldData();
 		
 		if (DataFixerAPI.fixData(this.levelSource, levelID, true, (appliedFixes) -> {
 			LifeCycleAPI._runBeforeLevelLoad();
@@ -76,6 +76,9 @@ public abstract class MinecraftMixin {
 	
 	@Inject(method = "createLevel", at = @At("HEAD"))
 	private void bclib_initPatchData(String levelID, LevelSettings levelSettings, RegistryHolder registryHolder, WorldGenSettings worldGenSettings, CallbackInfo ci) {
+		DataExchangeAPI.prepareServerside();
+		BiomeAPI.prepareWorldData();
+		
 		DataFixerAPI.initializeWorldData(this.levelSource, levelID, true);
 		LifeCycleAPI._runBeforeLevelLoad();
 	}
