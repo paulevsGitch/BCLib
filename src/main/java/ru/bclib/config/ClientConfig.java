@@ -4,6 +4,9 @@ import ru.bclib.BCLib;
 import ru.bclib.api.dataexchange.handler.autosync.AutoSync;
 
 public class ClientConfig extends NamedPathConfig {
+	public static final ConfigToken<Boolean> SUPPRESS_EXPERIMENTAL_DIALOG = ConfigToken.Boolean(false, "suppressExperimentalDialogOnLoad", "ui");
+	
+	@ConfigUI(topPadding = 12)
 	public static final ConfigToken<Boolean> ENABLED = ConfigToken.Boolean(true, "enabled", AutoSync.SYNC_CATEGORY);
 	
 	@ConfigUI(leftPadding = 8)
@@ -45,5 +48,8 @@ public class ClientConfig extends NamedPathConfig {
 
 	public boolean isShowingModInfo() {
 		return get(DISPLAY_MOD_INFO) /*&& isAllowingAutoSync()*/;
+	}
+	public boolean suppressExperimentalDialog() {
+		return get(SUPPRESS_EXPERIMENTAL_DIALOG);
 	}
 }

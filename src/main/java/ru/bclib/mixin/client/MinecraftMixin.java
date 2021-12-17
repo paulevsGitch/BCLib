@@ -26,6 +26,7 @@ import ru.bclib.api.LifeCycleAPI;
 import ru.bclib.api.biomes.BiomeAPI;
 import ru.bclib.api.dataexchange.DataExchangeAPI;
 import ru.bclib.api.datafixer.DataFixerAPI;
+import ru.bclib.config.Configs;
 import ru.bclib.interfaces.CustomColorProvider;
 
 import java.util.function.Function;
@@ -71,6 +72,11 @@ public abstract class MinecraftMixin {
 		}
 		else {
 			LifeCycleAPI._runBeforeLevelLoad();
+		}
+		
+		if (Configs.CLIENT_CONFIG.suppressExperimentalDialog()) {
+			this.doLoadLevel(levelID, RegistryAccess.builtin(), Minecraft::loadDataPacks, Minecraft::loadWorldData, false, ExperimentalDialogType.NONE);
+			ci.cancel();
 		}
 	}
 	

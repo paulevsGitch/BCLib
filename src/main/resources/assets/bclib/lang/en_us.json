@@ -32,6 +32,7 @@
 	"title.config.bclib.generator.options.useOldBiomeGenerator": "Use legacy 1.17 Biome Generator",
 	"title.config.bclib.main.patches.applyPatches": "Automatically apply patches when loading level",
 	"title.config.bclib.main.patches.repairBiomesOnLoad": "Fix Biomesource on level load",
+	"title.config.bclib.client.ui.suppressExperimentalDialogOnLoad": "Disable Experimental Warning Screen on Load",
 
 	"title.bclib.syncfiles.modInfo": "Mod Info",
 	"title.bclib.syncfiles.modlist": "Mod Information",
