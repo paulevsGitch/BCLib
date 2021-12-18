@@ -15,6 +15,7 @@ import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import org.jetbrains.annotations.Nullable;
 import ru.bclib.BCLib;
 import ru.bclib.api.biomes.BiomeAPI;
+import ru.bclib.config.Configs;
 import ru.bclib.util.WeightedList;
 
 import java.util.HashMap;
@@ -387,5 +388,30 @@ public class BCLBiome {
 	 */
 	public String configGroup() {
 		return biomeID.getNamespace() + "." + biomeID.getPath();
+	}
+	
+	private boolean didLoadConfig = false;
+	/**
+	 * Set Biome configuartion from Config
+	 * @return This instance
+	 */
+	public BCLBiome setupFromConfig() {
+		if (didLoadConfig) return this;
+		didLoadConfig = true;
+		
+		String group = this.configGroup();
+		float chance = Configs.BIOMES_CONFIG.getFloat(group, "generation_chance", this.getGenChance());
+		float fog = Configs.BIOMES_CONFIG.getFloat(group, "fog_density", this.getFogDensity());
+		this.setGenChance(chance)
+				.setFogDensity(fog);
+		
+		if (this.getEdge()!=null){
+			int edgeSize = Configs.BIOMES_CONFIG.getInt(group, "edge_size", this.getEdgeSize());
+			this.setEdgeSize(edgeSize);
+		}
+		
+		Configs.BIOMES_CONFIG.saveChanges();
+		
+		return this;
 	}
 }
