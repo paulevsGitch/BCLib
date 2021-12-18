@@ -4,6 +4,8 @@ import net.minecraft.core.Registry;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeSource;
 import ru.bclib.api.biomes.BiomeAPI;
+import ru.bclib.config.Configs;
+import ru.bclib.world.biomes.BCLBiome;
 
 import java.util.List;
 
@@ -23,5 +25,29 @@ public abstract class BCLBiomeSource extends BiomeSource {
 		this.biomeRegistry = biomeRegistry;
 		
 		BiomeAPI.initRegistry(biomeRegistry);
+	}
+	
+	
+	
+	/**
+	 * Set Biome configuartion from Config
+	 * @param bclBiome The biome you want to configure
+	 * @return The input biome
+	 */
+	public static BCLBiome setupFromConfig(BCLBiome bclBiome) {
+		String group = bclBiome.configGroup();
+		float chance = Configs.BIOMES_CONFIG.getFloat(group, "generation_chance", bclBiome.getGenChance());
+		float fog = Configs.BIOMES_CONFIG.getFloat(group, "fog_density", bclBiome.getFogDensity());
+		bclBiome.setGenChance(chance)
+				.setFogDensity(fog);
+		
+		if (bclBiome.getEdge()!=null){
+			int edgeSize = Configs.BIOMES_CONFIG.getInt(group, "edge_size", bclBiome.getEdgeSize());
+			bclBiome.setEdgeSize(edgeSize);
+		}
+		
+		Configs.BIOMES_CONFIG.saveChanges();
+		
+		return bclBiome;
 	}
 }

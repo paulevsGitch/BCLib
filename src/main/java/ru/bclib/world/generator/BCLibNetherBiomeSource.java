@@ -58,30 +58,19 @@ public class BCLibNetherBiomeSource extends BCLBiomeSource {
 	public BCLibNetherBiomeSource(Registry<Biome> biomeRegistry, long seed) {
 		super(biomeRegistry, seed, getBiomes(biomeRegistry));
 		
-
 		BiomeAPI.NETHER_BIOME_PICKER.clearMutables();
 		
 		this.possibleBiomes().forEach(biome -> {
 			ResourceLocation key = biomeRegistry.getKey(biome);
-			String group = key.getNamespace() + "." + key.getPath();
+			
 			if (!BiomeAPI.hasBiome(key)) {
-				float chance = Configs.BIOMES_CONFIG.getFloat(group, "generation_chance", 1.0F);
-				float fog = Configs.BIOMES_CONFIG.getFloat(group, "fog_density", 1.0F);
-				BCLBiome bclBiome = new BCLBiome(key, biome).setGenChance(chance).setFogDensity(fog);
+				BCLBiome bclBiome = setupFromConfig(new BCLBiome(key, biome));
 				BiomeAPI.NETHER_BIOME_PICKER.addBiomeMutable(bclBiome);
 			}
 			else {
 				BCLBiome bclBiome = BiomeAPI.getBiome(key);
 				if (bclBiome != BiomeAPI.EMPTY_BIOME) {
-					float chance = Configs.BIOMES_CONFIG.getFloat(group, "generation_chance", bclBiome.getGenChance());
-					float fog = Configs.BIOMES_CONFIG.getFloat(group, "fog_density", bclBiome.getFogDensity());
-					bclBiome.setGenChance(chance)
-							.setFogDensity(fog);
-					
-					if (bclBiome.getEdgeSize()!=0){
-						int edgeSize = Configs.BIOMES_CONFIG.getInt(group, "edge_size", bclBiome.getEdgeSize());
-						bclBiome.setEdgeSize(edgeSize);
-					}
+					setupFromConfig(bclBiome);
 					
 					if (bclBiome.getParentBiome() == null) {
 						if (!BiomeAPI.NETHER_BIOME_PICKER.containsImmutable(key)) {
@@ -92,7 +81,6 @@ public class BCLibNetherBiomeSource extends BCLBiomeSource {
 			}
 		});
 		
-		Configs.BIOMES_CONFIG.saveChanges();
 		BiomeAPI.NETHER_BIOME_PICKER.getBiomes().forEach(biome -> biome.updateActualBiomes(biomeRegistry));
 		BiomeAPI.NETHER_BIOME_PICKER.rebuild();
 		

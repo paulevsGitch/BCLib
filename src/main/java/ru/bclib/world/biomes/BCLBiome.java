@@ -378,4 +378,14 @@ public class BCLBiome {
 	public Map<Decoration, List<Supplier<PlacedFeature>>> getFeatures(){
 		return features;
 	}
+	
+	/**
+	 * Returns the group used in the config Files for this biome
+	 *
+	 * Example: {@code Configs.BIOMES_CONFIG.getFloat(configGroup(), "generation_chance", 1.0);}
+	 * @return The group name
+	 */
+	public String configGroup() {
+		return biomeID.getNamespace() + "." + biomeID.getPath();
+	}
 }
