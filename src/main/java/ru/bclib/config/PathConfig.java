@@ -5,6 +5,8 @@ import ru.bclib.config.ConfigKeeper.Entry;
 import ru.bclib.config.ConfigKeeper.FloatRange;
 import ru.bclib.config.ConfigKeeper.IntegerRange;
 
+import java.util.List;
+
 public class PathConfig extends Config {
 	public PathConfig(String modID, String group, boolean autoSync, boolean diffContent) {
 		super(modID, group, autoSync, diffContent);
@@ -93,6 +95,18 @@ public class PathConfig extends Config {
 	
 	public boolean setBoolean(String category, String key, boolean value) {
 		return this.setBoolean(createKey(category, key), value);
+	}
+	
+	public List<String> getStringArray(String category, String key, List<String> defaultValue) {
+		return this.getStringArray(createKey(category, key), defaultValue);
+	}
+	
+	public List<String> getStringArray(String category, String key) {
+		return this.getStringArray(createKey(category, key));
+	}
+	
+	public boolean setStringArray(String category, String key, List<String> value) {
+		return this.setStringArray(createKey(category, key), value);
 	}
 	
 	// From Root
