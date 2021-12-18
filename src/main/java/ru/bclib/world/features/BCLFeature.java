@@ -101,15 +101,68 @@ public class BCLFeature {
 	 * @param hostBlock {@link Block} to generate feature in.
 	 * @param veins iterations per chunk.
 	 * @param veinSize size of ore vein.
+	 * @param airDiscardChance chance that this orge gets discarded when it is exposed to air
+	 * @param minY minimum height
+	 * @param maxY maximum height.
+	 * @return new BCLFeature instance.
+	 */
+	public static BCLFeature makeOreFeature(ResourceLocation id, Block blockOre, Block hostBlock, int veins, int veinSize, float airDiscardChance, int minY, int maxY) {
+		return makeOreFeature(id, blockOre, hostBlock, veins, veinSize, airDiscardChance, VerticalAnchor.absolute(minY), VerticalAnchor.absolute(maxY), false);
+	}
+	
+	/**
+	 * Will create a basic ore feature.
+	 * @param id {@link ResourceLocation} feature ID.
+	 * @param blockOre {@link Decoration} feature step.
+	 * @param hostBlock {@link Block} to generate feature in.
+	 * @param veins iterations per chunk.
+	 * @param veinSize size of ore vein.
+	 * @param airDiscardChance chance that this orge gets discarded when it is exposed to air
+	 * @param minY A {@link VerticalAnchor} for the minimum height, for example
+	 *				{@code VerticalAnchor.bottom()}, {@code VerticalAnchor.absolute(10)}, {@code VerticalAnchor.aboveBottom(10)}
+	 * @param maxY A {@link VerticalAnchor} for the maximum height.
+	 * @return new BCLFeature instance.
+	 */
+	public static BCLFeature makeOreFeature(ResourceLocation id, Block blockOre, Block hostBlock, int veins, int veinSize, float airDiscardChance, VerticalAnchor minY, VerticalAnchor maxY) {
+		return makeOreFeature(id, blockOre, hostBlock, veins, veinSize, airDiscardChance, minY, maxY, false);
+	}
+	
+	/**
+	 * Will create a basic ore feature.
+	 * @param id {@link ResourceLocation} feature ID.
+	 * @param blockOre {@link Decoration} feature step.
+	 * @param hostBlock {@link Block} to generate feature in.
+	 * @param veins iterations per chunk.
+	 * @param veinSize size of ore vein.
 	 * @param minY A {@link VerticalAnchor} for the minimum height, for example
 	 *				{@code VerticalAnchor.bottom()}, {@code VerticalAnchor.absolute(10)}, {@code VerticalAnchor.aboveBottom(10)}
 	 * @param maxY A {@link VerticalAnchor} for the maximum height.
 	 * @return new BCLFeature instance.
 	 */
 	public static BCLFeature makeOreFeature(ResourceLocation id, Block blockOre, Block hostBlock, int veins, int veinSize, VerticalAnchor minY, VerticalAnchor maxY) {
-		return makeOreFeature(id, blockOre, hostBlock, veins, veinSize, minY, maxY, false);
+		return makeOreFeature(id, blockOre, hostBlock, veins, veinSize, 0.0f, minY, maxY, false);
 	}
 	
+	/**
+	 * Will create a basic ore feature.
+	 *
+	 * @param id		{@link ResourceLocation} feature ID.
+	 * @param blockOre  {@link Decoration} feature step.
+	 * @param hostBlock {@link Block} to generate feature in.
+	 * @param veins	 iterations per chunk.
+	 * @param veinSize  size of ore vein.
+	 * @param airDiscardChance chance that this orge gets discarded when it is exposed to air
+	 * @param minY A {@link VerticalAnchor} for the minimum height, for example
+	 *				{@code VerticalAnchor.bottom()}, {@code VerticalAnchor.absolute(10)}, {@code VerticalAnchor.aboveBottom(10)}
+	 * @param maxY A {@link VerticalAnchor} for the maximum height.
+	 * @param rare	  when true, this is placed as a rare resource
+	 * @return new BCLFeature instance.
+	 */
+	public static BCLFeature makeOreFeature(ResourceLocation id, Block blockOre, Block hostBlock, int veins, int veinSize, float airDiscardChance, VerticalAnchor minY, VerticalAnchor maxY, boolean rare) {
+		return makeOreFeature(id, blockOre, hostBlock, veins, veinSize, airDiscardChance, HeightRangePlacement.uniform(minY, maxY), rare);
+	}
+	
+	@Deprecated(forRemoval = true)
 	/**
 	 * Will create a basic ore feature.
 	 *
@@ -125,7 +178,7 @@ public class BCLFeature {
 	 * @return new BCLFeature instance.
 	 */
 	public static BCLFeature makeOreFeature(ResourceLocation id, Block blockOre, Block hostBlock, int veins, int veinSize, VerticalAnchor minY, VerticalAnchor maxY, boolean rare) {
-		return makeOreFeature(id, blockOre, hostBlock, veins, veinSize, HeightRangePlacement.uniform(minY, maxY), rare);
+		return makeOreFeature(id, blockOre, hostBlock, veins, veinSize, 0.0f, HeightRangePlacement.uniform(minY, maxY), rare);
 	}
 	
 	/**
@@ -136,16 +189,18 @@ public class BCLFeature {
 	 * @param hostBlock {@link Block} to generate feature in.
 	 * @param veins	 iterations per chunk.
 	 * @param veinSize  size of ore vein.
+	 * @param airDiscardChance chance that this orge gets discarded when it is exposed to air
 	 * @param placement {@link net.minecraft.world.level.levelgen.placement.PlacementModifier} for the ore distribution,
 	 *				  for example {@code PlacementUtils.FULL_RANGE}, {@code PlacementUtils.RANGE_10_10}
 	 * @param rare	  when true, this is placed as a rare resource
 	 * @return new BCLFeature instance.
 	 */
-	public static BCLFeature makeOreFeature(ResourceLocation id, Block blockOre, Block hostBlock, int veins, int veinSize, PlacementModifier placement, boolean rare) {
+	public static BCLFeature makeOreFeature(ResourceLocation id, Block blockOre, Block hostBlock, int veins, int veinSize, float airDiscardChance, PlacementModifier placement, boolean rare) {
 		OreConfiguration featureConfig = new OreConfiguration(
 			new BlockMatchTest(hostBlock),
 			blockOre.defaultBlockState(),
-			veinSize
+			veinSize,
+			airDiscardChance
 		);
 		
 		PlacedFeature oreFeature = Feature.ORE
@@ -160,6 +215,25 @@ public class BCLFeature {
 			Registry.register(BuiltinRegistries.PLACED_FEATURE, id, oreFeature),
 			Decoration.UNDERGROUND_ORES
 		);
+	}
+	
+	
+	@Deprecated(forRemoval = true)
+	/**
+	 * Will create a basic ore feature.
+	 *
+	 * @param id		{@link ResourceLocation} feature ID.
+	 * @param blockOre  {@link Decoration} feature step.
+	 * @param hostBlock {@link Block} to generate feature in.
+	 * @param veins	 iterations per chunk.
+	 * @param veinSize  size of ore vein.
+	 * @param placement {@link net.minecraft.world.level.levelgen.placement.PlacementModifier} for the ore distribution,
+	 *				  for example {@code PlacementUtils.FULL_RANGE}, {@code PlacementUtils.RANGE_10_10}
+	 * @param rare	  when true, this is placed as a rare resource
+	 * @return new BCLFeature instance.
+	 */
+	public static BCLFeature makeOreFeature(ResourceLocation id, Block blockOre, Block hostBlock, int veins, int veinSize,  PlacementModifier placement, boolean rare) {
+		return makeOreFeature(id, blockOre, hostBlock, veins, veinSize, 0.0f, placement, rare);
 	}
 	
 	/**
