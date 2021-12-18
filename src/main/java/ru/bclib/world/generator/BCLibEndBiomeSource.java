@@ -55,8 +55,9 @@ public class BCLibEndBiomeSource extends BCLBiomeSource {
 		List<String> includeVoid = Configs.BIOMES_CONFIG.getEntry("force_include", "end_void_biomes", StringArrayEntry.class).getValue();
 		this.possibleBiomes().forEach(biome -> {
 			ResourceLocation key = biomeRegistry.getKey(biome);
+			String group = key.getNamespace() + "." + key.getPath();
+			
 			if (!BiomeAPI.hasBiome(key)) {
-				String group = key.getNamespace() + "." + key.getPath();
 				float chance = Configs.BIOMES_CONFIG.getFloat(group, "generation_chance", 1.0F);
 				float fog = Configs.BIOMES_CONFIG.getFloat(group, "fog_density", 1.0F);
 				BCLBiome bclBiome = new BCLBiome(key, biome).setGenChance(chance).setFogDensity(fog);
@@ -69,13 +70,24 @@ public class BCLibEndBiomeSource extends BCLBiomeSource {
 			}
 			else {
 				BCLBiome bclBiome = BiomeAPI.getBiome(key);
-				if (bclBiome != BiomeAPI.EMPTY_BIOME && bclBiome.getParentBiome() == null) {
-					if (!BiomeAPI.END_LAND_BIOME_PICKER.containsImmutable(key) && !BiomeAPI.END_VOID_BIOME_PICKER.containsImmutable(key)) {
-						if (includeVoid.contains(key.toString())) {
-							BiomeAPI.END_VOID_BIOME_PICKER.addBiomeMutable(bclBiome);
-						}
-						else {
-							BiomeAPI.END_LAND_BIOME_PICKER.addBiomeMutable(bclBiome);
+				if (bclBiome != BiomeAPI.EMPTY_BIOME) {
+					float chance = Configs.BIOMES_CONFIG.getFloat(group, "generation_chance", bclBiome.getGenChance());
+					float fog = Configs.BIOMES_CONFIG.getFloat(group, "fog_density", bclBiome.getFogDensity());
+					bclBiome.setGenChance(chance).setFogDensity(fog);
+					if (bclBiome.getEdgeSize()!=0){
+						int edgeSize = Configs.BIOMES_CONFIG.getInt(group, "edge_size", bclBiome.getEdgeSize());
+						bclBiome.setEdgeSize(edgeSize);
+					}
+					
+					
+					if (bclBiome.getParentBiome() == null) {
+						if (!BiomeAPI.END_LAND_BIOME_PICKER.containsImmutable(key) && !BiomeAPI.END_VOID_BIOME_PICKER.containsImmutable(key)) {
+							if (includeVoid.contains(key.toString())) {
+								BiomeAPI.END_VOID_BIOME_PICKER.addBiomeMutable(bclBiome);
+							}
+							else {
+								BiomeAPI.END_LAND_BIOME_PICKER.addBiomeMutable(bclBiome);
+							}
 						}
 					}
 				}
