@@ -392,7 +392,10 @@ public class BCLBiome {
 	
 	private boolean didLoadConfig = false;
 	/**
-	 * Set Biome configuartion from Config
+	 * For internal use.
+	 * Set Biome configuartion from Config. This method is called for all Biomes that get registered
+	 * to a {@link ru.bclib.world.generator.BCLBiomeSource}.
+	 *
 	 * @return This instance
 	 */
 	public BCLBiome setupFromConfig() {
