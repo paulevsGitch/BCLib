@@ -8,7 +8,11 @@ import net.minecraft.client.resources.model.BlockModelRotation;
 import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.ItemTags;
+import net.minecraft.tags.Tag.Named;
 import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.DoorBlock;
@@ -24,13 +28,14 @@ import ru.bclib.client.models.PatternsHelper;
 import ru.bclib.client.render.BCLRenderLayer;
 import ru.bclib.interfaces.BlockModelProvider;
 import ru.bclib.interfaces.RenderLayerProvider;
+import ru.bclib.interfaces.TagProvider;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class BaseDoorBlock extends DoorBlock implements RenderLayerProvider, BlockModelProvider {
+public class BaseDoorBlock extends DoorBlock implements RenderLayerProvider, BlockModelProvider, TagProvider {
 	public BaseDoorBlock(Block source) {
 		this(FabricBlockSettings.copyOf(source).strength(3F, 3F).noOcclusion());
 	}
@@ -143,6 +148,12 @@ public class BaseDoorBlock extends DoorBlock implements RenderLayerProvider, Blo
 	private boolean isHinge(DoorHingeSide hingeSide, boolean open) {
 		boolean isHinge = hingeSide == DoorHingeSide.RIGHT;
 		return isHinge && !open || !isHinge && open;
+	}
+	
+	@Override
+	public void addTags(List<Named<Block>> blockTags, List<Named<Item>> itemTags) {
+		blockTags.add(BlockTags.DOORS);
+		itemTags.add(ItemTags.DOORS);
 	}
 	
 	protected enum DoorType implements StringRepresentable {
