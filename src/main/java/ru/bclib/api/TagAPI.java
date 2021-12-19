@@ -45,6 +45,9 @@ public class TagAPI {
 	public static final Tag.Named<Block> BLOCK_SAPLINGS = makeCommonBlockTag("saplings");
 	public static final Tag.Named<Block> BLOCK_LEAVES = makeCommonBlockTag("leaves");
 	public static final Tag.Named<Block> BLOCK_IMMOBILE = makeCommonBlockTag("immobile");
+	public static final Tag.Named<Block> BLOCK_SOUL_GROUND = makeCommonBlockTag("soul_ground");
+	public static final Tag.Named<Block> BLOCK_NETHERRACK = makeCommonBlockTag("netherrack");
+	public static final Tag.Named<Block> BLOCK_NETHER_MYCELIUM = makeCommonBlockTag("nether_mycelium");
 	
 	public static final Tag.Named<Block> BLOCK_DRAGON_IMMUNE = getMCBlockTag("dragon_immune");
 	
@@ -66,6 +69,8 @@ public class TagAPI {
 	public static final Tag.Named<Item> ITEM_LEAVES = makeCommonItemTag("leaves");
 	public static final Tag.Named<Item> ITEM_SHEARS = getMCItemTag("shears");
 	public static final Tag.Named<Item> ITEM_COMMON_SHEARS = makeCommonItemTag("shears");
+	public static final Tag.Named<Item> ITEM_SOUL_GROUND = makeCommonItemTag("soul_ground");
+	
 
 
 	/**
