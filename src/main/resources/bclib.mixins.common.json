@@ -10,6 +10,7 @@
 		"LayerLightSectionStorageMixin",
 		"NoiseBasedChunkGeneratorMixin",
 		"NoiseGeneratorSettingsMixin",
+		"SurfaceRulesContextAccessor",
 		"shears.TripWireBlockMixin",
 		"StructureSettingsAccessor",
 		"MobSpawnSettingsAccessor",
@@ -35,12 +36,11 @@
 		"shears.SheepMixin",
 		"PortalShapeMixin",
 		"ServerLevelMixin",
+		"BiomeSourceMixin",
 		"AnvilBlockMixin",
 		"AnvilMenuMixin",
 		"TagLoaderMixin",
-		"MainMixin",
-		"SurfaceRulesContextAccessor",
-		"BiomeSourceMixin"
+		"MainMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

@@ -13,6 +13,7 @@ import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfigur
 import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
 import net.minecraft.world.level.levelgen.feature.configurations.OreConfiguration;
 import net.minecraft.world.level.levelgen.placement.BiomeFilter;
+import net.minecraft.world.level.levelgen.placement.CountOnEveryLayerPlacement;
 import net.minecraft.world.level.levelgen.placement.CountPlacement;
 import net.minecraft.world.level.levelgen.placement.HeightRangePlacement;
 import net.minecraft.world.level.levelgen.placement.InSquarePlacement;
@@ -61,6 +62,7 @@ public class BCLFeature {
 	public Decoration getDecoration() {
 		return featureStep;
 	}
+	
 	/**
 	 * Will create a basic plant feature.
 	 * @param id {@link ResourceLocation} feature ID.
@@ -69,16 +71,28 @@ public class BCLFeature {
 	 * @return new BCLFeature instance.
 	 */
 	public static BCLFeature makeVegetationFeature(ResourceLocation id, Feature<NoneFeatureConfiguration> feature, int density) {
-		PlacedFeature configured = feature
-			.configured(FeatureConfiguration.NONE)
-			.placed(
-				CountPlacement.of(UniformInt.of(0, 4)),
-				InSquarePlacement.spread(),
-				PlacementUtils.HEIGHTMAP,
-				BiomeFilter.biome()
-			);
-		return new BCLFeature(id, feature, Decoration.VEGETAL_DECORATION, configured);
+		return makeVegetationFeature(id, feature, density, false);
 	}
+	
+	/**
+	 * Will create a basic plant feature.
+	 * @param id {@link ResourceLocation} feature ID.
+	 * @param feature {@link Feature} with {@link NoneFeatureConfiguration} config.
+	 * @param density iterations per chunk.
+	 * @param allHeight if {@code true} will generate plant on all layers, if {@code false} - only on surface.
+	 * @return new BCLFeature instance.
+	 */
+	public static BCLFeature makeVegetationFeature(ResourceLocation id, Feature<NoneFeatureConfiguration> feature, int density, boolean allHeight) {
+		@SuppressWarnings("deprecation")
+		PlacementModifier count = allHeight ? CountOnEveryLayerPlacement.of(8) : CountPlacement.of(UniformInt.of(0, density));
+		return makeFeature(id, Decoration.VEGETAL_DECORATION, feature,
+			count,
+			InSquarePlacement.spread(),
+			PlacementUtils.HEIGHTMAP,
+			BiomeFilter.biome()
+		);
+	}
+	
 	/**
 	 * Will create a basic ore feature.
 	 * @param id {@link ResourceLocation} feature ID.
@@ -209,7 +223,9 @@ public class BCLFeature {
 				InSquarePlacement.spread(),
 				rare ? RarityFilter.onAverageOnceEvery(veins) : CountPlacement.of(veins),
 				placement,
-				BiomeFilter.biome());
+				BiomeFilter.biome()
+			);
+		
 		return new BCLFeature(
 			net.minecraft.world.level.levelgen.feature.Feature.ORE,
 			Registry.register(BuiltinRegistries.PLACED_FEATURE, id, oreFeature),
@@ -244,10 +260,7 @@ public class BCLFeature {
 	 * @return new BCLFeature instance.
 	 */
 	public static BCLFeature makeChunkFeature(ResourceLocation id, Decoration step, Feature<NoneFeatureConfiguration> feature) {
-		PlacedFeature configured = feature
-			.configured(FeatureConfiguration.NONE)
-			.placed(CountPlacement.of(1));
-		return new BCLFeature(id, feature, step, configured);
+		return makeFeature(id, step, feature, CountPlacement.of(1));
 	}
 	
 	/**
@@ -259,10 +272,7 @@ public class BCLFeature {
 	 * @return new BCLFeature instance.
 	 */
 	public static BCLFeature makeChancedFeature(ResourceLocation id, Decoration step, Feature<NoneFeatureConfiguration> feature, int chance) {
-		PlacedFeature configured = feature
-			.configured(FeatureConfiguration.NONE)
-			.placed(RarityFilter.onAverageOnceEvery(chance));
-		return new BCLFeature(id, feature, step, configured);
+		return makeFeature(id, step, feature, RarityFilter.onAverageOnceEvery(chance));
 	}
 	
 	/**
@@ -274,11 +284,7 @@ public class BCLFeature {
 	 * @return new BCLFeature instance.
 	 */
 	public static BCLFeature makeCountFeature(ResourceLocation id, Decoration step, Feature<NoneFeatureConfiguration> feature, int count) {
-		PlacedFeature configured = feature
-			.configured(FeatureConfiguration.NONE)
-			.placed(CountPlacement.of(count));
-			//.decorated(FeatureDecorator.COUNT.configured(new CountConfiguration(count)));
-		return new BCLFeature(id, feature, step, configured);
+		return makeFeature(id, step, feature, CountPlacement.of(count));
 	}
 	
 	/**
@@ -289,7 +295,19 @@ public class BCLFeature {
 	 * @return new BCLFeature instance.
 	 */
 	public static BCLFeature makeFeatureConfigured(ResourceLocation id, Decoration step, Feature<NoneFeatureConfiguration> feature) {
-		PlacedFeature configured = feature.configured(FeatureConfiguration.NONE).placed();
+		return makeFeature(id, step, feature);
+	}
+	
+	/**
+	 * Creates and configures new BCLib feature.
+	 * @param id {@link ResourceLocation} feature ID.
+	 * @param step {@link Decoration} feature step.
+	 * @param feature {@link Feature} with {@link NoneFeatureConfiguration} config.
+	 * @param placementModifiers array of {@link PlacementModifier}
+	 * @return new BCLFeature instance.
+	 */
+	public static BCLFeature makeFeature(ResourceLocation id, Decoration step, Feature<NoneFeatureConfiguration> feature, PlacementModifier... placementModifiers) {
+		PlacedFeature configured = feature.configured(FeatureConfiguration.NONE).placed(placementModifiers);
 		return new BCLFeature(id, feature, step, configured);
 	}
 }

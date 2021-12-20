@@ -9,9 +9,7 @@ import ru.bclib.integration.modmenu.ModMenuIntegration.ModMenuScreenFactory;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Function;
 
 @Deprecated
 class ModMenuScreenFactoryImpl {

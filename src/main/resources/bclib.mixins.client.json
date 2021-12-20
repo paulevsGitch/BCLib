@@ -12,9 +12,9 @@
 		"TextureAtlasMixin",
 		"AnvilScreenMixin",
 		"ModelBakeryMixin",
+		"WorldPresetMixin",
 		"MinecraftMixin",
-		"GameMixin",
-		"WorldPresetMixin"
+		"GameMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

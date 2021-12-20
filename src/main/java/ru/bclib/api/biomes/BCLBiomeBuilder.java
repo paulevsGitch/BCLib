@@ -1,11 +1,9 @@
 package ru.bclib.api.biomes;
 
 import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
-import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.data.BuiltinRegistries;
 import net.minecraft.data.worldgen.BiomeDefaultFeatures;
-import net.minecraft.data.worldgen.placement.OrePlacements;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.Music;
 import net.minecraft.sounds.SoundEvent;
@@ -36,14 +34,12 @@ import ru.bclib.api.surface.SurfaceRuleBuilder;
 import ru.bclib.entity.BCLEntityWrapper;
 import ru.bclib.mixin.common.BiomeGenerationSettingsAccessor;
 import ru.bclib.util.ColorUtil;
-import ru.bclib.util.Pair;
 import ru.bclib.world.biomes.BCLBiome;
 import ru.bclib.world.features.BCLFeature;
 import ru.bclib.world.structures.BCLStructureFeature;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
