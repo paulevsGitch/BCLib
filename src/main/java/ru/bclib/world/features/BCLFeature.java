@@ -83,15 +83,19 @@ public class BCLFeature {
 	 * @return new BCLFeature instance.
 	 */
 	public static BCLFeature makeVegetationFeature(ResourceLocation id, Feature<NoneFeatureConfiguration> feature, int density, boolean allHeight) {
-		@SuppressWarnings("deprecation")
-		PlacementModifier count = allHeight ? CountOnEveryLayerPlacement.of(8) : CountPlacement.of(UniformInt.of(0, density));
-		return makeFeature(id, Decoration.VEGETAL_DECORATION, feature,
-			count,
-			InSquarePlacement.spread(),
-			PlacementUtils.HEIGHTMAP//,
-			// Will result with: Tried to biome check an unregistered feature
-			// BiomeFilter.biome()
-		);
+		if (allHeight) {
+			@SuppressWarnings("deprecation")
+			PlacementModifier count =CountOnEveryLayerPlacement.of(density);
+			return makeFeature(id, Decoration.VEGETAL_DECORATION, feature, count, BiomeFilter.biome());
+		}
+		else {
+			return makeFeature(id, Decoration.VEGETAL_DECORATION, feature,
+				CountPlacement.of(UniformInt.of(0, density)),
+				InSquarePlacement.spread(),
+				PlacementUtils.HEIGHTMAP,
+				BiomeFilter.biome()
+			);
+		}
 	}
 	
 	/**
