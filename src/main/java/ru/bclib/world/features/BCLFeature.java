@@ -88,8 +88,9 @@ public class BCLFeature {
 		return makeFeature(id, Decoration.VEGETAL_DECORATION, feature,
 			count,
 			InSquarePlacement.spread(),
-			PlacementUtils.HEIGHTMAP,
-			BiomeFilter.biome()
+			PlacementUtils.HEIGHTMAP//,
+			// Will result with: Tried to biome check an unregistered feature
+			// BiomeFilter.biome()
 		);
 	}
 	
