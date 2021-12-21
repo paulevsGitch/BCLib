@@ -1,10 +1,14 @@
 package ru.bclib.api.features;
 
+import net.minecraft.data.worldgen.placement.PlacementUtils;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.levelgen.GenerationStep.Decoration;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
+import net.minecraft.world.level.levelgen.placement.BiomeFilter;
+import net.minecraft.world.level.levelgen.placement.CountOnEveryLayerPlacement;
 import net.minecraft.world.level.levelgen.placement.CountPlacement;
+import net.minecraft.world.level.levelgen.placement.InSquarePlacement;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraft.world.level.levelgen.placement.PlacementModifier;
 import net.minecraft.world.level.levelgen.placement.RarityFilter;
@@ -75,13 +79,14 @@ public class BCLFeatureBuilder {
 	}
 	
 	/**
-	 * Generate feature in certain iterations (per chunk), count can be different in different chunks.
+	 * Generate feature in certain iterations (per chunk).
 	 * Feature will be generated on all layers (example - Nether plants).
-	 * @param average how many times feature will be generated in chunk (in average).
+	 * @param count how many times feature will be generated in chunk layers.
 	 * @return same {@link BCLFeatureBuilder} instance.
 	 */
-	public BCLFeatureBuilder countLayers(int average) {
-		return modifier(RarityFilter.onAverageOnceEvery(average));
+	@SuppressWarnings("deprecation")
+	public BCLFeatureBuilder countLayers(int count) {
+		return modifier(CountOnEveryLayerPlacement.of(count));
 	}
 	
 	/**
@@ -91,6 +96,25 @@ public class BCLFeatureBuilder {
 	 */
 	public BCLFeatureBuilder oncePerChunks(int chunks) {
 		return modifier(RarityFilter.onAverageOnceEvery(chunks));
+	}
+	
+	/**
+	 * Restricts feature generation only to biome where feature was added.
+	 * @return same {@link BCLFeatureBuilder} instance.
+	 */
+	public BCLFeatureBuilder onlyInBiome() {
+		return modifier(BiomeFilter.biome());
+	}
+	
+	// Are these two things required in 1.18.1?
+	// TODO - add information
+	public BCLFeatureBuilder squarePlacement() {
+		return modifier(InSquarePlacement.spread());
+	}
+	
+	// TODO - add information
+	public BCLFeatureBuilder heightmap() {
+		return modifier(PlacementUtils.HEIGHTMAP);
 	}
 	
 	/**

@@ -21,6 +21,7 @@ import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraft.world.level.levelgen.placement.PlacementModifier;
 import net.minecraft.world.level.levelgen.placement.RarityFilter;
 import net.minecraft.world.level.levelgen.structure.templatesystem.BlockMatchTest;
+import ru.bclib.api.features.BCLCommonFeatures;
 
 public class BCLFeature {
 	private PlacedFeature placedFeature;
@@ -64,14 +65,16 @@ public class BCLFeature {
 	}
 	
 	/**
+	 * Deprecated, use function from {@link BCLCommonFeatures} instead.
 	 * Will create a basic plant feature.
 	 * @param id {@link ResourceLocation} feature ID.
 	 * @param feature {@link Feature} with {@link NoneFeatureConfiguration} config.
 	 * @param density iterations per chunk.
 	 * @return new BCLFeature instance.
 	 */
+	@Deprecated(forRemoval = true)
 	public static BCLFeature makeVegetationFeature(ResourceLocation id, Feature<NoneFeatureConfiguration> feature, int density) {
-		return makeVegetationFeature(id, feature, density, false);
+		return BCLCommonFeatures.makeVegetationFeature(id, feature, density);
 	}
 	
 	/**
@@ -82,20 +85,9 @@ public class BCLFeature {
 	 * @param allHeight if {@code true} will generate plant on all layers, if {@code false} - only on surface.
 	 * @return new BCLFeature instance.
 	 */
+	@Deprecated(forRemoval = true)
 	public static BCLFeature makeVegetationFeature(ResourceLocation id, Feature<NoneFeatureConfiguration> feature, int density, boolean allHeight) {
-		if (allHeight) {
-			@SuppressWarnings("deprecation")
-			PlacementModifier count =CountOnEveryLayerPlacement.of(density);
-			return makeFeature(id, Decoration.VEGETAL_DECORATION, feature, count, BiomeFilter.biome());
-		}
-		else {
-			return makeFeature(id, Decoration.VEGETAL_DECORATION, feature,
-				CountPlacement.of(UniformInt.of(0, density)),
-				InSquarePlacement.spread(),
-				PlacementUtils.HEIGHTMAP,
-				BiomeFilter.biome()
-			);
-		}
+		return BCLCommonFeatures.makeVegetationFeature(id, feature, density, allHeight);
 	}
 	
 	/**
