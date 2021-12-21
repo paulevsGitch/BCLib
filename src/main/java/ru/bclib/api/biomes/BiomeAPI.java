@@ -73,6 +73,7 @@ import ru.bclib.world.structures.BCLStructureFeature;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -183,6 +184,7 @@ public class BiomeAPI {
 	public static void prepareWorldData(){
 		structureStarts.clear();
 		worldSources.clear();
+		knownNoiseGenerators.clear();
 	}
 	
 	/**
@@ -609,6 +611,14 @@ public class BiomeAPI {
 											   .collect(Collectors.toSet());
 		return getRuleSourcesFromIDs(biomeIDs);
 	}
+
+	private static List<SurfaceRules.RuleSource> getAllRuleSources() {
+		List<SurfaceRules.RuleSource> rules = Lists.newArrayList();
+		SURFACE_RULES.forEach((biomeID, rule) -> {
+			rules.add(rule);
+		});
+		return rules;
+	}
 	
 	private static List<SurfaceRules.RuleSource> getRuleSourcesFromIDs(Set<ResourceLocation> biomeIDs) {
 		List<SurfaceRules.RuleSource> rules = Lists.newArrayList();
@@ -788,6 +798,7 @@ public class BiomeAPI {
 	 */
 	public static void addSurfaceRule(ResourceLocation biomeID, SurfaceRules.RuleSource source) {
 		SURFACE_RULES.put(biomeID, source);
+		knownNoiseGenerators.forEach(BiomeAPI::changeSurfaceRulesForGenerator);
 	}
 	
 	/**
@@ -907,7 +918,11 @@ public class BiomeAPI {
 	}
 	
 	private final static Map<StructureID, BiConsumer<Map<StructureFeature<?>, Multimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>>>, Map<StructureFeature<?>, StructureFeatureConfiguration>>> structureStarts = new HashMap<>();
-	
+
+	private static void registerNoiseGeneratorAndChangeSurfaceRules(NoiseGeneratorSettings settings){
+		knownNoiseGenerators.add(settings);
+		changeSurfaceRulesForGenerator(settings);
+	}
 	public static void registerStructureEvents(){
 		DynamicRegistrySetupCallback.EVENT.register(registryManager -> {
 			Optional<? extends Registry<NoiseGeneratorSettings>> oGeneratorRegistry = registryManager.registry(Registry.NOISE_GENERATOR_SETTINGS_REGISTRY);
@@ -915,6 +930,7 @@ public class BiomeAPI {
 			
 			
 			if (oGeneratorRegistry.isPresent()) {
+				oGeneratorRegistry.get().forEach(BiomeAPI::registerNoiseGeneratorAndChangeSurfaceRules);
 				RegistryEntryAddedCallback
 					.event(oGeneratorRegistry.get())
 					.register((rawId, id, settings) -> {
@@ -925,16 +941,23 @@ public class BiomeAPI {
 						structureStarts.entrySet().forEach(entry -> changeStructureStarts(a, entry.getValue()));
 						
 						//add surface rules
-						if (biomeRegistry!=null) {
-							List<SurfaceRules.RuleSource> rules = getRuleSourcesFromIDs(biomeRegistry.keySet());
-							SurfaceRuleProvider provider = SurfaceRuleProvider.class.cast(settings);
-							changeSurfaceRules(rules, provider);
-						}
+						registerNoiseGeneratorAndChangeSurfaceRules(settings);
 					});
 			}
 			
 			
 		});
+	}
+	private static final Set<NoiseGeneratorSettings> knownNoiseGenerators = new HashSet<>();
+	private static void changeSurfaceRulesForGenerator(NoiseGeneratorSettings settings){
+		List<SurfaceRules.RuleSource> rules;
+		if (biomeRegistry!=null) {
+			rules = getRuleSourcesFromIDs(biomeRegistry.keySet());
+		} else {
+			rules = getAllRuleSources();
+		}
+		SurfaceRuleProvider provider = SurfaceRuleProvider.class.cast(settings);
+		changeSurfaceRules(rules, provider);
 	}
 	
 	private static void changeSurfaceRules(List<RuleSource> rules, SurfaceRuleProvider provider) {
