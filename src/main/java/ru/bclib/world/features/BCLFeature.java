@@ -33,7 +33,7 @@ public class BCLFeature {
 		this.feature = feature;
 	}
 	
-	public BCLFeature(ResourceLocation id, Feature<NoneFeatureConfiguration> feature, Decoration featureStep, PlacedFeature placedFeature) {
+	public BCLFeature(ResourceLocation id, Feature<?> feature, Decoration featureStep, PlacedFeature placedFeature) {
 		this.placedFeature = Registry.register(BuiltinRegistries.PLACED_FEATURE, id, placedFeature);
 		this.feature = Registry.register(Registry.FEATURE, id, feature);
 		this.featureStep = featureStep;
