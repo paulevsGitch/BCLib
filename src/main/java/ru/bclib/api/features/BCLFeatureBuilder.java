@@ -4,8 +4,10 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.levelgen.GenerationStep.Decoration;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
+import net.minecraft.world.level.levelgen.placement.CountPlacement;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraft.world.level.levelgen.placement.PlacementModifier;
+import net.minecraft.world.level.levelgen.placement.RarityFilter;
 import ru.bclib.world.features.BCLFeature;
 
 import java.util.ArrayList;
@@ -52,6 +54,43 @@ public class BCLFeatureBuilder {
 	public BCLFeatureBuilder modifier(PlacementModifier modifier) {
 		modifications.add(modifier);
 		return this;
+	}
+	
+	/**
+	 * Generate feature in certain iterations (per chunk).
+	 * @param count how many times feature will be generated in chunk.
+	 * @return same {@link BCLFeatureBuilder} instance.
+	 */
+	public BCLFeatureBuilder count(int count) {
+		return modifier(CountPlacement.of(count));
+	}
+	
+	/**
+	 * Generate feature in certain iterations (per chunk), count can be different in different chunks.
+	 * @param average how many times feature will be generated in chunk (in average).
+	 * @return same {@link BCLFeatureBuilder} instance.
+	 */
+	public BCLFeatureBuilder countAverage(int average) {
+		return modifier(RarityFilter.onAverageOnceEvery(average));
+	}
+	
+	/**
+	 * Generate feature in certain iterations (per chunk), count can be different in different chunks.
+	 * Feature will be generated on all layers (example - Nether plants).
+	 * @param average how many times feature will be generated in chunk (in average).
+	 * @return same {@link BCLFeatureBuilder} instance.
+	 */
+	public BCLFeatureBuilder countLayers(int average) {
+		return modifier(RarityFilter.onAverageOnceEvery(average));
+	}
+	
+	/**
+	 * Will place feature once in certain amount of chunks (in average).
+	 * @param chunks amount of chunks.
+	 * @return same {@link BCLFeatureBuilder} instance.
+	 */
+	public BCLFeatureBuilder oncePerChunks(int chunks) {
+		return modifier(RarityFilter.onAverageOnceEvery(chunks));
 	}
 	
 	/**
