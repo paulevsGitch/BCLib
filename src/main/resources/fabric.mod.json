@@ -1,11 +1,12 @@
 {
 	"schemaVersion": 1,
 	"id": "bclib",
-	"version": "1.1.4",
+	"version": "${version}",
 	"name": "BCLib",
 	"description": "A library for BetterX team mods",
 	"authors": [
 		"paulevs",
+		"Quiqueck",
 		"Bulldog83"
 	],
 	"contact": {
@@ -38,7 +39,7 @@
 	"depends": {
 		"fabricloader": ">=0.12.9",
 		"fabric": ">=0.44.0",
-		"minecraft": ">=1.18"
+		"minecraft": "1.18.x"
 	},
 	"custom":{
 		"modmenu":{
