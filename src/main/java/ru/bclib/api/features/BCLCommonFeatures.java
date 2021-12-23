@@ -39,7 +39,7 @@ public class BCLCommonFeatures {
 		else {
 			return BCLFeatureBuilder
 				.start(id, feature)
-				.oncePerChunks(density)
+				.countMax(density)
 				.squarePlacement()
 				.heightmap()
 				.onlyInBiome()
@@ -108,7 +108,7 @@ public class BCLCommonFeatures {
 			builder.oncePerChunks(veins);
 		}
 		else {
-			builder.oncePerChunks(veins);
+			builder.countMax(veins);
 		}
 		
 		return builder.build(new OreConfiguration(
