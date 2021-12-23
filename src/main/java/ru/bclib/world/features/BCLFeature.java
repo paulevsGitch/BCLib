@@ -2,6 +2,7 @@ package ru.bclib.world.features;
 
 import net.minecraft.core.Registry;
 import net.minecraft.data.BuiltinRegistries;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.levelgen.GenerationStep.Decoration;
@@ -14,6 +15,9 @@ import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraft.world.level.levelgen.placement.PlacementModifier;
 import ru.bclib.api.features.BCLCommonFeatures;
 
+import java.util.Map.Entry;
+import java.util.Optional;
+
 public class BCLFeature {
 	private PlacedFeature placedFeature;
 	private Decoration featureStep;
@@ -21,15 +25,24 @@ public class BCLFeature {
 	
 	public BCLFeature(ResourceLocation id, Feature<?> feature, Decoration featureStep, PlacedFeature placedFeature) {
 		this.placedFeature = placedFeature;
-		this.feature = feature;
 		this.featureStep = featureStep;
+		this.feature = feature;
 		
 		if (!BuiltinRegistries.PLACED_FEATURE.containsKey(id)) {
 			Registry.register(BuiltinRegistries.PLACED_FEATURE, id, placedFeature);
 		}
-		if (!Registry.FEATURE.containsKey(id)) {
+		if (!Registry.FEATURE.containsKey(id) && !containsObj(Registry.FEATURE, feature)) {
 			Registry.register(Registry.FEATURE, id, feature);
 		}
+	}
+	
+	private static <E> boolean containsObj(Registry<E> registry, E obj) {
+		Optional<Entry<ResourceKey<E>, E>> optional = registry
+			.entrySet()
+			.stream()
+			.filter(entry -> entry.getValue() == obj)
+			.findAny();
+		return optional.isPresent();
 	}
 	
 	/**
