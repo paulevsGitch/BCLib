@@ -17,7 +17,7 @@ import ru.bclib.util.BackgroundInfo;
 import ru.bclib.util.MHelper;
 import ru.bclib.world.biomes.BCLBiome;
 
-public class CustomBackgroundRenderer {
+public class CustomFogRenderer {
 	private static final MutableBlockPos LAST_POS = new MutableBlockPos(0, -100, 0);
 	private static final MutableBlockPos MUT_POS = new MutableBlockPos();
 	private static final float[] FOG_DENSITY = new float[8];
@@ -46,7 +46,7 @@ public class CustomBackgroundRenderer {
 			fogEnd = Math.min(viewDistance, 192.0F) * 0.5F / fog;
 		}
 		else {
-			fogStart = 0;//viewDistance * 0.75F / fog;
+			fogStart = viewDistance * 0.25F / fog; // In vanilla - 0
 			fogEnd = viewDistance / fog;
 		}
 		

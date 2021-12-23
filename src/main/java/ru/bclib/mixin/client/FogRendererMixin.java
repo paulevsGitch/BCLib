@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import ru.bclib.client.render.CustomBackgroundRenderer;
+import ru.bclib.client.render.CustomFogRenderer;
 import ru.bclib.util.BackgroundInfo;
 
 @Mixin(FogRenderer.class)
@@ -50,7 +50,7 @@ public class FogRendererMixin {
 	
 	@Inject(method = "setupFog", at = @At("HEAD"), cancellable = true)
 	private static void bclib_fogDensity(Camera camera, FogRenderer.FogMode fogMode, float viewDistance, boolean thickFog, CallbackInfo info) {
-		if (CustomBackgroundRenderer.applyFogDensity(camera, fogMode, viewDistance, thickFog)) {
+		if (CustomFogRenderer.applyFogDensity(camera, fogMode, viewDistance, thickFog)) {
 			info.cancel();
 		}
 	}
