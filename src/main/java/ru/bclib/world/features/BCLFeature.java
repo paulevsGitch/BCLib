@@ -86,38 +86,6 @@ public class BCLFeature {
 	}
 	
 	/**
-	 * Deprecated, use function from {@link BCLCommonFeatures} instead.
-	 */
-	@Deprecated(forRemoval = true)
-	public static BCLFeature makeOreFeature(ResourceLocation id, Block blockOre, Block hostBlock, int veins, int veinSize, int minY, int maxY) {
-		return BCLCommonFeatures.makeOreFeature(id, blockOre, hostBlock, veins, veinSize, VerticalAnchor.absolute(minY), VerticalAnchor.absolute(maxY), false);
-	}
-	
-	/**
-	 * Deprecated, use function from {@link BCLCommonFeatures} instead.
-	 */
-	@Deprecated(forRemoval = true)
-	public static BCLFeature makeOreFeature(ResourceLocation id, Block blockOre, Block hostBlock, int veins, int veinSize, float airDiscardChance, int minY, int maxY) {
-		return BCLCommonFeatures.makeOreFeature(id, blockOre, hostBlock, veins, veinSize, airDiscardChance, VerticalAnchor.absolute(minY), VerticalAnchor.absolute(maxY), false);
-	}
-	
-	/**
-	 * Deprecated, use function from {@link BCLCommonFeatures} instead.
-	 */
-	@Deprecated(forRemoval = true)
-	public static BCLFeature makeOreFeature(ResourceLocation id, Block blockOre, Block hostBlock, int veins, int veinSize, float airDiscardChance, VerticalAnchor minY, VerticalAnchor maxY) {
-		return BCLCommonFeatures.makeOreFeature(id, blockOre, hostBlock, veins, veinSize, airDiscardChance, minY, maxY, false);
-	}
-	
-	/**
-	 * Deprecated, use function from {@link BCLCommonFeatures} instead.
-	 */
-	@Deprecated(forRemoval = true)
-	public static BCLFeature makeOreFeature(ResourceLocation id, Block blockOre, Block hostBlock, int veins, int veinSize, VerticalAnchor minY, VerticalAnchor maxY) {
-		return BCLCommonFeatures.makeOreFeature(id, blockOre, hostBlock, veins, veinSize, 0.0f, minY, maxY, false);
-	}
-	
-	/**
 	 * Deprecated, moved to {@link BCLCommonFeatures}. Will be completely removed.
 	 */
 	@Deprecated(forRemoval = true)
