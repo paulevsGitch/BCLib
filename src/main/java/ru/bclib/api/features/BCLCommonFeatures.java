@@ -108,7 +108,7 @@ public class BCLCommonFeatures {
 			builder.oncePerChunks(veins);
 		}
 		else {
-			builder.countMax(veins);
+			builder.count(veins);
 		}
 		
 		return builder.build(new OreConfiguration(
