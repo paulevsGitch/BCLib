@@ -97,12 +97,7 @@ public class BCLCommonFeatures {
 	 * @return new BCLFeature instance.
 	 */
 	public static BCLFeature makeOreFeature(ResourceLocation id, Block blockOre, Block hostBlock, int veins, int veinSize, float airDiscardChance, PlacementModifier placement, boolean rare) {
-		BCLFeatureBuilder builder = BCLFeatureBuilder
-			.start(id, Feature.ORE)
-			.decoration(Decoration.UNDERGROUND_ORES)
-			.modifier(placement)
-			.squarePlacement()
-			.onlyInBiome();
+		BCLFeatureBuilder builder = BCLFeatureBuilder.start(id, Feature.ORE).decoration(Decoration.UNDERGROUND_ORES);
 		
 		if (rare) {
 			builder.oncePerChunks(veins);
@@ -110,6 +105,8 @@ public class BCLCommonFeatures {
 		else {
 			builder.count(veins);
 		}
+		
+		builder.modifier(placement).onlyInBiome();
 		
 		return builder.build(new OreConfiguration(
 			new BlockMatchTest(hostBlock),
