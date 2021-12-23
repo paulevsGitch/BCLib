@@ -2,6 +2,8 @@ package ru.bclib.api.features;
 
 import net.minecraft.data.worldgen.placement.PlacementUtils;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.valueproviders.IntProvider;
+import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.level.levelgen.GenerationStep.Decoration;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
@@ -70,6 +72,15 @@ public class BCLFeatureBuilder {
 	}
 	
 	/**
+	 * Generate feature in certain iterations (per chunk). Count can be between 0 and max value.
+	 * @param count maximum amount of iterations per chunk.
+	 * @return same {@link BCLFeatureBuilder} instance.
+	 */
+	public BCLFeatureBuilder countMax(int count) {
+		return modifier(CountPlacement.of(UniformInt.of(0, count)));
+	}
+	
+	/**
 	 * Generate feature in certain iterations (per chunk), count can be different in different chunks.
 	 * @param average how many times feature will be generated in chunk (in average).
 	 * @return same {@link BCLFeatureBuilder} instance.
@@ -87,6 +98,17 @@ public class BCLFeatureBuilder {
 	@SuppressWarnings("deprecation")
 	public BCLFeatureBuilder countLayers(int count) {
 		return modifier(CountOnEveryLayerPlacement.of(count));
+	}
+	
+	/**
+	 * Generate feature in certain iterations (per chunk). Count can be between 0 and max value.
+	 * Feature will be generated on all layers (example - Nether plants).
+	 * @param count maximum amount of iterations per chunk layers.
+	 * @return same {@link BCLFeatureBuilder} instance.
+	 */
+	@SuppressWarnings("deprecation")
+	public BCLFeatureBuilder countLayersMax(int count) {
+		return modifier(CountOnEveryLayerPlacement.of(UniformInt.of(0, count)));
 	}
 	
 	/**
