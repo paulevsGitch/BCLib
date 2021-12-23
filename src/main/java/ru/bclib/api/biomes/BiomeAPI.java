@@ -27,6 +27,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeGenerationSettings;
@@ -36,7 +37,9 @@ import net.minecraft.world.level.biome.Climate;
 import net.minecraft.world.level.biome.MobSpawnSettings.SpawnerData;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkGenerator;
+import net.minecraft.world.level.chunk.PalettedContainer;
 import net.minecraft.world.level.levelgen.GenerationStep.Carving;
 import net.minecraft.world.level.levelgen.GenerationStep.Decoration;
 import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
@@ -102,8 +105,10 @@ public class BiomeAPI {
 	private static final Map<PlacedFeature, Integer> FEATURE_ORDER = Maps.newHashMap();
 	private static final MutableInt FEATURE_ORDER_ID = new MutableInt(0);
 	
+	private final static Map<StructureID, BiConsumer<Map<StructureFeature<?>, Multimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>>>, Map<StructureFeature<?>, StructureFeatureConfiguration>>> STRUCTURE_STARTS = new HashMap<>();
 	private static final Map<ResourceKey, List<BiConsumer<ResourceLocation, Biome>>> MODIFICATIONS = Maps.newHashMap();
 	private static final Map<ResourceLocation, SurfaceRules.RuleSource> SURFACE_RULES = Maps.newHashMap();
+	private static final Set<NoiseGeneratorSettings> NOISE_GENERATOR_SETTINGS = new HashSet<>();
 	private static final Set<ResourceLocation> MODIFIED_BIOMES = Sets.newHashSet();
 	
 	public static final BCLBiome NETHER_WASTES_BIOME = registerNetherBiome(getFromRegistry(Biomes.NETHER_WASTES));
@@ -124,19 +129,21 @@ public class BiomeAPI {
 			return;
 		}
 		
-		BuiltinRegistries.BIOME.entrySet()
-							   .stream()
-							   .filter(entry -> entry.getKey()
-													 .location()
-													 .getNamespace()
-													 .equals("minecraft"))
-							   .map(Entry::getValue)
-							   .map(biome -> (BiomeGenerationSettingsAccessor) biome.getGenerationSettings())
-							   .map(BiomeGenerationSettingsAccessor::bclib_getFeatures)
-							   .forEach(stepFeatureSuppliers -> stepFeatureSuppliers.forEach(step -> step.forEach(featureSupplier -> {
-								   PlacedFeature feature = featureSupplier.get();
-								   FEATURE_ORDER.computeIfAbsent(feature, f -> FEATURE_ORDER_ID.getAndIncrement());
-							   })));
+		BuiltinRegistries.BIOME
+			.entrySet()
+			.stream()
+			.filter(entry -> entry
+				.getKey()
+				.location()
+				.getNamespace()
+				.equals("minecraft"))
+			.map(Entry::getValue)
+			.map(biome -> (BiomeGenerationSettingsAccessor) biome.getGenerationSettings())
+			.map(BiomeGenerationSettingsAccessor::bclib_getFeatures)
+			.forEach(stepFeatureSuppliers -> stepFeatureSuppliers.forEach(step -> step.forEach(featureSupplier -> {
+				PlacedFeature feature = featureSupplier.get();
+				FEATURE_ORDER.computeIfAbsent(feature, f -> FEATURE_ORDER_ID.getAndIncrement());
+			})));
 	}
 	
 	/**
@@ -181,9 +188,9 @@ public class BiomeAPI {
 	 * called from  {@link ru.bclib.mixin.client.MinecraftMixin}
 	 */
 	public static void prepareWorldData(){
-		structureStarts.clear();
+		STRUCTURE_STARTS.clear();
 		worldSources.clear();
-		knownNoiseGenerators.clear();
+		NOISE_GENERATOR_SETTINGS.clear();
 	}
 	
 	/**
@@ -797,7 +804,7 @@ public class BiomeAPI {
 	 */
 	public static void addSurfaceRule(ResourceLocation biomeID, SurfaceRules.RuleSource source) {
 		SURFACE_RULES.put(biomeID, source);
-		knownNoiseGenerators.forEach(BiomeAPI::changeSurfaceRulesForGenerator);
+		NOISE_GENERATOR_SETTINGS.forEach(BiomeAPI::changeSurfaceRulesForGenerator);
 	}
 	
 	/**
@@ -888,6 +895,29 @@ public class BiomeAPI {
 		return Optional.empty();
 	}
 	
+	/**
+	 * Set biome in chunk at specified position.
+	 * @param chunk {@link ChunkAccess} chunk to set biome in.
+	 * @param pos {@link BlockPos} biome position.
+	 * @param biome {@link Biome} instance. Should be biome from world.
+	 */
+	public static void setBiome(ChunkAccess chunk, BlockPos pos, Biome biome) {
+		int sectionY = (pos.getY() - chunk.getMinBuildHeight()) >> 4;
+		PalettedContainer<Biome> biomes = chunk.getSection(sectionY).getBiomes();
+		biomes.set(pos.getX() & 15, pos.getY() & 15, pos.getZ() & 15, biome);
+	}
+	
+	/**
+	 * Set biome in world at specified position.
+	 * @param level {@link LevelAccessor} world to set biome in.
+	 * @param pos {@link BlockPos} biome position.
+	 * @param biome {@link Biome} instance. Should be biome from world.
+	 */
+	public static void setBiome(LevelAccessor level, BlockPos pos, Biome biome) {
+		ChunkAccess chunk = level.getChunk(pos);
+		setBiome(chunk, pos, biome);
+	}
+	
 	static class StructureID {
 		public final ResourceLocation id;
 		public final ConfiguredStructureFeature structure;
@@ -916,12 +946,11 @@ public class BiomeAPI {
 		}
 	}
 	
-	private final static Map<StructureID, BiConsumer<Map<StructureFeature<?>, Multimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>>>, Map<StructureFeature<?>, StructureFeatureConfiguration>>> structureStarts = new HashMap<>();
-
 	private static void registerNoiseGeneratorAndChangeSurfaceRules(NoiseGeneratorSettings settings){
-		knownNoiseGenerators.add(settings);
+		NOISE_GENERATOR_SETTINGS.add(settings);
 		changeSurfaceRulesForGenerator(settings);
 	}
+	
 	public static void registerStructureEvents(){
 		DynamicRegistrySetupCallback.EVENT.register(registryManager -> {
 			Optional<? extends Registry<NoiseGeneratorSettings>> oGeneratorRegistry = registryManager.registry(Registry.NOISE_GENERATOR_SETTINGS_REGISTRY);
@@ -937,7 +966,7 @@ public class BiomeAPI {
 						
 						//add back modded structures
 						StructureSettingsAccessor a = (StructureSettingsAccessor)settings.structureSettings();
-						structureStarts.entrySet().forEach(entry -> changeStructureStarts(a, entry.getValue()));
+						STRUCTURE_STARTS.entrySet().forEach(entry -> changeStructureStarts(a, entry.getValue()));
 						
 						//add surface rules
 						registerNoiseGeneratorAndChangeSurfaceRules(settings);
@@ -947,7 +976,7 @@ public class BiomeAPI {
 			
 		});
 	}
-	private static final Set<NoiseGeneratorSettings> knownNoiseGenerators = new HashSet<>();
+	
 	private static void changeSurfaceRulesForGenerator(NoiseGeneratorSettings settings){
 		List<SurfaceRules.RuleSource> rules;
 		if (biomeRegistry!=null) {
@@ -969,7 +998,7 @@ public class BiomeAPI {
 	}
 	
 	private static void changeStructureStarts(ResourceLocation id, ConfiguredStructureFeature structure, BiConsumer<Map<StructureFeature<?>, Multimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>>>, Map<StructureFeature<?>, StructureFeatureConfiguration>> modifier) {
-		structureStarts.put(new StructureID(id, structure), modifier);
+		STRUCTURE_STARTS.put(new StructureID(id, structure), modifier);
 		Registry<NoiseGeneratorSettings> chunkGenSettingsRegistry = BuiltinRegistries.NOISE_GENERATOR_SETTINGS;
 		
 		for (Map.Entry<ResourceKey<NoiseGeneratorSettings>, NoiseGeneratorSettings> entry : chunkGenSettingsRegistry.entrySet()) {
