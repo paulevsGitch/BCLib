@@ -60,9 +60,10 @@ public abstract class ModIntegration {
 	}
 	
 	public BCLFeature getFeature(String featureID, String placedFeatureID, GenerationStep.Decoration featureStep) {
-		Feature<?> feature = Registry.FEATURE.get(getID(featureID));
+		ResourceLocation id = getID(featureID);
+		Feature<?> feature = Registry.FEATURE.get(id);
 		PlacedFeature featureConfigured = BuiltinRegistries.PLACED_FEATURE.get(getID(placedFeatureID));
-		return new BCLFeature(feature, featureConfigured, featureStep);
+		return new BCLFeature(id, feature, featureStep, featureConfigured);
 	}
 	
 	public BCLFeature getFeature(String name, GenerationStep.Decoration featureStep) {

@@ -19,16 +19,17 @@ public class BCLFeature {
 	private Decoration featureStep;
 	private Feature<?> feature;
 	
-	public BCLFeature(Feature<?> feature, PlacedFeature placedFeature, Decoration featureStep) {
-		this.placedFeature = placedFeature;
-		this.featureStep = featureStep;
-		this.feature = feature;
-	}
-	
 	public BCLFeature(ResourceLocation id, Feature<?> feature, Decoration featureStep, PlacedFeature placedFeature) {
-		this.placedFeature = Registry.register(BuiltinRegistries.PLACED_FEATURE, id, placedFeature);
-		this.feature = Registry.register(Registry.FEATURE, id, feature);
+		this.placedFeature = placedFeature;
+		this.feature = feature;
 		this.featureStep = featureStep;
+		
+		if (!BuiltinRegistries.PLACED_FEATURE.containsKey(id)) {
+			Registry.register(BuiltinRegistries.PLACED_FEATURE, id, placedFeature);
+		}
+		if (!Registry.FEATURE.containsKey(id)) {
+			Registry.register(Registry.FEATURE, id, feature);
+		}
 	}
 	
 	/**
