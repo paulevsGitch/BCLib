@@ -63,6 +63,7 @@ public class BCLBiomeBuilder {
 	private float fogDensity;
 	private float genChance;
 	private float downfall;
+	private float height;
 	
 	/**
 	 * Starts new biome building process.
@@ -81,6 +82,7 @@ public class BCLBiomeBuilder {
 		INSTANCE.fogDensity = 1.0F;
 		INSTANCE.downfall = 1.0F;
 		INSTANCE.genChance = 1.0F;
+		INSTANCE.height = 0.1F;
 		return INSTANCE;
 	}
 	
@@ -567,6 +569,16 @@ public class BCLBiomeBuilder {
 	}
 	
 	/**
+	 * Set terrain height for the biome. Can be used in custom generators, doesn't change vanilla biome distribution or generation.
+	 * @param height a relative float terrain height value.
+	 * @return same {@link BCLBiomeBuilder} instance.
+	 */
+	public BCLBiomeBuilder terrainHeight(float height) {
+		this.height = height;
+		return this;
+	}
+	
+	/**
 	 * Finalize biome creation.
 	 * @return created {@link BCLBiome} instance.
 	 */
@@ -590,26 +602,27 @@ public class BCLBiomeBuilder {
 		builder.specialEffects(getEffects().build());
 		
 		Map<Decoration, List<Supplier<PlacedFeature>>> defferedFeatures = new HashMap<>();
-		BiomeGenerationSettingsAccessor acc = (BiomeGenerationSettingsAccessor)getGeneration().build();
-		if (acc!=null){
+		BiomeGenerationSettingsAccessor acc = BiomeGenerationSettingsAccessor.class.cast(getGeneration().build());
+		if (acc != null) {
 			builder.generationSettings(new BiomeGenerationSettings.Builder().build());
 			var decorations = acc.bclib_getFeatures();
-			
-			for (Decoration d : Decoration.values()){
+			for (Decoration d : Decoration.values()) {
 				int i = d.ordinal();
-				
-				if (i>=0 && i<decorations.size()) {
+				if (i >= 0 && i < decorations.size()) {
 					var features = decorations.get(i);
 					defferedFeatures.put(d, features.stream().collect(Collectors.toList()));
-				} else {
+				}
+				else {
 					defferedFeatures.put(d, new ArrayList<>(0));
 				}
 			}
-		} else {
+		}
+		else {
 			builder.generationSettings(getGeneration().build());
 		}
 		
 		final T res = biomeConstructor.apply(biomeID, builder.build());
+		res.setTerrainHeight(height);
 		res.attachStructures(structures);
 		res.setSurface(surfaceRule);
 		res.setFogDensity(fogDensity);

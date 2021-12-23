@@ -290,6 +290,16 @@ public class BCLBiome {
 	}
 	
 	/**
+	 * Setter for terrain height, can be used in custom terrain generator.
+	 * @param terrainHeight a relative float terrain height value.
+	 * @return same {@link BCLBiome}.
+	 */
+	public BCLBiome setTerrainHeight(float terrainHeight) {
+		this.terrainHeight = terrainHeight;
+		return this;
+	}
+	
+	/**
 	 * Getter for terrain height, can be used in custom terrain generator.
 	 * @return terrain height.
 	 */
