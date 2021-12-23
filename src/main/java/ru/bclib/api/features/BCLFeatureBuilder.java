@@ -80,15 +80,6 @@ public class BCLFeatureBuilder {
 	}
 	
 	/**
-	 * Generate feature in certain iterations (per chunk), count can be different in different chunks.
-	 * @param average how many times feature will be generated in chunk (in average).
-	 * @return same {@link BCLFeatureBuilder} instance.
-	 */
-	public BCLFeatureBuilder countAverage(int average) {
-		return modifier(RarityFilter.onAverageOnceEvery(average));
-	}
-	
-	/**
 	 * Generate feature in certain iterations (per chunk).
 	 * Feature will be generated on all layers (example - Nether plants).
 	 * @param count how many times feature will be generated in chunk layers.

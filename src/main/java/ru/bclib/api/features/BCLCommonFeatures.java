@@ -39,7 +39,7 @@ public class BCLCommonFeatures {
 		else {
 			return BCLFeatureBuilder
 				.start(id, feature)
-				.countAverage(density)
+				.oncePerChunks(density)
 				.squarePlacement()
 				.heightmap()
 				.onlyInBiome()
@@ -67,7 +67,7 @@ public class BCLCommonFeatures {
 	 * @return new BCLFeature instance.
 	 */
 	public static BCLFeature makeChancedFeature(ResourceLocation id, Decoration decoration, Feature<NoneFeatureConfiguration> feature, int chance) {
-		return BCLFeatureBuilder.start(id, feature).decoration(decoration).countAverage(chance).onlyInBiome().build();
+		return BCLFeatureBuilder.start(id, feature).decoration(decoration).oncePerChunks(chance).onlyInBiome().build();
 	}
 	
 	/**
@@ -108,7 +108,7 @@ public class BCLCommonFeatures {
 			builder.oncePerChunks(veins);
 		}
 		else {
-			builder.countAverage(veins);
+			builder.oncePerChunks(veins);
 		}
 		
 		return builder.build(new OreConfiguration(
