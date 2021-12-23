@@ -6,11 +6,11 @@
 	"client": [
 		"SimpleReloadableResourceManagerMixin",
 		"EnchantingTableBlockMixin",
-		"BackgroundRendererMixin",
 		"ClientRecipeBookMixin",
 		"ModelManagerMixin",
 		"TextureAtlasMixin",
 		"AnvilScreenMixin",
+		"FogRendererMixin",
 		"ModelBakeryMixin",
 		"WorldPresetMixin",
 		"MinecraftMixin",

@@ -27,9 +27,7 @@ public class CustomBackgroundRenderer {
 	private static float fogEnd = 192;
 	
 	public static boolean applyFogDensity(Camera camera, FogRenderer.FogMode fogMode, float viewDistance, boolean thickFog) {
-		FogType fogType = camera.getFluidInCamera();
-		
-		if (fogType == FogType.WATER || fogType == FogType.LAVA || fogMode != FogMode.FOG_SKY) {
+		if (fogMode != FogMode.FOG_SKY && fogMode != FogMode.FOG_TERRAIN) {
 			BackgroundInfo.fogDensity = 1;
 			return false;
 		}
@@ -49,7 +47,7 @@ public class CustomBackgroundRenderer {
 			fogEnd = Math.min(viewDistance, 192.0F) * 0.5F / fog;
 		}
 		else {
-			fogStart = viewDistance * 0.75F / fog;
+			fogStart = 0;//viewDistance * 0.75F / fog;
 			fogEnd = viewDistance / fog;
 		}
 		
