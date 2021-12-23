@@ -904,7 +904,7 @@ public class BiomeAPI {
 	public static void setBiome(ChunkAccess chunk, BlockPos pos, Biome biome) {
 		int sectionY = (pos.getY() - chunk.getMinBuildHeight()) >> 4;
 		PalettedContainer<Biome> biomes = chunk.getSection(sectionY).getBiomes();
-		biomes.set(pos.getX() & 15, pos.getY() & 15, pos.getZ() & 15, biome);
+		biomes.set((pos.getX() & 15) >> 2, (pos.getY() & 15) >> 2, (pos.getZ() & 15) >> 2, biome);
 	}
 	
 	/**
