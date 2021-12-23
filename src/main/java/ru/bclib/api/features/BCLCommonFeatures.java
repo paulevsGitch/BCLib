@@ -32,7 +32,7 @@ public class BCLCommonFeatures {
 	 */
 	public static BCLFeature makeVegetationFeature(ResourceLocation id, Feature<NoneFeatureConfiguration> feature, int density, boolean allHeight) {
 		if (allHeight) {
-			return BCLFeatureBuilder.start(id, feature).countLayers(density).onlyInBiome().build();
+			return BCLFeatureBuilder.start(id, feature).countLayers(density).squarePlacement().onlyInBiome().build();
 		}
 		else {
 			return BCLFeatureBuilder
@@ -65,7 +65,7 @@ public class BCLCommonFeatures {
 	 * @return new BCLFeature instance.
 	 */
 	public static BCLFeature makeChancedFeature(ResourceLocation id, Decoration decoration, Feature<NoneFeatureConfiguration> feature, int chance) {
-		return BCLFeatureBuilder.start(id, feature).decoration(decoration).oncePerChunks(chance).onlyInBiome().build();
+		return BCLFeatureBuilder.start(id, feature).decoration(decoration).oncePerChunks(chance).squarePlacement().onlyInBiome().build();
 	}
 	
 	/**
@@ -77,7 +77,7 @@ public class BCLCommonFeatures {
 	 * @return new BCLFeature instance.
 	 */
 	public static BCLFeature makeCountFeature(ResourceLocation id, Decoration decoration, Feature<NoneFeatureConfiguration> feature, int count) {
-		return BCLFeatureBuilder.start(id, feature).decoration(decoration).count(count).onlyInBiome().build();
+		return BCLFeatureBuilder.start(id, feature).decoration(decoration).count(count).squarePlacement().onlyInBiome().build();
 	}
 	
 	/**
