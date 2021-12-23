@@ -104,7 +104,7 @@ public class BCLCommonFeatures {
 			builder.count(veins);
 		}
 		
-		builder.modifier(placement).onlyInBiome();
+		builder.modifier(placement).squarePlacement().onlyInBiome();
 		
 		return builder.build(new OreConfiguration(
 			new BlockMatchTest(hostBlock),
