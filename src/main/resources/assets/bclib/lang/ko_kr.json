@@ -28,6 +28,11 @@
 	"title.config.bclib.client.auto_sync.acceptMods": "수신 모드 수락",
 	"title.config.bclib.client.auto_sync.displayModInfo": "서버사이드 모드가 클라이언트와 다를 때 경고 표시",
 	"title.config.bclib.client.auto_sync.debugHashes": "로그에 자동 동기화 디버그 해시 인쇄",
+	
+	"title.config.bclib.generator.options.useOldBiomeGenerator": "유산 1.17 생물군계 생성기를 사용합니다.",
+	"title.config.bclib.main.patches.applyPatches": "레벨을 로드할 때 패치를 자동으로 적용합니다.",
+	"title.config.bclib.main.patches.repairBiomesOnLoad": "레벨 로드할 때 바이옴소스를 수정합니다.",
+	"title.config.bclib.client.ui.suppressExperimentalDialogOnLoad": "로드 시 실험 경고 화면을 사용하지 않도록 설정합니다.",
 
 	"title.bclib.syncfiles.modInfo": "모드 정보",
 	"title.bclib.syncfiles.modlist": "모드 목록",
