@@ -154,16 +154,6 @@ public class BiomeAPI {
 		if (biomeRegistry != BiomeAPI.biomeRegistry) {
 			BiomeAPI.biomeRegistry = biomeRegistry;
 			CLIENT.clear();
-			
-			for (var entry : biomeRegistry.entrySet()){
-				onAddedBiome(entry.getValue());
-			}
-			RegistryEntryAddedCallback
-				.event(biomeRegistry)
-				.register((rawId, id, biome)->{
-					//BCLib.LOGGER.info(" #### " + rawId + ", " + biome + ", " + id);
-					onAddedBiome(biome);
-				});
 		}
 	}
 	
@@ -191,33 +181,6 @@ public class BiomeAPI {
 		STRUCTURE_STARTS.clear();
 		worldSources.clear();
 		NOISE_GENERATOR_SETTINGS.clear();
-	}
-	
-	/**
-	 * Registered by {@link #initRegistry(Registry)} as a callback for whenever a new Biome was
-	 * added to our registry
-	 * @param biome The {@link Biome} that got added
-	 */
-	private static void onAddedBiome(Biome biome) {
-		boolean didChange = false;
-		//BCLib.LOGGER.info(" ++++ " + getBiomeID(biome) + ", " + getBiomeKey(biome) + ", " + biome);
-		for (var dim : MODIFICATIONS.keySet()) {
-			List<BiConsumer<ResourceLocation, Biome>> modifications = MODIFICATIONS.get(dim);
-			if (modifications == null) {
-				sortBiomeFeatures(biome);
-				continue;
-			}
-			
-			didChange=true;
-			applyModificationsToBiome(modifications, biome);
-		}
-		
-//		if (didChange) {
-//			worldSources.stream()
-//						.filter(s -> s.possibleBiomes()
-//									  .contains(biome))
-//						.forEach(s -> ((BiomeSourceAccessor) s).bclRebuildFeatures());
-//		}
 	}
 	
 	/**
@@ -612,9 +575,10 @@ public class BiomeAPI {
 	}
 	
 	private static List<SurfaceRules.RuleSource> getRuleSources(Set<Biome> biomes) {
-		Set<ResourceLocation> biomeIDs = biomes.stream()
-											   .map(biome -> getBiomeID(biome))
-											   .collect(Collectors.toSet());
+		Set<ResourceLocation> biomeIDs = biomes
+			.stream()
+			.map(biome -> getBiomeID(biome))
+			.collect(Collectors.toSet());
 		return getRuleSourcesFromIDs(biomeIDs);
 	}
 
@@ -633,29 +597,6 @@ public class BiomeAPI {
 				rules.add(rule);
 			}
 		});
-		
-		// Try handle biomes from other dimension, may work not as expected
-		// Will not work
-		/*Optional<Biome> optional = biomes
-			.stream()
-			.filter(biome -> biome.getBiomeCategory() != BiomeCategory.THEEND && biome.getBiomeCategory() != BiomeCategory.NETHER)
-			.findAny();
-		if (optional.isPresent()) {
-			rules.add(SurfaceRuleData.overworld());
-		}
-		
-		if (dimensionType == Level.NETHER) {
-			optional = biomes.stream().filter(biome -> biome.getBiomeCategory() != BiomeCategory.THEEND).findAny();
-			if (optional.isPresent()) {
-				rules.add(SurfaceRuleData.end());
-			}
-		}
-		else if (dimensionType == Level.END) {
-			optional = biomes.stream().filter(biome -> biome.getBiomeCategory() != BiomeCategory.NETHER).findAny();
-			if (optional.isPresent()) {
-				rules.add(SurfaceRuleData.end());
-			}
-		}*/
 		
 		return rules;
 	}
@@ -702,8 +643,7 @@ public class BiomeAPI {
 	/**
 	 * For internal use only!
 	 *
-	 * Adds new features to existing biome. Called from {@link BCLBiome#setFeatures(Map)} when the Biome is
-	 * first built, and from {@link #onAddedBiome(Biome)} whenever a Biome is readded through a Datapack
+	 * Adds new features to existing biome. Called from {@link BCLBiome#setFeatures(Map)} when the Biome is first built
 	 * @param biome {@link Biome} to add features in.
 	 * @param featureMap Map of {@link ConfiguredFeature} to add.
 	 */

@@ -37,7 +37,6 @@ public abstract class ServerLevelMixin extends Level {
 		ServerLevel level = ServerLevel.class.cast(this);
 		LifeCycleAPI._runLevelLoad(level, server, executor, levelStorageAccess, serverLevelData, resourceKey, dimensionType, chunkProgressListener, chunkGenerator, bl, l, list, bl2);
 		
-		//BiomeAPI.initRegistry(server);
 		BiomeAPI.applyModifications(ServerLevel.class.cast(this));
 		
 		if (level.dimension() == Level.NETHER) {
