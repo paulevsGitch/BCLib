@@ -109,7 +109,6 @@ public class BiomeAPI {
 	private static final Map<ResourceKey, List<BiConsumer<ResourceLocation, Biome>>> MODIFICATIONS = Maps.newHashMap();
 	private static final Map<ResourceLocation, SurfaceRules.RuleSource> SURFACE_RULES = Maps.newHashMap();
 	private static final Set<NoiseGeneratorSettings> NOISE_GENERATOR_SETTINGS = new HashSet<>();
-	private static final Set<ResourceLocation> MODIFIED_BIOMES = Sets.newHashSet();
 	
 	public static final BCLBiome NETHER_WASTES_BIOME = registerNetherBiome(getFromRegistry(Biomes.NETHER_WASTES));
 	public static final BCLBiome CRIMSON_FOREST_BIOME = registerNetherBiome(getFromRegistry(Biomes.CRIMSON_FOREST));
@@ -374,9 +373,9 @@ public class BiomeAPI {
 	 */
 	@Nullable
 	public static ResourceKey getBiomeKey(Biome biome) {
-		return BuiltinRegistries.BIOME.getResourceKey(biome)
-									  .orElseGet(() -> biomeRegistry != null ? biomeRegistry.getResourceKey(biome)
-																							.orElse(null) : null);
+		return BuiltinRegistries.BIOME
+			.getResourceKey(biome)
+			.orElseGet(() -> biomeRegistry != null ? biomeRegistry.getResourceKey(biome).orElse(null) : null);
 	}
 	
 	/**
@@ -539,22 +538,12 @@ public class BiomeAPI {
 
 	private static void applyModificationsToBiome(List<BiConsumer<ResourceLocation, Biome>> modifications, Biome biome) {
 		ResourceLocation biomeID = getBiomeID(biome);
-		boolean modify = isDatapackBiome(biomeID);
-		if (biome != BuiltinRegistries.BIOME.get(biomeID)) {
-			modify = true;
-		}
-		else if (!modify && !MODIFIED_BIOMES.contains(biomeID)) {
-			MODIFIED_BIOMES.add(biomeID);
-			modify = true;
-		}
-		if (modify) {
-			modifications.forEach(consumer -> {
-				consumer.accept(biomeID, biome);
-			});
-		}
+		modifications.forEach(consumer -> {
+			consumer.accept(biomeID, biome);
+		});
 		
 		final BCLBiome bclBiome = BiomeAPI.getBiome(biome);
-		if (bclBiome!=null) {
+		if (bclBiome != null) {
 			addStepFeaturesToBiome(biome, bclBiome.getFeatures());
 		}
 		
@@ -597,7 +586,6 @@ public class BiomeAPI {
 				rules.add(rule);
 			}
 		});
-		
 		return rules;
 	}
 	
@@ -633,7 +621,7 @@ public class BiomeAPI {
 		Set<PlacedFeature> set = CollectionsUtil.getMutable(accessor.bclib_getFeatureSet());
 		List<Supplier<PlacedFeature>> features = getFeaturesList(allFeatures, step);
 		for (var feature : featureList) {
-			features.add(() ->  feature);
+			features.add(() -> feature);
 			set.add(feature);
 		}
 		accessor.bclib_setFeatures(allFeatures);
@@ -671,7 +659,7 @@ public class BiomeAPI {
 	 * @param structure {@link ConfiguredStructureFeature} to add.
 	 */
 	public static void addBiomeStructure(ResourceKey biomeKey, ConfiguredStructureFeature structure) {
-		if (biomeKey==null){
+		if (biomeKey == null){
 			BCLib.LOGGER.error("null is not a valid biomeKey for " + structure);
 			return;
 		}
@@ -680,7 +668,7 @@ public class BiomeAPI {
 			configuredMap.put(structure, biomeKey);
 			
 			StructureFeatureConfiguration config = FabricStructureImpl.STRUCTURE_TO_CONFIG_MAP.get(structure.feature);
-			if (config!=null){
+			if (config != null){
 				configMap.put(structure.feature, config);
 			}
 		});
@@ -690,9 +678,9 @@ public class BiomeAPI {
 		changeStructureStarts(BiomeAPI.getBiomeID(biome), structure, (structureMap, configMap) -> {
 			Multimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>> configuredMap = structureMap.computeIfAbsent(structure.feature, k -> HashMultimap.create());
 			var key = getBiomeKey(biome);
-			if (key!=null) {
+			if (key != null) {
 				StructureFeatureConfiguration config = FabricStructureImpl.STRUCTURE_TO_CONFIG_MAP.get(structure.feature);
-				if (config!=null){
+				if (config != null) {
 					configMap.put(structure.feature, config);
 				}
 				configuredMap.put(structure, key);
