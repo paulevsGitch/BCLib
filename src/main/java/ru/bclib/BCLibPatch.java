@@ -4,11 +4,13 @@ import net.minecraft.nbt.CompoundTag;
 import ru.bclib.api.datafixer.DataFixerAPI;
 import ru.bclib.api.datafixer.ForcedLevelPatch;
 import ru.bclib.api.datafixer.MigrationProfile;
+import ru.bclib.config.Configs;
 import ru.bclib.world.generator.GeneratorOptions;
 
 public final class BCLibPatch {
-	public static void register(){
-		if (GeneratorOptions.fixBiomeSource()) {
+	public static void register() {
+		// TODO separate values in config on client side (config screen)
+		if (Configs.MAIN_CONFIG.repairBiomes() && (GeneratorOptions.fixEndBiomeSource() || GeneratorOptions.fixNetherBiomeSource())) {
 			DataFixerAPI.registerPatch(BiomeSourcePatch::new);
 		}
 	}
@@ -29,20 +31,24 @@ final class BiomeSourcePatch extends ForcedLevelPatch{
 		long seed = worldGenSettings.getLong("seed");
 		boolean result = false;
 		
-		if (!dimensions.contains("minecraft:the_nether") || !isBCLibEntry(dimensions.getCompound("minecraft:the_nether"))) {
-			CompoundTag dimRoot = new CompoundTag();
-			dimRoot.put("generator", makeNetherGenerator(seed));
-			dimRoot.putString("type", "minecraft:the_nether");
-			dimensions.put("minecraft:the_nether", dimRoot);
-			result = true;
+		if (GeneratorOptions.fixNetherBiomeSource()) {
+			if (!dimensions.contains("minecraft:the_nether") || !isBCLibEntry(dimensions.getCompound("minecraft:the_nether"))) {
+				CompoundTag dimRoot = new CompoundTag();
+				dimRoot.put("generator", makeNetherGenerator(seed));
+				dimRoot.putString("type", "minecraft:the_nether");
+				dimensions.put("minecraft:the_nether", dimRoot);
+				result = true;
+			}
 		}
 		
-		if (!dimensions.contains("minecraft:the_end") || !isBCLibEntry(dimensions.getCompound("minecraft:the_end"))) {
-			CompoundTag dimRoot = new CompoundTag();
-			dimRoot.put("generator", makeEndGenerator(seed));
-			dimRoot.putString("type", "minecraft:the_end");
-			dimensions.put("minecraft:the_end", dimRoot);
-			result = true;
+		if (GeneratorOptions.fixEndBiomeSource()) {
+			if (!dimensions.contains("minecraft:the_end") || !isBCLibEntry(dimensions.getCompound("minecraft:the_end"))) {
+				CompoundTag dimRoot = new CompoundTag();
+				dimRoot.put("generator", makeEndGenerator(seed));
+				dimRoot.putString("type", "minecraft:the_end");
+				dimensions.put("minecraft:the_end", dimRoot);
+				result = true;
+			}
 		}
 		
 		return result;

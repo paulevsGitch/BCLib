@@ -283,8 +283,7 @@ public class DataFixerAPI {
 	}
 	@Environment(EnvType.CLIENT)
 	private static void showLevelFixErrorScreen(State state, Listener onContinue){
-		Minecraft.getInstance()
-				 .setScreen(new LevelFixErrorScreen(Minecraft.getInstance().screen, state.getErrorMessages(), onContinue));
+		Minecraft.getInstance().setScreen(new LevelFixErrorScreen(Minecraft.getInstance().screen, state.getErrorMessages(), onContinue));
 	}
 	
 	private static MigrationProfile loadProfileIfNeeded(File levelBaseDir){
