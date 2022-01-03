@@ -2,6 +2,7 @@ package ru.bclib.world.generator;
 
 import net.minecraft.util.Mth;
 import ru.bclib.config.Configs;
+import ru.bclib.config.MainConfig;
 
 import java.awt.Point;
 import java.util.function.Function;
@@ -32,7 +33,8 @@ public class GeneratorOptions {
 		addEndBiomesByCategory = Configs.GENERATOR_CONFIG.getBoolean("options", "addEndBiomesByCategory", false);
 		useOldBiomeGenerator = Configs.GENERATOR_CONFIG.useOldGenerator();
 		verticalBiomes = Configs.GENERATOR_CONFIG.getBoolean("options", "verticalBiomesInTallNether", true);
-		fixBiomeSource = Configs.GENERATOR_CONFIG.getBoolean("options", "fixBiomeSource", true);
+		
+		fixBiomeSource = Configs.MAIN_CONFIG.get(MainConfig.REPAIR_BIOMES);
 	}
 	
 	public static int getBiomeSizeNether() {

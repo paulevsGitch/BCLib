@@ -4,7 +4,8 @@ import ru.bclib.BCLib;
 
 public class GeneratorConfig extends NamedPathConfig {
 	public static final ConfigToken<Boolean> USE_OLD_GENERATOR = ConfigToken.Boolean(false, "useOldBiomeGenerator", "options");
-	
+
+
 	public GeneratorConfig() {
 		super(BCLib.MOD_ID, "generator", false);
 	}
