@@ -4,11 +4,12 @@ import net.minecraft.nbt.CompoundTag;
 import ru.bclib.api.datafixer.DataFixerAPI;
 import ru.bclib.api.datafixer.ForcedLevelPatch;
 import ru.bclib.api.datafixer.MigrationProfile;
+import ru.bclib.config.Configs;
 import ru.bclib.world.generator.GeneratorOptions;
 
 public final class BCLibPatch {
 	public static void register(){
-		if (GeneratorOptions.fixEndBiomeSource() || GeneratorOptions.fixNetherBiomeSource()) {
+		if (Configs.MAIN_CONFIG.repairBiomes() && (GeneratorOptions.fixEndBiomeSource() || GeneratorOptions.fixNetherBiomeSource())) {
 			DataFixerAPI.registerPatch(BiomeSourcePatch::new);
 		}
 	}
