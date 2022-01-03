@@ -4,24 +4,22 @@ import net.minecraft.nbt.CompoundTag;
 import ru.bclib.api.datafixer.DataFixerAPI;
 import ru.bclib.api.datafixer.ForcedLevelPatch;
 import ru.bclib.api.datafixer.MigrationProfile;
-import ru.bclib.api.datafixer.Patch;
-import ru.bclib.config.Configs;
-import ru.bclib.interfaces.PatchFunction;
-
-
+import ru.bclib.world.generator.GeneratorOptions;
 
 public final class BCLibPatch {
 	public static void register(){
-		DataFixerAPI.registerPatch(BiomeSourcePatch::new);
-		if (Configs.MAIN_CONFIG.repairBiomes()) {
-			DataFixerAPI.registerPatch(BiomeFixPatch::new);
+		if (GeneratorOptions.fixBiomeSource()) {
+			DataFixerAPI.registerPatch(BiomeSourcePatch::new);
 		}
 	}
 }
 
-final class BiomeFixPatch extends ForcedLevelPatch{
-	protected BiomeFixPatch() {
-		super(BCLib.MOD_ID, "0.5.0");
+final class BiomeSourcePatch extends ForcedLevelPatch{
+	private static final String NETHER_BIOME_SOURCE = "bclib:nether_biome_source";
+	private static final String END_BIOME_SOURCE = "bclib:end_biome_source";
+	
+	protected BiomeSourcePatch() {
+		super(BCLib.MOD_ID, "1.2.1");
 	}
 	
 	@Override
@@ -31,88 +29,32 @@ final class BiomeFixPatch extends ForcedLevelPatch{
 		long seed = worldGenSettings.getLong("seed");
 		boolean result = false;
 		
-		if (!dimensions.contains("minecraft:the_nether")) {
-			BCLib.LOGGER.info("Repairing Nether biome source");
-			result = true;
-			
+		if (!dimensions.contains("minecraft:the_nether") || !isBCLibEntry(dimensions.getCompound("minecraft:the_nether"))) {
 			CompoundTag dimRoot = new CompoundTag();
-			dimRoot.put("generator", BiomeSourcePatch.makeNetherGenerator(seed));
+			dimRoot.put("generator", makeNetherGenerator(seed));
 			dimRoot.putString("type", "minecraft:the_nether");
 			dimensions.put("minecraft:the_nether", dimRoot);
-		} else {
-			result |= BiomeSourcePatch.repairNetherSource(dimensions, seed);
+			result = true;
 		}
 		
-		if (!dimensions.contains("minecraft:the_end")) {
-			BCLib.LOGGER.info("Repairing End biome source");
-			result = true;
-			
+		if (!dimensions.contains("minecraft:the_end") || !isBCLibEntry(dimensions.getCompound("minecraft:the_end"))) {
 			CompoundTag dimRoot = new CompoundTag();
-			dimRoot.put("generator", BiomeSourcePatch.makeEndGenerator(seed));
+			dimRoot.put("generator", makeEndGenerator(seed));
 			dimRoot.putString("type", "minecraft:the_end");
 			dimensions.put("minecraft:the_end", dimRoot);
-		} else {
-			result |= BiomeSourcePatch.repairEndSource(dimensions, seed);
-		}
-		
-		return result;
-	}
-}
-
-final class BiomeSourcePatch extends Patch {
-	private static final String NETHER_BIOME_SOURCE = "bclib:nether_biome_source";
-	private static final String END_BIOME_SOURCE = "bclib:end_biome_source";
-	
-	protected BiomeSourcePatch() {
-		super(BCLib.MOD_ID, "0.4.0");
-	}
-	
-	public PatchFunction<CompoundTag, Boolean> getLevelDatPatcher() {
-		return BiomeSourcePatch::fixBiomeSources;
-	}
-	
-	private static boolean fixBiomeSources(CompoundTag root, MigrationProfile profile) {
-		CompoundTag worldGenSettings = root.getCompound("Data").getCompound("WorldGenSettings");
-		CompoundTag dimensions = worldGenSettings.getCompound("dimensions");
-		long seed = worldGenSettings.getLong("seed");
-		boolean result = false;
-		
-		if (dimensions.contains("minecraft:the_nether")) {
-			result |= repairNetherSource(dimensions, seed);
-		}
-		
-		if (dimensions.contains("minecraft:the_end")) {
-			result |= repairEndSource(dimensions, seed);
+			result = true;
 		}
 		
 		return result;
 	}
 	
-	public static boolean repairEndSource(CompoundTag dimensions, long seed) {
-		CompoundTag dimRoot = dimensions.getCompound("minecraft:the_end");
-		CompoundTag biomeSource = dimRoot.getCompound("generator").getCompound("biome_source");
-		if (!biomeSource.getString("type").equals(END_BIOME_SOURCE)) {
-			BCLib.LOGGER.info("Applying End biome source patch");
-			dimRoot.put("generator", makeEndGenerator(seed));
-			return true;
+	private boolean isBCLibEntry(CompoundTag dimRoot) {
+		String type = dimRoot.getCompound("generator").getCompound("biome_source").getString("type");
+		if (type.isEmpty() || type.length() < 5) {
+			return false;
 		}
-		
-		return false;
+		return type.substring(0, 5).equals("bclib");
 	}
-	
-	public static boolean repairNetherSource(CompoundTag dimensions, long seed) {
-		CompoundTag dimRoot = dimensions.getCompound("minecraft:the_nether");
-		CompoundTag biomeSource = dimRoot.getCompound("generator").getCompound("biome_source");
-		if (!biomeSource.getString("type").equals(NETHER_BIOME_SOURCE)) {
-			BCLib.LOGGER.info("Applying Nether biome source patch");
-			dimRoot.put("generator", makeNetherGenerator(seed));
-			return true;
-		}
-		
-		return false;
-	}
-	
-	;
 	
 	public static CompoundTag makeNetherGenerator(long seed) {
 		CompoundTag generator = new CompoundTag();

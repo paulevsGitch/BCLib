@@ -19,6 +19,7 @@ public class GeneratorOptions {
 	private static boolean useOldBiomeGenerator = false;
 	private static boolean verticalBiomes = true;
 	private static long farEndBiomesSqr = 1000000;
+	private static boolean fixBiomeSource = true;
 	
 	public static void init() {
 		biomeSizeNether = Configs.GENERATOR_CONFIG.getInt("nether.biomeMap", "biomeSize", 256);
@@ -31,6 +32,7 @@ public class GeneratorOptions {
 		addEndBiomesByCategory = Configs.GENERATOR_CONFIG.getBoolean("options", "addEndBiomesByCategory", false);
 		useOldBiomeGenerator = Configs.GENERATOR_CONFIG.useOldGenerator();
 		verticalBiomes = Configs.GENERATOR_CONFIG.getBoolean("options", "verticalBiomesInTallNether", true);
+		fixBiomeSource = Configs.GENERATOR_CONFIG.getBoolean("options", "fixBiomeSource", true);
 	}
 	
 	public static int getBiomeSizeNether() {
@@ -99,5 +101,9 @@ public class GeneratorOptions {
 	
 	public static boolean useVerticalBiomes() {
 		return verticalBiomes;
+	}
+	
+	public static boolean fixBiomeSource() {
+		return fixBiomeSource;
 	}
 }
