@@ -8,7 +8,8 @@ import ru.bclib.config.Configs;
 import ru.bclib.world.generator.GeneratorOptions;
 
 public final class BCLibPatch {
-	public static void register(){
+	public static void register() {
+		// TODO separate values in config on client side (config screen)
 		if (Configs.MAIN_CONFIG.repairBiomes() && (GeneratorOptions.fixEndBiomeSource() || GeneratorOptions.fixNetherBiomeSource())) {
 			DataFixerAPI.registerPatch(BiomeSourcePatch::new);
 		}
