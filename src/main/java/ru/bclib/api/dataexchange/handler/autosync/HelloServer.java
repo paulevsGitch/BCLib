@@ -6,6 +6,7 @@ import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.entity.player.Player;
 import ru.bclib.BCLib;
 import ru.bclib.api.dataexchange.DataExchangeAPI;
 import ru.bclib.api.dataexchange.DataHandler;
@@ -84,12 +85,12 @@ public class HelloServer extends DataHandler.FromClient {
 	}
 	
 	@Override
-	protected void deserializeIncomingDataOnServer(FriendlyByteBuf buf, PacketSender responseSender) {
+	protected void deserializeIncomingDataOnServer(FriendlyByteBuf buf, Player player, PacketSender responseSender) {
 		bclibVersion = ModUtil.convertModVersion(buf.readInt());
 	}
 	
 	@Override
-	protected void runOnServerGameThread(MinecraftServer server) {
+	protected void runOnServerGameThread(MinecraftServer server, Player player) {
 		if (!Configs.SERVER_CONFIG.isAllowingAutoSync()) {
 			BCLib.LOGGER.info("Auto-Sync was disabled on the server.");
 			return;

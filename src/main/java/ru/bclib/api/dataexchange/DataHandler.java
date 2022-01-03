@@ -14,6 +14,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import net.minecraft.world.entity.player.Player;
 import ru.bclib.BCLib;
 import ru.bclib.api.dataexchange.handler.autosync.Chunker;
 import ru.bclib.api.dataexchange.handler.autosync.Chunker.PacketChunkSender;
@@ -132,7 +133,7 @@ public abstract class DataHandler extends BaseDataHandler {
 			}
 			
 			@Override
-			protected void deserializeIncomingDataOnServer(FriendlyByteBuf buf, PacketSender responseSender) {
+			protected void deserializeIncomingDataOnServer(FriendlyByteBuf buf, Player player, PacketSender responseSender) {
 			}
 		}
 		
@@ -145,10 +146,24 @@ public abstract class DataHandler extends BaseDataHandler {
 		
 		@Environment(EnvType.CLIENT)
 		abstract protected void serializeDataOnClient(FriendlyByteBuf buf);
-		
-		abstract protected void deserializeIncomingDataOnServer(FriendlyByteBuf buf, PacketSender responseSender);
-		
-		abstract protected void runOnServerGameThread(MinecraftServer server);
+
+		@Deprecated(forRemoval = true)
+		protected void deserializeIncomingDataOnServer(FriendlyByteBuf buf, PacketSender responseSender){ }
+
+		//TODO: should be abstract once deserializeIncomingDataOnServer(FriendlyByteBuf buf, PacketSender responseSender) was removed
+
+		protected void deserializeIncomingDataOnServer(FriendlyByteBuf buf, Player player, PacketSender responseSender) {
+			deserializeIncomingDataOnServer(buf, responseSender);
+		}
+
+		@Deprecated(forRemoval = true)
+		protected void runOnServerGameThread(MinecraftServer server){ }
+
+
+		//TODO: should be abstract once   runOnServerGameThread(MinecraftServer server) was  removed
+		protected void runOnServerGameThread(MinecraftServer server, Player player){
+			runOnServerGameThread(server);
+		}
 		
 		
 		@Environment(EnvType.CLIENT)
@@ -161,8 +176,8 @@ public abstract class DataHandler extends BaseDataHandler {
 		void receiveFromClient(MinecraftServer server, ServerPlayer player, ServerGamePacketListenerImpl handler, FriendlyByteBuf buf, PacketSender responseSender) {
 			super.receiveFromClient(server, player, handler, buf, responseSender);
 			
-			deserializeIncomingDataOnServer(buf, responseSender);
-			final Runnable runner = () -> runOnServerGameThread(server);
+			deserializeIncomingDataOnServer(buf, player, responseSender);
+			final Runnable runner = () -> runOnServerGameThread(server, player);
 			
 			if (isBlocking()) server.executeBlocking(runner);
 			else server.execute(runner);
