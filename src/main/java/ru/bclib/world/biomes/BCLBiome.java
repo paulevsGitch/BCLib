@@ -367,7 +367,12 @@ public class BCLBiome {
 	public void setSurface(RuleSource surface) {
 		this.surfaceInit = (actualBiome) -> {
 			ResourceKey key = BiomeAPI.getBiomeKey(actualBiome);
-			BiomeAPI.addSurfaceRule(biomeID, SurfaceRules.ifTrue(SurfaceRules.isBiome(key), surface));
+			if (key == null) {
+				BCLib.LOGGER.warning("BCL Biome " + biomeID + " don't have registry key!");
+			}
+			else {
+				BiomeAPI.addSurfaceRule(biomeID, SurfaceRules.ifTrue(SurfaceRules.isBiome(key), surface));
+			}
 		};
 	}
 	
@@ -415,8 +420,7 @@ public class BCLBiome {
 		String group = this.configGroup();
 		float chance = Configs.BIOMES_CONFIG.getFloat(group, "generation_chance", this.getGenChance());
 		float fog = Configs.BIOMES_CONFIG.getFloat(group, "fog_density", this.getFogDensity());
-		this.setGenChance(chance)
-				.setFogDensity(fog);
+		this.setGenChance(chance).setFogDensity(fog);
 		
 		if (this.getEdge()!=null){
 			int edgeSize = Configs.BIOMES_CONFIG.getInt(group, "edge_size", this.getEdgeSize());

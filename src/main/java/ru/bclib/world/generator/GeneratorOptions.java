@@ -2,7 +2,6 @@ package ru.bclib.world.generator;
 
 import net.minecraft.util.Mth;
 import ru.bclib.config.Configs;
-import ru.bclib.config.MainConfig;
 
 import java.awt.Point;
 import java.util.function.Function;
