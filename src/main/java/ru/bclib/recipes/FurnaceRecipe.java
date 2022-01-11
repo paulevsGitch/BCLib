@@ -75,7 +75,7 @@ public class FurnaceRecipe {
 	}
 	
 	public void build(boolean blasting, boolean campfire, boolean smoker) {
-		if (exist) {
+		if (!exist) {
 			return;
 		}
 		

@@ -255,7 +255,7 @@ public class AnvilRecipe implements Recipe<Container>, UnknownReceipBookCategory
 		}
 
 		public void build() {
-			if (exist) {
+			if (!exist) {
 				return;
 			}
 			
