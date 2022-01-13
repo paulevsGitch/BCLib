@@ -21,6 +21,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import ru.bclib.BCLib;
 import ru.bclib.api.dataexchange.DataExchangeAPI;
 import ru.bclib.recipes.BCLRecipeManager;
 
@@ -59,7 +60,9 @@ public class MinecraftServerMixin {
 
 	private void bclib_injectRecipes() {
 		RecipeManagerAccessor accessor = (RecipeManagerAccessor) resources.getRecipeManager();
+		if (!BCLib.isClient()) {
+			accessor.bclib_setRecipesByName(BCLRecipeManager.getMapByName(accessor.bclib_getRecipesByName()));
+		}
 		accessor.bclib_setRecipes(BCLRecipeManager.getMap(accessor.bclib_getRecipes()));
-		accessor.bclib_setRecipesByName(BCLRecipeManager.getMapByName(accessor.bclib_getRecipesByName()));
 	}
 }

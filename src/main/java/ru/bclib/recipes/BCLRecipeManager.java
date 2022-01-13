@@ -63,7 +63,7 @@ public class BCLRecipeManager {
 	public static Map<ResourceLocation, Recipe<?>> getMapByName(Map<ResourceLocation, Recipe<?>> recipes) {
 		Map<ResourceLocation, Recipe<?>> result = CollectionsUtil.getMutable(recipes);
 		RECIPES.values().forEach(map -> map.forEach((location, recipe) -> {
-			if (!recipes.containsKey(location)) {
+			if (!result.containsKey(location)) {
 				result.put(location, recipe);
 			}
 		}));
