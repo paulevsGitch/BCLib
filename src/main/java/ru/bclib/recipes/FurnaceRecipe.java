@@ -80,7 +80,7 @@ public class FurnaceRecipe {
 		}
 		
 		SmeltingRecipe recipe = new SmeltingRecipe(
-			id,
+			new ResourceLocation(id + "_smelting"),
 			group,
 			Ingredient.of(input),
 			new ItemStack(output, count),
@@ -91,7 +91,7 @@ public class FurnaceRecipe {
 		
 		if (blasting) {
 			BlastingRecipe recipe2 = new BlastingRecipe(
-				id,
+				new ResourceLocation(id + "_blasting"),
 				group,
 				Ingredient.of(input),
 				new ItemStack(output, count),
@@ -103,7 +103,7 @@ public class FurnaceRecipe {
 		
 		if (campfire) {
 			CampfireCookingRecipe recipe2 = new CampfireCookingRecipe(
-				id,
+				new ResourceLocation(id + "_campfire"),
 				group,
 				Ingredient.of(input),
 				new ItemStack(output, count),
@@ -115,7 +115,7 @@ public class FurnaceRecipe {
 		
 		if (smoker) {
 			SmokingRecipe recipe2 = new SmokingRecipe(
-				id,
+				new ResourceLocation(id + "_smoker"),
 				group,
 				Ingredient.of(input),
 				new ItemStack(output, count),

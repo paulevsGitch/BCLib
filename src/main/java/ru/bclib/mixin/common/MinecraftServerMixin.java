@@ -60,9 +60,7 @@ public class MinecraftServerMixin {
 
 	private void bclib_injectRecipes() {
 		RecipeManagerAccessor accessor = (RecipeManagerAccessor) resources.getRecipeManager();
-		if (!BCLib.isClient()) {
-			accessor.bclib_setRecipesByName(BCLRecipeManager.getMapByName(accessor.bclib_getRecipesByName()));
-		}
+		accessor.bclib_setRecipesByName(BCLRecipeManager.getMapByName(accessor.bclib_getRecipesByName()));
 		accessor.bclib_setRecipes(BCLRecipeManager.getMap(accessor.bclib_getRecipes()));
 	}
 }

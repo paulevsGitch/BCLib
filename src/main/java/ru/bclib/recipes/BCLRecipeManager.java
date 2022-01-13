@@ -17,20 +17,13 @@ public class BCLRecipeManager {
 	private static final Map<RecipeType<?>, Map<ResourceLocation, Recipe<?>>> RECIPES = Maps.newHashMap();
 	
 	public static void addRecipe(RecipeType<?> type, Recipe<?> recipe) {
-		Map<ResourceLocation, Recipe<?>> list = RECIPES.get(type);
-		if (list == null) {
-			list = Maps.newHashMap();
-			RECIPES.put(type, list);
-		}
+		Map<ResourceLocation, Recipe<?>> list = RECIPES.computeIfAbsent(type, i -> Maps.newHashMap());
 		list.put(recipe.getId(), recipe);
 	}
 	
-	@SuppressWarnings("unchecked")
 	public static <T extends Recipe<?>> T getRecipe(RecipeType<T> type, ResourceLocation id) {
-		if (RECIPES.containsKey(type)) {
-			return (T) RECIPES.get(type).get(id);
-		}
-		return null;
+		Map<ResourceLocation, Recipe<?>> map = RECIPES.get(type);
+		return map != null ? (T) map.get(id) : null;
 	}
 	
 	public static Map<RecipeType<?>, Map<ResourceLocation, Recipe<?>>> getMap(Map<RecipeType<?>, Map<ResourceLocation, Recipe<?>>> recipes) {
@@ -42,31 +35,22 @@ public class BCLRecipeManager {
 			result.put(type, typeList);
 		}
 		
-		for (RecipeType<?> type : RECIPES.keySet()) {
-			Map<ResourceLocation, Recipe<?>> list = RECIPES.get(type);
+		RECIPES.forEach((type, list) -> {
 			if (list != null) {
-				Map<ResourceLocation, Recipe<?>> typeList = result.get(type);
-				if (typeList == null) {
-					typeList = Maps.newHashMap();
-					result.put(type, typeList);
-				}
+				Map<ResourceLocation, Recipe<?>> typeList = result.computeIfAbsent(type, i -> Maps.newHashMap());
 				for (Entry<ResourceLocation, Recipe<?>> entry : list.entrySet()) {
 					ResourceLocation id = entry.getKey();
-					if (!typeList.containsKey(id)) typeList.put(id, entry.getValue());
+					typeList.computeIfAbsent(id, i -> entry.getValue());
 				}
 			}
-		}
+		});
 		
 		return result;
 	}
 	
 	public static Map<ResourceLocation, Recipe<?>> getMapByName(Map<ResourceLocation, Recipe<?>> recipes) {
 		Map<ResourceLocation, Recipe<?>> result = CollectionsUtil.getMutable(recipes);
-		RECIPES.values().forEach(map -> map.forEach((location, recipe) -> {
-			if (!result.containsKey(location)) {
-				result.put(location, recipe);
-			}
-		}));
+		RECIPES.values().forEach(map -> map.forEach((location, recipe) -> result.computeIfAbsent(location, i -> recipe)));
 		return result;
 	}
 	
