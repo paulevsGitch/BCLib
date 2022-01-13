@@ -16,4 +16,10 @@ public interface RecipeManagerAccessor {
 	
 	@Accessor("recipes")
 	void bclib_setRecipes(Map<RecipeType<?>, Map<ResourceLocation, Recipe<?>>> recipes);
+	
+	@Accessor("byName")
+	Map<ResourceLocation, Recipe<?>> bclib_getRecipesByName();
+	
+	@Accessor("byName")
+	void bclib_setRecipesByName(Map<ResourceLocation, Recipe<?>> recipes);
 }

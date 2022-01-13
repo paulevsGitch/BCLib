@@ -8,6 +8,7 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
+import ru.bclib.util.CollectionsUtil;
 
 import java.util.Map;
 import java.util.Map.Entry;
@@ -56,6 +57,16 @@ public class BCLRecipeManager {
 			}
 		}
 		
+		return result;
+	}
+	
+	public static Map<ResourceLocation, Recipe<?>> getMapByName(Map<ResourceLocation, Recipe<?>> recipes) {
+		Map<ResourceLocation, Recipe<?>> result = CollectionsUtil.getMutable(recipes);
+		RECIPES.values().forEach(map -> map.forEach((location, recipe) -> {
+			if (!recipes.containsKey(location)) {
+				result.put(location, recipe);
+			}
+		}));
 		return result;
 	}
 	
