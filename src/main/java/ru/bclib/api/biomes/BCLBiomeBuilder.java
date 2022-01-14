@@ -519,9 +519,10 @@ public class BCLBiomeBuilder {
 	 * @return same {@link BCLBiomeBuilder} instance.
 	 */
 	public BCLBiomeBuilder carver(GenerationStep.Carving step, ConfiguredWorldCarver<?> carver) {
+		final ResourceLocation immutableID = biomeID;
 		BuiltinRegistries.CONFIGURED_CARVER
 			.getResourceKey(carver)
-			.ifPresent(key -> BiomeModifications.addCarver(ctx -> ctx.getBiomeKey().location().equals(biomeID), step, key));
+			.ifPresent(key -> BiomeModifications.addCarver(ctx -> ctx.getBiomeKey().location().equals(immutableID), step, key));
 		return this;
 	}
 	
