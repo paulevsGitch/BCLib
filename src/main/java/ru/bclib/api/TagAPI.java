@@ -70,8 +70,6 @@ public class TagAPI {
 	public static final Tag.Named<Item> ITEM_SHEARS = getMCItemTag("shears");
 	public static final Tag.Named<Item> ITEM_COMMON_SHEARS = makeCommonItemTag("shears");
 	public static final Tag.Named<Item> ITEM_SOUL_GROUND = makeCommonItemTag("soul_ground");
-	
-
 
 	/**
 	 * Get or create {@link Tag.Named}.
@@ -82,7 +80,6 @@ public class TagAPI {
 	 */
 	public static <T> Tag.Named<T> makeTag(Supplier<TagCollection<T>> containerSupplier, ResourceLocation id) {
 		Tag<T> tag = containerSupplier.get().getTag(id);
-		//return tag == null ? TagRegistry.create(id, containerSupplier) : (Named<T>) tag;
 		return tag == null ? new TagDelegate<>(id, containerSupplier) : (Named<T>) tag;
 	}
 	
@@ -139,7 +136,6 @@ public class TagAPI {
 	public static Tag.Named<Block> getMCBlockTag(String name) {
 		ResourceLocation id = new ResourceLocation(name);
 		Tag<Block> tag = BlockTags.getAllTags().getTag(id);
-		//return tag == null ? (Named<Block>) TagRegistry.block(id) : (Named<Block>) tag;
 		return tag == null ? (Named<Block>) TagFactory.BLOCK.create(id): (Named<Block>) tag;
 	}
 	
@@ -178,18 +174,21 @@ public class TagAPI {
 	/**
 	 * Initializes basic tags. Should be called only in BCLib main class.
 	 */
+	// TODO replace getName with actual IDs to improve compat
 	public static void init() {
-		addTag(BLOCK_BOOKSHELVES, Blocks.BOOKSHELF);
-		addTag(BLOCK_GEN_TERRAIN, Blocks.END_STONE, Blocks.NETHERRACK, Blocks.SOUL_SAND, Blocks.SOUL_SOIL);
-		addTag(BLOCK_NETHER_GROUND, Blocks.NETHERRACK, Blocks.SOUL_SAND, Blocks.SOUL_SOIL);
-		addTag(BLOCK_END_GROUND, Blocks.END_STONE);
-		addTag(BLOCK_CHEST, Blocks.CHEST);
-		addTag(ITEM_CHEST, Items.CHEST);
-		addTag(ITEM_IRON_INGOTS, Items.IRON_INGOT);
-		addTag(ITEM_FURNACES, Blocks.FURNACE);
+		addTag(BLOCK_BOOKSHELVES.getName(), Blocks.BOOKSHELF);
+		addTag(BLOCK_GEN_TERRAIN.getName(), Blocks.END_STONE, Blocks.NETHERRACK, Blocks.SOUL_SAND, Blocks.SOUL_SOIL);
+		addTag(BLOCK_NETHER_GROUND.getName(), Blocks.NETHERRACK, Blocks.SOUL_SAND, Blocks.SOUL_SOIL);
+		addTag(BLOCK_END_GROUND.getName(), Blocks.END_STONE);
+		addTag(BLOCK_CHEST.getName(), Blocks.CHEST);
+		addTag(ITEM_CHEST.getName(), Items.CHEST);
+		addTag(ITEM_IRON_INGOTS.getName(), Items.IRON_INGOT);
+		addTag(ITEM_FURNACES.getName(), Blocks.FURNACE);
 	}
 	
 	/**
+	 * Deprecated due to low compatibility. Use addTag({@link ResourceLocation}, {@link Block}... blocks) instead.
+	 *
 	 * Adds one Tag to multiple Blocks.
 	 * <p>
 	 * Example:
@@ -202,8 +201,18 @@ public class TagAPI {
 	 * @param tag	The new Tag
 	 * @param blocks One or more blocks that should receive the Tag.
 	 */
+	@Deprecated
 	public static void addTag(Tag.Named<Block> tag, Block... blocks) {
 		ResourceLocation tagID = tag.getName();
+		addTag(tagID, blocks);
+	}
+	
+	/**
+	 * Adds one Tag to multiple Blocks.
+	 * @param tagID {@link ResourceLocation} tag ID.
+	 * @param blocks array of {@link Block} to add into tag.
+	 */
+	public static void addTag(ResourceLocation tagID, Block... blocks) {
 		Set<ResourceLocation> set = TAGS_BLOCK.computeIfAbsent(tagID, k -> Sets.newHashSet());
 		for (Block block : blocks) {
 			ResourceLocation id = Registry.BLOCK.getKey(block);
@@ -214,6 +223,8 @@ public class TagAPI {
 	}
 	
 	/**
+	 * Deprecated due to low compatibility. Use addTag({@link ResourceLocation}, {@link ItemLike}... items) instead.
+	 *
 	 * Adds one Tag to multiple Items.
 	 * <p>
 	 * Example:
@@ -226,6 +237,7 @@ public class TagAPI {
 	 * @param tag   The new Tag
 	 * @param items One or more item that should receive the Tag.
 	 */
+	@Deprecated
 	public static void addTag(Tag.Named<Item> tag, ItemLike... items) {
 		ResourceLocation tagID = tag.getName();
 		Set<ResourceLocation> set = TAGS_ITEM.computeIfAbsent(tagID, k -> Sets.newHashSet());
@@ -238,6 +250,23 @@ public class TagAPI {
 	}
 	
 	/**
+	 * Adds one Tag to multiple Items.
+	 * @param tagID {@link ResourceLocation} tag ID.
+	 * @param items array of {@link ItemLike} to add into tag.
+	 */
+	public static void addTag(ResourceLocation tagID, ItemLike... items) {
+		Set<ResourceLocation> set = TAGS_ITEM.computeIfAbsent(tagID, k -> Sets.newHashSet());
+		for (ItemLike item : items) {
+			ResourceLocation id = Registry.ITEM.getKey(item.asItem());
+			if (id != Registry.ITEM.getDefaultKey()) {
+				set.add(id);
+			}
+		}
+	}
+	
+	/**
+	 * Deprecated, use addTag({@link ResourceLocation}, {@link ItemLike}... items) instead.
+	 *
 	 * Adds multiple Tags to one Item.
 	 * <p>
 	 * The call will reserve the Tags. The Tags are added to the Item once
@@ -246,6 +275,7 @@ public class TagAPI {
 	 * @param item The Item that will receive all Tags
 	 * @param tags One or more Tags
 	 */
+	@Deprecated
 	@SafeVarargs
 	public static void addTags(ItemLike item, Tag.Named<Item>... tags) {
 		for (Tag.Named<Item> tag : tags) {
@@ -254,6 +284,8 @@ public class TagAPI {
 	}
 	
 	/**
+	 * Deprecated, use addTag({@link ResourceLocation}, {@link Block}... blocks) instead.
+	 *
 	 * Adds multiple Tags to one Block.
 	 * <p>
 	 * The call will reserve the Tags. The Tags are added to the Block once
@@ -262,6 +294,7 @@ public class TagAPI {
 	 * @param block The Block that will receive all Tags
 	 * @param tags  One or more Tags
 	 */
+	@Deprecated
 	@SafeVarargs
 	public static void addTags(Block block, Tag.Named<Block>... tags) {
 		for (Tag.Named<Block> tag : tags) {
