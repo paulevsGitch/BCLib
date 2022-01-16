@@ -152,59 +152,17 @@ public class TagAPI {
 	}
 	
 	/**
-	 * Adds {@link Block} to NETHER_GROUND and GEN_TERRAIN tags to process it properly in terrain generators and block logic.
-	 *
-	 * @param block - {@link Block}.
-	 */
-	public static void addNetherGround(Block block) {
-		addTag(BLOCK_NETHER_GROUND, block);
-		addTag(BLOCK_GEN_TERRAIN, block);
-	}
-	
-	/**
-	 * Adds {@link Block} to END_GROUND and GEN_TERRAIN tags to process it properly in terrain generators and block logic.
-	 *
-	 * @param block - {@link Block}.
-	 */
-	public static void addEndGround(Block block) {
-		addTag(BLOCK_GEN_TERRAIN, block);
-		addTag(BLOCK_END_GROUND, block);
-	}
-	
-	/**
 	 * Initializes basic tags. Should be called only in BCLib main class.
 	 */
-	// TODO replace getName with actual IDs to improve compat
 	public static void init() {
-		addTag(BLOCK_BOOKSHELVES.getName(), Blocks.BOOKSHELF);
-		addTag(BLOCK_GEN_TERRAIN.getName(), Blocks.END_STONE, Blocks.NETHERRACK, Blocks.SOUL_SAND, Blocks.SOUL_SOIL);
-		addTag(BLOCK_NETHER_GROUND.getName(), Blocks.NETHERRACK, Blocks.SOUL_SAND, Blocks.SOUL_SOIL);
-		addTag(BLOCK_END_GROUND.getName(), Blocks.END_STONE);
-		addTag(BLOCK_CHEST.getName(), Blocks.CHEST);
-		addTag(ITEM_CHEST.getName(), Items.CHEST);
-		addTag(ITEM_IRON_INGOTS.getName(), Items.IRON_INGOT);
-		addTag(ITEM_FURNACES.getName(), Blocks.FURNACE);
-	}
-	
-	/**
-	 * Deprecated due to low compatibility. Use addTag({@link ResourceLocation}, {@link Block}... blocks) instead.
-	 *
-	 * Adds one Tag to multiple Blocks.
-	 * <p>
-	 * Example:
-	 * <pre>{@code  Tag.Named<Block> DIMENSION_STONE = makeBlockTag("mymod", "dim_stone");
-	 * addTag(DIMENSION_STONE, Blocks.END_STONE, Blocks.NETHERRACK);}</pre>
-	 * <p>
-	 * The call will reserve the Tag. The Tag is added to the blocks once
-	 * {@link #apply(String, Map)} was executed.
-	 *
-	 * @param tag	The new Tag
-	 * @param blocks One or more blocks that should receive the Tag.
-	 */
-	@Deprecated
-	public static void addTag(Tag.Named<Block> tag, Block... blocks) {
-		ResourceLocation tagID = tag.getName();
-		addTag(tagID, blocks);
+		addBlockTag(BLOCK_BOOKSHELVES.getName(), Blocks.BOOKSHELF);
+		addBlockTag(BLOCK_GEN_TERRAIN.getName(), Blocks.END_STONE, Blocks.NETHERRACK, Blocks.SOUL_SAND, Blocks.SOUL_SOIL);
+		addBlockTag(BLOCK_NETHER_GROUND.getName(), Blocks.NETHERRACK, Blocks.SOUL_SAND, Blocks.SOUL_SOIL);
+		addBlockTag(BLOCK_END_GROUND.getName(), Blocks.END_STONE);
+		addBlockTag(BLOCK_CHEST.getName(), Blocks.CHEST);
+		addItemTag(ITEM_CHEST.getName(), Items.CHEST);
+		addItemTag(ITEM_IRON_INGOTS.getName(), Items.IRON_INGOT);
+		addItemTag(ITEM_FURNACES.getName(), Blocks.FURNACE);
 	}
 	
 	/**
@@ -212,7 +170,7 @@ public class TagAPI {
 	 * @param tagID {@link ResourceLocation} tag ID.
 	 * @param blocks array of {@link Block} to add into tag.
 	 */
-	public static void addTag(ResourceLocation tagID, Block... blocks) {
+	public static void addBlockTag(ResourceLocation tagID, Block... blocks) {
 		Set<ResourceLocation> set = TAGS_BLOCK.computeIfAbsent(tagID, k -> Sets.newHashSet());
 		for (Block block : blocks) {
 			ResourceLocation id = Registry.BLOCK.getKey(block);
@@ -221,6 +179,60 @@ public class TagAPI {
 			}
 		}
 	}
+	
+	/**
+	 * Adds one Tag to multiple Items.
+	 * @param tagID {@link ResourceLocation} tag ID.
+	 * @param items array of {@link ItemLike} to add into tag.
+	 */
+	public static void addItemTag(ResourceLocation tagID, ItemLike... items) {
+		Set<ResourceLocation> set = TAGS_ITEM.computeIfAbsent(tagID, k -> Sets.newHashSet());
+		for (ItemLike item : items) {
+			ResourceLocation id = Registry.ITEM.getKey(item.asItem());
+			if (id != Registry.ITEM.getDefaultKey()) {
+				set.add(id);
+			}
+		}
+	}
+	
+	/**
+	 * Automatically called in {@link net.minecraft.tags.TagLoader#loadAndBuild(ResourceManager)}.
+	 * <p>
+	 * In most cases there is no need to call this Method manually.
+	 *
+	 * @param directory The name of the Tag-directory. Should be either <i>"tags/blocks"</i> or
+	 *				  <i>"tags/items"</i>.
+	 * @param tagsMap   The map that will hold the registered Tags
+	 * @return The {@code tagsMap} Parameter.
+	 */
+	public static Map<ResourceLocation, Tag.Builder> apply(String directory, Map<ResourceLocation, Tag.Builder> tagsMap) {
+		Map<ResourceLocation, Set<ResourceLocation>> tagMap = null;
+		if ("tags/blocks".equals(directory)) {
+			tagMap = TAGS_BLOCK;
+		}
+		else if ("tags/items".equals(directory)) {
+			tagMap = TAGS_ITEM;
+		}
+		if (tagMap != null) {
+			tagMap.forEach((id, ids) -> apply(tagsMap.computeIfAbsent(id, key -> Tag.Builder.tag()), ids));
+		}
+		return tagsMap;
+	}
+	
+	/**
+	 * Adds all {@code ids} to the {@code builder}.
+	 *
+	 * @param builder
+	 * @param ids
+	 * @return The Builder passed as {@code builder}.
+	 */
+	public static Tag.Builder apply(Tag.Builder builder, Set<ResourceLocation> ids) {
+		ids.forEach(value -> builder.addElement(value, "BCLib Code"));
+		return builder;
+	}
+	
+	//    DEPRECATED SECTION    //
+	// WILL BE REMOVED IN 1.3.0 //
 	
 	/**
 	 * Deprecated due to low compatibility. Use addTag({@link ResourceLocation}, {@link ItemLike}... items) instead.
@@ -239,29 +251,7 @@ public class TagAPI {
 	 */
 	@Deprecated
 	public static void addTag(Tag.Named<Item> tag, ItemLike... items) {
-		ResourceLocation tagID = tag.getName();
-		Set<ResourceLocation> set = TAGS_ITEM.computeIfAbsent(tagID, k -> Sets.newHashSet());
-		for (ItemLike item : items) {
-			ResourceLocation id = Registry.ITEM.getKey(item.asItem());
-			if (id != Registry.ITEM.getDefaultKey()) {
-				set.add(id);
-			}
-		}
-	}
-	
-	/**
-	 * Adds one Tag to multiple Items.
-	 * @param tagID {@link ResourceLocation} tag ID.
-	 * @param items array of {@link ItemLike} to add into tag.
-	 */
-	public static void addTag(ResourceLocation tagID, ItemLike... items) {
-		Set<ResourceLocation> set = TAGS_ITEM.computeIfAbsent(tagID, k -> Sets.newHashSet());
-		for (ItemLike item : items) {
-			ResourceLocation id = Registry.ITEM.getKey(item.asItem());
-			if (id != Registry.ITEM.getDefaultKey()) {
-				set.add(id);
-			}
-		}
+		addItemTag(tag.getName(), items);
 	}
 	
 	/**
@@ -279,7 +269,7 @@ public class TagAPI {
 	@SafeVarargs
 	public static void addTags(ItemLike item, Tag.Named<Item>... tags) {
 		for (Tag.Named<Item> tag : tags) {
-			addTag(tag, item);
+			addItemTag(tag.getName(), item);
 		}
 	}
 	
@@ -303,38 +293,44 @@ public class TagAPI {
 	}
 	
 	/**
-	 * Adds all {@code ids} to the {@code builder}.
+	 * Deprecated due to low compatibility. Use addTag({@link ResourceLocation}, {@link Block}... blocks) instead.
 	 *
-	 * @param builder
-	 * @param ids
-	 * @return The Builder passed as {@code builder}.
+	 * Adds one Tag to multiple Blocks.
+	 * <p>
+	 * Example:
+	 * <pre>{@code  Tag.Named<Block> DIMENSION_STONE = makeBlockTag("mymod", "dim_stone");
+	 * addTag(DIMENSION_STONE, Blocks.END_STONE, Blocks.NETHERRACK);}</pre>
+	 * <p>
+	 * The call will reserve the Tag. The Tag is added to the blocks once
+	 * {@link #apply(String, Map)} was executed.
+	 *
+	 * @param tag	The new Tag
+	 * @param blocks One or more blocks that should receive the Tag.
 	 */
-	public static Tag.Builder apply(Tag.Builder builder, Set<ResourceLocation> ids) {
-		ids.forEach(value -> builder.addElement(value, "Better End Code"));
-		return builder;
+	@Deprecated
+	public static void addTag(Tag.Named<Block> tag, Block... blocks) {
+		addBlockTag(tag.getName(), blocks);
 	}
 	
 	/**
-	 * Automatically called in {@link net.minecraft.tags.TagLoader#loadAndBuild(ResourceManager)}.
-	 * <p>
-	 * In most cases there is no need to call this Method manually.
+	 * Adds {@link Block} to NETHER_GROUND and GEN_TERRAIN tags to process it properly in terrain generators and block logic.
 	 *
-	 * @param directory The name of the Tag-directory. Should be either <i>"tags/blocks"</i> or
-	 *				  <i>"tags/items"</i>.
-	 * @param tagsMap   The map that will hold the registered Tags
-	 * @return The {@code tagsMap} Parameter.
+	 * @param block - {@link Block}.
 	 */
-	public static Map<ResourceLocation, Tag.Builder> apply(String directory, Map<ResourceLocation, Tag.Builder> tagsMap) {
-		Map<ResourceLocation, Set<ResourceLocation>> endTags = null;
-		if ("tags/blocks".equals(directory)) {
-			endTags = TAGS_BLOCK;
-		}
-		else if ("tags/items".equals(directory)) {
-			endTags = TAGS_ITEM;
-		}
-		if (endTags != null) {
-			endTags.forEach((id, ids) -> apply(tagsMap.computeIfAbsent(id, key -> Tag.Builder.tag()), ids));
-		}
-		return tagsMap;
+	@Deprecated
+	public static void addNetherGround(Block block) {
+		addTag(BLOCK_NETHER_GROUND, block);
+		addTag(BLOCK_GEN_TERRAIN, block);
+	}
+	
+	/**
+	 * Adds {@link Block} to END_GROUND and GEN_TERRAIN tags to process it properly in terrain generators and block logic.
+	 *
+	 * @param block - {@link Block}.
+	 */
+	@Deprecated
+	public static void addEndGround(Block block) {
+		addTag(BLOCK_GEN_TERRAIN, block);
+		addTag(BLOCK_END_GROUND, block);
 	}
 }
