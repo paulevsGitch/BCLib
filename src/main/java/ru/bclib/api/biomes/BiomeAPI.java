@@ -52,6 +52,7 @@ import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
 import net.minecraft.world.level.levelgen.feature.StructureFeature;
 import net.minecraft.world.level.levelgen.feature.configurations.StructureFeatureConfiguration;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
+import net.minecraft.world.level.storage.WorldData;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.jetbrains.annotations.Nullable;
 import ru.bclib.BCLib;
@@ -168,6 +169,19 @@ public class BiomeAPI {
 	 */
 	public static void registerBiomeSource(BiomeSource source){
 		worldSources.add(source);
+	}
+	
+	private static WorldData worldData;
+	public static void registerWorldData(WorldData w){
+		worldData = w;
+		if (worldData!=null){
+
+			worldData.worldGenSettings().dimensions().forEach(dim->{
+				StructureSettingsAccessor a = (StructureSettingsAccessor)dim.generator().getSettings();
+				STRUCTURE_STARTS.entrySet().forEach(entry -> applyStructureStarts(a, entry.getValue()));
+			});
+
+		}
 	}
 	
 	/**
@@ -894,7 +908,7 @@ public class BiomeAPI {
 						
 						//add back modded structures
 						StructureSettingsAccessor a = (StructureSettingsAccessor)settings.structureSettings();
-						STRUCTURE_STARTS.entrySet().forEach(entry -> changeStructureStarts(a, entry.getValue()));
+						STRUCTURE_STARTS.entrySet().forEach(entry -> applyStructureStarts(a, entry.getValue()));
 						
 						//add surface rules
 						registerNoiseGeneratorAndChangeSurfaceRules(settings);
@@ -931,12 +945,19 @@ public class BiomeAPI {
 		
 		for (Map.Entry<ResourceKey<NoiseGeneratorSettings>, NoiseGeneratorSettings> entry : chunkGenSettingsRegistry.entrySet()) {
 			final StructureSettingsAccessor access = (StructureSettingsAccessor)  entry.getValue().structureSettings();
-			changeStructureStarts(access, modifier);
+			applyStructureStarts(access, modifier);
+		}
+		
+		if (worldData!=null){
+			worldData.worldGenSettings().dimensions().forEach(dim->{
+				StructureSettingsAccessor access = (StructureSettingsAccessor)dim.generator().getSettings();
+				applyStructureStarts(access, modifier);
+			});
 		}
 	}
 	
 	
-	private static void changeStructureStarts(StructureSettingsAccessor access, BiConsumer<Map<StructureFeature<?>, Multimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>>>, Map<StructureFeature<?>, StructureFeatureConfiguration>> modifier) {
+	private static void applyStructureStarts(StructureSettingsAccessor access, BiConsumer<Map<StructureFeature<?>, Multimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>>>, Map<StructureFeature<?>, StructureFeatureConfiguration>> modifier) {
 			Map<StructureFeature<?>, Multimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>>> structureMap;
 			Map<StructureFeature<?>, StructureFeatureConfiguration> configMap;
 			
