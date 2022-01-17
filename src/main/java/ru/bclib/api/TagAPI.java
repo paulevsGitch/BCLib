@@ -20,7 +20,9 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import ru.bclib.BCLib;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.function.Supplier;
 
@@ -29,60 +31,60 @@ public class TagAPI {
 	private static final Map<ResourceLocation, Set<ResourceLocation>> TAGS_ITEM = Maps.newConcurrentMap();
 	
 	// Vanilla Block Tags
-	public static final ResourceLocation NAMED_SOUL_SPEED_BLOCKS = new ResourceLocation("soul_speed_blocks");
-	public static final ResourceLocation NAMED_SOUL_FIRE_BASE_BLOCKS = new ResourceLocation("soul_fire_base_blocks");
-	public static final ResourceLocation NAMED_CLIMBABLE = new ResourceLocation("climbable");
-	public static final ResourceLocation NAMED_NYLIUM = new ResourceLocation("nylium");
-	public static final ResourceLocation NAMED_ANVIL = new ResourceLocation("anvil");
-	public static final ResourceLocation NAMED_WALLS = new ResourceLocation("walls");
-	public static final ResourceLocation LEAVES = new ResourceLocation("leaves");
-	public static final ResourceLocation NAMED_MINEABLE_AXE = new ResourceLocation("mineable/axe");
-	public static final ResourceLocation NAMED_MINEABLE_PICKAXE = new ResourceLocation("mineable/pickaxe");
-	public static final ResourceLocation NAMED_MINEABLE_SHOVEL = new ResourceLocation("mineable/shovel");
-	public static final ResourceLocation NAMED_MINEABLE_HOE = new ResourceLocation("mineable/hoe");
+	public static final TagLocation<Block> NAMED_SOUL_SPEED_BLOCKS = new TagLocation<>("soul_speed_blocks");
+	public static final TagLocation<Block> NAMED_SOUL_FIRE_BASE_BLOCKS = new TagLocation<>("soul_fire_base_blocks");
+	public static final TagLocation<Block> NAMED_CLIMBABLE = new TagLocation<>("climbable");
+	public static final TagLocation<Block> NAMED_NYLIUM = new TagLocation<>("nylium");
+	public static final TagLocation<Block> NAMED_ANVIL = new TagLocation<>("anvil");
+	public static final TagLocation<Block> NAMED_WALLS = new TagLocation<>("walls");
+	public static final TagLocation<Block> LEAVES = new TagLocation<>("leaves");
+	public static final TagLocation<Block> NAMED_MINEABLE_AXE = new TagLocation<>("mineable/axe");
+	public static final TagLocation<Block> NAMED_MINEABLE_PICKAXE = new TagLocation<>("mineable/pickaxe");
+	public static final TagLocation<Block> NAMED_MINEABLE_SHOVEL = new TagLocation<>("mineable/shovel");
+	public static final TagLocation<Block> NAMED_MINEABLE_HOE = new TagLocation<>("mineable/hoe");
 	
 	// Block Tags
-	public static final Tag.Named<Block> BLOCK_BOOKSHELVES = makeCommonBlockTag("bookshelves");
-	public static final Tag.Named<Block> BLOCK_GEN_TERRAIN = makeBlockTag(BCLib.MOD_ID, "gen_terrain");
-	public static final Tag.Named<Block> BLOCK_NETHER_GROUND = makeBlockTag(BCLib.MOD_ID, "nether_ground");
-	public static final Tag.Named<Block> BLOCK_END_GROUND = makeBlockTag(BCLib.MOD_ID, "end_ground");
+	public static final TagNamed<Block> BLOCK_BOOKSHELVES = makeCommonBlockTag("bookshelves");
+	public static final TagNamed<Block> BLOCK_GEN_TERRAIN = makeBlockTag(BCLib.MOD_ID, "gen_terrain");
+	public static final TagNamed<Block> BLOCK_NETHER_GROUND = makeBlockTag(BCLib.MOD_ID, "nether_ground");
+	public static final TagNamed<Block> BLOCK_END_GROUND = makeBlockTag(BCLib.MOD_ID, "end_ground");
 	
-	public static final Tag.Named<Block> BLOCK_CHEST = makeCommonBlockTag("chest");
-	public static final Tag.Named<Block> BLOCK_WOODEN_CHEST = makeCommonBlockTag("wooden_chests");
-	public static final Tag.Named<Block> BLOCK_BARREL = makeCommonBlockTag("barrel");
-	public static final Tag.Named<Block> BLOCK_WOODEN_BARREL = makeCommonBlockTag("wooden_barrels");
-	public static final Tag.Named<Block> BLOCK_END_STONES = makeCommonBlockTag("end_stones");
-	public static final Tag.Named<Block> BLOCK_NETHER_STONES = makeCommonBlockTag("nether_stones");
-	public static final Tag.Named<Block> BLOCK_NETHER_PORTAL_FRAME = makeCommonBlockTag("nether_pframe");
-	public static final Tag.Named<Block> BLOCK_WORKBENCHES = makeCommonBlockTag("workbench");
-	public static final Tag.Named<Block> BLOCK_SAPLINGS = makeCommonBlockTag("saplings");
-	public static final Tag.Named<Block> BLOCK_LEAVES = makeCommonBlockTag("leaves");
-	public static final Tag.Named<Block> BLOCK_IMMOBILE = makeCommonBlockTag("immobile");
-	public static final Tag.Named<Block> BLOCK_SOUL_GROUND = makeCommonBlockTag("soul_ground");
-	public static final Tag.Named<Block> BLOCK_NETHERRACK = makeCommonBlockTag("netherrack");
-	public static final Tag.Named<Block> BLOCK_NETHER_MYCELIUM = makeCommonBlockTag("nether_mycelium");
+	public static final TagNamed<Block> BLOCK_CHEST = makeCommonBlockTag("chest");
+	public static final TagNamed<Block> BLOCK_WOODEN_CHEST = makeCommonBlockTag("wooden_chests");
+	public static final TagNamed<Block> BLOCK_BARREL = makeCommonBlockTag("barrel");
+	public static final TagNamed<Block> BLOCK_WOODEN_BARREL = makeCommonBlockTag("wooden_barrels");
+	public static final TagNamed<Block> BLOCK_END_STONES = makeCommonBlockTag("end_stones");
+	public static final TagNamed<Block> BLOCK_NETHER_STONES = makeCommonBlockTag("nether_stones");
+	public static final TagNamed<Block> BLOCK_NETHER_PORTAL_FRAME = makeCommonBlockTag("nether_pframe");
+	public static final TagNamed<Block> BLOCK_WORKBENCHES = makeCommonBlockTag("workbench");
+	public static final TagNamed<Block> BLOCK_SAPLINGS = makeCommonBlockTag("saplings");
+	public static final TagNamed<Block> BLOCK_LEAVES = makeCommonBlockTag("leaves");
+	public static final TagNamed<Block> BLOCK_IMMOBILE = makeCommonBlockTag("immobile");
+	public static final TagNamed<Block> BLOCK_SOUL_GROUND = makeCommonBlockTag("soul_ground");
+	public static final TagNamed<Block> BLOCK_NETHERRACK = makeCommonBlockTag("netherrack");
+	public static final TagNamed<Block> BLOCK_NETHER_MYCELIUM = makeCommonBlockTag("nether_mycelium");
 	
-	public static final Tag.Named<Block> BLOCK_DRAGON_IMMUNE = getMCBlockTag("dragon_immune");
+	public static final TagNamed<Block> BLOCK_DRAGON_IMMUNE = getMCBlockTag("dragon_immune");
 	
-	public static final Tag.Named<Block> MINEABLE_AXE = getMCBlockTag("mineable/axe");
-	public static final Tag.Named<Block> MINEABLE_PICKAXE = getMCBlockTag("mineable/pickaxe");
-	public static final Tag.Named<Block> MINEABLE_SHOVEL = getMCBlockTag("mineable/shovel");
-	public static final Tag.Named<Block> MINEABLE_HOE = getMCBlockTag("mineable/hoe");
+	public static final TagNamed<Block> MINEABLE_AXE = getMCBlockTag("mineable/axe");
+	public static final TagNamed<Block> MINEABLE_PICKAXE = getMCBlockTag("mineable/pickaxe");
+	public static final TagNamed<Block> MINEABLE_SHOVEL = getMCBlockTag("mineable/shovel");
+	public static final TagNamed<Block> MINEABLE_HOE = getMCBlockTag("mineable/hoe");
 	
 	// Item Tags
-	public static final Tag.Named<Item> ITEM_CHEST = makeCommonItemTag("chest");
-	public static final Tag.Named<Item> ITEM_WOODEN_CHEST = makeCommonItemTag("wooden_chests");
-	public static final Tag.Named<Item> ITEM_BARREL = makeCommonItemTag("barrel");
-	public static final Tag.Named<Item> ITEM_WOODEN_BARREL = makeCommonItemTag("wooden_barrels");
-	public static final Tag.Named<Item> ITEM_IRON_INGOTS = makeCommonItemTag("iron_ingots");
-	public static final Tag.Named<Item> ITEM_FURNACES = makeCommonItemTag("furnaces");
-	public static final Tag.Named<Item> ITEM_WORKBENCHES = makeCommonItemTag("workbench");
-	public final static Tag.Named<Item> ITEM_HAMMERS = makeCommonItemTag("hammers");
-	public static final Tag.Named<Item> ITEM_SAPLINGS = makeCommonItemTag("saplings");
-	public static final Tag.Named<Item> ITEM_LEAVES = makeCommonItemTag("leaves");
-	public static final Tag.Named<Item> ITEM_SHEARS = getMCItemTag("shears");
-	public static final Tag.Named<Item> ITEM_COMMON_SHEARS = makeCommonItemTag("shears");
-	public static final Tag.Named<Item> ITEM_SOUL_GROUND = makeCommonItemTag("soul_ground");
+	public static final TagNamed<Item> ITEM_CHEST = makeCommonItemTag("chest");
+	public static final TagNamed<Item> ITEM_WOODEN_CHEST = makeCommonItemTag("wooden_chests");
+	public static final TagNamed<Item> ITEM_BARREL = makeCommonItemTag("barrel");
+	public static final TagNamed<Item> ITEM_WOODEN_BARREL = makeCommonItemTag("wooden_barrels");
+	public static final TagNamed<Item> ITEM_IRON_INGOTS = makeCommonItemTag("iron_ingots");
+	public static final TagNamed<Item> ITEM_FURNACES = makeCommonItemTag("furnaces");
+	public static final TagNamed<Item> ITEM_WORKBENCHES = makeCommonItemTag("workbench");
+	public final static TagNamed<Item> ITEM_HAMMERS = makeCommonItemTag("hammers");
+	public static final TagNamed<Item> ITEM_SAPLINGS = makeCommonItemTag("saplings");
+	public static final TagNamed<Item> ITEM_LEAVES = makeCommonItemTag("leaves");
+	public static final TagNamed<Item> ITEM_SHEARS = getMCItemTag("shears");
+	public static final TagNamed<Item> ITEM_COMMON_SHEARS = makeCommonItemTag("shears");
+	public static final TagNamed<Item> ITEM_SOUL_GROUND = makeCommonItemTag("soul_ground");
 
 	/**
 	 * Get or create {@link Tag.Named}.
@@ -91,9 +93,9 @@ public class TagAPI {
 	 * @param id				- {@link ResourceLocation} tag id.
 	 * @return {@link Tag.Named}.
 	 */
-	public static <T> Tag.Named<T> makeTag(Supplier<TagCollection<T>> containerSupplier, ResourceLocation id) {
+	public static <T> TagNamed<T> makeTag(Supplier<TagCollection<T>> containerSupplier, TagLocation<T> id) {
 		Tag<T> tag = containerSupplier.get().getTag(id);
-		return tag == null ? new TagDelegate<>(id, containerSupplier) : (Named<T>) tag;
+		return tag == null ? new Delegate<>(id, containerSupplier) : CommonDelegate.proxy((Named<T>) tag);
 	}
 	
 	/**
@@ -103,8 +105,8 @@ public class TagAPI {
 	 * @param name  - {@link String} tag name.
 	 * @return {@link Block} {@link Tag.Named}.
 	 */
-	public static Tag.Named<Block> makeBlockTag(String modID, String name) {
-		return makeTag(BlockTags::getAllTags, new ResourceLocation(modID, name));
+	public static TagNamed<Block> makeBlockTag(String modID, String name) {
+		return makeTag(BlockTags::getAllTags, new TagLocation<>(modID, name));
 	}
 	
 	/**
@@ -114,8 +116,8 @@ public class TagAPI {
 	 * @param name  - {@link String} tag name.
 	 * @return {@link Item} {@link Tag.Named}.
 	 */
-	public static Tag.Named<Item> makeItemTag(String modID, String name) {
-		return makeTag(ItemTags::getAllTags, new ResourceLocation(modID, name));
+	public static TagNamed<Item> makeItemTag(String modID, String name) {
+		return makeTag(ItemTags::getAllTags, new TagLocation<>(modID, name));
 	}
 	
 	/**
@@ -125,8 +127,8 @@ public class TagAPI {
 	 * @return {@link Block} {@link Tag.Named}.
 	 * @see <a href="https://fabricmc.net/wiki/tutorial:tags">Fabric Wiki (Tags)</a>
 	 */
-	public static Tag.Named<Block> makeCommonBlockTag(String name) {
-		return makeTag(BlockTags::getAllTags, new ResourceLocation("c", name));
+	public static TagNamed<Block> makeCommonBlockTag(String name) {
+		return makeTag(BlockTags::getAllTags, new TagLocation<>("c", name));
 	}
 	
 	/**
@@ -136,8 +138,8 @@ public class TagAPI {
 	 * @return {@link Item} {@link Tag.Named}.
 	 * @see <a href="https://fabricmc.net/wiki/tutorial:tags">Fabric Wiki (Tags)</a>
 	 */
-	public static Tag.Named<Item> makeCommonItemTag(String name) {
-		return makeTag(ItemTags::getAllTags, new ResourceLocation("c", name));
+	public static TagNamed<Item> makeCommonItemTag(String name) {
+		return makeTag(ItemTags::getAllTags, new TagLocation<>("c", name));
 	}
 	
 	/**
@@ -146,10 +148,10 @@ public class TagAPI {
 	 * @param name - {@link String} tag name.
 	 * @return {@link Block} {@link Tag.Named}.
 	 */
-	public static Tag.Named<Block> getMCBlockTag(String name) {
+	public static TagNamed<Block> getMCBlockTag(String name) {
 		ResourceLocation id = new ResourceLocation(name);
 		Tag<Block> tag = BlockTags.getAllTags().getTag(id);
-		return tag == null ? (Named<Block>) TagFactory.BLOCK.create(id): (Named<Block>) tag;
+		return CommonDelegate.proxy(tag == null ? (Named<Block>) TagFactory.BLOCK.create(id): (Named<Block>) tag);
 	}
 	
 	/**
@@ -158,10 +160,10 @@ public class TagAPI {
 	 * @param name - {@link String} tag name.
 	 * @return {@link Item} {@link Tag.Named}.
 	 */
-	public static Tag.Named<Item> getMCItemTag(String name) {
+	public static TagNamed<Item> getMCItemTag(String name) {
 		ResourceLocation id = new ResourceLocation(name);
 		Tag<Item> tag = ItemTags.getAllTags().getTag(id);
-		return tag == null ? (Named<Item>) TagRegistry.item(id) : (Named<Item>) tag;
+		return  CommonDelegate.proxy(tag == null ? (Named<Item>) TagRegistry.item(id) : (Named<Item>) tag);
 	}
 	
 	/**
@@ -180,13 +182,23 @@ public class TagAPI {
 	
 	/**
 	 * Adds multiple Tags to one Block.
-	 * @param tagIDs array of {@link ResourceLocation} tag IDs.
+	 * @param tagIDs array of {@link TagLocation<Block>} tag IDs.
 	 * @param block The {@link Block} to add tag.
 	 */
-	public static void addBlockTags(Block block, ResourceLocation... tagIDs) {
-		for (ResourceLocation tagID : tagIDs) {
-			addBlockTag(tagID, block);
+	@SafeVarargs
+	public static void addBlockTags(Block block, TagLocation<Block>... tagIDs) {
+		for (TagLocation<Block> tagID : tagIDs) {
+			addBlockTagUntyped(tagID, block);
 		}
+	}
+	
+	/**
+	 * Adds one Tag to multiple Blocks.
+	 * @param tagID {@link TagLocation<Block>} tag ID.
+	 * @param blocks array of {@link Block} to add into tag.
+	 */
+	public static void addBlockTag(TagLocation<Block> tagID, Block... blocks) {
+		addBlockTagUntyped(tagID, blocks);
 	}
 	
 	/**
@@ -194,7 +206,7 @@ public class TagAPI {
 	 * @param tagID {@link ResourceLocation} tag ID.
 	 * @param blocks array of {@link Block} to add into tag.
 	 */
-	public static void addBlockTag(ResourceLocation tagID, Block... blocks) {
+	protected static void addBlockTagUntyped(ResourceLocation tagID, Block... blocks) {
 		Set<ResourceLocation> set = TAGS_BLOCK.computeIfAbsent(tagID, k -> Sets.newHashSet());
 		for (Block block : blocks) {
 			ResourceLocation id = Registry.BLOCK.getKey(block);
@@ -206,13 +218,23 @@ public class TagAPI {
 	
 	/**
 	 * Adds multiple Tags to one Item.
-	 * @param tagIDs array of {@link ResourceLocation} tag IDs.
+	 * @param tagIDs array of {@link TagLocation<Item>} tag IDs.
 	 * @param item The {@link Item} to add tag.
 	 */
-	public static void addItemTags(ItemLike item, ResourceLocation... tagIDs) {
-		for (ResourceLocation tagID : tagIDs) {
-			addItemTag(tagID, item);
+	@SafeVarargs
+	public static void addItemTags(ItemLike item, TagLocation<Item>... tagIDs) {
+		for (TagLocation<Item> tagID : tagIDs) {
+			addItemTagUntyped(tagID, item);
 		}
+	}
+	
+	/**
+	 * Adds one Tag to multiple Items.
+	 * @param tagID {@link TagLocation<Item>} tag ID.
+	 * @param items array of {@link ItemLike} to add into tag.
+	 */
+	public static void addItemTag(TagLocation<Item> tagID, ItemLike... items) {
+		addItemTagUntyped(tagID, items);
 	}
 	
 	/**
@@ -220,7 +242,7 @@ public class TagAPI {
 	 * @param tagID {@link ResourceLocation} tag ID.
 	 * @param items array of {@link ItemLike} to add into tag.
 	 */
-	public static void addItemTag(ResourceLocation tagID, ItemLike... items) {
+	protected static void addItemTagUntyped(ResourceLocation tagID, ItemLike... items) {
 		Set<ResourceLocation> set = TAGS_ITEM.computeIfAbsent(tagID, k -> Sets.newHashSet());
 		for (ItemLike item : items) {
 			ResourceLocation id = Registry.ITEM.getKey(item.asItem());
@@ -286,7 +308,7 @@ public class TagAPI {
 	 */
 	@Deprecated
 	public static void addTag(Tag.Named<Item> tag, ItemLike... items) {
-		addItemTag(tag.getName(), items);
+		addItemTagUntyped(tag.getName(), items);
 	}
 	
 	/**
@@ -304,7 +326,7 @@ public class TagAPI {
 	@SafeVarargs
 	public static void addTags(ItemLike item, Tag.Named<Item>... tags) {
 		for (Tag.Named<Item> tag : tags) {
-			addItemTag(tag.getName(), item);
+			addItemTagUntyped(tag.getName(), item);
 		}
 	}
 	
@@ -344,7 +366,7 @@ public class TagAPI {
 	 */
 	@Deprecated
 	public static void addTag(Tag.Named<Block> tag, Block... blocks) {
-		addBlockTag(tag.getName(), blocks);
+		addBlockTagUntyped(tag.getName(), blocks);
 	}
 	
 	/**
@@ -367,5 +389,80 @@ public class TagAPI {
 	public static void addEndGround(Block block) {
 		addTag(BLOCK_GEN_TERRAIN, block);
 		addTag(BLOCK_END_GROUND, block);
+	}
+	
+	/**
+	 * Extends {@link Tag.Named} to return a type safe {@link TagLocation}. This Type was introduced to
+	 * allow type-safe definition of Tags using their ResourceLocation.
+	 * @param <T> The Type of the underlying {@link Tag}
+	 */
+	public interface TagNamed<T> extends Tag.Named<T>{
+		TagLocation<T> getName();
+	}
+	
+	/**
+	 * Extends (without changing) {@link ResourceLocation}. This Type was introduced to allow type-safe definition af
+	 * Tags using their ResourceLocation.
+	 * @param <T> The Type of the underlying {@link Tag}
+	 */
+	public static class TagLocation<T> extends ResourceLocation {
+		public TagLocation(String string) {
+			super(string);
+		}
+		
+		public TagLocation(String string, String string2) {
+			super(string, string2);
+		}
+	}
+	
+	private abstract static class CommonDelegate<T>  implements TagNamed<T> {
+		protected final Tag.Named<T> delegate;
+		protected CommonDelegate(Tag.Named<T> source){
+			this.delegate = source;
+		}
+		
+		public static<T> TagNamed<T> proxy(Tag.Named<T> source){
+			if (source instanceof TagNamed typed) return typed;
+			return new ProxyDelegate<>(source);
+		}
+		
+		@Override
+		public boolean contains(T object) {
+			return delegate.contains(object);
+		}
+		
+		@Override
+		public List<T> getValues() {
+			return delegate.getValues();
+		}
+		
+		@Override
+		public T getRandomElement(Random random) {
+			return delegate.getRandomElement(random);
+		}
+	}
+	
+	private static final class ProxyDelegate<T> extends CommonDelegate<T>{
+		private final TagLocation<T> id;
+		private ProxyDelegate(Tag.Named<T> source) {
+			super( source);
+			id = new TagLocation<>(source.getName()
+										 .getNamespace(), source.getName()
+																.getPath());
+		}
+		@Override
+		public TagLocation<T> getName(){
+			return id;
+		}
+	}
+	
+	private static final class Delegate<T> extends CommonDelegate<T>{
+		public Delegate(TagLocation<T> id, Supplier<TagCollection<T>> containerSupplier) {
+			super( new TagDelegate<>(id, containerSupplier));
+		}
+		@Override
+		public TagLocation<T> getName(){
+			return (TagLocation<T>)delegate.getName();
+		}
 	}
 }
