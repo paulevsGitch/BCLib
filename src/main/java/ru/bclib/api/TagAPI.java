@@ -29,12 +29,17 @@ public class TagAPI {
 	private static final Map<ResourceLocation, Set<ResourceLocation>> TAGS_ITEM = Maps.newConcurrentMap();
 	
 	// Vanilla Block Tags
-	public static final ResourceLocation SOUL_SPEED_BLOCKS = new ResourceLocation("soul_speed_blocks");
-	public static final ResourceLocation SOUL_FIRE_BASE_BLOCKS = new ResourceLocation("soul_fire_base_blocks");
-	public static final ResourceLocation CLIMBABLE = new ResourceLocation("climbable");
-	public static final ResourceLocation NYLIUM = new ResourceLocation("nylium");
-	public static final ResourceLocation ANVIL = new ResourceLocation("anvil");
-	public static final ResourceLocation WALLS = new ResourceLocation("walls");
+	public static final ResourceLocation NAMED_SOUL_SPEED_BLOCKS = new ResourceLocation("soul_speed_blocks");
+	public static final ResourceLocation NAMED_SOUL_FIRE_BASE_BLOCKS = new ResourceLocation("soul_fire_base_blocks");
+	public static final ResourceLocation NAMED_CLIMBABLE = new ResourceLocation("climbable");
+	public static final ResourceLocation NAMED_NYLIUM = new ResourceLocation("nylium");
+	public static final ResourceLocation NAMED_ANVIL = new ResourceLocation("anvil");
+	public static final ResourceLocation NAMED_WALLS = new ResourceLocation("walls");
+	public static final ResourceLocation LEAVES = new ResourceLocation("leaves");
+	public static final ResourceLocation NAMED_MINEABLE_AXE = new ResourceLocation("mineable/axe");
+	public static final ResourceLocation NAMED_MINEABLE_PICKAXE = new ResourceLocation("mineable/pickaxe");
+	public static final ResourceLocation NAMED_MINEABLE_SHOVEL = new ResourceLocation("mineable/shovel");
+	public static final ResourceLocation NAMED_MINEABLE_HOE = new ResourceLocation("mineable/hoe");
 	
 	// Block Tags
 	public static final Tag.Named<Block> BLOCK_BOOKSHELVES = makeCommonBlockTag("bookshelves");
