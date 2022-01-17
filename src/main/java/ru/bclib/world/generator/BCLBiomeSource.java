@@ -5,6 +5,7 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeSource;
 import ru.bclib.api.biomes.BiomeAPI;
 import ru.bclib.world.biomes.BCLBiome;
+import ru.bclib.world.biomes.BCLBiomeSettings;
 
 import java.util.List;
 
@@ -24,15 +25,5 @@ public abstract class BCLBiomeSource extends BiomeSource {
 		this.biomeRegistry = biomeRegistry;
 		
 		BiomeAPI.initRegistry(biomeRegistry);
-	}
-	
-	/**
-	 * Set Biome configuartion from Config
-	 * @param bclBiome The biome you want to configure
-	 * @return The input biome
-	 */
-	public static BCLBiome setupFromConfig(BCLBiome bclBiome) {
-		bclBiome.setupFromConfig();
-		return bclBiome;
 	}
 }

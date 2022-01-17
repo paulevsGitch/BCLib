@@ -64,14 +64,12 @@ public class BCLibNetherBiomeSource extends BCLBiomeSource {
 			ResourceLocation key = biomeRegistry.getKey(biome);
 			
 			if (!BiomeAPI.hasBiome(key)) {
-				BCLBiome bclBiome = setupFromConfig(new BCLBiome(key, biome));
+				BCLBiome bclBiome = new BCLBiome(key, biome);
 				BiomeAPI.NETHER_BIOME_PICKER.addBiomeMutable(bclBiome);
 			}
 			else {
 				BCLBiome bclBiome = BiomeAPI.getBiome(key);
 				if (bclBiome != BiomeAPI.EMPTY_BIOME) {
-					setupFromConfig(bclBiome);
-					
 					if (bclBiome.getParentBiome() == null) {
 						if (!BiomeAPI.NETHER_BIOME_PICKER.containsImmutable(key)) {
 							BiomeAPI.NETHER_BIOME_PICKER.addBiomeMutable(bclBiome);

@@ -58,7 +58,7 @@ public class BCLibEndBiomeSource extends BCLBiomeSource {
 			String group = key.getNamespace() + "." + key.getPath();
 			
 			if (!BiomeAPI.hasBiome(key)) {
-				BCLBiome bclBiome = setupFromConfig(new BCLBiome(key, biome));
+				BCLBiome bclBiome = new BCLBiome(key, biome);
 				
 				if (includeVoid.contains(key.toString())) {
 					BiomeAPI.END_VOID_BIOME_PICKER.addBiomeMutable(bclBiome);
@@ -70,8 +70,6 @@ public class BCLibEndBiomeSource extends BCLBiomeSource {
 			else {
 				BCLBiome bclBiome = BiomeAPI.getBiome(key);
 				if (bclBiome != BiomeAPI.EMPTY_BIOME) {
-					setupFromConfig(bclBiome);
-					
 					if (bclBiome.getParentBiome() == null) {
 						if (!BiomeAPI.END_LAND_BIOME_PICKER.containsImmutable(key) && !BiomeAPI.END_VOID_BIOME_PICKER.containsImmutable(key)) {
 							if (includeVoid.contains(key.toString())) {
