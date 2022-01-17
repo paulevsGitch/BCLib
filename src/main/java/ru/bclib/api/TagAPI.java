@@ -28,6 +28,14 @@ public class TagAPI {
 	private static final Map<ResourceLocation, Set<ResourceLocation>> TAGS_BLOCK = Maps.newConcurrentMap();
 	private static final Map<ResourceLocation, Set<ResourceLocation>> TAGS_ITEM = Maps.newConcurrentMap();
 	
+	// Vanilla Block Tags
+	public static final ResourceLocation SOUL_SPEED_BLOCKS = new ResourceLocation("soul_speed_blocks");
+	public static final ResourceLocation SOUL_FIRE_BASE_BLOCKS = new ResourceLocation("soul_fire_base_blocks");
+	public static final ResourceLocation CLIMBABLE = new ResourceLocation("climbable");
+	public static final ResourceLocation NYLIUM = new ResourceLocation("nylium");
+	public static final ResourceLocation ANVIL = new ResourceLocation("anvil");
+	public static final ResourceLocation WALLS = new ResourceLocation("walls");
+	
 	// Block Tags
 	public static final Tag.Named<Block> BLOCK_BOOKSHELVES = makeCommonBlockTag("bookshelves");
 	public static final Tag.Named<Block> BLOCK_GEN_TERRAIN = makeBlockTag(BCLib.MOD_ID, "gen_terrain");
@@ -166,6 +174,17 @@ public class TagAPI {
 	}
 	
 	/**
+	 * Adds multiple Tags to one Block.
+	 * @param tagIDs array of {@link ResourceLocation} tag IDs.
+	 * @param block The {@link Block} to add tag.
+	 */
+	public static void addBlockTags(Block block, ResourceLocation... tagIDs) {
+		for (ResourceLocation tagID : tagIDs) {
+			addBlockTag(tagID, block);
+		}
+	}
+	
+	/**
 	 * Adds one Tag to multiple Blocks.
 	 * @param tagID {@link ResourceLocation} tag ID.
 	 * @param blocks array of {@link Block} to add into tag.
@@ -177,6 +196,17 @@ public class TagAPI {
 			if (id != Registry.BLOCK.getDefaultKey()) {
 				set.add(id);
 			}
+		}
+	}
+	
+	/**
+	 * Adds multiple Tags to one Item.
+	 * @param tagIDs array of {@link ResourceLocation} tag IDs.
+	 * @param item The {@link Item} to add tag.
+	 */
+	public static void addItemTags(ItemLike item, ResourceLocation... tagIDs) {
+		for (ResourceLocation tagID : tagIDs) {
+			addItemTag(tagID, item);
 		}
 	}
 	
