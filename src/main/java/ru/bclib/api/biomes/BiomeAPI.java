@@ -177,12 +177,10 @@ public class BiomeAPI {
 	public static void registerWorldData(WorldData w){
 		worldData = w;
 		if (worldData!=null){
-
 			worldData.worldGenSettings().dimensions().forEach(dim->{
 				StructureSettingsAccessor a = (StructureSettingsAccessor)dim.generator().getSettings();
 				STRUCTURE_STARTS.entrySet().forEach(entry -> applyStructureStarts(a, entry.getValue()));
 			});
-
 		}
 	}
 	
@@ -542,6 +540,7 @@ public class BiomeAPI {
 		List<BiConsumer<ResourceLocation, Biome>> modifications = MODIFICATIONS.get(level.dimension());
 		if (modifications == null) {
 			biomes.forEach(biome -> sortBiomeFeatures(biome));
+			((BiomeSourceAccessor) source).bclRebuildFeatures();
 			return;
 		}
 		
@@ -898,8 +897,15 @@ public class BiomeAPI {
 	public static void registerStructureEvents(){
 		DynamicRegistrySetupCallback.EVENT.register(registryManager -> {
 			Optional<? extends Registry<NoiseGeneratorSettings>> oGeneratorRegistry = registryManager.registry(Registry.NOISE_GENERATOR_SETTINGS_REGISTRY);
-			Optional<? extends Registry<Codec<? extends BiomeSource>>> oBiomeSourceRegistry = registryManager.registry(Registry.BIOME_SOURCE_REGISTRY);
-			
+//			Optional<? extends Registry<Codec<? extends BiomeSource>>> oBiomeSourceRegistry = registryManager.registry(Registry.BIOME_SOURCE_REGISTRY);
+//
+//			if (oBiomeSourceRegistry.isPresent()) {
+//				RegistryEntryAddedCallback
+//						.event(oBiomeSourceRegistry.get())
+//						.register((rawId, id, source) -> {
+//							BCLib.LOGGER.info(" #### " + rawId + ", " + source + ", " + id);
+//						});
+//			}
 			
 			if (oGeneratorRegistry.isPresent()) {
 				oGeneratorRegistry.get().forEach(BiomeAPI::registerNoiseGeneratorAndChangeSurfaceRules);
