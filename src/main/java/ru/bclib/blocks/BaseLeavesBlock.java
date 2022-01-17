@@ -23,6 +23,7 @@ import ru.bclib.client.render.BCLRenderLayer;
 import ru.bclib.interfaces.BlockModelProvider;
 import ru.bclib.interfaces.RenderLayerProvider;
 import ru.bclib.interfaces.TagProvider;
+import ru.bclib.items.tool.BaseShearsItem;
 import ru.bclib.util.MHelper;
 
 import java.util.Collections;
@@ -31,12 +32,12 @@ import java.util.function.Consumer;
 
 public class BaseLeavesBlock extends LeavesBlock implements BlockModelProvider, RenderLayerProvider, TagProvider {
 	protected final Block sapling;
-	
+
 	private static FabricBlockSettings makeLeaves(MaterialColor color) {
 		return FabricBlockSettings
 			.copyOf(Blocks.OAK_LEAVES)
 			.mapColor(color)
-			.requiresTool()
+			//.requiresTool()
 			.allowsSpawning((state, world, pos, type) -> false)
 			.suffocates((state, world, pos) -> false)
 			.blockVision((state, world, pos) -> false);
@@ -72,7 +73,7 @@ public class BaseLeavesBlock extends LeavesBlock implements BlockModelProvider, 
 	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
 		ItemStack tool = builder.getParameter(LootContextParams.TOOL);
 		if (tool != null) {
-			if (tool.isCorrectToolForDrops(state) || EnchantmentHelper.getItemEnchantmentLevel(
+			if (BaseShearsItem.isShear(tool) || EnchantmentHelper.getItemEnchantmentLevel(
 				Enchantments.SILK_TOUCH,
 				tool
 			) > 0) {
@@ -95,7 +96,7 @@ public class BaseLeavesBlock extends LeavesBlock implements BlockModelProvider, 
 	@Override
 	public void addTags(List<Named<Block>> blockTags, List<Named<Item>> itemTags) {
 		blockTags.add(FabricMineableTags.SHEARS_MINEABLE);
-		blockTags.add(TagAPI.MINEABLE_HOE);
+		//blockTags.add(TagAPI.MINEABLE_HOE);
 		blockTags.add(BlockTags.LEAVES);
 	}
 }
