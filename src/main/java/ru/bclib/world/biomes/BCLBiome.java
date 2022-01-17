@@ -25,7 +25,7 @@ import java.util.Random;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public class BCLBiome {
+public class BCLBiome extends BCLBiomeSettings {
 	private final List<ConfiguredStructureFeature> structures = Lists.newArrayList();
 	private final WeightedList<BCLBiome> subbiomes = new WeightedList<>();
 	private final Map<String, Object> customData = Maps.newHashMap();
@@ -35,13 +35,6 @@ public class BCLBiome {
 	private Consumer<Biome> surfaceInit;
 	private BCLBiome biomeParent;
 	private Biome actualBiome;
-	private BCLBiome edge;
-	
-	private float terrainHeight = 0.1F;
-	private float fogDensity = 1.0F;
-	private float genChance = 1.0F;
-	private int edgeSize = 0;
-	private boolean vertical;
 	
 	/**
 	 * Create wrapper for existing biome using its {@link ResourceLocation} identifier.
@@ -56,7 +49,7 @@ public class BCLBiome {
 	 * @param biomeID {@link ResourceLocation} biome ID.
 	 */
 	public BCLBiome(ResourceLocation biomeID) {
-		this(biomeID, BuiltinRegistries.BIOME.get(biomeID));
+		this(biomeID, BuiltinRegistries.BIOME.get(biomeID), null);
 	}
 	
 	/**
@@ -64,13 +57,36 @@ public class BCLBiome {
 	 * @param biome {@link Biome} to wrap.
 	 */
 	public BCLBiome(Biome biome) {
-		this(BuiltinRegistries.BIOME.getKey(biome), biome);
+		this(biome, null);
+	}
+	
+	/**
+	 * Create wrapper for existing biome using biome instance from {@link BuiltinRegistries}.
+	 * @param biome {@link Biome} to wrap.
+	 * @param settings The Settings for this Biome or {@code null} if you want to apply default settings
+	 */
+	public BCLBiome(Biome biome, VanillaBiomeSettings settings) {
+		this(BuiltinRegistries.BIOME.getKey(biome), biome, settings);
 	}
 	
 	public BCLBiome(ResourceLocation biomeID, Biome biome) {
+		this(biomeID, biome, null);
+	}
+	
+	/**
+	 * Create a new Biome
+	 * @param biomeID {@link ResourceLocation} biome ID.
+	 * @param biome  {@link Biome} to wrap.
+	 * @param defaults The Settings for this Biome or null if you want to apply the defaults
+	 */
+	public BCLBiome(ResourceLocation biomeID, Biome biome, BCLBiomeSettings defaults) {
 		this.subbiomes.add(this, 1.0F);
 		this.biomeID = biomeID;
 		this.biome = biome;
+		
+		if (defaults !=null){
+			defaults.applyWithDefaults(this);
+		}
 	}
 	
 	/**
@@ -87,27 +103,9 @@ public class BCLBiome {
 	 * @param edge {@link BCLBiome} as the edge biome.
 	 * @return same {@link BCLBiome}.
 	 */
-	public BCLBiome setEdge(BCLBiome edge) {
+	BCLBiome setEdge(BCLBiome edge) {
 		this.edge = edge;
 		edge.biomeParent = this;
-		return this;
-	}
-	
-	/**
-	 * Getter for biome edge size.
-	 * @return edge size in blocks.
-	 */
-	public int getEdgeSize() {
-		return edgeSize;
-	}
-	
-	/**
-	 * Set edges size for this biome. Size is in blocks.
-	 * @param size as a float value.
-	 * @return same {@link BCLBiome}.
-	 */
-	public BCLBiome setEdgeSize(int size) {
-		edgeSize = size;
 		return this;
 	}
 	
@@ -167,23 +165,6 @@ public class BCLBiome {
 		return biomeID;
 	}
 	
-	/**
-	 * Getter for fog density, used in custom for renderer.
-	 * @return fog density as a float.
-	 */
-	public float getFogDensity() {
-		return fogDensity;
-	}
-	
-	/**
-	 * Sets fog density for this biome.
-	 * @param fogDensity
-	 * @return same {@link BCLBiome}.
-	 */
-	public BCLBiome setFogDensity(float fogDensity) {
-		this.fogDensity = fogDensity;
-		return this;
-	}
 	
 	/**
 	 * Getter for biome from buil-in registry. For datapack biomes will be same as actual biome.
@@ -201,23 +182,7 @@ public class BCLBiome {
 		return this.actualBiome;
 	}
 	
-	/**
-	 * Getter for biome generation chance, used in {@link ru.bclib.world.generator.BiomePicker} and in custom generators.
-	 * @return biome generation chance as float.
-	 */
-	public float getGenChance() {
-		return this.genChance;
-	}
 	
-	/**
-	 * Set gen chance for this biome, default value is 1.0.
-	 * @param genChance chance of this biome to be generated.
-	 * @return same {@link BCLBiome}.
-	 */
-	public BCLBiome setGenChance(float genChance) {
-		this.genChance = genChance;
-		return this;
-	}
 	
 	/**
 	 * Recursively update biomes to correct world biome registry instances, for internal usage only.
@@ -287,50 +252,6 @@ public class BCLBiome {
 	public BCLBiome addCustomData(Map<String, Object> data) {
 		customData.putAll(data);
 		return this;
-	}
-	
-	/**
-	 * Setter for terrain height, can be used in custom terrain generator.
-	 * @param terrainHeight a relative float terrain height value.
-	 * @return same {@link BCLBiome}.
-	 */
-	public BCLBiome setTerrainHeight(float terrainHeight) {
-		this.terrainHeight = terrainHeight;
-		return this;
-	}
-	
-	/**
-	 * Getter for terrain height, can be used in custom terrain generator.
-	 * @return terrain height.
-	 */
-	public float getTerrainHeight() {
-		return terrainHeight;
-	}
-	
-	/**
-	 * Set biome vertical distribution (for tall Nether only).
-	 * @return same {@link BCLBiome}.
-	 */
-	public BCLBiome setVertical() {
-		return setVertical(true);
-	}
-	
-	/**
-	 * Set biome vertical distribution (for tall Nether only).
-	 * @param vertical {@code boolean} value.
-	 * @return same {@link BCLBiome}.
-	 */
-	public BCLBiome setVertical(boolean vertical) {
-		this.vertical = vertical;
-		return this;
-	}
-	
-	/**
-	 * Checks if biome is vertical, for tall Nether only (or for custom generators).
-	 * @return is biome vertical or not.
-	 */
-	public boolean isVertical() {
-		return vertical;
 	}
 	
 	@Override
@@ -406,29 +327,62 @@ public class BCLBiome {
 	}
 	
 	private boolean didLoadConfig = false;
-	/**
-	 * For internal use.
-	 * Set Biome configuartion from Config. This method is called for all Biomes that get registered
-	 * to a {@link ru.bclib.world.generator.BCLBiomeSource}.
-	 *
-	 * @return This instance
-	 */
-	public BCLBiome setupFromConfig() {
-		if (didLoadConfig) return this;
-		didLoadConfig = true;
-		
-		String group = this.configGroup();
-		float chance = Configs.BIOMES_CONFIG.getFloat(group, "generation_chance", this.getGenChance());
-		float fog = Configs.BIOMES_CONFIG.getFloat(group, "fog_density", this.getFogDensity());
-		this.setGenChance(chance).setFogDensity(fog);
-		
-		if (this.getEdge()!=null){
-			int edgeSize = Configs.BIOMES_CONFIG.getInt(group, "edge_size", this.getEdgeSize());
-			this.setEdgeSize(edgeSize);
-		}
-		
-		Configs.BIOMES_CONFIG.saveChanges();
-		
-		return this;
-	}
+	
+//	/**
+//	 * Set gen chance for this biome, default value is 1.0.
+//	 * @param genChance chance of this biome to be generated.
+//	 * @return same {@link BCLBiome}.
+//	 */
+//	public BCLBiome setGenChance(float genChance) {
+//		super.setGenChance(genChance);
+//		return this;
+//	}
+//
+//	/**
+//	 * Setter for terrain height, can be used in custom terrain generator.
+//	 * @param terrainHeight a relative float terrain height value.
+//	 * @return same {@link BCLBiome}.
+//	 */
+//	public BCLBiome setTerrainHeight(float terrainHeight) {
+//		super.setTerrainHeight(genChance);
+//		return this;
+//	}
+//
+//	/**
+//	 * Set biome vertical distribution (for tall Nether only).
+//	 * @return same {@link BCLBiome}.
+//	 */
+//	public BCLBiome setVertical() {
+//		return setVertical(true);
+//	}
+//
+//	/**
+//	 * Set biome vertical distribution (for tall Nether only).
+//	 * @param vertical {@code boolean} value.
+//	 * @return same {@link BCLBiome}.
+//	 */
+//	public BCLBiome setVertical(boolean vertical) {
+//		super.setVertical(vertical);
+//		return this;
+//	}
+//
+//	/**
+//	 * Sets fog density for this biome.
+//	 * @param fogDensity
+//	 * @return same {@link BCLBiome}.
+//	 */
+//	public BCLBiome setFogDensity(float fogDensity) {
+//		super.setFogDensity(fogDensity);
+//		return this;
+//	}
+//
+//	/**
+//	 * Set edges size for this biome. Size is in blocks.
+//	 * @param size as a float value.
+//	 * @return same {@link BCLBiome}.
+//	 */
+//	public BCLBiome setEdgeSize(int size) {
+//		edgeSize = size;
+//		return this;
+//	}
 }

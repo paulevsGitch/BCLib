@@ -69,7 +69,9 @@ import ru.bclib.mixin.common.StructureSettingsAccessor;
 import ru.bclib.util.CollectionsUtil;
 import ru.bclib.util.MHelper;
 import ru.bclib.world.biomes.BCLBiome;
+import ru.bclib.world.biomes.BCLBiomeSettings;
 import ru.bclib.world.biomes.FabricBiomesData;
+import ru.bclib.world.biomes.VanillaBiomeSettings;
 import ru.bclib.world.features.BCLFeature;
 import ru.bclib.world.generator.BiomePicker;
 import ru.bclib.world.structures.BCLStructureFeature;
@@ -216,7 +218,7 @@ public class BiomeAPI {
 	}
 	
 	public static BCLBiome registerSubBiome(BCLBiome parent, Biome biome, float genChance) {
-		BCLBiome subBiome = new BCLBiome(biome).setGenChance(genChance);
+		BCLBiome subBiome = new BCLBiome(biome, VanillaBiomeSettings.createVanilla().setGenChance(genChance).build());
 		return registerSubBiome(parent, subBiome);
 	}
 	
@@ -253,8 +255,8 @@ public class BiomeAPI {
 	 * @return {@link BCLBiome}
 	 */
 	public static BCLBiome registerNetherBiome(Biome biome) {
-		BCLBiome bclBiome = new BCLBiome(biome);
-		configureBiome(bclBiome);
+		BCLBiome bclBiome = new BCLBiome(biome, null);
+		
 		NETHER_BIOME_PICKER.addBiome(bclBiome);
 		registerBiome(bclBiome);
 		return bclBiome;
@@ -268,7 +270,7 @@ public class BiomeAPI {
 	 */
 	public static BCLBiome registerEndLandBiome(BCLBiome biome) {
 		registerBiome(biome);
-		configureBiome(biome);
+		
 		END_LAND_BIOME_PICKER.addBiome(biome);
 		float weight = biome.getGenChance();
 		ResourceKey<Biome> key = BuiltinRegistries.BIOME.getResourceKey(biome.getBiome()).orElseThrow();
@@ -284,8 +286,8 @@ public class BiomeAPI {
 	 * @return {@link BCLBiome}
 	 */
 	public static BCLBiome registerEndLandBiome(Biome biome) {
-		BCLBiome bclBiome = new BCLBiome(biome);
-		configureBiome(bclBiome);
+		BCLBiome bclBiome = new BCLBiome(biome, null);
+		
 		END_LAND_BIOME_PICKER.addBiome(bclBiome);
 		registerBiome(bclBiome);
 		return bclBiome;
@@ -299,8 +301,8 @@ public class BiomeAPI {
 	 * @return {@link BCLBiome}
 	 */
 	public static BCLBiome registerEndLandBiome(Biome biome, float genChance) {
-		BCLBiome bclBiome = new BCLBiome(biome).setGenChance(genChance);
-		configureBiome(bclBiome);
+		BCLBiome bclBiome = new BCLBiome(biome, VanillaBiomeSettings.createVanilla().setGenChance(genChance).build());
+		
 		END_LAND_BIOME_PICKER.addBiome(bclBiome);
 		registerBiome(bclBiome);
 		return bclBiome;
@@ -314,7 +316,7 @@ public class BiomeAPI {
 	 */
 	public static BCLBiome registerEndVoidBiome(BCLBiome biome) {
 		registerBiome(biome);
-		configureBiome(biome);
+		
 		END_VOID_BIOME_PICKER.addBiome(biome);
 		float weight = biome.getGenChance();
 		ResourceKey<Biome> key = BuiltinRegistries.BIOME.getResourceKey(biome.getBiome()).orElseThrow();
@@ -329,8 +331,8 @@ public class BiomeAPI {
 	 * @return {@link BCLBiome}
 	 */
 	public static BCLBiome registerEndVoidBiome(Biome biome) {
-		BCLBiome bclBiome = new BCLBiome(biome);
-		configureBiome(bclBiome);
+		BCLBiome bclBiome = new BCLBiome(biome, null);
+		
 		END_VOID_BIOME_PICKER.addBiome(bclBiome);
 		registerBiome(bclBiome);
 		return bclBiome;
@@ -344,8 +346,8 @@ public class BiomeAPI {
 	 * @return {@link BCLBiome}
 	 */
 	public static BCLBiome registerEndVoidBiome(Biome biome, float genChance) {
-		BCLBiome bclBiome = new BCLBiome(biome).setGenChance(genChance);
-		configureBiome(bclBiome);
+		BCLBiome bclBiome = new BCLBiome(biome, VanillaBiomeSettings.createVanilla().setGenChance(genChance).build());
+		
 		END_VOID_BIOME_PICKER.addBiome(bclBiome);
 		registerBiome(bclBiome);
 		return bclBiome;
@@ -991,13 +993,6 @@ public class BiomeAPI {
 			int v2 = FEATURE_ORDER.getOrDefault(f2.get(), 70000);
 			return Integer.compare(v1, v2);
 		});
-	}
-	
-	private static void configureBiome(BCLBiome biome) {
-		String group = biome.getID().getNamespace() + "." + biome.getID().getPath();
-		float chance = Configs.BIOMES_CONFIG.getFloat(group, "generation_chance", biome.getGenChance());
-		float fog = Configs.BIOMES_CONFIG.getFloat(group, "fog_density", biome.getFogDensity());
-		biome.setGenChance(chance).setFogDensity(fog);
 	}
 	
 	/**

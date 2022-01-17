@@ -34,7 +34,10 @@ import ru.bclib.api.surface.SurfaceRuleBuilder;
 import ru.bclib.entity.BCLEntityWrapper;
 import ru.bclib.mixin.common.BiomeGenerationSettingsAccessor;
 import ru.bclib.util.ColorUtil;
+import ru.bclib.util.TriFunction;
 import ru.bclib.world.biomes.BCLBiome;
+import ru.bclib.world.biomes.BCLBiomeSettings;
+import ru.bclib.world.biomes.BCLBiomeSettings.Builder;
 import ru.bclib.world.features.BCLFeature;
 import ru.bclib.world.structures.BCLStructureFeature;
 
@@ -48,6 +51,10 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class BCLBiomeBuilder {
+	@FunctionalInterface
+	public interface BiomeSupplier<T> extends TriFunction<ResourceLocation, Biome, BCLBiomeSettings, T>{
+	}
+	
 	private static final BCLBiomeBuilder INSTANCE = new BCLBiomeBuilder();
 	private static final SurfaceRules.ConditionSource SURFACE_NOISE = SurfaceRules.noiseCondition(Noises.SOUL_SAND_LAYER, -0.012);
 	
@@ -64,6 +71,10 @@ public class BCLBiomeBuilder {
 	private float genChance;
 	private float downfall;
 	private float height;
+	private int edgeSize;
+	private BCLBiome edge;
+	private boolean vertical;
+	
 	
 	/**
 	 * Starts new biome building process.
@@ -80,9 +91,12 @@ public class BCLBiomeBuilder {
 		INSTANCE.structures.clear();
 		INSTANCE.temperature = 1.0F;
 		INSTANCE.fogDensity = 1.0F;
+		INSTANCE.edgeSize = 0;
 		INSTANCE.downfall = 1.0F;
 		INSTANCE.genChance = 1.0F;
 		INSTANCE.height = 0.1F;
+		INSTANCE.vertical = false;
+		INSTANCE.edge = null;
 		return INSTANCE;
 	}
 	
@@ -231,6 +245,40 @@ public class BCLBiomeBuilder {
 	 */
 	public BCLBiomeBuilder genChance(float genChance) {
 		this.genChance = genChance;
+		return this;
+	}
+	
+	/**
+	 * Sets edge size for this biome.
+	 * @param edgeSize  size of the Edge (in Blocks)
+	 * @return same {@link BCLBiomeBuilder}.
+	 */
+	public BCLBiomeBuilder edgeSize(int edgeSize) {
+		this.edgeSize = edgeSize;
+		return this;
+	}
+	
+	/**
+	 * Sets edge-Biome for this biome.
+	 * @param edge The Edge Biome
+	 * @return same {@link BCLBiomeBuilder}.
+	 */
+	public BCLBiomeBuilder edge(BCLBiome edge) {
+		this.edge = edge;
+		return this;
+	}
+	
+	
+	
+	/**
+	 * Sets edge-Biome for this biome.
+	 * @param edge The Edge Biome
+	 * @param edgeSize size of the Edge (in Blocks)
+	 * @return same {@link BCLBiomeBuilder}.
+	 */
+	public BCLBiomeBuilder edge(BCLBiome edge, int edgeSize) {
+		this.edge(edge);
+		this.edgeSize(edgeSize);
 		return this;
 	}
 	
@@ -579,12 +627,24 @@ public class BCLBiomeBuilder {
 		return this;
 	}
 	
+	
+	
+	/**
+	 * Make this a vertical Biome
+	 *
+	 * @return same {@link BCLBiomeBuilder} instance.
+	 */
+	public BCLBiomeBuilder vertical() {
+		this.vertical = vertical;
+		return this;
+	}
+	
 	/**
 	 * Finalize biome creation.
 	 * @return created {@link BCLBiome} instance.
 	 */
 	public BCLBiome build() {
-		return build(BCLBiome::new);
+		return build((BiomeSupplier<BCLBiome>)BCLBiome::new);
 	}
 	
 	/**
@@ -592,7 +652,17 @@ public class BCLBiomeBuilder {
 	 * @param biomeConstructor {@link BiFunction} biome constructor.
 	 * @return created {@link BCLBiome} instance.
 	 */
+	@Deprecated(forRemoval = true)
 	public <T extends BCLBiome> T build(BiFunction<ResourceLocation, Biome, T> biomeConstructor) {
+		return build((id, biome, settings)->biomeConstructor.apply(id, biome));
+	}
+	
+	/**
+	 * Finalize biome creation.
+	 * @param biomeConstructor {@link BiomeSupplier} biome constructor.
+	 * @return created {@link BCLBiome} instance.
+	 */
+	public <T extends BCLBiome> T build(BiomeSupplier<T> biomeConstructor) {
 		BiomeBuilder builder = new BiomeBuilder()
 			.precipitation(precipitation)
 			.biomeCategory(category)
@@ -622,12 +692,18 @@ public class BCLBiomeBuilder {
 			builder.generationSettings(getGeneration().build());
 		}
 		
-		final T res = biomeConstructor.apply(biomeID, builder.build());
-		res.setTerrainHeight(height);
+		BCLBiomeSettings settings = BCLBiomeSettings.createBCL()
+			.setTerrainHeight(height)
+			.setFogDensity(fogDensity)
+			.setGenChance(genChance)
+			.setEdgeSize(edgeSize)
+			.setEdge(edge)
+			.setVertical(vertical)
+			.build();
+		
+		final T res = biomeConstructor.apply(biomeID, builder.build(), settings);
 		res.attachStructures(structures);
 		res.setSurface(surfaceRule);
-		res.setFogDensity(fogDensity);
-		res.setGenChance(genChance);
 		res.setFeatures(defferedFeatures);
 		return res;
 	}
