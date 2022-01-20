@@ -1,6 +1,7 @@
 package ru.bclib.world.surface;
 
 import com.mojang.serialization.Codec;
+import net.minecraft.core.Registry;
 import net.minecraft.world.level.levelgen.SurfaceRules;
 import ru.bclib.api.surface.rules.SurfaceNoiseCondition;
 import ru.bclib.mixin.common.SurfaceRulesContextAccessor;
@@ -37,5 +38,9 @@ public class DoubleBlockSurfaceNoiseCondition extends SurfaceNoiseCondition {
 		lastZ=z;
 		lastValue=value;
 		return value > threshold;
+	}
+
+	static {
+		Registry.register(Registry.CONDITION , "betternether_doubleblock_surface", DoubleBlockSurfaceNoiseCondition.CODEC);
 	}
 }
