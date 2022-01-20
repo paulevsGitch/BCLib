@@ -3,6 +3,7 @@ package ru.bclib.world.surface;
 import com.mojang.serialization.Codec;
 import net.minecraft.core.Registry;
 import net.minecraft.world.level.levelgen.SurfaceRules;
+import ru.bclib.BCLib;
 import ru.bclib.api.surface.rules.SurfaceNoiseCondition;
 import ru.bclib.mixin.common.SurfaceRulesContextAccessor;
 import ru.bclib.noise.OpenSimplexNoise;
@@ -41,6 +42,6 @@ public class DoubleBlockSurfaceNoiseCondition extends SurfaceNoiseCondition {
 	}
 
 	static {
-		Registry.register(Registry.CONDITION , "betternether_doubleblock_surface", DoubleBlockSurfaceNoiseCondition.CODEC);
+		Registry.register(Registry.CONDITION , BCLib.makeID("doubleblock_surface"), DoubleBlockSurfaceNoiseCondition.CODEC);
 	}
 }

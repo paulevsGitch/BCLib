@@ -2,7 +2,7 @@ package ru.bclib.api.surface.rules;
 
 import com.mojang.serialization.Codec;
 import net.minecraft.core.Registry;
-import net.minecraft.world.level.levelgen.SurfaceRules;
+import ru.bclib.BCLib;
 import ru.bclib.interfaces.NumericProvider;
 import ru.bclib.mixin.common.SurfaceRulesContextAccessor;
 import ru.bclib.util.MHelper;
@@ -21,6 +21,6 @@ public record RandomIntProvider(int range) implements NumericProvider {
 	}
 
 	static {
-		Registry.register(NumericProvider.NUMERIC_PROVIDER , "biome", RandomIntProvider.CODEC);
+		Registry.register(NumericProvider.NUMERIC_PROVIDER , BCLib.makeID("rnd_int"), RandomIntProvider.CODEC);
 	}
 }
