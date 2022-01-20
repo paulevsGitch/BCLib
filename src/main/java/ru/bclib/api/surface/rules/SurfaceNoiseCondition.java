@@ -10,11 +10,6 @@ import ru.bclib.mixin.common.SurfaceRulesContextAccessor;
 
 public abstract class SurfaceNoiseCondition implements NoiseCondition{
 	@Override
-	public Codec<? extends ConditionSource> codec() {
-		return SurfaceRules.ConditionSource.CODEC;
-	}
-	
-	@Override
 	public final Condition apply(Context context2) {
 		final SurfaceNoiseCondition self = this;
 

@@ -1,5 +1,7 @@
 package ru.bclib.world.surface;
 
+import com.mojang.serialization.Codec;
+import net.minecraft.world.level.levelgen.SurfaceRules;
 import ru.bclib.api.surface.rules.SurfaceNoiseCondition;
 import ru.bclib.mixin.common.SurfaceRulesContextAccessor;
 import ru.bclib.noise.OpenSimplexNoise;
@@ -8,10 +10,15 @@ import ru.bclib.util.MHelper;
 public class DoubleBlockSurfaceNoiseCondition extends SurfaceNoiseCondition {
 	public static final DoubleBlockSurfaceNoiseCondition CONDITION = new DoubleBlockSurfaceNoiseCondition(0);
 	private static final OpenSimplexNoise NOISE = new OpenSimplexNoise(4141);
-
+	public static final Codec<DoubleBlockSurfaceNoiseCondition> CODEC = Codec.DOUBLE.fieldOf("threshold").xmap(DoubleBlockSurfaceNoiseCondition::new, obj -> obj.threshold).codec();
 	private final double threshold;
 	public DoubleBlockSurfaceNoiseCondition(double threshold){
 		this.threshold = threshold;
+	}
+
+	@Override
+	public Codec<? extends SurfaceRules.ConditionSource> codec() {
+		return CODEC;
 	}
 
 	private static int lastX = Integer.MIN_VALUE;
