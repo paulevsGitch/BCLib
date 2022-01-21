@@ -8,9 +8,6 @@ import net.minecraft.client.resources.model.BlockModelRotation;
 import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.BlockTags;
-import net.minecraft.tags.ItemTags;
-import net.minecraft.tags.Tag.Named;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -22,6 +19,8 @@ import net.minecraft.world.level.block.state.properties.DoorHingeSide;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.level.storage.loot.LootContext;
 import org.jetbrains.annotations.Nullable;
+import ru.bclib.api.TagAPI;
+import ru.bclib.api.TagAPI.TagLocation;
 import ru.bclib.client.models.BasePatterns;
 import ru.bclib.client.models.ModelsHelper;
 import ru.bclib.client.models.PatternsHelper;
@@ -151,9 +150,9 @@ public class BaseDoorBlock extends DoorBlock implements RenderLayerProvider, Blo
 	}
 	
 	@Override
-	public void addTags(List<Named<Block>> blockTags, List<Named<Item>> itemTags) {
-		blockTags.add(BlockTags.DOORS);
-		itemTags.add(ItemTags.DOORS);
+	public void addTags(List<TagLocation<Block>> blockTags, List<TagLocation<Item>> itemTags) {
+		blockTags.add(TagAPI.NAMED_BLOCK_DOORS);
+		itemTags.add(TagAPI.NAMED_ITEM_DOORS);
 	}
 	
 	protected enum DoorType implements StringRepresentable {

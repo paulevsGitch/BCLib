@@ -1,6 +1,5 @@
 package ru.bclib.registry;
 
-import net.fabricmc.fabric.api.tool.attribute.v1.FabricToolTags;
 import net.minecraft.core.BlockSource;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
@@ -8,7 +7,6 @@ import net.minecraft.core.dispenser.DefaultDispenseItemBehavior;
 import net.minecraft.core.dispenser.ShearsDispenseItemBehavior;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraft.tags.Tag;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
@@ -71,22 +69,22 @@ public class ItemRegistry extends BaseRegistry<Item> {
 		registerItem(itemId, item);
 		
 		if (item instanceof ShovelItem) {
-			TagAPI.addTag((Tag.Named<Item>) FabricToolTags.SHOVELS, item);
+			TagAPI.addItemTag(TagAPI.NAMED_FABRIC_SHOVELS, item);
 		}
 		else if (item instanceof SwordItem) {
-			TagAPI.addTag((Tag.Named<Item>) FabricToolTags.SWORDS, item);
+			TagAPI.addItemTag(TagAPI.NAMED_FABRIC_SWORDS, item);
 		}
 		else if (item instanceof BasePickaxeItem) {
-			TagAPI.addTag((Tag.Named<Item>) FabricToolTags.PICKAXES, item);
+			TagAPI.addItemTag(TagAPI.NAMED_FABRIC_PICKAXES, item);
 		}
 		else if (item instanceof BaseAxeItem) {
-			TagAPI.addTag((Tag.Named<Item>) FabricToolTags.AXES, item);
+			TagAPI.addItemTag(TagAPI.NAMED_FABRIC_AXES, item);
 		}
 		else if (item instanceof BaseHoeItem) {
-			TagAPI.addTag((Tag.Named<Item>) FabricToolTags.HOES, item);
+			TagAPI.addItemTag(TagAPI.NAMED_FABRIC_HOES, item);
 		}
 		else if (item instanceof BaseShearsItem) {
-			TagAPI.addTags(item, (Tag.Named<Item>) FabricToolTags.SHEARS, TagAPI.ITEM_SHEARS, TagAPI.ITEM_COMMON_SHEARS);
+			TagAPI.addItemTags(item, TagAPI.NAMED_FABRIC_SHEARS, TagAPI.NAMED_COMMON_ITEM_SHEARS);
 			DispenserBlock.registerBehavior(item.asItem(), new ShearsDispenseItemBehavior());
 		}
 		

@@ -1,7 +1,6 @@
 package ru.bclib.api.surface.rules;
 
 import com.mojang.serialization.Codec;
-import net.minecraft.world.level.levelgen.SurfaceRules;
 import net.minecraft.world.level.levelgen.SurfaceRules.Condition;
 import net.minecraft.world.level.levelgen.SurfaceRules.ConditionSource;
 import net.minecraft.world.level.levelgen.SurfaceRules.Context;

@@ -15,7 +15,6 @@ import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import org.jetbrains.annotations.Nullable;
 import ru.bclib.BCLib;
 import ru.bclib.api.biomes.BiomeAPI;
-import ru.bclib.config.Configs;
 import ru.bclib.util.WeightedList;
 
 import java.util.HashMap;

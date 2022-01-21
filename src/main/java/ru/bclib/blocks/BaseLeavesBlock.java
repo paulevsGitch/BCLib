@@ -1,12 +1,9 @@
 package ru.bclib.blocks;
 
 import com.google.common.collect.Lists;
-import net.fabricmc.fabric.api.mininglevel.v1.FabricMineableTags;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.BlockTags;
-import net.minecraft.tags.Tag.Named;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
@@ -19,6 +16,7 @@ import net.minecraft.world.level.material.MaterialColor;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import ru.bclib.api.TagAPI;
+import ru.bclib.api.TagAPI.TagLocation;
 import ru.bclib.client.render.BCLRenderLayer;
 import ru.bclib.interfaces.BlockModelProvider;
 import ru.bclib.interfaces.RenderLayerProvider;
@@ -94,9 +92,10 @@ public class BaseLeavesBlock extends LeavesBlock implements BlockModelProvider, 
 	}
 	
 	@Override
-	public void addTags(List<Named<Block>> blockTags, List<Named<Item>> itemTags) {
-		blockTags.add(FabricMineableTags.SHEARS_MINEABLE);
-		//blockTags.add(TagAPI.MINEABLE_HOE);
-		blockTags.add(BlockTags.LEAVES);
+	public void addTags(List<TagLocation<Block>> blockTags, List<TagLocation<Item>> itemTags) {
+		blockTags.add(TagAPI.NAMED_MINEABLE_SHEARS);
+		blockTags.add(TagAPI.NAMED_MINEABLE_HOE);
+		blockTags.add(TagAPI.NAMED_BLOCK_LEAVES);
+		itemTags.add(TagAPI.NAMED_ITEM_LEAVES);
 	}
 }

@@ -2,7 +2,6 @@ package ru.bclib.world.biomes;
 
 import net.minecraft.world.level.biome.Biome;
 import ru.bclib.config.Configs;
-import ru.bclib.world.biomes.VanillaBiomeSettings.Builder;
 
 public class BCLBiomeSettings {
 	public static Builder createBCL(){

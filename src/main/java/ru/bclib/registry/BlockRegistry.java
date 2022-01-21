@@ -1,6 +1,5 @@
 package ru.bclib.registry;
 
-import net.fabricmc.fabric.api.mininglevel.v1.FabricMineableTags;
 import net.fabricmc.fabric.api.registry.FlammableBlockRegistry;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
@@ -43,16 +42,22 @@ public class BlockRegistry extends BaseRegistry<Block> {
 		getModBlocks(id.getNamespace()).add(block);
 
 		if (block instanceof BaseLeavesBlock){
-			TagAPI.addTags(block, TagAPI.BLOCK_LEAVES, TagAPI.MINEABLE_HOE, FabricMineableTags.SHEARS_MINEABLE);
+			TagAPI.addBlockTags(
+				block,
+				TagAPI.NAMED_BLOCK_LEAVES,
+				TagAPI.NAMED_COMMON_BLOCK_LEAVES,
+				TagAPI.NAMED_MINEABLE_HOE,
+				TagAPI.NAMED_MINEABLE_SHEARS
+			);
 			if (item != null){
-				TagAPI.addTags(item, TagAPI.ITEM_LEAVES);
+				TagAPI.addItemTags(item, TagAPI.NAMED_COMMON_ITEM_LEAVES, TagAPI.NAMED_ITEM_LEAVES);
 			}
 		} else if (block instanceof BaseOreBlock){
-			TagAPI.addTags(block, TagAPI.MINEABLE_PICKAXE);
+			TagAPI.addBlockTags(block, TagAPI.NAMED_MINEABLE_PICKAXE);
 		} else if (block instanceof FeatureSaplingBlock){
-			TagAPI.addTags(block, TagAPI.BLOCK_SAPLINGS);
+			TagAPI.addBlockTags(block, TagAPI.NAMED_COMMON_BLOCK_SAPLINGS, TagAPI.NAMED_BLOCK_SAPLINGS);
 			if (item != null){
-				TagAPI.addTags(item, TagAPI.ITEM_SAPLINGS);
+				TagAPI.addItemTags(item, TagAPI.NAMED_COMMON_ITEM_SAPLINGS, TagAPI.NAMED_ITEM_SAPLINGS);
 			}
 		}
 

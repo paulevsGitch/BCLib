@@ -28,6 +28,6 @@ public class PortalShapeMixin {
 	}
 	
 	private static boolean be_FRAME(StatePredicate FRAME, BlockState state, BlockGetter getter, BlockPos pos){
-		return state.is(TagAPI.BLOCK_NETHER_PORTAL_FRAME) || FRAME.test(state, getter, pos);
+		return state.is(TagAPI.COMMON_BLOCK_NETHER_PORTAL_FRAME) || FRAME.test(state, getter, pos);
 	}
 }

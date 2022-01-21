@@ -3,7 +3,6 @@ package ru.bclib.api;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import net.fabricmc.fabric.api.tag.TagFactory;
-import net.fabricmc.fabric.api.tag.TagRegistry;
 import net.fabricmc.fabric.impl.tag.extension.TagDelegate;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
@@ -18,7 +17,6 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import ru.bclib.BCLib;
 
 import java.util.List;
 import java.util.Map;
@@ -30,61 +28,143 @@ public class TagAPI {
 	private static final Map<ResourceLocation, Set<ResourceLocation>> TAGS_BLOCK = Maps.newConcurrentMap();
 	private static final Map<ResourceLocation, Set<ResourceLocation>> TAGS_ITEM = Maps.newConcurrentMap();
 	
-	// Vanilla Block Tags
-	public static final TagLocation<Block> NAMED_SOUL_SPEED_BLOCKS = new TagLocation<>("soul_speed_blocks");
-	public static final TagLocation<Block> NAMED_SOUL_FIRE_BASE_BLOCKS = new TagLocation<>("soul_fire_base_blocks");
-	public static final TagLocation<Block> NAMED_CLIMBABLE = new TagLocation<>("climbable");
-	public static final TagLocation<Block> NAMED_NYLIUM = new TagLocation<>("nylium");
-	public static final TagLocation<Block> NAMED_ANVIL = new TagLocation<>("anvil");
-	public static final TagLocation<Block> NAMED_WALLS = new TagLocation<>("walls");
-	public static final TagLocation<Block> LEAVES = new TagLocation<>("leaves");
+	// LOCATIONS //
+	
+	// Mineable Block Tags
 	public static final TagLocation<Block> NAMED_MINEABLE_AXE = new TagLocation<>("mineable/axe");
-	public static final TagLocation<Block> NAMED_MINEABLE_PICKAXE = new TagLocation<>("mineable/pickaxe");
-	public static final TagLocation<Block> NAMED_MINEABLE_SHOVEL = new TagLocation<>("mineable/shovel");
 	public static final TagLocation<Block> NAMED_MINEABLE_HOE = new TagLocation<>("mineable/hoe");
+	public static final TagLocation<Block> NAMED_MINEABLE_PICKAXE = new TagLocation<>("mineable/pickaxe");
+	public static final TagLocation<Block> NAMED_MINEABLE_SHEARS = new TagLocation<>("fabric", "mineable/shears");
+	public static final TagLocation<Block> NAMED_MINEABLE_SHOVEL = new TagLocation<>("mineable/shovel");
+	public static final TagLocation<Block> NAMED_MINEABLE_SWORD = new TagLocation<>("fabric", "mineable/sword");
 	
-	// Block Tags
-	public static final TagNamed<Block> BLOCK_BOOKSHELVES = makeCommonBlockTag("bookshelves");
-	public static final TagNamed<Block> BLOCK_GEN_TERRAIN = makeBlockTag(BCLib.MOD_ID, "gen_terrain");
-	public static final TagNamed<Block> BLOCK_NETHER_GROUND = makeBlockTag(BCLib.MOD_ID, "nether_ground");
-	public static final TagNamed<Block> BLOCK_END_GROUND = makeBlockTag(BCLib.MOD_ID, "end_ground");
+	// Fabric Tools
+	public static final TagLocation<Item> NAMED_FABRIC_AXES = new TagLocation<>("fabric", "axes");
+	public static final TagLocation<Item> NAMED_FABRIC_HOES = new TagLocation<>("fabric", "hoes");
+	public static final TagLocation<Item> NAMED_FABRIC_PICKAXES = new TagLocation<>("fabric", "pickaxes");
+	public static final TagLocation<Item> NAMED_FABRIC_SHEARS = new TagLocation<>("fabric", "shears");
+	public static final TagLocation<Item> NAMED_FABRIC_SHOVELS = new TagLocation<>("fabric", "shovels");
+	public static final TagLocation<Item> NAMED_FABRIC_SWORDS = new TagLocation<>("fabric", "swords");
 	
-	public static final TagNamed<Block> BLOCK_CHEST = makeCommonBlockTag("chest");
-	public static final TagNamed<Block> BLOCK_WOODEN_CHEST = makeCommonBlockTag("wooden_chests");
-	public static final TagNamed<Block> BLOCK_BARREL = makeCommonBlockTag("barrel");
-	public static final TagNamed<Block> BLOCK_WOODEN_BARREL = makeCommonBlockTag("wooden_barrels");
-	public static final TagNamed<Block> BLOCK_END_STONES = makeCommonBlockTag("end_stones");
-	public static final TagNamed<Block> BLOCK_NETHER_STONES = makeCommonBlockTag("nether_stones");
-	public static final TagNamed<Block> BLOCK_NETHER_PORTAL_FRAME = makeCommonBlockTag("nether_pframe");
-	public static final TagNamed<Block> BLOCK_WORKBENCHES = makeCommonBlockTag("workbench");
-	public static final TagNamed<Block> BLOCK_SAPLINGS = makeCommonBlockTag("saplings");
-	public static final TagNamed<Block> BLOCK_LEAVES = makeCommonBlockTag("leaves");
-	public static final TagNamed<Block> BLOCK_IMMOBILE = makeCommonBlockTag("immobile");
-	public static final TagNamed<Block> BLOCK_SOUL_GROUND = makeCommonBlockTag("soul_ground");
-	public static final TagNamed<Block> BLOCK_NETHERRACK = makeCommonBlockTag("netherrack");
-	public static final TagNamed<Block> BLOCK_NETHER_MYCELIUM = makeCommonBlockTag("nether_mycelium");
+	// Vanilla Block Tags
+	public static final TagLocation<Block> NAMED_BLOCK_ANVIL = new TagLocation<>("anvil");
+	public static final TagLocation<Block> NAMED_BLOCK_BUTTONS = new TagLocation<>("buttons");
+	public static final TagLocation<Block> NAMED_BLOCK_CLIMBABLE = new TagLocation<>("climbable");
+	public static final TagLocation<Block> NAMED_BLOCK_DOORS = new TagLocation<>("doors");
+	public static final TagLocation<Block> NAMED_BLOCK_FENCES = new TagLocation<>("fences");
+	public static final TagLocation<Block> NAMED_BLOCK_FENCE_GATES = new TagLocation<>("fence_gates");
+	public static final TagLocation<Block> NAMED_BLOCK_LEAVES = new TagLocation<>("leaves");
+	public static final TagLocation<Block> NAMED_BLOCK_LOGS = new TagLocation<>("logs");
+	public static final TagLocation<Block> NAMED_BLOCK_LOGS_THAT_BURN = new TagLocation<>("logs_that_burn");
+	public static final TagLocation<Block> NAMED_BLOCK_NYLIUM = new TagLocation<>("nylium");
+	public static final TagLocation<Block> NAMED_BLOCK_PLANKS = new TagLocation<>("planks");
+	public static final TagLocation<Block> NAMED_BLOCK_PRESSURE_PLATES = new TagLocation<>("pressure_plates");
+	public static final TagLocation<Block> NAMED_BLOCK_SAPLINGS = new TagLocation<>("saplings");
+	public static final TagLocation<Block> NAMED_BLOCK_SIGNS = new TagLocation<>("signs");
+	public static final TagLocation<Block> NAMED_BLOCK_SLABS = new TagLocation<>("slabs");
+	public static final TagLocation<Block> NAMED_BLOCK_STAIRS = new TagLocation<>("stairs");
+	public static final TagLocation<Block> NAMED_BLOCK_STONE_PRESSURE_PLATES = new TagLocation<>("stone_pressure_plates");
+	public static final TagLocation<Block> NAMED_BLOCK_TRAPDOORS = new TagLocation<>("trapdoors");
+	public static final TagLocation<Block> NAMED_BLOCK_WALLS = new TagLocation<>("walls");
+	public static final TagLocation<Block> NAMED_BLOCK_WOODEN_BUTTONS = new TagLocation<>("wooden_buttons");
+	public static final TagLocation<Block> NAMED_BLOCK_WOODEN_DOORS = new TagLocation<>("wooden_doors");
+	public static final TagLocation<Block> NAMED_BLOCK_WOODEN_FENCES = new TagLocation<>("wooden_fences");
+	public static final TagLocation<Block> NAMED_BLOCK_WOODEN_PRESSURE_PLATES = new TagLocation<>("wooden_pressure_plates");
+	public static final TagLocation<Block> NAMED_BLOCK_WOODEN_SLABS = new TagLocation<>("wooden_slabs");
+	public static final TagLocation<Block> NAMED_BLOCK_WOODEN_STAIRS = new TagLocation<>("wooden_stairs");
+	public static final TagLocation<Block> NAMED_BLOCK_WOODEN_TRAPDOORS = new TagLocation<>("wooden_trapdoors");
+	public static final TagLocation<Block> NAMED_SOUL_FIRE_BASE_BLOCKS = new TagLocation<>("soul_fire_base_blocks");
+	public static final TagLocation<Block> NAMED_SOUL_SPEED_BLOCKS = new TagLocation<>("soul_speed_blocks");
 	
-	public static final TagNamed<Block> BLOCK_DRAGON_IMMUNE = getMCBlockTag("dragon_immune");
+	// Vanilla Item Tags
+	public static final TagLocation<Item> NAMED_ITEM_BUTTONS = new TagLocation<>("buttons");
+	public static final TagLocation<Item> NAMED_ITEM_DOORS = new TagLocation<>("doors");
+	public static final TagLocation<Item> NAMED_ITEM_FENCES = new TagLocation<>("fences");
+	public static final TagLocation<Item> NAMED_ITEM_FENCE_GATES = new TagLocation<>("fence_gates");
+	public static final TagLocation<Item> NAMED_ITEM_LEAVES = new TagLocation<>("leaves");
+	public static final TagLocation<Item> NAMED_ITEM_LOGS = new TagLocation<>("logs");
+	public static final TagLocation<Item> NAMED_ITEM_LOGS_THAT_BURN = new TagLocation<>("logs_that_burn");
+	public static final TagLocation<Item> NAMED_ITEM_PLANKS = new TagLocation<>("planks");
+	public static final TagLocation<Item> NAMED_ITEM_PRESSURE_PLATES = new TagLocation<>("pressure_plates");
+	public static final TagLocation<Item> NAMED_ITEM_SAPLINGS = new TagLocation<>("saplings");
+	public static final TagLocation<Item> NAMED_ITEM_SHEARS = new TagLocation<>("shears");
+	public static final TagLocation<Item> NAMED_ITEM_SIGNS = new TagLocation<>("signs");
+	public static final TagLocation<Item> NAMED_ITEM_SLABS = new TagLocation<>("slabs");
+	public static final TagLocation<Item> NAMED_ITEM_STAIRS = new TagLocation<>("stairs");
+	public static final TagLocation<Item> NAMED_ITEM_STONE_PRESSURE_PLATES = new TagLocation<>("stone_pressure_plates");
+	public static final TagLocation<Item> NAMED_ITEM_TRAPDOORS = new TagLocation<>("trapdoors");
+	public static final TagLocation<Item> NAMED_ITEM_WOODEN_BUTTONS = new TagLocation<>("wooden_buttons");
+	public static final TagLocation<Item> NAMED_ITEM_WOODEN_DOORS = new TagLocation<>("wooden_doors");
+	public static final TagLocation<Item> NAMED_ITEM_WOODEN_FENCES = new TagLocation<>("wooden_fences");
+	public static final TagLocation<Item> NAMED_ITEM_WOODEN_PRESSURE_PLATES = new TagLocation<>("wooden_pressure_plates");
+	public static final TagLocation<Item> NAMED_ITEM_WOODEN_SLABS = new TagLocation<>("wooden_slabs");
+	public static final TagLocation<Item> NAMED_ITEM_WOODEN_STAIRS = new TagLocation<>("wooden_stairs");
+	public static final TagLocation<Item> NAMED_ITEM_WOODEN_TRAPDOORS = new TagLocation<>("wooden_trapdoors");
 	
-	public static final TagNamed<Block> MINEABLE_AXE = getMCBlockTag("mineable/axe");
-	public static final TagNamed<Block> MINEABLE_PICKAXE = getMCBlockTag("mineable/pickaxe");
-	public static final TagNamed<Block> MINEABLE_SHOVEL = getMCBlockTag("mineable/shovel");
-	public static final TagNamed<Block> MINEABLE_HOE = getMCBlockTag("mineable/hoe");
+	// Common Block Tags
+	public static final TagLocation<Block> NAMED_BLOCK_DRAGON_IMMUNE = new TagLocation<>("c", "dragon_immune");
+	public static final TagLocation<Block> NAMED_COMMON_BLOCK_BARREL = new TagLocation<>("c", "barrel");
+	public static final TagLocation<Block> NAMED_COMMON_BLOCK_BOOKSHELVES = new TagLocation<>("c", "bookshelves");
+	public static final TagLocation<Block> NAMED_COMMON_BLOCK_CHEST = new TagLocation<>("c", "chest");
+	public static final TagLocation<Block> NAMED_COMMON_BLOCK_END_STONES = new TagLocation<>("c", "end_stones");
+	public static final TagLocation<Block> NAMED_COMMON_BLOCK_IMMOBILE = new TagLocation<>("c", "immobile");
+	public static final TagLocation<Block> NAMED_COMMON_BLOCK_LEAVES = new TagLocation<>("c", "leaves");
+	public static final TagLocation<Block> NAMED_COMMON_BLOCK_NETHERRACK = new TagLocation<>("c", "netherrack");
+	public static final TagLocation<Block> NAMED_COMMON_BLOCK_NETHER_MYCELIUM = new TagLocation<>("c", "nether_mycelium");
+	public static final TagLocation<Block> NAMED_COMMON_BLOCK_NETHER_PORTAL_FRAME = new TagLocation<>("c", "nether_pframe");
+	public static final TagLocation<Block> NAMED_COMMON_BLOCK_NETHER_STONES = new TagLocation<>("c", "nether_stones");
+	public static final TagLocation<Block> NAMED_COMMON_BLOCK_SAPLINGS = new TagLocation<>("c", "saplings");
+	public static final TagLocation<Block> NAMED_COMMON_BLOCK_SOUL_GROUND = new TagLocation<>("c", "soul_ground");
+	public static final TagLocation<Block> NAMED_COMMON_BLOCK_WOODEN_BARREL = new TagLocation<>("c", "wooden_barrels");
+	public static final TagLocation<Block> NAMED_COMMON_BLOCK_WOODEN_CHEST = new TagLocation<>("c", "wooden_chests");
+	public static final TagLocation<Block> NAMED_COMMON_BLOCK_WORKBENCHES = new TagLocation<>("c", "workbench");
 	
-	// Item Tags
-	public static final TagNamed<Item> ITEM_CHEST = makeCommonItemTag("chest");
-	public static final TagNamed<Item> ITEM_WOODEN_CHEST = makeCommonItemTag("wooden_chests");
-	public static final TagNamed<Item> ITEM_BARREL = makeCommonItemTag("barrel");
-	public static final TagNamed<Item> ITEM_WOODEN_BARREL = makeCommonItemTag("wooden_barrels");
-	public static final TagNamed<Item> ITEM_IRON_INGOTS = makeCommonItemTag("iron_ingots");
-	public static final TagNamed<Item> ITEM_FURNACES = makeCommonItemTag("furnaces");
-	public static final TagNamed<Item> ITEM_WORKBENCHES = makeCommonItemTag("workbench");
-	public final static TagNamed<Item> ITEM_HAMMERS = makeCommonItemTag("hammers");
-	public static final TagNamed<Item> ITEM_SAPLINGS = makeCommonItemTag("saplings");
-	public static final TagNamed<Item> ITEM_LEAVES = makeCommonItemTag("leaves");
-	public static final TagNamed<Item> ITEM_SHEARS = getMCItemTag("shears");
-	public static final TagNamed<Item> ITEM_COMMON_SHEARS = makeCommonItemTag("shears");
-	public static final TagNamed<Item> ITEM_SOUL_GROUND = makeCommonItemTag("soul_ground");
+	// Common Item Tags
+	public static final TagLocation<Item> NAMED_COMMON_ITEM_BARREL = new TagLocation<>("c", "barrel");
+	public static final TagLocation<Item> NAMED_COMMON_ITEM_CHEST = new TagLocation<>("c", "chest");
+	public static final TagLocation<Item> NAMED_COMMON_ITEM_FURNACES = new TagLocation<>("c", "furnaces");
+	public static final TagLocation<Item> NAMED_COMMON_ITEM_HAMMERS = new TagLocation<>("c", "hammers");
+	public static final TagLocation<Item> NAMED_COMMON_ITEM_IRON_INGOTS = new TagLocation<>("c", "iron_ingots");
+	public static final TagLocation<Item> NAMED_COMMON_ITEM_LEAVES = new TagLocation<>("c", "leaves");
+	public static final TagLocation<Item> NAMED_COMMON_ITEM_SAPLINGS = new TagLocation<>("c", "saplings");
+	public static final TagLocation<Item> NAMED_COMMON_ITEM_SHEARS = new TagLocation<>("c", "shears");
+	public static final TagLocation<Item> NAMED_COMMON_ITEM_SOUL_GROUND = new TagLocation<>("c", "soul_ground");
+	public static final TagLocation<Item> NAMED_COMMON_ITEM_WOODEN_BARREL = new TagLocation<>("c", "wooden_barrels");
+	public static final TagLocation<Item> NAMED_COMMON_ITEM_WOODEN_CHEST = new TagLocation<>("c", "wooden_chests");
+	public static final TagLocation<Item> NAMED_COMMON_ITEM_WORKBENCHES = new TagLocation<>("c", "workbench");
+	
+	// TAGS //
+	
+	// Common Block Tags
+	public static final TagNamed<Block> COMMON_BLOCK_BARREL = makeCommonBlockTag("barrel");
+	public static final TagNamed<Block> COMMON_BLOCK_BOOKSHELVES = makeCommonBlockTag("bookshelves");
+	public static final TagNamed<Block> COMMON_BLOCK_CHEST = makeCommonBlockTag("chest");
+	public static final TagNamed<Block> COMMON_BLOCK_END_STONES = makeCommonBlockTag("end_stones");
+	public static final TagNamed<Block> COMMON_BLOCK_IMMOBILE = makeCommonBlockTag("immobile");
+	public static final TagNamed<Block> COMMON_BLOCK_LEAVES = makeCommonBlockTag("leaves");
+	public static final TagNamed<Block> COMMON_BLOCK_NETHERRACK = makeCommonBlockTag("netherrack");
+	public static final TagNamed<Block> COMMON_BLOCK_NETHER_MYCELIUM = makeCommonBlockTag("nether_mycelium");
+	public static final TagNamed<Block> COMMON_BLOCK_NETHER_PORTAL_FRAME = makeCommonBlockTag("nether_pframe");
+	public static final TagNamed<Block> COMMON_BLOCK_NETHER_STONES = makeCommonBlockTag("nether_stones");
+	public static final TagNamed<Block> COMMON_BLOCK_SAPLINGS = makeCommonBlockTag("saplings");
+	public static final TagNamed<Block> COMMON_BLOCK_SOUL_GROUND = makeCommonBlockTag("soul_ground");
+	public static final TagNamed<Block> COMMON_BLOCK_WOODEN_BARREL = makeCommonBlockTag("wooden_barrels");
+	public static final TagNamed<Block> COMMON_BLOCK_WOODEN_CHEST = makeCommonBlockTag("wooden_chests");
+	public static final TagNamed<Block> COMMON_BLOCK_WORKBENCHES = makeCommonBlockTag("workbench");
+	
+	// Common Item Tags
+	public final static TagNamed<Item> COMMON_ITEM_HAMMERS = makeCommonItemTag("hammers");
+	public static final TagNamed<Item> COMMON_ITEM_BARREL = makeCommonItemTag("barrel");
+	public static final TagNamed<Item> COMMON_ITEM_CHEST = makeCommonItemTag("chest");
+	public static final TagNamed<Item> COMMON_ITEM_SHEARS = makeCommonItemTag("shears");
+	public static final TagNamed<Item> COMMON_ITEM_FURNACES = makeCommonItemTag("furnaces");
+	public static final TagNamed<Item> COMMON_ITEM_IRON_INGOTS = makeCommonItemTag("iron_ingots");
+	public static final TagNamed<Item> COMMON_ITEM_LEAVES = makeCommonItemTag("leaves");
+	public static final TagNamed<Item> COMMON_ITEM_SAPLINGS = makeCommonItemTag("saplings");
+	public static final TagNamed<Item> COMMON_ITEM_SOUL_GROUND = makeCommonItemTag("soul_ground");
+	public static final TagNamed<Item> COMMON_ITEM_WOODEN_BARREL = makeCommonItemTag("wooden_barrels");
+	public static final TagNamed<Item> COMMON_ITEM_WOODEN_CHEST = makeCommonItemTag("wooden_chests");
+	public static final TagNamed<Item> COMMON_ITEM_WORKBENCHES = makeCommonItemTag("workbench");
 
 	/**
 	 * Get or create {@link Tag.Named}.
@@ -148,6 +228,7 @@ public class TagAPI {
 	 * @param name - {@link String} tag name.
 	 * @return {@link Block} {@link Tag.Named}.
 	 */
+	@Deprecated(forRemoval = true)
 	public static TagNamed<Block> getMCBlockTag(String name) {
 		ResourceLocation id = new ResourceLocation(name);
 		Tag<Block> tag = BlockTags.getAllTags().getTag(id);
@@ -155,29 +236,14 @@ public class TagAPI {
 	}
 	
 	/**
-	 * Get or create Minecraft {@link Item} {@link Tag.Named}.
-	 *
-	 * @param name - {@link String} tag name.
-	 * @return {@link Item} {@link Tag.Named}.
-	 */
-	public static TagNamed<Item> getMCItemTag(String name) {
-		ResourceLocation id = new ResourceLocation(name);
-		Tag<Item> tag = ItemTags.getAllTags().getTag(id);
-		return  CommonDelegate.proxy(tag == null ? (Named<Item>) TagRegistry.item(id) : (Named<Item>) tag);
-	}
-	
-	/**
 	 * Initializes basic tags. Should be called only in BCLib main class.
 	 */
 	public static void init() {
-		addBlockTag(BLOCK_BOOKSHELVES.getName(), Blocks.BOOKSHELF);
-		addBlockTag(BLOCK_GEN_TERRAIN.getName(), Blocks.END_STONE, Blocks.NETHERRACK, Blocks.SOUL_SAND, Blocks.SOUL_SOIL);
-		addBlockTag(BLOCK_NETHER_GROUND.getName(), Blocks.NETHERRACK, Blocks.SOUL_SAND, Blocks.SOUL_SOIL);
-		addBlockTag(BLOCK_END_GROUND.getName(), Blocks.END_STONE);
-		addBlockTag(BLOCK_CHEST.getName(), Blocks.CHEST);
-		addItemTag(ITEM_CHEST.getName(), Items.CHEST);
-		addItemTag(ITEM_IRON_INGOTS.getName(), Items.IRON_INGOT);
-		addItemTag(ITEM_FURNACES.getName(), Blocks.FURNACE);
+		addBlockTag(COMMON_BLOCK_BOOKSHELVES.getName(), Blocks.BOOKSHELF);
+		addBlockTag(COMMON_BLOCK_CHEST.getName(), Blocks.CHEST);
+		addItemTag(COMMON_ITEM_CHEST.getName(), Items.CHEST);
+		addItemTag(COMMON_ITEM_IRON_INGOTS.getName(), Items.IRON_INGOT);
+		addItemTag(COMMON_ITEM_FURNACES.getName(), Blocks.FURNACE);
 	}
 	
 	/**
@@ -288,109 +354,6 @@ public class TagAPI {
 		return builder;
 	}
 	
-	//    DEPRECATED SECTION    //
-	// WILL BE REMOVED IN 1.3.0 //
-	
-	/**
-	 * Deprecated due to low compatibility. Use addTag({@link ResourceLocation}, {@link ItemLike}... items) instead.
-	 *
-	 * Adds one Tag to multiple Items.
-	 * <p>
-	 * Example:
-	 * <pre>{@code  Tag.Named<Item> METALS = makeBlockTag("mymod", "metals");
-	 * addTag(METALS, Items.IRON_INGOT, Items.GOLD_INGOT, Items.COPPER_INGOT);}</pre>
-	 * <p>
-	 * The call will reserve the Tag. The Tag is added to the items once
-	 * {@link #apply(String, Map)} was executed.
-	 *
-	 * @param tag   The new Tag
-	 * @param items One or more item that should receive the Tag.
-	 */
-	@Deprecated
-	public static void addTag(Tag.Named<Item> tag, ItemLike... items) {
-		addItemTagUntyped(tag.getName(), items);
-	}
-	
-	/**
-	 * Deprecated, use addTag({@link ResourceLocation}, {@link ItemLike}... items) instead.
-	 *
-	 * Adds multiple Tags to one Item.
-	 * <p>
-	 * The call will reserve the Tags. The Tags are added to the Item once
-	 * * {@link #apply(String, Map)} was executed.
-	 *
-	 * @param item The Item that will receive all Tags
-	 * @param tags One or more Tags
-	 */
-	@Deprecated
-	@SafeVarargs
-	public static void addTags(ItemLike item, Tag.Named<Item>... tags) {
-		for (Tag.Named<Item> tag : tags) {
-			addItemTagUntyped(tag.getName(), item);
-		}
-	}
-	
-	/**
-	 * Deprecated, use addTag({@link ResourceLocation}, {@link Block}... blocks) instead.
-	 *
-	 * Adds multiple Tags to one Block.
-	 * <p>
-	 * The call will reserve the Tags. The Tags are added to the Block once
-	 * * {@link #apply(String, Map)} was executed.
-	 *
-	 * @param block The Block that will receive all Tags
-	 * @param tags  One or more Tags
-	 */
-	@Deprecated
-	@SafeVarargs
-	public static void addTags(Block block, Tag.Named<Block>... tags) {
-		for (Tag.Named<Block> tag : tags) {
-			addTag(tag, block);
-		}
-	}
-	
-	/**
-	 * Deprecated due to low compatibility. Use addTag({@link ResourceLocation}, {@link Block}... blocks) instead.
-	 *
-	 * Adds one Tag to multiple Blocks.
-	 * <p>
-	 * Example:
-	 * <pre>{@code  Tag.Named<Block> DIMENSION_STONE = makeBlockTag("mymod", "dim_stone");
-	 * addTag(DIMENSION_STONE, Blocks.END_STONE, Blocks.NETHERRACK);}</pre>
-	 * <p>
-	 * The call will reserve the Tag. The Tag is added to the blocks once
-	 * {@link #apply(String, Map)} was executed.
-	 *
-	 * @param tag	The new Tag
-	 * @param blocks One or more blocks that should receive the Tag.
-	 */
-	@Deprecated
-	public static void addTag(Tag.Named<Block> tag, Block... blocks) {
-		addBlockTagUntyped(tag.getName(), blocks);
-	}
-	
-	/**
-	 * Adds {@link Block} to NETHER_GROUND and GEN_TERRAIN tags to process it properly in terrain generators and block logic.
-	 *
-	 * @param block - {@link Block}.
-	 */
-	@Deprecated
-	public static void addNetherGround(Block block) {
-		addTag(BLOCK_NETHER_GROUND, block);
-		addTag(BLOCK_GEN_TERRAIN, block);
-	}
-	
-	/**
-	 * Adds {@link Block} to END_GROUND and GEN_TERRAIN tags to process it properly in terrain generators and block logic.
-	 *
-	 * @param block - {@link Block}.
-	 */
-	@Deprecated
-	public static void addEndGround(Block block) {
-		addTag(BLOCK_GEN_TERRAIN, block);
-		addTag(BLOCK_END_GROUND, block);
-	}
-	
 	/**
 	 * Extends {@link Tag.Named} to return a type safe {@link TagLocation}. This Type was introduced to
 	 * allow type-safe definition of Tags using their ResourceLocation.
@@ -412,6 +375,10 @@ public class TagAPI {
 		
 		public TagLocation(String string, String string2) {
 			super(string, string2);
+		}
+		
+		public TagLocation(ResourceLocation location) {
+			super(location.getNamespace(), location.getPath());
 		}
 	}
 	

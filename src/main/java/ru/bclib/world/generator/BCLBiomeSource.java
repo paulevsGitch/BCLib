@@ -4,8 +4,6 @@ import net.minecraft.core.Registry;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeSource;
 import ru.bclib.api.biomes.BiomeAPI;
-import ru.bclib.world.biomes.BCLBiome;
-import ru.bclib.world.biomes.BCLBiomeSettings;
 
 import java.util.List;
 

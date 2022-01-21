@@ -15,7 +15,7 @@ import ru.bclib.api.TagAPI;
 public class PistonBaseBlockMixin {
 	@Inject(method="isPushable", at=@At("HEAD"), cancellable = true)
 	private static void bclib_isPushable(BlockState blockState, Level level, BlockPos blockPos, Direction direction, boolean bl, Direction direction2, CallbackInfoReturnable<Boolean> cir){
-		if (blockState.is(TagAPI.BLOCK_IMMOBILE)){
+		if (blockState.is(TagAPI.COMMON_BLOCK_IMMOBILE)){
 			cir.setReturnValue(false);
 			cir.cancel();
 		}

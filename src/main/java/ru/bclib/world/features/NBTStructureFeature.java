@@ -106,9 +106,10 @@ public abstract class NBTStructureFeature extends DefaultFeature {
 		center = center.offset(0, getYOffset(structure, world, center, random) + 0.5, 0);
 		
 		BoundingBox bounds = makeBox(center);
-		StructurePlaceSettings placementData = new StructurePlaceSettings().setRotation(rotation)
-																		   .setMirror(mirror)
-																		   .setBoundingBox(bounds);
+		StructurePlaceSettings placementData = new StructurePlaceSettings()
+			.setRotation(rotation)
+			.setMirror(mirror)
+			.setBoundingBox(bounds);
 		addStructureData(placementData);
 		center = center.offset(-offset.getX() * 0.5, 0, -offset.getZ() * 0.5);
 		structure.placeInWorld(world, center, center, placementData, random, 4);
@@ -140,11 +141,11 @@ public abstract class NBTStructureFeature extends DefaultFeature {
 					mut.setZ(z);
 					mut.setY(surfMax);
 					BlockState state = world.getBlockState(mut);
-					if (!state.is(TagAPI.BLOCK_GEN_TERRAIN) && state.isFaceSturdy(world, mut, Direction.DOWN)) {
+					if (!isTerrain(state) && state.isFaceSturdy(world, mut, Direction.DOWN)) {
 						for (int i = 0; i < 10; i++) {
 							mut.setY(mut.getY() - 1);
 							BlockState stateSt = world.getBlockState(mut);
-							if (!stateSt.is(TagAPI.BLOCK_GEN_TERRAIN)) {
+							if (!isTerrain(stateSt)) {
 								if (merge == TerrainMerge.SURFACE) {
 									boolean isTop = mut.getY() == surfMax && state.getMaterial().isSolidBlocking();
 									Biome b = world.getBiome(mut);
@@ -156,7 +157,7 @@ public abstract class NBTStructureFeature extends DefaultFeature {
 								}
 							}
 							else {
-								if (stateSt.is(TagAPI.BLOCK_END_GROUND) && state.getMaterial().isSolidBlocking()) {
+								if (isTerrain(state) && state.getMaterial().isSolidBlocking()) {
 									if (merge == TerrainMerge.SURFACE) {
 										Biome b = world.getBiome(mut);
 										BlockState bottom = BiomeAPI.findUnderMaterial(b).orElse(defaultBlock);
@@ -176,6 +177,10 @@ public abstract class NBTStructureFeature extends DefaultFeature {
 		//BlocksHelper.fixBlocks(world, new BlockPos(x1, center.getY(), z1), new BlockPos(x2, center.getY() + offset.getY(), z2));
 		
 		return true;
+	}
+	
+	private boolean isTerrain(BlockState state) {
+		return state.is(TagAPI.COMMON_BLOCK_END_STONES) || state.is(TagAPI.COMMON_BLOCK_NETHER_STONES);
 	}
 	
 	protected BoundingBox makeBox(BlockPos pos) {
@@ -210,7 +215,7 @@ public abstract class NBTStructureFeature extends DefaultFeature {
 		return template;
 	}
 	
-	public static enum TerrainMerge {
+	public enum TerrainMerge {
 		NONE, SURFACE, OBJECT;
 		
 		public static TerrainMerge getFromString(String type) {

@@ -23,7 +23,7 @@ public abstract class CraftingMenuMixin {
 	private void bclib_stillValid(Player player, CallbackInfoReturnable<Boolean> info) {
 		if (access.evaluate((world, pos) -> {
 			BlockState state = world.getBlockState(pos);
-			return state.getBlock() instanceof CraftingTableBlock || state.is(TagAPI.BLOCK_WORKBENCHES);
+			return state.getBlock() instanceof CraftingTableBlock || state.is(TagAPI.COMMON_BLOCK_WORKBENCHES);
 		}, true)) {
 			info.setReturnValue(true);
 		}

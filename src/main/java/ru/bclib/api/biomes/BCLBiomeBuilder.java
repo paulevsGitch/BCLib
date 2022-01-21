@@ -37,7 +37,6 @@ import ru.bclib.util.ColorUtil;
 import ru.bclib.util.TriFunction;
 import ru.bclib.world.biomes.BCLBiome;
 import ru.bclib.world.biomes.BCLBiomeSettings;
-import ru.bclib.world.biomes.BCLBiomeSettings.Builder;
 import ru.bclib.world.features.BCLFeature;
 import ru.bclib.world.structures.BCLStructureFeature;
 

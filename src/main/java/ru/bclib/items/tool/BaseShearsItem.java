@@ -1,5 +1,6 @@
 package ru.bclib.items.tool;
 
+import net.fabricmc.fabric.api.tool.attribute.v1.FabricToolTags;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -12,12 +13,12 @@ public class BaseShearsItem extends ShearsItem {
 	}
 
 	public static boolean isShear(ItemStack tool){
-		return tool.is(Items.SHEARS) | tool.is(TagAPI.ITEM_COMMON_SHEARS) || tool.is(TagAPI.ITEM_SHEARS);
+		return tool.is(Items.SHEARS) | tool.is(TagAPI.COMMON_ITEM_SHEARS) || tool.is(FabricToolTags.SHEARS);
 	}
 
 	public static boolean isShear(ItemStack itemStack, Item item){
 		if (item == Items.SHEARS){
-			return itemStack.is(item) | itemStack.is(TagAPI.ITEM_COMMON_SHEARS) || itemStack.is(TagAPI.ITEM_SHEARS);
+			return itemStack.is(item) | itemStack.is(TagAPI.COMMON_ITEM_SHEARS) || itemStack.is(FabricToolTags.SHEARS);
 		} else {
 			return itemStack.is(item);
 		}

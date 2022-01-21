@@ -20,6 +20,6 @@ public abstract class EnchantingTableBlockMixin extends Block {
 		target = "Lnet/minecraft/world/level/block/state/BlockState;is(Lnet/minecraft/world/level/block/Block;)Z")//,
 	)
 	private boolean bclib_isBookshelf(BlockState state, Block block) {
-		return block == Blocks.BOOKSHELF ? state.is(TagAPI.BLOCK_BOOKSHELVES) : state.is(block);
+		return block == Blocks.BOOKSHELF ? state.is(TagAPI.COMMON_BLOCK_BOOKSHELVES) : state.is(block);
 	}
 }
