@@ -380,6 +380,10 @@ public class TagAPI {
 		public TagLocation(ResourceLocation location) {
 			super(location.getNamespace(), location.getPath());
 		}
+
+		public static<R> TagLocation<R> of(Tag.Named<R> tag){
+			return new TagLocation<R>(tag.getName());
+		}
 	}
 	
 	private abstract static class CommonDelegate<T>  implements TagNamed<T> {
