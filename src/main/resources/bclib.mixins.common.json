@@ -32,6 +32,7 @@
 		"DimensionTypeMixin",
 		"RecipeManagerMixin",
 		"RecipeManagerMixin",
+		"ShovelItemAccessor",
 		"BoneMealItemMixin",
 		"CraftingMenuMixin",
 		"shears.SheepMixin",
@@ -39,6 +40,7 @@
 		"ServerLevelMixin",
 		"BiomeSourceMixin",
 		"AnvilBlockMixin",
+		"HoeItemAccessor",
 		"AnvilMenuMixin",
 		"TagLoaderMixin",
 		"MainMixin"
