@@ -68,15 +68,16 @@ public abstract class MinecraftMixin {
 			LifeCycleAPI._runBeforeLevelLoad();
 			this.doLoadLevel(levelID, RegistryAccess.builtin(), Minecraft::loadDataPacks, Minecraft::loadWorldData, false, appliedFixes ? ExperimentalDialogType.NONE : ExperimentalDialogType.BACKUP);
 		})) {
+			//cancle call when fix-screen is presented
 			ci.cancel();
 		}
 		else {
 			LifeCycleAPI._runBeforeLevelLoad();
-		}
-		
-		if (Configs.CLIENT_CONFIG.suppressExperimentalDialog()) {
-			this.doLoadLevel(levelID, RegistryAccess.builtin(), Minecraft::loadDataPacks, Minecraft::loadWorldData, false, ExperimentalDialogType.NONE);
-			ci.cancel();
+			if (Configs.CLIENT_CONFIG.suppressExperimentalDialog()) {
+				this.doLoadLevel(levelID, RegistryAccess.builtin(), Minecraft::loadDataPacks, Minecraft::loadWorldData, false, ExperimentalDialogType.NONE);
+				//cancle call as we manually start the level load here
+				ci.cancel();
+			}
 		}
 	}
 	
