@@ -8,6 +8,7 @@ public class NamedCommonBlockTags {
 	public static final TagLocation<Block> BOOKSHELVES = new TagLocation<>("c", "bookshelves");
 	public static final TagLocation<Block> CHEST = new TagLocation<>("c", "chest");
 	public static final TagLocation<Block> END_STONES = new TagLocation<>("c", "end_stones");
+	public static final TagLocation<Block> GEN_END_STONES = END_STONES;
 	public static final TagLocation<Block> IMMOBILE = new TagLocation<>("c", "immobile");
 	public static final TagLocation<Block> LEAVES = new TagLocation<>("c", "leaves");
 	public static final TagLocation<Block> NETHERRACK = new TagLocation<>("c", "netherrack");

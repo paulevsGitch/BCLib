@@ -27,4 +27,8 @@ public class NamedItemTags {
 	public static final TagLocation<Item> WOODEN_SLABS = new TagLocation<>("wooden_slabs");
 	public static final TagLocation<Item> WOODEN_STAIRS = new TagLocation<>("wooden_stairs");
 	public static final TagLocation<Item> WOODEN_TRAPDOORS = new TagLocation<>("wooden_trapdoors");
+	public static final TagLocation<Item> BEACON_PAYMENT_ITEMS = new TagLocation<>("beacon_payment_items");
+	public static final TagLocation<Item> STONE_BRICKS = new TagLocation<>("stone_bricks");
+	public static final TagLocation<Item> STONE_CRAFTING_MATERIALS = new TagLocation<>("stone_crafting_materials");
+	public static final TagLocation<Item> STONE_TOOL_MATERIALS = new TagLocation<>("stone_tool_materials");
 }

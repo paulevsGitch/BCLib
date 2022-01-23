@@ -8,6 +8,7 @@ public class CommonBlockTags {
 	public static final TagNamed<Block> BOOKSHELVES = TagAPI.makeCommonBlockTag("bookshelves");
 	public static final TagNamed<Block> CHEST = TagAPI.makeCommonBlockTag("chest");
 	public static final TagNamed<Block> END_STONES = TagAPI.makeCommonBlockTag("end_stones");
+	public static final TagNamed<Block> GEN_END_STONES = END_STONES;
 	public static final TagNamed<Block> IMMOBILE = TagAPI.makeCommonBlockTag("immobile");
 	public static final TagNamed<Block> LEAVES = TagAPI.makeCommonBlockTag("leaves");
 	public static final TagNamed<Block> NETHERRACK = TagAPI.makeCommonBlockTag("netherrack");

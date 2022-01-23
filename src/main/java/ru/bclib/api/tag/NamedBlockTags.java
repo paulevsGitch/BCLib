@@ -32,4 +32,6 @@ public class NamedBlockTags {
 	public static final TagLocation<Block> WOODEN_TRAPDOORS = new TagLocation<>("wooden_trapdoors");
 	public static final TagLocation<Block> SOUL_FIRE_BASE_BLOCKS = new TagLocation<>("soul_fire_base_blocks");
 	public static final TagLocation<Block> SOUL_SPEED_BLOCKS = new TagLocation<>("soul_speed_blocks");
+	public static final TagLocation<Block> BEACON_BASE_BLOCKS = new TagLocation<>("beacon_base_blocks");
+	public static final TagLocation<Block> STONE_BRICKS = new TagLocation("stone_bricks");
 }
