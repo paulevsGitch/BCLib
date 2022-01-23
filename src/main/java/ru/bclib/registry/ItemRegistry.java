@@ -20,7 +20,9 @@ import net.minecraft.world.item.ShovelItem;
 import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.item.SwordItem;
 import net.minecraft.world.level.block.DispenserBlock;
-import ru.bclib.api.TagAPI;
+import ru.bclib.api.tag.NamedCommonItemTags;
+import ru.bclib.api.tag.NamedToolTags;
+import ru.bclib.api.tag.TagAPI;
 import ru.bclib.config.PathConfig;
 import ru.bclib.items.BaseDiscItem;
 import ru.bclib.items.BaseDrinkItem;
@@ -69,22 +71,22 @@ public class ItemRegistry extends BaseRegistry<Item> {
 		registerItem(itemId, item);
 		
 		if (item instanceof ShovelItem) {
-			TagAPI.addItemTag(TagAPI.NAMED_FABRIC_SHOVELS, item);
+			TagAPI.addItemTag(NamedToolTags.FABRIC_SHOVELS, item);
 		}
 		else if (item instanceof SwordItem) {
-			TagAPI.addItemTag(TagAPI.NAMED_FABRIC_SWORDS, item);
+			TagAPI.addItemTag(NamedToolTags.FABRIC_SWORDS, item);
 		}
 		else if (item instanceof BasePickaxeItem) {
-			TagAPI.addItemTag(TagAPI.NAMED_FABRIC_PICKAXES, item);
+			TagAPI.addItemTag(NamedToolTags.FABRIC_PICKAXES, item);
 		}
 		else if (item instanceof BaseAxeItem) {
-			TagAPI.addItemTag(TagAPI.NAMED_FABRIC_AXES, item);
+			TagAPI.addItemTag(NamedToolTags.FABRIC_AXES, item);
 		}
 		else if (item instanceof BaseHoeItem) {
-			TagAPI.addItemTag(TagAPI.NAMED_FABRIC_HOES, item);
+			TagAPI.addItemTag(NamedToolTags.FABRIC_HOES, item);
 		}
 		else if (item instanceof BaseShearsItem) {
-			TagAPI.addItemTags(item, TagAPI.NAMED_FABRIC_SHEARS, TagAPI.NAMED_COMMON_ITEM_SHEARS);
+			TagAPI.addItemTags(item, NamedToolTags.FABRIC_SHEARS, NamedCommonItemTags.SHEARS);
 			DispenserBlock.registerBehavior(item.asItem(), new ShearsDispenseItemBehavior());
 		}
 		

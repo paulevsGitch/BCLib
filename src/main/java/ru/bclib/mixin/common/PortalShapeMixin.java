@@ -8,7 +8,7 @@ import net.minecraft.world.level.portal.PortalShape;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
-import ru.bclib.api.TagAPI;
+import ru.bclib.api.tag.CommonBlockTags;
 
 @Mixin(PortalShape.class)
 public class PortalShapeMixin {
@@ -28,6 +28,6 @@ public class PortalShapeMixin {
 	}
 	
 	private static boolean be_FRAME(StatePredicate FRAME, BlockState state, BlockGetter getter, BlockPos pos){
-		return state.is(TagAPI.COMMON_BLOCK_NETHER_PORTAL_FRAME) || FRAME.test(state, getter, pos);
+		return state.is(CommonBlockTags.NETHER_PORTAL_FRAME) || FRAME.test(state, getter, pos);
 	}
 }

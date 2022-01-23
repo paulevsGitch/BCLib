@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import ru.bclib.api.TagAPI;
+import ru.bclib.api.tag.CommonBlockTags;
 
 @Mixin(CraftingMenu.class)
 public abstract class CraftingMenuMixin {
@@ -23,7 +23,7 @@ public abstract class CraftingMenuMixin {
 	private void bclib_stillValid(Player player, CallbackInfoReturnable<Boolean> info) {
 		if (access.evaluate((world, pos) -> {
 			BlockState state = world.getBlockState(pos);
-			return state.getBlock() instanceof CraftingTableBlock || state.is(TagAPI.COMMON_BLOCK_WORKBENCHES);
+			return state.getBlock() instanceof CraftingTableBlock || state.is(CommonBlockTags.WORKBENCHES);
 		}, true)) {
 			info.setReturnValue(true);
 		}

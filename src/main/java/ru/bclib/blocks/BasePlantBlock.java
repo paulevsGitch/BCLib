@@ -32,8 +32,8 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
-import ru.bclib.api.TagAPI;
-import ru.bclib.api.TagAPI.TagLocation;
+import ru.bclib.api.tag.NamedMineableTags;
+import ru.bclib.api.tag.TagAPI.TagLocation;
 import ru.bclib.client.models.BasePatterns;
 import ru.bclib.client.models.ModelsHelper;
 import ru.bclib.client.models.PatternsHelper;
@@ -170,7 +170,7 @@ public abstract class BasePlantBlock extends BaseBlockNotFull implements RenderL
 	
 	@Override
 	public void addTags(List<TagLocation<Block>> blockTags, List<TagLocation<Item>> itemTags) {
-		blockTags.add(TagAPI.NAMED_MINEABLE_SHEARS);
-		blockTags.add(TagAPI.NAMED_MINEABLE_HOE);
+		blockTags.add(NamedMineableTags.SHEARS);
+		blockTags.add(NamedMineableTags.HOE);
 	}
 }

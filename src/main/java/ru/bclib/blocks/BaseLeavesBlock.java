@@ -15,8 +15,10 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.MaterialColor;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
-import ru.bclib.api.TagAPI;
-import ru.bclib.api.TagAPI.TagLocation;
+import ru.bclib.api.tag.NamedBlockTags;
+import ru.bclib.api.tag.NamedItemTags;
+import ru.bclib.api.tag.NamedMineableTags;
+import ru.bclib.api.tag.TagAPI.TagLocation;
 import ru.bclib.client.render.BCLRenderLayer;
 import ru.bclib.interfaces.BlockModelProvider;
 import ru.bclib.interfaces.RenderLayerProvider;
@@ -93,9 +95,9 @@ public class BaseLeavesBlock extends LeavesBlock implements BlockModelProvider, 
 	
 	@Override
 	public void addTags(List<TagLocation<Block>> blockTags, List<TagLocation<Item>> itemTags) {
-		blockTags.add(TagAPI.NAMED_MINEABLE_SHEARS);
-		blockTags.add(TagAPI.NAMED_MINEABLE_HOE);
-		blockTags.add(TagAPI.NAMED_BLOCK_LEAVES);
-		itemTags.add(TagAPI.NAMED_ITEM_LEAVES);
+		blockTags.add(NamedMineableTags.SHEARS);
+		blockTags.add(NamedMineableTags.HOE);
+		blockTags.add(NamedBlockTags.LEAVES);
+		itemTags.add(NamedItemTags.LEAVES);
 	}
 }

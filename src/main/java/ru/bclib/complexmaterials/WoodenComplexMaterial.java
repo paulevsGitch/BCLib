@@ -10,8 +10,12 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.MaterialColor;
 import ru.bclib.BCLib;
-import ru.bclib.api.TagAPI;
-import ru.bclib.api.TagAPI.TagLocation;
+import ru.bclib.api.tag.NamedBlockTags;
+import ru.bclib.api.tag.NamedCommonBlockTags;
+import ru.bclib.api.tag.NamedCommonItemTags;
+import ru.bclib.api.tag.NamedItemTags;
+import ru.bclib.api.tag.TagAPI;
+import ru.bclib.api.tag.TagAPI.TagLocation;
 import ru.bclib.blocks.BaseBarkBlock;
 import ru.bclib.blocks.BaseBarrelBlock;
 import ru.bclib.blocks.BaseBlock;
@@ -101,85 +105,85 @@ public class WoodenComplexMaterial extends ComplexMaterial {
 
 		addBlockEntry(
 				new BlockEntry(BLOCK_STRIPPED_LOG, (complexMaterial, settings) -> new BaseRotatedPillarBlock(settings))
-					.setBlockTags(TagAPI.NAMED_BLOCK_LOGS, TagAPI.NAMED_BLOCK_LOGS_THAT_BURN, tagBlockLog)
-					.setItemTags(TagAPI.NAMED_ITEM_LOGS, TagAPI.NAMED_ITEM_LOGS_THAT_BURN, tagItemLog)
+					.setBlockTags(NamedBlockTags.LOGS, NamedBlockTags.LOGS_THAT_BURN, tagBlockLog)
+					.setItemTags(NamedItemTags.LOGS, NamedItemTags.LOGS_THAT_BURN, tagItemLog)
 		);
 		addBlockEntry(
 				new BlockEntry(BLOCK_STRIPPED_BARK, (complexMaterial, settings) -> new BaseBarkBlock(settings))
-					.setBlockTags(TagAPI.NAMED_BLOCK_LOGS, TagAPI.NAMED_BLOCK_LOGS_THAT_BURN, tagBlockLog)
-					.setItemTags(TagAPI.NAMED_ITEM_LOGS, TagAPI.NAMED_ITEM_LOGS_THAT_BURN, tagItemLog)
+					.setBlockTags(NamedBlockTags.LOGS, NamedBlockTags.LOGS_THAT_BURN, tagBlockLog)
+					.setItemTags(NamedItemTags.LOGS, NamedItemTags.LOGS_THAT_BURN, tagItemLog)
 		);
 
 		addBlockEntry(
 				new BlockEntry(BLOCK_LOG, (complexMaterial, settings) -> new BaseStripableLogBlock(woodColor, getBlock(BLOCK_STRIPPED_LOG)))
-					.setBlockTags(TagAPI.NAMED_BLOCK_LOGS, TagAPI.NAMED_BLOCK_LOGS_THAT_BURN, tagBlockLog)
-					.setItemTags(TagAPI.NAMED_ITEM_LOGS, TagAPI.NAMED_ITEM_LOGS_THAT_BURN, tagItemLog)
+					.setBlockTags(NamedBlockTags.LOGS, NamedBlockTags.LOGS_THAT_BURN, tagBlockLog)
+					.setItemTags(NamedItemTags.LOGS, NamedItemTags.LOGS_THAT_BURN, tagItemLog)
 		);
 		addBlockEntry(
 				new BlockEntry(BLOCK_BARK, (complexMaterial, settings) -> new StripableBarkBlock(woodColor, getBlock(BLOCK_STRIPPED_BARK)))
-					.setBlockTags(TagAPI.NAMED_BLOCK_LOGS, TagAPI.NAMED_BLOCK_LOGS_THAT_BURN, tagBlockLog)
-					.setItemTags(TagAPI.NAMED_ITEM_LOGS, TagAPI.NAMED_ITEM_LOGS_THAT_BURN, tagItemLog)
+					.setBlockTags(NamedBlockTags.LOGS, NamedBlockTags.LOGS_THAT_BURN, tagBlockLog)
+					.setItemTags(NamedItemTags.LOGS, NamedItemTags.LOGS_THAT_BURN, tagItemLog)
 		);
 		addBlockEntry(new BlockEntry(BLOCK_PLANKS, (complexMaterial, settings) -> new BaseBlock(settings))
-			.setBlockTags(TagAPI.NAMED_BLOCK_PLANKS)
-			.setItemTags(TagAPI.NAMED_ITEM_PLANKS));
+			.setBlockTags(NamedBlockTags.PLANKS)
+			.setItemTags(NamedItemTags.PLANKS));
 
 		addBlockEntry(new BlockEntry(BLOCK_STAIRS, (complexMaterial, settings) -> new BaseStairsBlock(getBlock(BLOCK_PLANKS)))
-			.setBlockTags(TagAPI.NAMED_BLOCK_WOODEN_STAIRS, TagAPI.NAMED_BLOCK_STAIRS)
-			.setItemTags(TagAPI.NAMED_ITEM_WOODEN_STAIRS, TagAPI.NAMED_ITEM_STAIRS));
+			.setBlockTags(NamedBlockTags.WOODEN_STAIRS, NamedBlockTags.STAIRS)
+			.setItemTags(NamedItemTags.WOODEN_STAIRS, NamedItemTags.STAIRS));
 		
 		addBlockEntry(new BlockEntry(BLOCK_SLAB, (complexMaterial, settings) -> new BaseSlabBlock(getBlock(BLOCK_PLANKS)))
-			.setBlockTags(TagAPI.NAMED_BLOCK_WOODEN_SLABS, TagAPI.NAMED_BLOCK_SLABS)
-			.setItemTags(TagAPI.NAMED_ITEM_WOODEN_SLABS, TagAPI.NAMED_ITEM_SLABS));
+			.setBlockTags(NamedBlockTags.WOODEN_SLABS, NamedBlockTags.SLABS)
+			.setItemTags(NamedItemTags.WOODEN_SLABS, NamedItemTags.SLABS));
 		
 		addBlockEntry(new BlockEntry(BLOCK_FENCE, (complexMaterial, settings) -> new BaseFenceBlock(getBlock(BLOCK_PLANKS)))
-			.setBlockTags(TagAPI.NAMED_BLOCK_FENCES, TagAPI.NAMED_BLOCK_WOODEN_FENCES)
-			.setItemTags(TagAPI.NAMED_ITEM_FENCES, TagAPI.NAMED_ITEM_WOODEN_FENCES));
+			.setBlockTags(NamedBlockTags.FENCES, NamedBlockTags.WOODEN_FENCES)
+			.setItemTags(NamedItemTags.FENCES, NamedItemTags.WOODEN_FENCES));
 		
 		addBlockEntry(new BlockEntry(BLOCK_GATE, (complexMaterial, settings) -> new BaseGateBlock(getBlock(BLOCK_PLANKS)))
-			.setBlockTags(TagAPI.NAMED_BLOCK_FENCE_GATES));
+			.setBlockTags(NamedBlockTags.FENCE_GATES));
 		
 		addBlockEntry(new BlockEntry(BLOCK_BUTTON, (complexMaterial, settings) -> new BaseWoodenButtonBlock(getBlock(BLOCK_PLANKS)))
-			.setBlockTags(TagAPI.NAMED_BLOCK_BUTTONS, TagAPI.NAMED_BLOCK_WOODEN_BUTTONS)
-			.setItemTags(TagAPI.NAMED_ITEM_BUTTONS, TagAPI.NAMED_ITEM_WOODEN_BUTTONS));
+			.setBlockTags(NamedBlockTags.BUTTONS, NamedBlockTags.WOODEN_BUTTONS)
+			.setItemTags(NamedItemTags.BUTTONS, NamedItemTags.WOODEN_BUTTONS));
 		
 		addBlockEntry(new BlockEntry(BLOCK_PRESSURE_PLATE, (complexMaterial, settings) -> new WoodenPressurePlateBlock(getBlock(BLOCK_PLANKS)))
-			.setBlockTags(TagAPI.NAMED_BLOCK_PRESSURE_PLATES, TagAPI.NAMED_BLOCK_WOODEN_PRESSURE_PLATES)
-			.setItemTags(TagAPI.NAMED_ITEM_WOODEN_PRESSURE_PLATES));
+			.setBlockTags(NamedBlockTags.PRESSURE_PLATES, NamedBlockTags.WOODEN_PRESSURE_PLATES)
+			.setItemTags(NamedItemTags.WOODEN_PRESSURE_PLATES));
 		
 		addBlockEntry(new BlockEntry(BLOCK_TRAPDOOR, (complexMaterial, settings) -> new BaseTrapdoorBlock(getBlock(BLOCK_PLANKS)))
-			.setBlockTags(TagAPI.NAMED_BLOCK_TRAPDOORS, TagAPI.NAMED_BLOCK_WOODEN_TRAPDOORS)
-			.setItemTags(TagAPI.NAMED_ITEM_TRAPDOORS, TagAPI.NAMED_ITEM_WOODEN_TRAPDOORS));
+			.setBlockTags(NamedBlockTags.TRAPDOORS, NamedBlockTags.WOODEN_TRAPDOORS)
+			.setItemTags(NamedItemTags.TRAPDOORS, NamedItemTags.WOODEN_TRAPDOORS));
 		
 		addBlockEntry(new BlockEntry(BLOCK_DOOR, (complexMaterial, settings) -> new BaseDoorBlock(getBlock(BLOCK_PLANKS)))
-			.setBlockTags(TagAPI.NAMED_BLOCK_DOORS, TagAPI.NAMED_BLOCK_WOODEN_DOORS)
-			.setItemTags(TagAPI.NAMED_ITEM_DOORS, TagAPI.NAMED_ITEM_WOODEN_DOORS));
+			.setBlockTags(NamedBlockTags.DOORS, NamedBlockTags.WOODEN_DOORS)
+			.setItemTags(NamedItemTags.DOORS, NamedItemTags.WOODEN_DOORS));
 
 		addBlockEntry(new BlockEntry(BLOCK_LADDER, (complexMaterial, settings) -> new BaseLadderBlock(getBlock(BLOCK_PLANKS)))
-			.setBlockTags(TagAPI.NAMED_BLOCK_CLIMBABLE));
+			.setBlockTags(NamedBlockTags.CLIMBABLE));
 		
 		addBlockEntry(new BlockEntry(BLOCK_SIGN, (complexMaterial, settings) -> new BaseSignBlock(getBlock(BLOCK_PLANKS)))
-			.setBlockTags(TagAPI.NAMED_BLOCK_SIGNS)
-			.setItemTags(TagAPI.NAMED_ITEM_SIGNS));
+			.setBlockTags(NamedBlockTags.SIGNS)
+			.setItemTags(NamedItemTags.SIGNS));
 	}
 
 	final protected void initStorage(FabricBlockSettings blockSettings, FabricItemSettings itemSettings) {
 		addBlockEntry(new BlockEntry(BLOCK_CHEST, (complexMaterial, settings) -> new BaseChestBlock(getBlock(BLOCK_PLANKS)))
-			.setBlockTags(TagAPI.NAMED_COMMON_BLOCK_CHEST, TagAPI.NAMED_COMMON_BLOCK_WOODEN_CHEST)
-			.setItemTags(TagAPI.NAMED_COMMON_ITEM_CHEST, TagAPI.NAMED_COMMON_ITEM_WOODEN_CHEST));
+			.setBlockTags(NamedCommonBlockTags.CHEST, NamedCommonBlockTags.WOODEN_CHEST)
+			.setItemTags(NamedCommonItemTags.CHEST, NamedCommonItemTags.WOODEN_CHEST));
 
 		addBlockEntry(new BlockEntry(BLOCK_BARREL, (complexMaterial, settings) -> new BaseBarrelBlock(getBlock(BLOCK_PLANKS)))
-			.setBlockTags(TagAPI.NAMED_COMMON_BLOCK_BARREL, TagAPI.NAMED_COMMON_BLOCK_WOODEN_BARREL)
-			.setItemTags(TagAPI.NAMED_COMMON_ITEM_BARREL, TagAPI.NAMED_COMMON_ITEM_WOODEN_BARREL));
+			.setBlockTags(NamedCommonBlockTags.BARREL, NamedCommonBlockTags.WOODEN_BARREL)
+			.setItemTags(NamedCommonItemTags.BARREL, NamedCommonItemTags.WOODEN_BARREL));
 	}
 
 	final protected void initDecorations(FabricBlockSettings blockSettings, FabricItemSettings itemSettings) {
 		addBlockEntry(new BlockEntry(BLOCK_CRAFTING_TABLE, (complexMaterial, settings) -> new BaseCraftingTableBlock(getBlock(BLOCK_PLANKS)))
-			.setBlockTags(TagAPI.NAMED_COMMON_BLOCK_WORKBENCHES)
-			.setItemTags(TagAPI.NAMED_COMMON_ITEM_WORKBENCHES));
+			.setBlockTags(NamedCommonBlockTags.WORKBENCHES)
+			.setItemTags(NamedCommonItemTags.WORKBENCHES));
 
 		addBlockEntry(new BlockEntry(BLOCK_BOOKSHELF, (complexMaterial, settings) -> new BaseBookshelfBlock(getBlock(BLOCK_PLANKS)))
-			.setBlockTags(TagAPI.NAMED_COMMON_BLOCK_BOOKSHELVES));
+			.setBlockTags(NamedCommonBlockTags.BOOKSHELVES));
 
 		addBlockEntry(new BlockEntry(BLOCK_COMPOSTER, (complexMaterial, settings) -> new BaseComposterBlock(getBlock(BLOCK_PLANKS))));
 	}

@@ -10,6 +10,7 @@ import net.minecraft.tags.Tag;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import org.jetbrains.annotations.Nullable;
+import ru.bclib.api.tag.TagAPI;
 import ru.bclib.complexmaterials.entry.BlockEntry;
 import ru.bclib.complexmaterials.entry.ItemEntry;
 import ru.bclib.complexmaterials.entry.RecipeEntry;
@@ -103,7 +104,7 @@ public abstract class ComplexMaterial {
 	protected void initFlammable(FlammableBlockRegistry registry) {}
 	
 	/**
-	 * Adds custom block tag for this {@link ComplexMaterial}, tag can be created with {@link ru.bclib.api.TagAPI} or you can use one of already created tags.
+	 * Adds custom block tag for this {@link ComplexMaterial}, tag can be created with {@link TagAPI} or you can use one of already created tags.
 	 * @param tag {@link Tag.Named} for {@link Block}
 	 */
 	protected void addBlockTag(Tag.Named<Block> tag) {
@@ -112,7 +113,7 @@ public abstract class ComplexMaterial {
 	}
 	
 	/**
-	 * Adds custom iten tag for this {@link ComplexMaterial}, tag can be created with {@link ru.bclib.api.TagAPI} or you can use one of already created tags.
+	 * Adds custom iten tag for this {@link ComplexMaterial}, tag can be created with {@link TagAPI} or you can use one of already created tags.
 	 * @param tag {@link Tag.Named} for {@link Item}
 	 */
 	protected void addItemTag(Tag.Named<Item> tag) {

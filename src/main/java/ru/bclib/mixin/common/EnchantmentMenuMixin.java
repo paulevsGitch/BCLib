@@ -9,7 +9,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
-import ru.bclib.api.TagAPI;
+import ru.bclib.api.tag.CommonBlockTags;
 
 @Mixin(EnchantmentMenu.class)
 public abstract class EnchantmentMenuMixin extends AbstractContainerMenu {
@@ -22,6 +22,6 @@ public abstract class EnchantmentMenuMixin extends AbstractContainerMenu {
 		target = "Lnet/minecraft/world/level/block/state/BlockState;is(Lnet/minecraft/world/level/block/Block;)Z")//,
 	)
 	private boolean bclib_isBookshelf(BlockState state, Block block) {
-		return block == Blocks.BOOKSHELF ? state.is(TagAPI.COMMON_BLOCK_BOOKSHELVES) : state.is(block);
+		return block == Blocks.BOOKSHELF ? state.is(CommonBlockTags.BOOKSHELVES) : state.is(block);
 	}
 }

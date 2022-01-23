@@ -19,8 +19,9 @@ import net.minecraft.world.level.block.state.properties.DoorHingeSide;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.level.storage.loot.LootContext;
 import org.jetbrains.annotations.Nullable;
-import ru.bclib.api.TagAPI;
-import ru.bclib.api.TagAPI.TagLocation;
+import ru.bclib.api.tag.NamedBlockTags;
+import ru.bclib.api.tag.NamedItemTags;
+import ru.bclib.api.tag.TagAPI.TagLocation;
 import ru.bclib.client.models.BasePatterns;
 import ru.bclib.client.models.ModelsHelper;
 import ru.bclib.client.models.PatternsHelper;
@@ -151,8 +152,8 @@ public class BaseDoorBlock extends DoorBlock implements RenderLayerProvider, Blo
 	
 	@Override
 	public void addTags(List<TagLocation<Block>> blockTags, List<TagLocation<Item>> itemTags) {
-		blockTags.add(TagAPI.NAMED_BLOCK_DOORS);
-		itemTags.add(TagAPI.NAMED_ITEM_DOORS);
+		blockTags.add(NamedBlockTags.DOORS);
+		itemTags.add(NamedItemTags.DOORS);
 	}
 	
 	protected enum DoorType implements StringRepresentable {

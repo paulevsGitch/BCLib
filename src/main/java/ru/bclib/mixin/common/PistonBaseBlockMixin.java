@@ -9,13 +9,13 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import ru.bclib.api.TagAPI;
+import ru.bclib.api.tag.CommonBlockTags;
 
 @Mixin(PistonBaseBlock.class)
 public class PistonBaseBlockMixin {
 	@Inject(method="isPushable", at=@At("HEAD"), cancellable = true)
 	private static void bclib_isPushable(BlockState blockState, Level level, BlockPos blockPos, Direction direction, boolean bl, Direction direction2, CallbackInfoReturnable<Boolean> cir){
-		if (blockState.is(TagAPI.COMMON_BLOCK_IMMOBILE)){
+		if (blockState.is(CommonBlockTags.IMMOBILE)){
 			cir.setReturnValue(false);
 			cir.cancel();
 		}

@@ -18,7 +18,7 @@ import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConf
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
-import ru.bclib.api.TagAPI;
+import ru.bclib.api.tag.CommonBlockTags;
 import ru.bclib.api.biomes.BiomeAPI;
 import ru.bclib.util.BlocksHelper;
 import ru.bclib.world.processors.DestructionStructureProcessor;
@@ -180,7 +180,7 @@ public abstract class NBTStructureFeature extends DefaultFeature {
 	}
 	
 	private boolean isTerrain(BlockState state) {
-		return state.is(TagAPI.COMMON_BLOCK_END_STONES) || state.is(TagAPI.COMMON_BLOCK_NETHER_STONES);
+		return state.is(CommonBlockTags.END_STONES) || state.is(CommonBlockTags.NETHER_STONES);
 	}
 	
 	protected BoundingBox makeBox(BlockPos pos) {

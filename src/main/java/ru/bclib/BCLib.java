@@ -4,7 +4,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.resources.ResourceLocation;
-import ru.bclib.api.TagAPI;
+import ru.bclib.api.tag.TagAPI;
 import ru.bclib.api.WorldDataAPI;
 import ru.bclib.api.biomes.BiomeAPI;
 import ru.bclib.api.dataexchange.DataExchangeAPI;

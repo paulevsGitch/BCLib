@@ -8,7 +8,12 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
-import ru.bclib.api.TagAPI;
+import ru.bclib.api.tag.NamedBlockTags;
+import ru.bclib.api.tag.NamedCommonBlockTags;
+import ru.bclib.api.tag.NamedCommonItemTags;
+import ru.bclib.api.tag.NamedItemTags;
+import ru.bclib.api.tag.NamedMineableTags;
+import ru.bclib.api.tag.TagAPI;
 import ru.bclib.blocks.BaseLeavesBlock;
 import ru.bclib.blocks.BaseOreBlock;
 import ru.bclib.blocks.FeatureSaplingBlock;
@@ -44,20 +49,20 @@ public class BlockRegistry extends BaseRegistry<Block> {
 		if (block instanceof BaseLeavesBlock){
 			TagAPI.addBlockTags(
 				block,
-				TagAPI.NAMED_BLOCK_LEAVES,
-				TagAPI.NAMED_COMMON_BLOCK_LEAVES,
-				TagAPI.NAMED_MINEABLE_HOE,
-				TagAPI.NAMED_MINEABLE_SHEARS
+				NamedBlockTags.LEAVES,
+				NamedCommonBlockTags.LEAVES,
+				NamedMineableTags.HOE,
+				NamedMineableTags.SHEARS
 			);
 			if (item != null){
-				TagAPI.addItemTags(item, TagAPI.NAMED_COMMON_ITEM_LEAVES, TagAPI.NAMED_ITEM_LEAVES);
+				TagAPI.addItemTags(item, NamedCommonItemTags.LEAVES, NamedItemTags.LEAVES);
 			}
 		} else if (block instanceof BaseOreBlock){
-			TagAPI.addBlockTags(block, TagAPI.NAMED_MINEABLE_PICKAXE);
+			TagAPI.addBlockTags(block, NamedMineableTags.PICKAXE);
 		} else if (block instanceof FeatureSaplingBlock){
-			TagAPI.addBlockTags(block, TagAPI.NAMED_COMMON_BLOCK_SAPLINGS, TagAPI.NAMED_BLOCK_SAPLINGS);
+			TagAPI.addBlockTags(block, NamedCommonBlockTags.SAPLINGS, NamedBlockTags.SAPLINGS);
 			if (item != null){
-				TagAPI.addItemTags(item, TagAPI.NAMED_COMMON_ITEM_SAPLINGS, TagAPI.NAMED_ITEM_SAPLINGS);
+				TagAPI.addItemTags(item, NamedCommonItemTags.SAPLINGS, NamedItemTags.SAPLINGS);
 			}
 		}
 

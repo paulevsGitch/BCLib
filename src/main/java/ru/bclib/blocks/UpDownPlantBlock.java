@@ -25,8 +25,8 @@ import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import ru.bclib.api.TagAPI;
-import ru.bclib.api.TagAPI.TagLocation;
+import ru.bclib.api.tag.NamedMineableTags;
+import ru.bclib.api.tag.TagAPI.TagLocation;
 import ru.bclib.client.render.BCLRenderLayer;
 import ru.bclib.interfaces.RenderLayerProvider;
 import ru.bclib.interfaces.TagProvider;
@@ -107,7 +107,7 @@ public abstract class UpDownPlantBlock extends BaseBlockNotFull implements Rende
 	
 	@Override
 	public void addTags(List<TagLocation<Block>> blockTags, List<TagLocation<Item>> itemTags) {
-		blockTags.add(TagAPI.NAMED_MINEABLE_SHEARS);
-		blockTags.add(TagAPI.NAMED_MINEABLE_HOE);
+		blockTags.add(NamedMineableTags.SHEARS);
+		blockTags.add(NamedMineableTags.HOE);
 	}
 }

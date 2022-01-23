@@ -24,7 +24,7 @@ import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
 import ru.bclib.BCLib;
-import ru.bclib.api.TagAPI;
+import ru.bclib.api.tag.CommonItemTags;
 import ru.bclib.config.PathConfig;
 import ru.bclib.interfaces.UnknownReceipBookCategory;
 import ru.bclib.util.ItemUtil;
@@ -116,7 +116,7 @@ public class AnvilRecipe implements Recipe<Container>, UnknownReceipBookCategory
 
 	public boolean matches(Container craftingInventory) {
 		ItemStack hammer = craftingInventory.getItem(1);
-		if (hammer.isEmpty() || !TagAPI.COMMON_ITEM_HAMMERS.contains(hammer.getItem())) {
+		if (hammer.isEmpty() || !CommonItemTags.HAMMERS.contains(hammer.getItem())) {
 			return false;
 		}
 		ItemStack material = craftingInventory.getItem(0);
@@ -140,7 +140,7 @@ public class AnvilRecipe implements Recipe<Container>, UnknownReceipBookCategory
 	@Override
 	public NonNullList<Ingredient> getIngredients() {
 		NonNullList<Ingredient> defaultedList = NonNullList.create();
-		defaultedList.add(Ingredient.of(TagAPI.COMMON_ITEM_HAMMERS
+		defaultedList.add(Ingredient.of(CommonItemTags.HAMMERS
 			.getValues()
 			.stream()
 			.filter(hammer -> ((TieredItem) hammer).getTier().getLevel() >= toolLevel)

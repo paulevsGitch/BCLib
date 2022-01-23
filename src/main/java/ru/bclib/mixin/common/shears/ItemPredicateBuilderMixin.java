@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import ru.bclib.api.TagAPI;
+import ru.bclib.api.tag.CommonItemTags;
 
 import java.util.Set;
 
@@ -24,7 +24,7 @@ public abstract class ItemPredicateBuilderMixin {
 	@Inject(method = "matches", at = @At("HEAD"), cancellable = true)
 	void bclib_of(ItemStack itemStack, CallbackInfoReturnable<Boolean> cir) {
 		if (this.items != null && this.items.size() == 1 && this.items.contains(Items.SHEARS)) {
-			if (itemStack.is(TagAPI.COMMON_ITEM_SHEARS) || itemStack.is(FabricToolTags.SHEARS)){
+			if (itemStack.is(CommonItemTags.SHEARS) || itemStack.is(FabricToolTags.SHEARS)){
 				cir.setReturnValue(true);
 			}
 		}

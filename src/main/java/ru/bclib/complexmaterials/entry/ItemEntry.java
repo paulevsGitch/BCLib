@@ -3,8 +3,8 @@ package ru.bclib.complexmaterials.entry;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
-import ru.bclib.api.TagAPI;
-import ru.bclib.api.TagAPI.TagLocation;
+import ru.bclib.api.tag.TagAPI;
+import ru.bclib.api.tag.TagAPI.TagLocation;
 import ru.bclib.complexmaterials.ComplexMaterial;
 import ru.bclib.registry.ItemRegistry;
 

@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
-import ru.bclib.api.TagAPI;
+import ru.bclib.api.tag.TagAPI;
 
 import java.util.Map;
 
