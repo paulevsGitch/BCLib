@@ -40,7 +40,6 @@
 		"ServerLevelMixin",
 		"BiomeSourceMixin",
 		"AnvilBlockMixin",
-		"HoeItemAccessor",
 		"AnvilMenuMixin",
 		"TagLoaderMixin",
 		"MainMixin"
