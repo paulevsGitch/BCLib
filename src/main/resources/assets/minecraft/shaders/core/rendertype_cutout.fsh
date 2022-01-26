@@ -46,8 +46,8 @@ void main() {
 		vec3 hsv = rgbToHSV(vertex.rgb);
 		hsv.z = 1.0;
 		vertex.rgb = hsvToRGB(hsv);
+		color.a = 1.0;
 	}
 	color = linear_fog(color * vertex, vertexDistance, FogStart, FogEnd, FogColor);
-	color.a = 1.0;
 	fragColor = color;
 }
