@@ -19,6 +19,7 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import ru.bclib.BCLib;
+import ru.bclib.interfaces.NoiseGeneratorSettingsProvider;
 import ru.bclib.interfaces.SurfaceProvider;
 
 import java.lang.reflect.Constructor;
@@ -26,7 +27,7 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 @Mixin(NoiseBasedChunkGenerator.class)
-public abstract class NoiseBasedChunkGeneratorMixin implements SurfaceProvider {
+public abstract class NoiseBasedChunkGeneratorMixin implements SurfaceProvider, NoiseGeneratorSettingsProvider {
 	@Final
 	@Shadow
 	private NoiseSampler sampler;
@@ -41,6 +42,11 @@ public abstract class NoiseBasedChunkGeneratorMixin implements SurfaceProvider {
 	
 	private static BlockState bclib_air = Blocks.AIR.defaultBlockState();
 	private static Constructor<?> bclib_constructor;
+
+	@Override
+	public NoiseGeneratorSettings bclib_getNoiseGeneratorSettings(){
+		return settings.get();
+	}
 	
 	@Override
 	@SuppressWarnings("deprecation")

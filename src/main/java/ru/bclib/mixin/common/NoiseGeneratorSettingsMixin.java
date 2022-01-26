@@ -1,5 +1,6 @@
 package ru.bclib.mixin.common;
 
+import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
 import net.minecraft.world.level.levelgen.SurfaceRules;
 import net.minecraft.world.level.levelgen.SurfaceRules.RuleSource;
@@ -7,9 +8,12 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.Shadow;
+import ru.bclib.api.biomes.BiomeAPI;
 import ru.bclib.interfaces.SurfaceRuleProvider;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Mixin(NoiseGeneratorSettings.class)
@@ -20,17 +24,32 @@ public class NoiseGeneratorSettingsMixin implements SurfaceRuleProvider {
 	private SurfaceRules.RuleSource surfaceRule;
 	
 	private SurfaceRules.RuleSource bclib_originalSurfaceRule;
-	
+	private Set<BiomeSource> bclib_biomeSources = new HashSet<>();
+
+	private void bclib_updateCutomRules(){
+		bclib_setCustomRules(BiomeAPI.getRuleSources(bclib_biomeSources));
+	}
+
 	@Override
-	public void clearCustomRules() {
+	public void bclib_addBiomeSource(BiomeSource source) {
+		bclib_biomeSources.add(source);
+		bclib_updateCutomRules();
+	}
+
+	@Override
+	public void bclib_clearBiomeSources(){
+		bclib_biomeSources.clear();
+		bclib_clearCustomRules();
+	}
+
+	private void bclib_clearCustomRules() {
 		if (bclib_originalSurfaceRule != null){
 			this.surfaceRule = bclib_originalSurfaceRule;
 			bclib_originalSurfaceRule = null;
 		}
 	}
 	
-	@Override
-	public void addCustomRules(List<RuleSource> rules) {
+	private void bclib_setCustomRules(List<RuleSource> rules) {
 		RuleSource org = getOriginalSurfaceRule();
 		if (org instanceof SurfaceRules.SequenceRuleSource sequenceRule){
 			List<RuleSource> currentSequence = sequenceRule.sequence();

@@ -1,12 +1,6 @@
 package ru.bclib.api.biomes;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableMultimap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
+import com.google.common.collect.*;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.event.registry.DynamicRegistrySetupCallback;
@@ -28,11 +22,7 @@ import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.WorldGenLevel;
-import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.biome.BiomeGenerationSettings;
-import net.minecraft.world.level.biome.BiomeSource;
-import net.minecraft.world.level.biome.Biomes;
-import net.minecraft.world.level.biome.Climate;
+import net.minecraft.world.level.biome.*;
 import net.minecraft.world.level.biome.MobSpawnSettings.SpawnerData;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -43,6 +33,7 @@ import net.minecraft.world.level.levelgen.GenerationStep.Carving;
 import net.minecraft.world.level.levelgen.GenerationStep.Decoration;
 import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
+import net.minecraft.world.level.levelgen.StructureSettings;
 import net.minecraft.world.level.levelgen.SurfaceRules;
 import net.minecraft.world.level.levelgen.SurfaceRules.RuleSource;
 import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
@@ -56,10 +47,7 @@ import org.apache.commons.lang3.mutable.MutableInt;
 import org.jetbrains.annotations.Nullable;
 import ru.bclib.BCLib;
 import ru.bclib.entity.BCLEntityWrapper;
-import ru.bclib.interfaces.BiomeSourceAccessor;
-import ru.bclib.interfaces.SurfaceMaterialProvider;
-import ru.bclib.interfaces.SurfaceProvider;
-import ru.bclib.interfaces.SurfaceRuleProvider;
+import ru.bclib.interfaces.*;
 import ru.bclib.mixin.common.BiomeGenerationSettingsAccessor;
 import ru.bclib.mixin.common.BiomeSourceMixin;
 import ru.bclib.mixin.common.MobSpawnSettingsAccessor;
@@ -73,16 +61,8 @@ import ru.bclib.world.features.BCLFeature;
 import ru.bclib.world.generator.BiomePicker;
 import ru.bclib.world.structures.BCLStructureFeature;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Random;
-import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -108,8 +88,8 @@ public class BiomeAPI {
 	private final static Map<StructureID, BiConsumer<Map<StructureFeature<?>, Multimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>>>, Map<StructureFeature<?>, StructureFeatureConfiguration>>> STRUCTURE_STARTS = new HashMap<>();
 	private static final Map<ResourceKey, List<BiConsumer<ResourceLocation, Biome>>> MODIFICATIONS = Maps.newHashMap();
 	private static final Map<ResourceLocation, SurfaceRules.RuleSource> SURFACE_RULES = Maps.newHashMap();
-	private static final Set<NoiseGeneratorSettings> NOISE_GENERATOR_SETTINGS = new HashSet<>();
-	
+	private static final Set<SurfaceRuleProvider> MODIFIED_SURFACE_PROVIDERS = new HashSet<>(8);
+
 	public static final BCLBiome NETHER_WASTES_BIOME = registerNetherBiome(getFromRegistry(Biomes.NETHER_WASTES));
 	public static final BCLBiome CRIMSON_FOREST_BIOME = registerNetherBiome(getFromRegistry(Biomes.CRIMSON_FOREST));
 	public static final BCLBiome WARPED_FOREST_BIOME = registerNetherBiome(getFromRegistry(Biomes.WARPED_FOREST));
@@ -155,42 +135,18 @@ public class BiomeAPI {
 			CLIENT.clear();
 		}
 	}
-	
-	private static final Set<BiomeSource> worldSources = new HashSet<>();
-	
-	/**
-	 * For internal use only.
-	 *
-	 * Used by {@link BiomeSourceMixin} to add new BiomeSources to the BiomeAPI. We need to know all
-	 * created Sources in order to rebuild their feature set whenever biomes get recreated
-	 * through a datapack.
-	 * @param source The new {@link BiomeSource}
-	 */
-	public static void registerBiomeSource(BiomeSource source){
-		worldSources.add(source);
-	}
-	
-	private static WorldData worldData;
-	public static void registerWorldData(WorldData w){
-		worldData = w;
-		if (worldData!=null){
-			worldData.worldGenSettings().dimensions().forEach(dim->{
-				StructureSettingsAccessor a = (StructureSettingsAccessor)dim.generator().getSettings();
-				STRUCTURE_STARTS.entrySet().forEach(entry -> applyStructureStarts(a, entry.getValue()));
-			});
-		}
-	}
-	
+
 	/**
 	 * For internal use only.
 	 *
 	 * This method gets called before a world is loaded/created to flush cashes we build. The Method is
 	 * called from  {@link ru.bclib.mixin.client.MinecraftMixin}
 	 */
-	public static void prepareWorldData(){
+	public static void prepareNewLevel(){
 		STRUCTURE_STARTS.clear();
-		worldSources.clear();
-		NOISE_GENERATOR_SETTINGS.clear();
+
+		MODIFIED_SURFACE_PROVIDERS.forEach(p->p.bclib_clearBiomeSources());
+		MODIFIED_SURFACE_PROVIDERS.clear();
 	}
 	
 	/**
@@ -517,34 +473,60 @@ public class BiomeAPI {
 	 * @param level
 	 */
 	public static void applyModifications(ServerLevel level) {
-		BiomeSource source = level.getChunkSource().getGenerator().getBiomeSource();
-		Set<Biome> biomes = source.possibleBiomes();
-		
-		NoiseGeneratorSettings generator = null;
-		if (level.dimension() == Level.NETHER) {
-			generator = BuiltinRegistries.NOISE_GENERATOR_SETTINGS.get(NoiseGeneratorSettings.NETHER);
+		final BiomeSource source = level.getChunkSource().getGenerator().getBiomeSource();
+		final StructureSettings settings = level.getChunkSource().getGenerator().getSettings();
+		final Set<Biome> biomes = source.possibleBiomes();
+
+		NoiseGeneratorSettings generator = level
+				.getServer()
+				.getWorldData()
+				.worldGenSettings()
+				.dimensions()
+				.stream()
+				.filter(dim->dim.generator().getSettings()==settings)
+				.map(dim->((NoiseGeneratorSettingsProvider)dim.generator()).bclib_getNoiseGeneratorSettings()).findFirst().orElse(null);;
+
+		// Datapacks (like Amplified Nether)will change the GeneratorSettings upon load, so we will
+		// only use the default Setting for Nether/End if we were unable to find a settings object
+		if (generator==null){
+			if (level.dimension() == Level.NETHER) {
+				generator = BuiltinRegistries.NOISE_GENERATOR_SETTINGS.get(NoiseGeneratorSettings.NETHER);
+			} else if (level.dimension() == Level.END) {
+				generator = BuiltinRegistries.NOISE_GENERATOR_SETTINGS.get(NoiseGeneratorSettings.END);
+			}
 		}
-		else if (level.dimension() == Level.END) {
-			generator = BuiltinRegistries.NOISE_GENERATOR_SETTINGS.get(NoiseGeneratorSettings.END);
-		}
-		
-		if (generator != null) {
-			List<SurfaceRules.RuleSource> rules = getRuleSources(biomes);
-			SurfaceRuleProvider provider = SurfaceRuleProvider.class.cast(generator);
-			changeSurfaceRules(rules, provider);
-		}
-		
+
 		List<BiConsumer<ResourceLocation, Biome>> modifications = MODIFICATIONS.get(level.dimension());
 		if (modifications == null) {
 			biomes.forEach(biome -> sortBiomeFeatures(biome));
-			((BiomeSourceAccessor) source).bclRebuildFeatures();
-			return;
+		} else {
+			biomes.forEach(biome -> {
+				applyModificationsToBiome(modifications, biome);
+			});
 		}
 		
-		biomes.forEach(biome -> {
-			applyModificationsToBiome(modifications, biome);
-		});
-		
+		if (generator != null) {
+			final SurfaceRuleProvider provider = SurfaceRuleProvider.class.cast(generator);
+			// Multiple Biomes can use the same generator. So we need to keep track of all Biomes that are
+			// Provided by all the BiomeSources that use the same generator.
+			// This happens for example when using the MiningDimensions, which reuses the generator for the
+			// Nethering Dimension
+			MODIFIED_SURFACE_PROVIDERS.add(provider);
+			provider.bclib_addBiomeSource(source);
+		} else {
+			BCLib.LOGGER.warning("No generator for " + source);
+		}
+
+		if (settings!=null){
+			final StructureSettingsAccessor settingsAccessor = (StructureSettingsAccessor)settings;
+			final Set<ResourceLocation> biomeIDs = biomes.stream().map(BiomeAPI::getBiomeID).collect(Collectors.toSet());
+			for (Entry<StructureID, BiConsumer<Map<StructureFeature<?>, Multimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>>>, Map<StructureFeature<?>, StructureFeatureConfiguration>>> e : STRUCTURE_STARTS.entrySet()) {
+				if (biomeIDs.contains(e.getKey().biomeID)) {
+					applyStructureStarts(settingsAccessor, e.getValue());
+				}
+			}
+		}
+
 		((BiomeSourceAccessor) source).bclRebuildFeatures();
 	}
 
@@ -562,6 +544,10 @@ public class BiomeAPI {
 		sortBiomeFeatures(biome);
 	}
 
+	/**
+	 * Create a unique sort order for all Features of the Biome
+	 * @param biome The {@link Biome} to sort the features for
+	 */
 	public static void sortBiomeFeatures(Biome biome) {
 		BiomeGenerationSettings settings = biome.getGenerationSettings();
 		BiomeGenerationSettingsAccessor accessor = (BiomeGenerationSettingsAccessor) settings;
@@ -575,7 +561,7 @@ public class BiomeAPI {
 		accessor.bclib_setFeatures(featureList);
 	}
 	
-	private static List<SurfaceRules.RuleSource> getRuleSources(Set<Biome> biomes) {
+	private static List<SurfaceRules.RuleSource> getRuleSourcesForBiomes(Set<Biome> biomes) {
 		Set<ResourceLocation> biomeIDs = biomes
 			.stream()
 			.map(biome -> getBiomeID(biome))
@@ -583,12 +569,23 @@ public class BiomeAPI {
 		return getRuleSourcesFromIDs(biomeIDs);
 	}
 
-	private static List<SurfaceRules.RuleSource> getAllRuleSources() {
-		List<SurfaceRules.RuleSource> rules = Lists.newArrayList();
-		SURFACE_RULES.forEach((biomeID, rule) -> {
-			rules.add(rule);
-		});
-		return rules;
+	/**
+	 * Creates a list of SurfaceRules for all Biomes that are managed by the passed {@link BiomeSource}.
+	 * If we have Surface rules for any of the Biomes from the given set of {@link BiomeSource}, they
+	 * will be added to the result
+	 *
+	 * Note: This Method is used in the {@link ru.bclib.mixin.common.NoiseGeneratorSettingsMixin} which in turn
+	 * is called from {@link #applyModifications(ServerLevel)}.
+	 * @param sources The Set of {@link BiomeSource} we want to consider
+	 * @return A list of {@link RuleSource}-Objects that are needed to create those Biomes
+	 */
+	public static List<SurfaceRules.RuleSource> getRuleSources(Set<BiomeSource> sources) {
+		final Set<Biome> biomes = new HashSet<>();
+		for (BiomeSource s : sources) {
+			biomes.addAll(s.possibleBiomes());
+		}
+
+		return getRuleSourcesForBiomes(biomes);
 	}
 	
 	private static List<SurfaceRules.RuleSource> getRuleSourcesFromIDs(Set<ResourceLocation> biomeIDs) {
@@ -643,11 +640,12 @@ public class BiomeAPI {
 	/**
 	 * For internal use only!
 	 *
-	 * Adds new features to existing biome. Called from {@link BCLBiome#setFeatures(Map)} when the Biome is first built
+	 * Adds new features to existing biome. Called from {@link #applyModificationsToBiome(List, Biome)} when the Biome is 
+	 * present in any {@link BiomeSource}
 	 * @param biome {@link Biome} to add features in.
 	 * @param featureMap Map of {@link ConfiguredFeature} to add.
 	 */
-	public static void addStepFeaturesToBiome(Biome biome, Map<Decoration, List<Supplier<PlacedFeature>>> featureMap) {
+	private static void addStepFeaturesToBiome(Biome biome, Map<Decoration, List<Supplier<PlacedFeature>>> featureMap) {
 		BiomeGenerationSettingsAccessor accessor = (BiomeGenerationSettingsAccessor) biome.getGenerationSettings();
 		List<List<Supplier<PlacedFeature>>> allFeatures = CollectionsUtil.getMutable(accessor.bclib_getFeatures());
 		Set<PlacedFeature> set = CollectionsUtil.getMutable(accessor.bclib_getFeatureSet());
@@ -685,7 +683,12 @@ public class BiomeAPI {
 			}
 		});
 	}
-	
+
+	/**
+	 * Add an existing StructureFeature to a Biome
+	 * @param biome The {@link Biome} you want to add teh feature to
+	 * @param structure The {@link ConfiguredStructureFeature} to add
+	 */
 	public static void addBiomeStructure(Biome biome, ConfiguredStructureFeature structure) {
 		changeStructureStarts(BiomeAPI.getBiomeID(biome), structure, (structureMap, configMap) -> {
 			Multimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>> configuredMap = structureMap.computeIfAbsent(structure.feature, k -> HashMultimap.create());
@@ -744,7 +747,7 @@ public class BiomeAPI {
 	 */
 	public static void addSurfaceRule(ResourceLocation biomeID, SurfaceRules.RuleSource source) {
 		SURFACE_RULES.put(biomeID, source);
-		NOISE_GENERATOR_SETTINGS.forEach(BiomeAPI::changeSurfaceRulesForGenerator);
+		//NOISE_GENERATOR_SETTINGS.forEach(BiomeAPI::changeSurfaceRulesForGenerator);
 	}
 	
 	/**
@@ -859,17 +862,17 @@ public class BiomeAPI {
 	}
 	
 	static class StructureID {
-		public final ResourceLocation id;
+		public final ResourceLocation biomeID;
 		public final ConfiguredStructureFeature structure;
 		
-		StructureID(ResourceLocation id, ConfiguredStructureFeature structure){
-			this.id = id;
+		StructureID(ResourceLocation biomeID, ConfiguredStructureFeature structure){
+			this.biomeID = biomeID;
 			this.structure = structure;
 		}
 
 		@Override
 		public String toString() {
-			return "StructureID{" + "id=" + id + ", structure=" + structure + '}';
+			return "StructureID{" + "id=" + biomeID + ", structure=" + structure + '}';
 		}
 
 		@Override
@@ -877,91 +880,19 @@ public class BiomeAPI {
 			if (this == o) return true;
 			if (o == null || getClass() != o.getClass()) return false;
 			StructureID that = (StructureID) o;
-			return id.equals(that.id) && structure.equals(that.structure);
+			return biomeID.equals(that.biomeID) && structure.equals(that.structure);
 		}
 		
 		@Override
 		public int hashCode() {
-			return Objects.hash(id, structure);
+			return Objects.hash(biomeID, structure);
 		}
 	}
 	
-	private static void registerNoiseGeneratorAndChangeSurfaceRules(NoiseGeneratorSettings settings){
-		NOISE_GENERATOR_SETTINGS.add(settings);
-		changeSurfaceRulesForGenerator(settings);
+	private static void changeStructureStarts(ResourceLocation biomeID, ConfiguredStructureFeature structure, BiConsumer<Map<StructureFeature<?>, Multimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>>>, Map<StructureFeature<?>, StructureFeatureConfiguration>> modifier) {
+		STRUCTURE_STARTS.put(new StructureID(biomeID, structure), modifier);
 	}
-	
-	public static void registerStructureEvents(){
-		DynamicRegistrySetupCallback.EVENT.register(registryManager -> {
-			Optional<? extends Registry<NoiseGeneratorSettings>> oGeneratorRegistry = registryManager.registry(Registry.NOISE_GENERATOR_SETTINGS_REGISTRY);
-//			Optional<? extends Registry<Codec<? extends BiomeSource>>> oBiomeSourceRegistry = registryManager.registry(Registry.BIOME_SOURCE_REGISTRY);
-//
-//			if (oBiomeSourceRegistry.isPresent()) {
-//				RegistryEntryAddedCallback
-//						.event(oBiomeSourceRegistry.get())
-//						.register((rawId, id, source) -> {
-//							BCLib.LOGGER.info(" #### " + rawId + ", " + source + ", " + id);
-//						});
-//			}
-			
-			if (oGeneratorRegistry.isPresent()) {
-				oGeneratorRegistry.get().forEach(BiomeAPI::registerNoiseGeneratorAndChangeSurfaceRules);
-				RegistryEntryAddedCallback
-					.event(oGeneratorRegistry.get())
-					.register((rawId, id, settings) -> {
-						//BCLib.LOGGER.info(" #### " + rawId + ", " + object + ", " + id);
-						
-						//add back modded structures
-						StructureSettingsAccessor a = (StructureSettingsAccessor)settings.structureSettings();
-						STRUCTURE_STARTS.entrySet().forEach(entry -> applyStructureStarts(a, entry.getValue()));
-						
-						//add surface rules
-						registerNoiseGeneratorAndChangeSurfaceRules(settings);
-					});
-			}
-			
-			
-		});
-	}
-	
-	private static void changeSurfaceRulesForGenerator(NoiseGeneratorSettings settings){
-		List<SurfaceRules.RuleSource> rules;
-		if (biomeRegistry!=null) {
-			rules = getRuleSourcesFromIDs(biomeRegistry.keySet());
-		} else {
-			rules = getAllRuleSources();
-		}
-		SurfaceRuleProvider provider = SurfaceRuleProvider.class.cast(settings);
-		changeSurfaceRules(rules, provider);
-	}
-	
-	private static void changeSurfaceRules(List<RuleSource> rules, SurfaceRuleProvider provider) {
-		if (rules.size() > 0) {
-			provider.addCustomRules(rules);
-		}
-		else {
-			provider.clearCustomRules();
-		}
-	}
-	
-	private static void changeStructureStarts(ResourceLocation id, ConfiguredStructureFeature structure, BiConsumer<Map<StructureFeature<?>, Multimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>>>, Map<StructureFeature<?>, StructureFeatureConfiguration>> modifier) {
-		STRUCTURE_STARTS.put(new StructureID(id, structure), modifier);
-		Registry<NoiseGeneratorSettings> chunkGenSettingsRegistry = BuiltinRegistries.NOISE_GENERATOR_SETTINGS;
-		
-		for (Map.Entry<ResourceKey<NoiseGeneratorSettings>, NoiseGeneratorSettings> entry : chunkGenSettingsRegistry.entrySet()) {
-			final StructureSettingsAccessor access = (StructureSettingsAccessor)  entry.getValue().structureSettings();
-			applyStructureStarts(access, modifier);
-		}
-		
-		if (worldData!=null){
-			worldData.worldGenSettings().dimensions().forEach(dim->{
-				StructureSettingsAccessor access = (StructureSettingsAccessor)dim.generator().getSettings();
-				applyStructureStarts(access, modifier);
-			});
-		}
-	}
-	
-	
+
 	private static void applyStructureStarts(StructureSettingsAccessor access, BiConsumer<Map<StructureFeature<?>, Multimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>>>, Map<StructureFeature<?>, StructureFeatureConfiguration>> modifier) {
 			Map<StructureFeature<?>, Multimap<ConfiguredStructureFeature<?, ?>, ResourceKey<Biome>>> structureMap;
 			Map<StructureFeature<?>, StructureFeatureConfiguration> configMap;

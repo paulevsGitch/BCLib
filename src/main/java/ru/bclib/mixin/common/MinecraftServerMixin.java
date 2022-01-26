@@ -46,7 +46,6 @@ public class MinecraftServerMixin {
 	@Inject(method = "<init>*", at = @At("TAIL"))
 	private void bclib_onServerInit(Thread thread, RegistryHolder registryHolder, LevelStorageAccess levelStorageAccess, WorldData worldData, PackRepository packRepository, Proxy proxy, DataFixer dataFixer, ServerResources serverResources, MinecraftSessionService minecraftSessionService, GameProfileRepository gameProfileRepository, GameProfileCache gameProfileCache, ChunkProgressListenerFactory chunkProgressListenerFactory, CallbackInfo ci) {
 		DataExchangeAPI.prepareServerside();
-		BiomeAPI.registerWorldData(worldData);
 	}
 
 	@Inject(method = "reloadResources", at = @At(value = "RETURN"), cancellable = true)

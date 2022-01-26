@@ -30,9 +30,4 @@ public abstract class BiomeSourceMixin implements BiomeSourceAccessor {
 		BCLib.LOGGER.info("Rebuilding features in BiomeSource " + this.getClass());
 		featuresPerStep = buildFeaturesPerStep(this.possibleBiomes().stream().toList(), true);
 	}
-	
-	@Inject(method="<init>(Ljava/util/List;)V", at=@At(value="INVOKE", shift = Shift.AFTER, target="Lnet/minecraft/world/level/biome/BiomeSource;buildFeaturesPerStep(Ljava/util/List;Z)Ljava/util/List;"))
-	private void bcl_Init(List list, CallbackInfo ci){
-		BiomeAPI.registerBiomeSource((BiomeSource)(Object)this);
-	}
 }

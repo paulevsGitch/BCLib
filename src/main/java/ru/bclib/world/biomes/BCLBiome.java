@@ -288,7 +288,7 @@ public class BCLBiome extends BCLBiomeSettings {
 		this.surfaceInit = (actualBiome) -> {
 			ResourceKey key = BiomeAPI.getBiomeKey(actualBiome);
 			if (key == null) {
-				BCLib.LOGGER.warning("BCL Biome " + biomeID + " don't have registry key!");
+				BCLib.LOGGER.warning("BCL Biome " + biomeID + " does not have registry key!");
 			}
 			else {
 				BiomeAPI.addSurfaceRule(biomeID, SurfaceRules.ifTrue(SurfaceRules.isBiome(key), surface));
@@ -304,7 +304,6 @@ public class BCLBiome extends BCLBiomeSettings {
 	 */
 	public void setFeatures(Map<Decoration, List<Supplier<PlacedFeature>>> features) {
 		this.features = features;
-		BiomeAPI.addStepFeaturesToBiome(getBiome(), features);
 	}
 	
 	/**

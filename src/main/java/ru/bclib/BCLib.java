@@ -48,8 +48,6 @@ public class BCLib implements ModInitializer {
 			Chunker.DESCRIPTOR
 		));
 		
-		BiomeAPI.registerStructureEvents();
-		
 		BCLibPatch.register();
 		Configs.save();
 	}
