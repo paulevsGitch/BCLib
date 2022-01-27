@@ -2,8 +2,6 @@ package ru.bclib.client.render;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Camera;
-import net.minecraft.client.renderer.FogRenderer;
-import net.minecraft.client.renderer.FogRenderer.FogMode;
 import net.minecraft.core.BlockPos.MutableBlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -12,7 +10,9 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.material.FogType;
 import ru.bclib.api.biomes.BiomeAPI;
+import ru.bclib.config.Configs;
 import ru.bclib.util.BackgroundInfo;
 import ru.bclib.util.MHelper;
 import ru.bclib.world.biomes.BCLBiome;
@@ -25,12 +25,12 @@ public class CustomFogRenderer {
 	private static float fogStart = 0;
 	private static float fogEnd = 192;
 	
-	public static boolean applyFogDensity(Camera camera, FogRenderer.FogMode fogMode, float viewDistance, boolean thickFog) {
-		if (fogMode != FogMode.FOG_SKY && fogMode != FogMode.FOG_TERRAIN) {
+	public static boolean applyFogDensity(Camera camera, float viewDistance, boolean thickFog) {
+		FogType fogType = camera.getFluidInCamera();
+		if (fogType != FogType.NONE) {
 			BackgroundInfo.fogDensity = 1;
 			return false;
 		}
-		
 		Entity entity = camera.getEntity();
 		
 		if (!isForcedDimension(entity.level) && shouldIgnoreArea(entity.level, (int) entity.getX(), (int) entity.getEyeY(), (int) entity.getZ())) {
@@ -41,7 +41,7 @@ public class CustomFogRenderer {
 		float fog = getFogDensity(entity.level, entity.getX(), entity.getEyeY(), entity.getZ());
 		BackgroundInfo.fogDensity = fog;
 		
-		if (thickFog) {
+		if (thickFog(thickFog, entity.level)) {
 			fogStart = viewDistance * 0.05F / fog;
 			fogEnd = Math.min(viewDistance, 192.0F) * 0.5F / fog;
 		}
@@ -75,6 +75,16 @@ public class CustomFogRenderer {
 		RenderSystem.setShaderFogStart(fogStart);
 		RenderSystem.setShaderFogEnd(fogEnd);
 		
+		return true;
+	}
+	
+	private static boolean thickFog(boolean thickFog, Level level) {
+		if (!thickFog) {
+			return false;
+		}
+		if (level.dimension() == Level.NETHER) {
+			return Configs.CLIENT_CONFIG.netherThickFog();
+		}
 		return true;
 	}
 	

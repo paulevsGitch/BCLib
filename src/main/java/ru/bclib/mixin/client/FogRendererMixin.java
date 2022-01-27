@@ -50,7 +50,7 @@ public class FogRendererMixin {
 	
 	@Inject(method = "setupFog", at = @At("HEAD"), cancellable = true)
 	private static void bclib_fogDensity(Camera camera, FogRenderer.FogMode fogMode, float viewDistance, boolean thickFog, CallbackInfo info) {
-		if (CustomFogRenderer.applyFogDensity(camera, fogMode, viewDistance, thickFog)) {
+		if (CustomFogRenderer.applyFogDensity(camera, viewDistance, thickFog)) {
 			info.cancel();
 		}
 	}
