@@ -19,7 +19,9 @@ public abstract class EnchantmentMenuMixin extends AbstractContainerMenu {
 	
 	@Redirect(method = "lambda$slotsChanged$0(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;)V", at = @At(
 		value = "INVOKE",
-		target = "Lnet/minecraft/world/level/block/state/BlockState;is(Lnet/minecraft/world/level/block/Block;)Z")//,
+		target = "Lnet/minecraft/world/level/block/state/BlockState;is(Lnet/minecraft/world/level/block/Block;)Z"),
+		require = -1,
+		expect = -1
 	)
 	private boolean bclib_isBookshelf(BlockState state, Block block) {
 		return block == Blocks.BOOKSHELF ? state.is(CommonBlockTags.BOOKSHELVES) : state.is(block);
