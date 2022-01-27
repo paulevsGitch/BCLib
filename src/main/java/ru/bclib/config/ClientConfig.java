@@ -20,8 +20,10 @@ public class ClientConfig extends NamedPathConfig {
 
 	@ConfigUI(topPadding = 12)
 	public static final ConfigToken<Boolean> DEBUG_HASHES = ConfigToken.Boolean(false, "debugHashes", AutoSync.SYNC_CATEGORY);
-
-
+	
+	@ConfigUI(leftPadding = 8)
+	public static final ConfigToken<Boolean> NETHER_THICK_FOG = ConfigToken.Boolean(true, "netherThickFog", "rendering");
+	
 	public ClientConfig() {
 		super(BCLib.MOD_ID, "client", false);
 	}
@@ -49,7 +51,12 @@ public class ClientConfig extends NamedPathConfig {
 	public boolean isShowingModInfo() {
 		return get(DISPLAY_MOD_INFO) /*&& isAllowingAutoSync()*/;
 	}
+	
 	public boolean suppressExperimentalDialog() {
 		return get(SUPPRESS_EXPERIMENTAL_DIALOG);
+	}
+	
+	public boolean netherThickFog() {
+		return get(NETHER_THICK_FOG);
 	}
 }
