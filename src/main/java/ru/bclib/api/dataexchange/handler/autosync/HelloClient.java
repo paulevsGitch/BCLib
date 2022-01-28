@@ -256,7 +256,7 @@ public class HelloClient extends DataHandler.FromServer {
 						SubFile localSubFile = localDescriptor.getLocalSubFile(subFile.relPath);
 						if (localSubFile != null) {
 							//the file exists locally, check if the hashes match
-							if (true || !localSubFile.hash.equals(subFile.hash)) {
+							if (!localSubFile.hash.equals(subFile.hash)) {
 								BCLib.LOGGER.info("	   * " + subFile.relPath + " (changed)");
 								filesToRequest.add(new AutoSyncID.ForDirectFileRequest(desc.folderID, new File(subFile.relPath)));
 							}
