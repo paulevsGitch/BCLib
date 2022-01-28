@@ -30,12 +30,6 @@ public class BCLib implements ModInitializer {
 	
 	@Override
 	public void onInitialize() {
-		System.out.println(ModUtil.convertModVersion("1.2"));
-		System.out.println(ModUtil.convertModVersion("1.2.3"));
-		System.out.println(ModUtil.convertModVersion("1.2.3-4.5"));
-		
-		var mods = ModUtil.getMods();
-		mods.entrySet().forEach(e->System.out.println(e.getKey() + ": " + ModUtil.getModVersion(e.getKey()) +" - " + ModUtil.convertModVersion(ModUtil.convertModVersion(e.getValue().getVersion()))));
 		BaseRegistry.register();
 		GeneratorOptions.init();
 		BaseBlockEntities.register();

@@ -31,12 +31,8 @@ public class BlocksHelper {
 	public static final Direction[] HORIZONTAL = makeHorizontal();
 	public static final Direction[] DIRECTIONS = Direction.values();
 	
-	private static final ThreadLocal<MutableBlockPos> TL_POS = new ThreadLocal<>(){
-		@Override
-		protected MutableBlockPos initialValue() {
-			return new MutableBlockPos();
-		}
-	};
+	private static final ThreadLocal<MutableBlockPos> TL_POS = ThreadLocal.withInitial(() -> new MutableBlockPos());
+	
 	protected static final BlockState AIR = Blocks.AIR.defaultBlockState();
 	protected static final BlockState WATER = Blocks.WATER.defaultBlockState();
 	

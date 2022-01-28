@@ -372,7 +372,6 @@ public class ModUtil {
 	private static void accept(Path file) {
 		try {
 			URI uri = URI.create("jar:" + file.toUri());
-			System.out.println(uri);
 			
 			FileSystem fs;
 			try {
