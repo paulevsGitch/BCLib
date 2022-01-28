@@ -177,8 +177,6 @@ public class HelloClient extends DataHandler.FromServer {
 	protected void deserializeIncomingDataOnClient(FriendlyByteBuf buf, PacketSender responseSender) {
 		//read BCLibVersion (=protocol version)
 		bclibVersion = ModUtil.convertModVersion(buf.readInt());
-		final boolean protocolVersion_0_4_1 = ModUtil.isLargerOrEqualVersion(bclibVersion, "0.4.1");
-		
 		
 		//read Plugin Versions
 		modVersion = new ServerModMap();
@@ -189,14 +187,8 @@ public class HelloClient extends DataHandler.FromServer {
 			final int size;
 			final boolean canDownload;
 			//since v0.4.1 we also send the size of the mod-File
-			if (protocolVersion_0_4_1) {
-				size = buf.readInt();
-				canDownload = buf.readBoolean();
-			}
-			else {
-				size = 0;
-				canDownload = true;
-			}
+			size = buf.readInt();
+			canDownload = buf.readBoolean();
 			modVersion.put(id, new OfferedModInfo(version, size, canDownload));
 		}
 		
@@ -213,15 +205,13 @@ public class HelloClient extends DataHandler.FromServer {
 		
 		autoSynFolders = new ArrayList<>(1);
 		//since v0.4.1 we also send the sync folders
-		if (protocolVersion_0_4_1) {
-			final int folderCount = buf.readInt();
-			for (int i = 0; i < folderCount; i++) {
-				SyncFolderDescriptor desc = SyncFolderDescriptor.deserialize(buf);
-				autoSynFolders.add(desc);
-			}
-
-			serverPublishedModInfo = buf.readBoolean();
+		final int folderCount = buf.readInt();
+		for (int i = 0; i < folderCount; i++) {
+			SyncFolderDescriptor desc = SyncFolderDescriptor.deserialize(buf);
+			autoSynFolders.add(desc);
 		}
+
+		serverPublishedModInfo = buf.readBoolean();
 	}
 	
 	@Environment(EnvType.CLIENT)
@@ -266,7 +256,7 @@ public class HelloClient extends DataHandler.FromServer {
 						SubFile localSubFile = localDescriptor.getLocalSubFile(subFile.relPath);
 						if (localSubFile != null) {
 							//the file exists locally, check if the hashes match
-							if (!localSubFile.hash.equals(subFile.hash)) {
+							if (true || !localSubFile.hash.equals(subFile.hash)) {
 								BCLib.LOGGER.info("	   * " + subFile.relPath + " (changed)");
 								filesToRequest.add(new AutoSyncID.ForDirectFileRequest(desc.folderID, new File(subFile.relPath)));
 							}
@@ -333,11 +323,14 @@ public class HelloClient extends DataHandler.FromServer {
 	@Environment(EnvType.CLIENT)
 	private void processModFileSync(final List<AutoSyncID> filesToRequest, final Set<String> mismatchingMods) {
 		for (Entry<String, OfferedModInfo> e : modVersion.entrySet()) {
-			final String localVersion = ModUtil.getModVersion(e.getKey());
+			final String localVersion = ModUtil.convertModVersion(ModUtil.convertModVersion(ModUtil.getModVersion(e.getKey())));
 			final OfferedModInfo serverInfo = e.getValue();
-			final boolean requestMod = !serverInfo.version.equals(localVersion) && serverInfo.size > 0 && serverInfo.canDownload;
 			
-			BCLib.LOGGER.info("	- " + e.getKey() + " (client=" + localVersion + ", server=" + serverInfo.version + ", size=" + PathUtil.humanReadableFileSize(serverInfo.size) + (requestMod ? ", requesting" : "") + (serverInfo.canDownload ? "" :", not offered")+ ")");
+			ModInfo nfo = ModUtil.getModInfo(e.getKey());
+			final boolean clientOnly = nfo!=null && nfo.metadata.getEnvironment()==ModEnvironment.CLIENT;
+			final boolean requestMod = !clientOnly && !serverInfo.version.equals(localVersion) && serverInfo.size > 0 && serverInfo.canDownload;
+			
+			BCLib.LOGGER.info("	- " + e.getKey() + " (client=" + localVersion + ", server=" + serverInfo.version + ", size=" + PathUtil.humanReadableFileSize(serverInfo.size) + (requestMod ? ", requesting" : "") + (serverInfo.canDownload ? "" :", not offered") + (clientOnly?", client only":"")+ ")");
 			if (requestMod) {
 				filesToRequest.add(new AutoSyncID.ForModFileRequest(e.getKey(), serverInfo.version));
 			}

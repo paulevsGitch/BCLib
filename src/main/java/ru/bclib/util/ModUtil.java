@@ -62,53 +62,31 @@ public class ModUtil {
 		
 		mods = new HashMap<>();
 		org.apache.logging.log4j.Logger logger = LogManager.getFormatterLogger("BCLib|ModLoader");
-		PathUtil.fileWalker(PathUtil.MOD_FOLDER.toFile(), false, (file -> {
-			try {
-				URI uri = URI.create("jar:" + file.toUri());
-				FileSystem fs = FileSystems.getFileSystem(uri);
-				if (fs!=null) {
-					try {
-						Path modMetaFile = fs.getPath("fabric.mod.json");
-						if (modMetaFile != null) {
-							try (InputStream is = Files.newInputStream(modMetaFile)) {
-								//ModMetadata mc = ModMetadataParser.parseMetadata(is, uri.toString(), new LinkedList<String>());
-								ModMetadata mc = readJSON(is, uri.toString());
-								if (mc!=null){
-									mods.put(mc.getId(), new ModInfo(mc, file));
-								}
-							}
-						}
-					} catch (Exception e) {
-						BCLib.LOGGER.error(e.getMessage());
-					}
-				}
-			}
-			catch (Exception e) {
-				BCLib.LOGGER.error(e.getMessage());
-			}
-		}));
+		PathUtil.fileWalker(PathUtil.MOD_FOLDER.toFile(), false, (ModUtil::accept));
 		
 		return mods;
 	}
 	
 	private static ModMetadata readJSON(InputStream is, String sourceFile) throws IOException {
 		try (com.google.gson.stream.JsonReader reader = new JsonReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
-			JsonObject data = new JsonParser().parse(reader).getAsJsonObject();
+			JsonObject data = new JsonParser().parse(reader)
+											  .getAsJsonObject();
 			Version ver;
 			try {
-				ver = new SemanticVersionImpl(data.get("version").getAsString(), false);
+				ver = new SemanticVersionImpl(data.get("version")
+												  .getAsString(), false);
 			}
 			catch (VersionParsingException e) {
 				BCLib.LOGGER.error("Unable to parse Version in " + sourceFile);
 				return null;
 			}
 			
-			if (data.get("id") == null){
+			if (data.get("id") == null) {
 				BCLib.LOGGER.error("Unable to read ID in " + sourceFile);
 				return null;
 			}
 			
-			if (data.get("name") == null){
+			if (data.get("name") == null) {
 				BCLib.LOGGER.error("Unable to read name in " + sourceFile);
 				return null;
 			}
@@ -118,6 +96,7 @@ public class ModUtil {
 				public Version getVersion() {
 					return ver;
 				}
+				
 				@Override
 				public String getType() {
 					return "fabric";
@@ -125,7 +104,8 @@ public class ModUtil {
 				
 				@Override
 				public String getId() {
-					return data.get("id").getAsString();
+					return data.get("id")
+							   .getAsString();
 				}
 				
 				@Override
@@ -136,35 +116,44 @@ public class ModUtil {
 				@Override
 				public ModEnvironment getEnvironment() {
 					JsonElement env = data.get("environment");
-					if (env==null) {
+					if (env == null) {
 						BCLib.LOGGER.warning("No environment specified in " + sourceFile);
 						//return ModEnvironment.UNIVERSAL;
 					}
-					final String environment = env==null?"":env.getAsString().toLowerCase(Locale.ROOT);
+					final String environment = env == null ? "" : env.getAsString()
+																	 .toLowerCase(Locale.ROOT);
 					
-					if (environment.isEmpty() || environment.equals("*") || environment.equals("common")) {
+					if (environment.isEmpty() || environment.equals("*") || environment.equals("\"*\"") || environment.equals("common")) {
 						JsonElement entrypoints = data.get("entrypoints");
 						boolean hasClient = true;
 						
 						//check if there is an actual client entrypoint
-						if (entrypoints!=null && entrypoints.isJsonObject()){
-							JsonElement client = entrypoints.getAsJsonObject().get("client");
-							if (client!=null && client.isJsonArray()){
-								hasClient = client.getAsJsonArray().size() > 0;
-							} else if (client==null || !client.isJsonPrimitive()){
+						if (entrypoints != null && entrypoints.isJsonObject()) {
+							JsonElement client = entrypoints.getAsJsonObject()
+															.get("client");
+							if (client != null && client.isJsonArray()) {
+								hasClient = client.getAsJsonArray()
+												  .size() > 0;
+							}
+							else if (client == null || !client.isJsonPrimitive()) {
 								hasClient = false;
-							} else if (!client.getAsJsonPrimitive().isString()){
+							}
+							else if (!client.getAsJsonPrimitive()
+											.isString()) {
 								hasClient = false;
 							}
 						}
 						
-						if (hasClient == false) return ModEnvironment.SERVER;
+						//if (hasClient == false) return ModEnvironment.SERVER;
 						return ModEnvironment.UNIVERSAL;
-					} else if (environment.equals("client")) {
+					}
+					else if (environment.equals("client")) {
 						return ModEnvironment.CLIENT;
-					} else if (environment.equals("server")) {
+					}
+					else if (environment.equals("server")) {
 						return ModEnvironment.SERVER;
-					} else {
+					}
+					else {
 						BCLib.LOGGER.error("Unable to read environment in " + sourceFile);
 						return ModEnvironment.UNIVERSAL;
 					}
@@ -201,7 +190,8 @@ public class ModUtil {
 				
 				@Override
 				public String getName() {
-					return data.get("name").getAsString();
+					return data.get("name")
+							   .getAsString();
 				}
 				
 				@Override
@@ -325,13 +315,16 @@ public class ModUtil {
 		}
 		try {
 			int res = 0;
-			final String semanticVersionPattern = "(\\d+)\\.(\\d+)\\.(\\d+)\\D*";
+			final String semanticVersionPattern = "(\\d+)\\.(\\d+)(\\.(\\d+))?\\D*";
 			final Matcher matcher = Pattern.compile(semanticVersionPattern)
 										   .matcher(version);
 			if (matcher.find()) {
-				if (matcher.groupCount() > 0) res = (Integer.parseInt(matcher.group(1)) & 0xFF) << 22;
-				if (matcher.groupCount() > 1) res |= (Integer.parseInt(matcher.group(2)) & 0xFF) << 14;
-				if (matcher.groupCount() > 2) res |= Integer.parseInt(matcher.group(3)) & 0x3FFF;
+				if (matcher.groupCount() > 0)
+					res = matcher.group(1) == null ? 0 : ((Integer.parseInt(matcher.group(1)) & 0xFF) << 22);
+				if (matcher.groupCount() > 1)
+					res |= matcher.group(2) == null ? 0 : ((Integer.parseInt(matcher.group(2)) & 0xFF) << 14);
+				if (matcher.groupCount() > 3)
+					res |= matcher.group(4) == null ? 0 : Integer.parseInt(matcher.group(4)) & 0x3FFF;
 			}
 			
 			return res;
@@ -376,6 +369,43 @@ public class ModUtil {
 		return convertModVersion(v1) >= convertModVersion(v2);
 	}
 	
+	private static void accept(Path file) {
+		try {
+			URI uri = URI.create("jar:" + file.toUri());
+			System.out.println(uri);
+			
+			FileSystem fs;
+			try {
+				fs = FileSystems.getFileSystem(uri);
+			}
+			catch (Exception e) {
+				fs = FileSystems.newFileSystem(file);
+			}
+			if (fs != null) {
+				try {
+					Path modMetaFile = fs.getPath("fabric.mod.json");
+					if (modMetaFile != null) {
+						try (InputStream is = Files.newInputStream(modMetaFile)) {
+							//ModMetadata mc = ModMetadataParser.parseMetadata(is, uri.toString(), new LinkedList<String>());
+							ModMetadata mc = readJSON(is, uri.toString());
+							if (mc != null) {
+								mods.put(mc.getId(), new ModInfo(mc, file));
+							}
+						}
+					}
+				}
+				catch (Exception e) {
+					BCLib.LOGGER.error("Error for " + uri + ": " + e.toString());
+				}
+				fs.close();
+			}
+		}
+		catch (Exception e) {
+			BCLib.LOGGER.error("Error for " + file.toUri() + ": " + e.toString());
+			e.printStackTrace();
+		}
+	}
+	
 	public static class ModInfo {
 		public final ModMetadata metadata;
 		public final Path jarPath;
@@ -416,7 +446,9 @@ public class ModUtil {
 		}
 		
 		public String getVersion() {
-			if (metadata == null) return "0.0.0";
+			if (metadata == null) {
+				return "0.0.0";
+			}
 			return versionToString(metadata.getVersion());
 		}
 	}
