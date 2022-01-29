@@ -374,10 +374,12 @@ public class ModUtil {
 			URI uri = URI.create("jar:" + file.toUri());
 			
 			FileSystem fs;
+			boolean doClose = false;
 			try {
 				fs = FileSystems.getFileSystem(uri);
 			}
 			catch (Exception e) {
+				doClose = true;
 				fs = FileSystems.newFileSystem(file);
 			}
 			if (fs != null) {
@@ -396,7 +398,7 @@ public class ModUtil {
 				catch (Exception e) {
 					BCLib.LOGGER.error("Error for " + uri + ": " + e.toString());
 				}
-				fs.close();
+				//if (doClose) fs.close();
 			}
 		}
 		catch (Exception e) {
