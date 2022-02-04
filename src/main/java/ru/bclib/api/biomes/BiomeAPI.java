@@ -501,8 +501,11 @@ public class BiomeAPI {
 				.worldGenSettings()
 				.dimensions()
 				.stream()
-				.filter(dim->dim.generator().getSettings()==settings)
-				.map(dim->((NoiseGeneratorSettingsProvider)dim.generator()).bclib_getNoiseGeneratorSettings()).findFirst().orElse(null);;
+				.map(dim->dim.generator())
+				.filter(gen->gen.getSettings()==settings && (gen instanceof NoiseGeneratorSettingsProvider))
+				.map(gen->((NoiseGeneratorSettingsProvider)gen).bclib_getNoiseGeneratorSettings())
+				.findFirst()
+				.orElse(null);
 
 		// Datapacks (like Amplified Nether)will change the GeneratorSettings upon load, so we will
 		// only use the default Setting for Nether/End if we were unable to find a settings object
