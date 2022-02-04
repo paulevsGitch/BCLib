@@ -515,13 +515,10 @@ public class BiomeAPI {
 		}
 
 		List<BiConsumer<ResourceLocation, Biome>> modifications = MODIFICATIONS.get(level.dimension());
-		if (modifications == null) {
-			biomes.forEach(biome -> sortBiomeFeatures(biome));
-		} else {
-			biomes.forEach(biome -> {
-				applyModificationsToBiome(modifications, biome);
-			});
+		for (Biome biome : biomes) {
+			applyModificationsToBiome(modifications, biome);
 		}
+		
 		
 		if (generator != null) {
 			final SurfaceRuleProvider provider = SurfaceRuleProvider.class.cast(generator);
@@ -550,9 +547,11 @@ public class BiomeAPI {
 
 	private static void applyModificationsToBiome(List<BiConsumer<ResourceLocation, Biome>> modifications, Biome biome) {
 		ResourceLocation biomeID = getBiomeID(biome);
-		modifications.forEach(consumer -> {
-			consumer.accept(biomeID, biome);
-		});
+		if (modifications!=null) {
+			modifications.forEach(consumer -> {
+				consumer.accept(biomeID, biome);
+			});
+		}
 		
 		final BCLBiome bclBiome = BiomeAPI.getBiome(biome);
 		if (bclBiome != null) {
