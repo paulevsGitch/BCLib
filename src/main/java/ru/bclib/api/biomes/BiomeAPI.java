@@ -516,7 +516,7 @@ public class BiomeAPI {
 
 		List<BiConsumer<ResourceLocation, Biome>> modifications = MODIFICATIONS.get(level.dimension());
 		for (Biome biome : biomes) {
-			applyModificationsToBiome(modifications, biome);
+			applyModificationsAndUpdateFeatures(modifications, biome);
 		}
 		
 		
@@ -545,7 +545,7 @@ public class BiomeAPI {
 		((BiomeSourceAccessor) source).bclRebuildFeatures();
 	}
 
-	private static void applyModificationsToBiome(List<BiConsumer<ResourceLocation, Biome>> modifications, Biome biome) {
+	private static void applyModificationsAndUpdateFeatures(List<BiConsumer<ResourceLocation, Biome>> modifications, Biome biome) {
 		ResourceLocation biomeID = getBiomeID(biome);
 		if (modifications!=null) {
 			modifications.forEach(consumer -> {
@@ -657,7 +657,7 @@ public class BiomeAPI {
 	/**
 	 * For internal use only!
 	 *
-	 * Adds new features to existing biome. Called from {@link #applyModificationsToBiome(List, Biome)} when the Biome is 
+	 * Adds new features to existing biome. Called from {@link #applyModificationsAndUpdateFeatures(List, Biome)} when the Biome is
 	 * present in any {@link BiomeSource}
 	 * @param biome {@link Biome} to add features in.
 	 * @param featureMap Map of {@link ConfiguredFeature} to add.
