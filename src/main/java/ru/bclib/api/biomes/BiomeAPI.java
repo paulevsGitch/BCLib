@@ -502,7 +502,7 @@ public class BiomeAPI {
 				.dimensions()
 				.stream()
 				.map(dim->dim.generator())
-				.filter(gen->gen.getSettings()==settings && (gen instanceof NoiseGeneratorSettingsProvider))
+				.filter(gen->(gen instanceof NoiseGeneratorSettingsProvider) && gen.getSettings()==settings)
 				.map(gen->((NoiseGeneratorSettingsProvider)gen).bclib_getNoiseGeneratorSettings())
 				.findFirst()
 				.orElse(null);
