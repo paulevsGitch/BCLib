@@ -22,7 +22,7 @@ public abstract class BiomeSourceMixin implements BiomeSourceAccessor {
 	@Mutable @Shadow @Final private List<StepFeatureData> featuresPerStep;
 	
 	public void bclRebuildFeatures(){
-		BCLib.LOGGER.info("Rebuilding features in BiomeSource " + this.getClass());
+		BCLib.LOGGER.info("Rebuilding features in BiomeSource " + this);
 		featuresPerStep = buildFeaturesPerStep(this.possibleBiomes().stream().toList(), true);
 	}
 }
