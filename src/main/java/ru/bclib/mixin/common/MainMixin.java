@@ -1,8 +1,11 @@
 package ru.bclib.mixin.common;
 
+import joptsimple.AbstractOptionSpec;
 import joptsimple.ArgumentAcceptingOptionSpec;
+import joptsimple.NonOptionArgumentSpec;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
+import joptsimple.OptionSpecBuilder;
 import net.minecraft.server.Main;
 import net.minecraft.server.dedicated.DedicatedServerSettings;
 import net.minecraft.world.level.storage.LevelStorageSource;
@@ -23,8 +26,25 @@ abstract public class MainMixin {
 	@Inject(method="main", at=@At(value="INVOKE", target="Lnet/minecraft/world/level/storage/LevelStorageSource;createDefault(Ljava/nio/file/Path;)Lnet/minecraft/world/level/storage/LevelStorageSource;"))
 	private static void bclib_callServerFix(String[] args, CallbackInfo ci){
 		OptionParser parser = new OptionParser();
-		ArgumentAcceptingOptionSpec<String> optionUniverse = parser.accepts("universe").withRequiredArg().defaultsTo(".", new String[0]);
+		ArgumentAcceptingOptionSpec<String> optionUniverse = parser.accepts("universe").withRequiredArg().defaultsTo(".", (String[])new String[0]);
 		ArgumentAcceptingOptionSpec<String> optionWorld = parser.accepts("world").withRequiredArg();
+		
+		//this is only for compat reasons, we do not need to read thise options in our mixin, but it seems to cause
+		//errors if they are not defined
+		parser.accepts("nogui");
+		parser.accepts("initSettings", "Initializes 'server.properties' and 'eula.txt', then quits");
+		parser.accepts("demo");
+		parser.accepts("bonusChest");
+		parser.accepts("forceUpgrade");
+		parser.accepts("eraseCache");
+		parser.accepts("safeMode", "Loads level with vanilla datapack only");
+		parser.accepts("help").forHelp();
+		parser.accepts("singleplayer").withRequiredArg();
+		parser.accepts("port").withRequiredArg().ofType(Integer.class).defaultsTo(-1, (Integer[])new Integer[0]);
+		parser.accepts("serverId").withRequiredArg();
+		parser.accepts("jfrProfile");
+		parser.nonOptions();
+		
 		OptionSet options = parser.parse(args);
 
 		Path settingPath = Paths.get("server.properties", new String[0]);
