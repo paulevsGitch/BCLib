@@ -1,5 +1,6 @@
 package ru.bclib.world.generator.map.hex;
 
+import net.minecraft.world.level.ChunkPos;
 import ru.bclib.interfaces.BiomeChunk;
 import ru.bclib.interfaces.BiomeMap;
 import ru.bclib.interfaces.TriConsumer;
@@ -18,12 +19,10 @@ public class HexBiomeMap implements BiomeMap {
 	private static final float COEF_HALF = COEF * 0.5F;
 	private static final float SIN = (float) Math.sin(0.4);
 	private static final float COS = (float) Math.cos(0.4);
-	private static final Random RANDOM = new Random();
 	private static final float[] EDGE_CIRCLE_X;
 	private static final float[] EDGE_CIRCLE_Z;
 	
-	private final HashMap<Point, HexBiomeChunk> chunks = new HashMap<>();
-	private final Point selector = new Point();
+	private final HashMap<ChunkPos, HexBiomeChunk> chunks = new HashMap<>();
 	private final BiomePicker picker;
 	
 	private final OpenSimplexNoise[] noises = new OpenSimplexNoise[2];
@@ -75,26 +74,15 @@ public class HexBiomeMap implements BiomeMap {
 	
 	@Override
 	public BiomeChunk getChunk(int cx, int cz, boolean update) {
-		HexBiomeChunk chunk;
-		
-		synchronized (selector) {
-			selector.setLocation(cx, cz);
-			chunk = chunks.get(selector);
-		}
-		
-		if (chunk == null) {
-			synchronized (RANDOM) {
-				RANDOM.setSeed(MHelper.getSeed(seed, cx, cz));
-				chunk = new HexBiomeChunk(RANDOM, picker);
-			}
-			chunks.put(new Point(cx, cz), chunk);
-			
+		ChunkPos pos = new ChunkPos(cx, cz);
+		return chunks.computeIfAbsent(pos, i -> {
+			Random random = new Random(MHelper.getSeed(seed, cx, cz));
+			HexBiomeChunk chunk = new HexBiomeChunk(random, picker);
 			if (update && processor != null) {
 				processor.accept(cx, cz, chunk.getSide());
 			}
-		}
-		
-		return chunk;
+			return chunk;
+		});
 	}
 	
 	@Override
