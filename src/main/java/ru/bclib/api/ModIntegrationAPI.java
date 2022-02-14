@@ -2,7 +2,7 @@ package ru.bclib.api;
 
 import com.google.common.collect.Lists;
 import net.fabricmc.loader.api.FabricLoader;
-import ru.bclib.integration.modmenu.ModIntegration;
+import ru.bclib.integration.ModIntegration;
 
 import java.util.List;
 

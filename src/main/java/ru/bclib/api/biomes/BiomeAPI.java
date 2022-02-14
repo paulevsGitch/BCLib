@@ -501,8 +501,11 @@ public class BiomeAPI {
 				.worldGenSettings()
 				.dimensions()
 				.stream()
-				.filter(dim->dim.generator().getSettings()==settings)
-				.map(dim->((NoiseGeneratorSettingsProvider)dim.generator()).bclib_getNoiseGeneratorSettings()).findFirst().orElse(null);;
+				.map(dim->dim.generator())
+				.filter(gen->(gen instanceof NoiseGeneratorSettingsProvider) && gen.getSettings()==settings)
+				.map(gen->((NoiseGeneratorSettingsProvider)gen).bclib_getNoiseGeneratorSettings())
+				.findFirst()
+				.orElse(null);
 
 		// Datapacks (like Amplified Nether)will change the GeneratorSettings upon load, so we will
 		// only use the default Setting for Nether/End if we were unable to find a settings object
@@ -515,13 +518,10 @@ public class BiomeAPI {
 		}
 
 		List<BiConsumer<ResourceLocation, Biome>> modifications = MODIFICATIONS.get(level.dimension());
-		if (modifications == null) {
-			biomes.forEach(biome -> sortBiomeFeatures(biome));
-		} else {
-			biomes.forEach(biome -> {
-				applyModificationsToBiome(modifications, biome);
-			});
+		for (Biome biome : biomes) {
+			applyModificationsAndUpdateFeatures(modifications, biome);
 		}
+		
 		
 		if (generator != null) {
 			final SurfaceRuleProvider provider = SurfaceRuleProvider.class.cast(generator);
@@ -548,11 +548,13 @@ public class BiomeAPI {
 		((BiomeSourceAccessor) source).bclRebuildFeatures();
 	}
 
-	private static void applyModificationsToBiome(List<BiConsumer<ResourceLocation, Biome>> modifications, Biome biome) {
+	private static void applyModificationsAndUpdateFeatures(List<BiConsumer<ResourceLocation, Biome>> modifications, Biome biome) {
 		ResourceLocation biomeID = getBiomeID(biome);
-		modifications.forEach(consumer -> {
-			consumer.accept(biomeID, biome);
-		});
+		if (modifications!=null) {
+			modifications.forEach(consumer -> {
+				consumer.accept(biomeID, biome);
+			});
+		}
 		
 		final BCLBiome bclBiome = BiomeAPI.getBiome(biome);
 		if (bclBiome != null) {
@@ -658,7 +660,7 @@ public class BiomeAPI {
 	/**
 	 * For internal use only!
 	 *
-	 * Adds new features to existing biome. Called from {@link #applyModificationsToBiome(List, Biome)} when the Biome is 
+	 * Adds new features to existing biome. Called from {@link #applyModificationsAndUpdateFeatures(List, Biome)} when the Biome is
 	 * present in any {@link BiomeSource}
 	 * @param biome {@link Biome} to add features in.
 	 * @param featureMap Map of {@link ConfiguredFeature} to add.

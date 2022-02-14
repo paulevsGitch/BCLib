@@ -31,7 +31,8 @@ public class BlocksHelper {
 	public static final Direction[] HORIZONTAL = makeHorizontal();
 	public static final Direction[] DIRECTIONS = Direction.values();
 	
-	private static final MutableBlockPos POS = new MutableBlockPos();
+	private static final ThreadLocal<MutableBlockPos> TL_POS = ThreadLocal.withInitial(() -> new MutableBlockPos());
+	
 	protected static final BlockState AIR = Blocks.AIR.defaultBlockState();
 	protected static final BlockState WATER = Blocks.WATER.defaultBlockState();
 	
@@ -76,6 +77,7 @@ public class BlocksHelper {
 	}
 	
 	public static int downRayRep(LevelAccessor world, BlockPos pos, int maxDist) {
+		final MutableBlockPos POS = TL_POS.get();
 		POS.set(pos);
 		for (int j = 1; j < maxDist && (world.getBlockState(POS)).getMaterial().isReplaceable(); j++) {
 			POS.setY(POS.getY() - 1);
@@ -84,6 +86,7 @@ public class BlocksHelper {
 	}
 	
 	public static int raycastSqr(LevelAccessor world, BlockPos pos, int dx, int dy, int dz, int maxDist) {
+		final MutableBlockPos POS = TL_POS.get();
 		POS.set(pos);
 		for (int j = 1; j < maxDist && (world.getBlockState(POS)).getMaterial().isReplaceable(); j++) {
 			POS.move(dx, dy, dz);

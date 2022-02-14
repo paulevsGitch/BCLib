@@ -50,6 +50,11 @@ public class NoiseGeneratorSettingsMixin implements SurfaceRuleProvider {
 	}
 	
 	private void bclib_setCustomRules(List<RuleSource> rules) {
+		if (rules.size()==0){
+			bclib_clearCustomRules();
+			return;
+		}
+
 		RuleSource org = getOriginalSurfaceRule();
 		if (org instanceof SurfaceRules.SequenceRuleSource sequenceRule){
 			List<RuleSource> currentSequence = sequenceRule.sequence();
@@ -58,6 +63,7 @@ public class NoiseGeneratorSettingsMixin implements SurfaceRuleProvider {
 		} else {
 			rules.add(org);
 		}
+
 		setSurfaceRule(SurfaceRules.sequence(rules.toArray(new RuleSource[rules.size()])));
 	}
 	

@@ -191,4 +191,9 @@ public class BCLibEndBiomeSource extends BCLBiomeSource {
 	public static void register() {
 		Registry.register(Registry.BIOME_SOURCE, BCLib.makeID("end_biome_source"), CODEC);
 	}
+	
+	@Override
+	public String toString() {
+		return "BCLib - The End BiomeSource";
+	}
 }

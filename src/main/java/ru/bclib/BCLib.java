@@ -17,6 +17,7 @@ import ru.bclib.recipes.CraftingRecipes;
 import ru.bclib.registry.BaseBlockEntities;
 import ru.bclib.registry.BaseRegistry;
 import ru.bclib.util.Logger;
+import ru.bclib.util.ModUtil;
 import ru.bclib.world.generator.BCLibEndBiomeSource;
 import ru.bclib.world.generator.BCLibNetherBiomeSource;
 import ru.bclib.world.generator.GeneratorOptions;

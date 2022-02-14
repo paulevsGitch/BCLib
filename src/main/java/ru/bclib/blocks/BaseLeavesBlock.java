@@ -8,6 +8,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LeavesBlock;
@@ -71,21 +72,25 @@ public class BaseLeavesBlock extends LeavesBlock implements BlockModelProvider, 
 	@Override
 	@SuppressWarnings("deprecation")
 	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
+		return BaseLeavesBlock.getLeaveDrops(this, this.sapling, builder, 16, 16);
+	}
+	
+	public static List<ItemStack> getLeaveDrops(ItemLike leaveBlock, Block sapling, LootContext.Builder builder, int fortuneRate, int dropRate) {
 		ItemStack tool = builder.getParameter(LootContextParams.TOOL);
 		if (tool != null) {
 			if (BaseShearsItem.isShear(tool) || EnchantmentHelper.getItemEnchantmentLevel(
 				Enchantments.SILK_TOUCH,
 				tool
 			) > 0) {
-				return Collections.singletonList(new ItemStack(this));
+				return Collections.singletonList(new ItemStack(leaveBlock));
 			}
 			int fortune = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.BLOCK_FORTUNE, tool);
-			if (MHelper.RANDOM.nextInt(16) <= fortune) {
+			if (MHelper.RANDOM.nextInt(fortuneRate) <= fortune) {
 				return Lists.newArrayList(new ItemStack(sapling));
 			}
 			return Lists.newArrayList();
 		}
-		return MHelper.RANDOM.nextInt(16) == 0 ? Lists.newArrayList(new ItemStack(sapling)) : Lists.newArrayList();
+		return MHelper.RANDOM.nextInt(dropRate) == 0 ? Lists.newArrayList(new ItemStack(sapling)) : Lists.newArrayList();
 	}
 	
 	@Override

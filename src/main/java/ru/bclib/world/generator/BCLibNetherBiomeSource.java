@@ -153,4 +153,9 @@ public class BCLibNetherBiomeSource extends BCLBiomeSource {
 			this.biomeMap = mapConstructor.apply(seed, GeneratorOptions.getBiomeSizeNether(), BiomeAPI.NETHER_BIOME_PICKER);
 		}
 	}
+	
+	@Override
+	public String toString() {
+		return "BCLib - Nether BiomeSource";
+	}
 }

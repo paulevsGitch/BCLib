@@ -76,6 +76,7 @@ public class ModListScreen extends BCLibScreen {
 		final int STATE_OK = 6;
 		final int STATE_SERVER_MISSING_CLIENT_MOD = 5;
 		final int STATE_MISSING_NOT_OFFERED = 4;
+		final int STATE_VERSION_CLIENT_ONLY = 7;
 		final int STATE_VERSION_NOT_OFFERED = 3;
 		final int STATE_VERSION = 2;
 		final int STATE_SERVER_MISSING = 1;
@@ -114,7 +115,10 @@ public class ModListScreen extends BCLibScreen {
 					final String modVer = data.version();
 					final int size = data.size();
 					if (!modVer.equals(mod.getVersion())) {
-						state = data.canDownload()?STATE_VERSION:STATE_VERSION_NOT_OFFERED;
+						if (mod.metadata.getEnvironment() == ModEnvironment.CLIENT)
+							state = STATE_VERSION_CLIENT_ONLY;
+						else
+							state = data.canDownload()?STATE_VERSION:STATE_VERSION_NOT_OFFERED;
 						serverVersion = modVer;
 						serverSize = size;
 					}
@@ -150,10 +154,12 @@ public class ModListScreen extends BCLibScreen {
 
 					int color = GridLayout.COLOR_RED;
 					final String typeText;
-					if (state==STATE_VERSION || state==STATE_VERSION_NOT_OFFERED) {
+					if (state==STATE_VERSION || state==STATE_VERSION_NOT_OFFERED || state==STATE_VERSION_CLIENT_ONLY) {
 						typeText = "[VERSION]";
 						if (state == STATE_VERSION_NOT_OFFERED) {
 							color = GridLayout.COLOR_YELLOW;
+						} else if (state == STATE_VERSION_CLIENT_ONLY) {
+							color = GridLayout.COLOR_DARK_GREEN;
 						}
 					} else if (state==STATE_MISSING || state==STATE_MISSING_NOT_OFFERED) {
 						typeText = "[MISSING]";

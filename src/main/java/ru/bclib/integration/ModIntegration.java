@@ -1,4 +1,4 @@
-package ru.bclib.integration.modmenu;
+package ru.bclib.integration;
 
 import net.fabricmc.fabric.api.tag.TagFactory;
 import net.fabricmc.loader.api.FabricLoader;
