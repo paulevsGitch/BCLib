@@ -1,5 +1,6 @@
 package ru.bclib.world.generator.map.hex;
 
+import com.google.common.collect.Maps;
 import net.minecraft.world.level.ChunkPos;
 import ru.bclib.interfaces.BiomeChunk;
 import ru.bclib.interfaces.BiomeMap;
@@ -9,8 +10,7 @@ import ru.bclib.util.MHelper;
 import ru.bclib.world.biomes.BCLBiome;
 import ru.bclib.world.generator.BiomePicker;
 
-import java.awt.Point;
-import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 public class HexBiomeMap implements BiomeMap {
@@ -22,7 +22,7 @@ public class HexBiomeMap implements BiomeMap {
 	private static final float[] EDGE_CIRCLE_X;
 	private static final float[] EDGE_CIRCLE_Z;
 	
-	private final HashMap<ChunkPos, HexBiomeChunk> chunks = new HashMap<>();
+	private final Map<ChunkPos, HexBiomeChunk> chunks = Maps.newConcurrentMap();
 	private final BiomePicker picker;
 	
 	private final OpenSimplexNoise[] noises = new OpenSimplexNoise[2];
