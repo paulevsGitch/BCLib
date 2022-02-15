@@ -19,12 +19,13 @@ public class HexBiomeChunk implements BiomeChunk {
 	private static final byte SIDE_OFFSET = (byte) Math.round(Math.log(SIDE) / Math.log(2));
 	private static final byte SIDE_PRE_OFFSET = (byte) Math.round(Math.log(SIDE_PRE) / Math.log(2));
 	private static final short[][] NEIGHBOURS;
-	private static final BCLBiome[][] BUFFERS = new BCLBiome[2][SIZE];
 	
 	private final BCLBiome[] biomes = new BCLBiome[SIZE];
 	
 	public HexBiomeChunk(Random random, BiomePicker picker) {
-		for (BCLBiome[] buffer: BUFFERS) {
+		BCLBiome[][] buffers = new BCLBiome[2][SIZE];
+		
+		for (BCLBiome[] buffer: buffers) {
 			Arrays.fill(buffer, null);
 		}
 		
@@ -33,15 +34,15 @@ public class HexBiomeChunk implements BiomeChunk {
 			byte pz = (byte) (index & SIDE_PRE_MASK);
 			px = (byte) (px * SCALE_PRE + random.nextInt(SCALE_PRE));
 			pz = (byte) (pz * SCALE_PRE + random.nextInt(SCALE_PRE));
-			circle(BUFFERS[0], getIndex(px, pz), picker.getBiome(random), null);
+			circle(buffers[0], getIndex(px, pz), picker.getBiome(random), null);
 		}
 		
 		boolean hasEmptyCells = true;
 		byte bufferIndex = 0;
 		while (hasEmptyCells) {
-			BCLBiome[] inBuffer = BUFFERS[bufferIndex];
+			BCLBiome[] inBuffer = buffers[bufferIndex];
 			bufferIndex = (byte) ((bufferIndex + 1) & 1);
-			BCLBiome[] outBuffer = BUFFERS[bufferIndex];
+			BCLBiome[] outBuffer = buffers[bufferIndex];
 			hasEmptyCells = false;
 			
 			for (short index = SIDE; index < MAX_SIDE; index++) {
@@ -63,7 +64,7 @@ public class HexBiomeChunk implements BiomeChunk {
 			}
 		}
 		
-		BCLBiome[] outBuffer = BUFFERS[bufferIndex];
+		BCLBiome[] outBuffer = buffers[bufferIndex];
 		byte preN = (byte) (SIDE_MASK - 2);
 		for (byte index = 0; index < SIDE; index++) {
 			outBuffer[getIndex(index, (byte) 0)] = outBuffer[getIndex(index, (byte) 2)];

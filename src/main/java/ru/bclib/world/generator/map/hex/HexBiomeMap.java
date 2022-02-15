@@ -38,7 +38,7 @@ public class HexBiomeMap implements BiomeMap {
 		noises[0] = new OpenSimplexNoise(random.nextInt());
 		noises[1] = new OpenSimplexNoise(random.nextInt());
 		noiseIterations = (byte) Math.min(Math.ceil(Math.log(scale) / Math.log(2)), 5);
-		this.seed = (int) (seed & 0xFFFFFFFF);
+		this.seed = random.nextInt();
 	}
 	
 	@Override
@@ -73,8 +73,8 @@ public class HexBiomeMap implements BiomeMap {
 	}
 	
 	@Override
-	public BiomeChunk getChunk(int cx, int cz, boolean update) {
-		ChunkPos pos = new ChunkPos(cx, cz);
+	public BiomeChunk getChunk(final int cx, final int cz, final boolean update) {
+		final ChunkPos pos = new ChunkPos(cx, cz);
 		return chunks.computeIfAbsent(pos, i -> {
 			Random random = new Random(MHelper.getSeed(seed, cx, cz));
 			HexBiomeChunk chunk = new HexBiomeChunk(random, picker);
