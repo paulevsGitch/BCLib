@@ -75,14 +75,16 @@ public class HexBiomeMap implements BiomeMap {
 	@Override
 	public BiomeChunk getChunk(final int cx, final int cz, final boolean update) {
 		final ChunkPos pos = new ChunkPos(cx, cz);
-		return chunks.computeIfAbsent(pos, i -> {
+		HexBiomeChunk chunk = chunks.get(pos);
+		if (chunk == null) {
 			Random random = new Random(MHelper.getSeed(seed, cx, cz));
-			HexBiomeChunk chunk = new HexBiomeChunk(random, picker);
+			chunk = new HexBiomeChunk(random, picker);
 			if (update && processor != null) {
 				processor.accept(cx, cz, chunk.getSide());
 			}
-			return chunk;
-		});
+			chunks.put(pos, chunk);
+		}
+		return chunk;
 	}
 	
 	@Override
