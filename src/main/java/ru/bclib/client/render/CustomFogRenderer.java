@@ -26,6 +26,10 @@ public class CustomFogRenderer {
 	private static float fogEnd = 192;
 	
 	public static boolean applyFogDensity(Camera camera, float viewDistance, boolean thickFog) {
+		if (!Configs.CLIENT_CONFIG.renderCustomFog()) {
+			return false;
+		}
+		
 		FogType fogType = camera.getFluidInCamera();
 		if (fogType != FogType.NONE) {
 			BackgroundInfo.fogDensity = 1;

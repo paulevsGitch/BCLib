@@ -51,5 +51,8 @@
 	"message.bclib.datafixer.progress": "Применение всех патчей к вашему миру.",
 	"title.bclib.datafixer.error": "Ошибки при исправлении мира",
 	"message.bclib.datafixer.error": "Были ошибки при восстановлении мира. Это означает, что этот мир, вероятно, находится в несогласованном состоянии, и вам не следует играть в него. Прежде чем повторить попытку, восстановите резервную копию и исправьте ошибки, указанные ниже.",
-	"title.bclib.datafixer.error.continue": "Продолжить и отметить как исправленное"
+	"title.bclib.datafixer.error.continue": "Продолжить и отметить как исправленное",
+	
+	"title.config.bclib.client.rendering.customFogRendering": "Пользовательский рендеринг тумана",
+	"title.config.bclib.client.rendering.netherThickFog": "Плотный туман в Нижнем мире"
 }

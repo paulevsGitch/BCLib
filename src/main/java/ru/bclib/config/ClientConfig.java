@@ -22,6 +22,8 @@ public class ClientConfig extends NamedPathConfig {
 	public static final ConfigToken<Boolean> DEBUG_HASHES = ConfigToken.Boolean(false, "debugHashes", AutoSync.SYNC_CATEGORY);
 	
 	@ConfigUI(leftPadding = 8)
+	public static final ConfigToken<Boolean> CUSTOM_FOG_RENDERING = ConfigToken.Boolean(true, "customFogRendering", "rendering");
+	@ConfigUI(leftPadding = 8)
 	public static final ConfigToken<Boolean> NETHER_THICK_FOG = ConfigToken.Boolean(true, "netherThickFog", "rendering");
 	
 	public ClientConfig() {
@@ -58,5 +60,9 @@ public class ClientConfig extends NamedPathConfig {
 	
 	public boolean netherThickFog() {
 		return get(NETHER_THICK_FOG);
+	}
+	
+	public boolean renderCustomFog() {
+		return get(CUSTOM_FOG_RENDERING);
 	}
 }

@@ -51,5 +51,8 @@
 	"message.bclib.datafixer.progress": "Applying all Patches to your World.",
 	"title.bclib.datafixer.error": "Errors while fixing World",
 	"message.bclib.datafixer.error": "There were errors while repairing the world. This means that this level is probably in an inconsistent state and you should not play it. Please restore your backup and fix the errors below before trying again.",
-	"title.bclib.datafixer.error.continue": "Fortfahren und als behoben markieren"
+	"title.bclib.datafixer.error.continue": "Proceed and mark as fixed",
+	
+	"title.config.bclib.client.rendering.customFogRendering": "Custom Fog Rendering",
+	"title.config.bclib.client.rendering.netherThickFog": "Nether Thick Fog"
 }
