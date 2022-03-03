@@ -50,7 +50,7 @@ public abstract class NoiseBasedChunkGeneratorMixin implements SurfaceProvider, 
 	
 	@Override
 	@SuppressWarnings("deprecation")
-	public BlockState getSurface(BlockPos pos, Biome biome, ServerLevel level) {
+	public BlockState bclib_getSurface(BlockPos pos, Biome biome, ServerLevel level) {
 		ChunkAccess chunkAccess = level.getChunk(pos.getX() >> 4, pos.getZ() >> 4);
 		StructureFeatureManager structureFeatureManager = level.structureFeatureManager();
 		NoiseBasedChunkGenerator generator = NoiseBasedChunkGenerator.class.cast(this);

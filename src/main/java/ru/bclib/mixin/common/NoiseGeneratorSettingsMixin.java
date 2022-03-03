@@ -55,7 +55,7 @@ public class NoiseGeneratorSettingsMixin implements SurfaceRuleProvider {
 			return;
 		}
 
-		RuleSource org = getOriginalSurfaceRule();
+		RuleSource org = bclib_getOriginalSurfaceRule();
 		if (org instanceof SurfaceRules.SequenceRuleSource sequenceRule){
 			List<RuleSource> currentSequence = sequenceRule.sequence();
 			rules = rules.stream().filter(r -> currentSequence.indexOf(r)<0).collect(Collectors.toList());
@@ -64,17 +64,17 @@ public class NoiseGeneratorSettingsMixin implements SurfaceRuleProvider {
 			rules.add(org);
 		}
 
-		setSurfaceRule(SurfaceRules.sequence(rules.toArray(new RuleSource[rules.size()])));
+		bclib_setSurfaceRule(SurfaceRules.sequence(rules.toArray(new RuleSource[rules.size()])));
 	}
 	
-	void setSurfaceRule(SurfaceRules.RuleSource surfaceRule) {
+	void bclib_setSurfaceRule(SurfaceRules.RuleSource surfaceRule) {
 		if (bclib_originalSurfaceRule == null){
 			bclib_originalSurfaceRule = this.surfaceRule;
 		}
 		this.surfaceRule = surfaceRule;
 	}
 	
-	RuleSource getOriginalSurfaceRule() {
+	RuleSource bclib_getOriginalSurfaceRule() {
 		if (bclib_originalSurfaceRule ==null) {
 			return surfaceRule;
 		}

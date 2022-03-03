@@ -135,7 +135,7 @@ public class BoneMealItemMixin {
 			BlockState state = world.getBlockState(p);
 			Block terrain = BonemealAPI.getSpreadable(state.getBlock());
 			if (center.is(terrain)) {
-				if (haveSameProperties(state, center)) {
+				if (bclib_haveSameProperties(state, center)) {
 					for (Property property : center.getProperties()) {
 						state = state.setValue(property, center.getValue(property));
 					}
@@ -146,7 +146,7 @@ public class BoneMealItemMixin {
 		return null;
 	}
 	
-	private boolean haveSameProperties(BlockState state1, BlockState state2) {
+	private boolean bclib_haveSameProperties(BlockState state1, BlockState state2) {
 		Property<?>[] properties1 = state1.getProperties().toArray(new Property[0]);
 		Property<?>[] properties2 = state2.getProperties().toArray(new Property[0]);
 		if (properties1.length != properties2.length) {

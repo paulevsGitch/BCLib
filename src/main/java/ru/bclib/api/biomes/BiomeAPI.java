@@ -823,7 +823,7 @@ public class BiomeAPI {
 		ChunkGenerator generator = level.getChunkSource().getGenerator();
 		if (generator instanceof NoiseBasedChunkGenerator) {
 			SurfaceProvider provider = SurfaceProvider.class.cast(generator);
-			return provider.getSurface(pos, biome, level);
+			return provider.bclib_getSurface(pos, biome, level);
 		}
 		return Blocks.AIR.defaultBlockState();
 	}

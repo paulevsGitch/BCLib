@@ -11,7 +11,7 @@ import ru.bclib.api.dataexchange.DataExchangeAPI;
 public class GameMixin {
 	
 	@Inject(method="onStartGameSession", at=@At("TAIL"))
-	public void bcliv_onStart(CallbackInfo ci){
+	public void bclib_onStart(CallbackInfo ci){
 		DataExchangeAPI.sendOnEnter();
 	}
 }
