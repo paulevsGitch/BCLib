@@ -8,6 +8,7 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.Registry;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
+import ru.bclib.BCLib;
 import ru.bclib.api.biomes.BiomeAPI;
 import ru.bclib.api.tag.TagAPI;
 import ru.bclib.api.tag.TagAPI.TagLocation;
@@ -55,6 +56,11 @@ public class PostInitAPI {
 				processBlockClient(block);
 			}
 		});
+		
+		
+		Registry.ITEM.forEach(item -> {
+			processItemCommon(item);
+		});
 		postInitFunctions = null;
 		blockTags = null;
 		itemTags = null;
@@ -74,6 +80,18 @@ public class PostInitAPI {
 		}
 		else if (block instanceof BaseSignBlock) {
 			BaseSignBlockEntityRenderer.registerRenderLayer(block);
+		}
+	}
+	
+	private static void processItemCommon(Item item) {
+		if (item instanceof TagProvider provider){
+			try {
+				provider.addTags(null, itemTags);
+			} catch (NullPointerException ex){
+				BCLib.LOGGER.error(item + " probably tried to access blockTags.", ex);
+			}
+			itemTags.forEach(tag -> TagAPI.addItemTag(tag, item));
+			itemTags.clear();
 		}
 	}
 	
