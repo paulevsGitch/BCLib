@@ -7,6 +7,7 @@ import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.registry.FlammableBlockRegistry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.Tag;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import org.jetbrains.annotations.Nullable;
@@ -32,8 +33,8 @@ public abstract class ComplexMaterial {
 	private final List<BlockEntry> defaultBlockEntries = Lists.newArrayList();
 	private final List<ItemEntry> defaultItemEntries = Lists.newArrayList();
 
-	private final Map<String, Tag.Named<Block>> blockTags = Maps.newHashMap();
-	private final Map<String, Tag.Named<Item>> itemTags = Maps.newHashMap();
+	private final Map<String, TagKey<Block>> blockTags = Maps.newHashMap();
+	private final Map<String, TagKey<Item>> itemTags = Maps.newHashMap();
 	private final Map<String, Block> blocks = Maps.newHashMap();
 	private final Map<String, Item> items = Maps.newHashMap();
 	

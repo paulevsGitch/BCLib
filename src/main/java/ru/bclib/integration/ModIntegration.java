@@ -1,6 +1,5 @@
 package ru.bclib.integration;
 
-import net.fabricmc.fabric.api.tag.TagFactory;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.Registry;
 import net.minecraft.data.BuiltinRegistries;
@@ -9,7 +8,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.Tag;
-import net.minecraft.tags.Tag.Named;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
@@ -197,18 +196,18 @@ public abstract class ModIntegration {
 		return null;
 	}
 	
-	public Tag.Named<Item> getItemTag(String name) {
+	public TagKey<Item> getItemTag(String name) {
 		ResourceLocation id = getID(name);
 		Tag<Item> tag = ItemTags.getAllTags().getTag(id);
 
-		//return tag == null ? (Named<Item>) TagRegistry.item(id) : (Named<Item>) tag;
-		return tag == null ? (Named<Item>) TagFactory.ITEM.create(id) : (Named<Item>) tag;
+		//return tag == null ? (TagKey<Item>) TagRegistry.item(id) : (TagKey<Item>) tag;
+		return tag == null ? (TagKey<Item>) TagFactory.ITEM.create(id) : (TagKey<Item>) tag;
 	}
 	
-	public Tag.Named<Block> getBlockTag(String name) {
+	public TagKey<Block> getBlockTag(String name) {
 		ResourceLocation id = getID(name);
 		Tag<Block> tag = BlockTags.getAllTags().getTag(id);
 		//return tag == null ? (Named<Block>) TagRegistry.block(id) : (Named<Block>) tag;
-		return tag == null ? (Named<Block>) TagFactory.BLOCK.create(id) : (Named<Block>) tag;
+		return tag == null ? (TagKey<Block>) TagFactory.BLOCK.create(id) : (TagKey<Block>) tag;
 	}
 }

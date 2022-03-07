@@ -1,8 +1,6 @@
 package ru.bclib.blocks;
 
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
-import net.fabricmc.fabric.api.tool.attribute.v1.FabricToolTags;
-import net.fabricmc.fabric.impl.object.builder.FabricBlockInternals;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
@@ -60,7 +58,8 @@ public class BaseOreBlock extends OreBlock implements BlockModelProvider {
 	}
 	
 	private static Properties makeProps(Properties properties, int level){
-		FabricBlockInternals.computeExtraData(properties).addMiningLevel(FabricToolTags.PICKAXES, level);
+		//TODO: 1.18.2 make sure this works with the new tag system
+		//FabricBlockInternals.computeExtraData(properties).addMiningLevel(FabricToolTags.PICKAXES, level);
 		return properties;
 	}
 	

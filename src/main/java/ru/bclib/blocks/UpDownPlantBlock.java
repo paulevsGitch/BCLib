@@ -2,7 +2,6 @@ package ru.bclib.blocks;
 
 import com.google.common.collect.Lists;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
-import net.fabricmc.fabric.api.tool.attribute.v1.FabricToolTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.player.Player;
@@ -39,7 +38,8 @@ public abstract class UpDownPlantBlock extends BaseBlockNotFull implements Rende
 	public UpDownPlantBlock() {
 		this(FabricBlockSettings
 			.of(Material.PLANT)
-			.breakByHand(true)
+			//TODO: 1.18.2 make sure this works with the new tag system
+			//.breakByHand(true)
 			.sound(SoundType.GRASS)
 			.noCollission()
 		);

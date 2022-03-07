@@ -24,10 +24,10 @@ public interface BiomeGenerationSettingsAccessor {
 	void bclib_setFeatures(List<List<Supplier<PlacedFeature>>> value);
 	
 	@Accessor("featureSet")
-	Set<PlacedFeature> bclib_getFeatureSet();
+	Supplier<Set<PlacedFeature>> bclib_getFeatureSet();
 	
 	@Accessor("featureSet")
-	void bclib_setFeatureSet(Set<PlacedFeature> features);
+	void bclib_setFeatureSet(Supplier<Set<PlacedFeature>> features);
 	
 	@Accessor("carvers")
 	Map<Carving, List<Supplier<ConfiguredWorldCarver<?>>>> bclib_getCarvers();

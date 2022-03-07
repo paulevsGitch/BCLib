@@ -2,21 +2,20 @@ package ru.bclib.api.tag;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import net.fabricmc.fabric.api.tag.TagFactory;
-import net.fabricmc.fabric.impl.tag.extension.TagDelegate;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
+import net.minecraft.tags.TagKey;
 import net.minecraft.tags.Tag;
-import net.minecraft.tags.Tag.Named;
-import net.minecraft.tags.TagCollection;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import ru.bclib.mixin.common.DiggerItemAccessor;
 
 import java.util.List;
 import java.util.Map;
@@ -29,44 +28,44 @@ public class TagAPI {
 	private static final Map<ResourceLocation, Set<ResourceLocation>> TAGS_ITEM = Maps.newConcurrentMap();
 	
 	/**
-	 * Get or create {@link Tag.Named}.
+	 * Get or create {@link TagNamed}.
 	 *
 	 * @param containerSupplier - {@link TagCollection} {@link Supplier} tag collection;
 	 * @param id				- {@link ResourceLocation} tag id.
-	 * @return {@link Tag.Named}.
+	 * @return {@link TagNamed}.
 	 */
 	public static <T> TagNamed<T> makeTag(Supplier<TagCollection<T>> containerSupplier, TagLocation<T> id) {
 		Tag<T> tag = containerSupplier.get().getTag(id);
-		return tag == null ? new Delegate<>(id, containerSupplier) : CommonDelegate.proxy((Named<T>) tag);
+		return tag == null ? new Delegate<>(id, containerSupplier) : CommonDelegate.proxy((TagKey<T>) tag);
 	}
 	
 	/**
-	 * Get or create {@link Block} {@link Tag.Named} with mod namespace.
+	 * Get or create {@link Block} {@link TagNamed} with mod namespace.
 	 *
 	 * @param modID - {@link String} mod namespace (mod id);
 	 * @param name  - {@link String} tag name.
-	 * @return {@link Block} {@link Tag.Named}.
+	 * @return {@link Block} {@link TagNamed}.
 	 */
 	public static TagNamed<Block> makeBlockTag(String modID, String name) {
 		return makeTag(BlockTags::getAllTags, new TagLocation<>(modID, name));
 	}
 	
 	/**
-	 * Get or create {@link Item} {@link Tag.Named} with mod namespace.
+	 * Get or create {@link Item} {@link TagNamed} with mod namespace.
 	 *
 	 * @param modID - {@link String} mod namespace (mod id);
 	 * @param name  - {@link String} tag name.
-	 * @return {@link Item} {@link Tag.Named}.
+	 * @return {@link Item} {@link TagNamed}.
 	 */
 	public static TagNamed<Item> makeItemTag(String modID, String name) {
 		return makeTag(ItemTags::getAllTags, new TagLocation<>(modID, name));
 	}
 	
 	/**
-	 * Get or create {@link Block} {@link Tag.Named}.
+	 * Get or create {@link Block} {@link TagNamed}.
 	 *
 	 * @param name - {@link String} tag name.
-	 * @return {@link Block} {@link Tag.Named}.
+	 * @return {@link Block} {@link TagNamed}.
 	 * @see <a href="https://fabricmc.net/wiki/tutorial:tags">Fabric Wiki (Tags)</a>
 	 */
 	public static TagNamed<Block> makeCommonBlockTag(String name) {
@@ -74,10 +73,10 @@ public class TagAPI {
 	}
 	
 	/**
-	 * Get or create {@link Item} {@link Tag.Named}.
+	 * Get or create {@link Item} {@link TagNamed}.
 	 *
 	 * @param name - {@link String} tag name.
-	 * @return {@link Item} {@link Tag.Named}.
+	 * @return {@link Item} {@link TagNamed}.
 	 * @see <a href="https://fabricmc.net/wiki/tutorial:tags">Fabric Wiki (Tags)</a>
 	 */
 	public static TagNamed<Item> makeCommonItemTag(String name) {
@@ -85,16 +84,16 @@ public class TagAPI {
 	}
 	
 	/**
-	 * Get or create Minecraft {@link Block} {@link Tag.Named}.
+	 * Get or create Minecraft {@link Block} {@link TagNamed}.
 	 *
 	 * @param name - {@link String} tag name.
-	 * @return {@link Block} {@link Tag.Named}.
+	 * @return {@link Block} {@link TagNamed}.
 	 */
 	@Deprecated(forRemoval = true)
 	public static TagNamed<Block> getMCBlockTag(String name) {
 		ResourceLocation id = new ResourceLocation(name);
 		Tag<Block> tag = BlockTags.getAllTags().getTag(id);
-		return CommonDelegate.proxy(tag == null ? (Named<Block>) TagFactory.BLOCK.create(id): (Named<Block>) tag);
+		return CommonDelegate.proxy(tag == null ? (TagKey<Block>) TagFactory.BLOCK.create(id): (TagKey<Block>) tag);
 	}
 	
 	/**
@@ -217,11 +216,11 @@ public class TagAPI {
 	}
 	
 	/**
-	 * Extends {@link Tag.Named} to return a type safe {@link TagLocation}. This Type was introduced to
+	 * Extends {@link TagNamed} to return a type safe {@link TagLocation}. This Type was introduced to
 	 * allow type-safe definition of Tags using their ResourceLocation.
 	 * @param <T> The Type of the underlying {@link Tag}
 	 */
-	public interface TagNamed<T> extends Tag.Named<T>{
+	public interface TagNamed<T> extends TagKey<T>{
 		TagLocation<T> getName();
 	}
 	
@@ -243,18 +242,18 @@ public class TagAPI {
 			super(location.getNamespace(), location.getPath());
 		}
 
-		public static<R> TagLocation<R> of(Tag.Named<R> tag){
+		public static<R> TagLocation<R> of(TagKey<R> tag){
 			return new TagLocation<R>(tag.getName());
 		}
 	}
 	
 	private abstract static class CommonDelegate<T>  implements TagNamed<T> {
-		protected final Tag.Named<T> delegate;
-		protected CommonDelegate(Tag.Named<T> source){
+		protected final TagKey<T> delegate;
+		protected CommonDelegate(TagKey<T> source){
 			this.delegate = source;
 		}
 		
-		public static<T> TagNamed<T> proxy(Tag.Named<T> source){
+		public static<T> TagNamed<T> proxy(TagKey<T> source){
 			if (source instanceof TagNamed typed) return typed;
 			return new ProxyDelegate<>(source);
 		}
@@ -297,5 +296,12 @@ public class TagAPI {
 		public TagLocation<T> getName(){
 			return (TagLocation<T>)delegate.getName();
 		}
+	}
+
+	public static boolean isToolWithMineableTag(ItemStack stack, TagLocation<Block> tag){
+		if (stack.getItem() instanceof DiggerItemAccessor dig){
+			return dig.bclib_getBlockTag().location().equals(tag);
+		}
+		return false;
 	}
 }

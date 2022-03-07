@@ -4,7 +4,6 @@ import com.google.common.collect.Lists;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
-import net.fabricmc.fabric.api.tool.attribute.v1.FabricToolTags;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -60,7 +59,8 @@ public abstract class BasePlantBlock extends BaseBlockNotFull implements RenderL
 		this(
 			FabricBlockSettings
 				.of(replaceable ? Material.REPLACEABLE_PLANT : Material.PLANT)
-				.breakByHand(true)
+					//TODO: 1.18.2 make sure this works with the new tag system
+					//.breakByHand(true)
 				.sound(SoundType.GRASS)
 				.noCollission()
 		);
