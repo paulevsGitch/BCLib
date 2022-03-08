@@ -11,6 +11,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import ru.bclib.mixin.common.DiggerItemAccessor;
@@ -38,6 +39,18 @@ public class TagAPI {
 				.findAny()
 				.orElse(TagKey.create(registry.key(), id));
 	}
+
+	/**
+	 * Get or create {@link Block} {@link TagKey} with mod namespace.
+	 *
+	 * @param modID - {@link String} mod namespace (mod id);
+	 * @param name  - {@link String} tag name.
+	 * @return {@link Block} {@link TagKey}.
+	 */
+	public static TagKey<Biome> makeBiomeTag(String modID, String name) {
+		return TagKey.create(Registry.BIOME_REGISTRY, new ResourceLocation(modID, name));
+	}
+
 	
 	/**
 	 * Get or create {@link Block} {@link TagKey} with mod namespace.

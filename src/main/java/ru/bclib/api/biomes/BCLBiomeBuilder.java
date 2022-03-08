@@ -1,6 +1,7 @@
 package ru.bclib.api.biomes;
 
 import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
+import net.minecraft.core.Holder;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.data.BuiltinRegistries;
 import net.minecraft.data.worldgen.BiomeDefaultFeatures;
@@ -500,7 +501,7 @@ public class BCLBiomeBuilder {
 	 * @param feature {@link PlacedFeature}.
 	 * @return same {@link BCLBiomeBuilder} instance.
 	 */
-	public BCLBiomeBuilder feature(Decoration decoration, PlacedFeature feature) {
+	public BCLBiomeBuilder feature(Decoration decoration, Holder<PlacedFeature> feature) {
 		getGeneration().addFeature(decoration, feature);
 		return this;
 	}

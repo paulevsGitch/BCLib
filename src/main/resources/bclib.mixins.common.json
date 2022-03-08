@@ -42,7 +42,9 @@
 		"AnvilMenuMixin",
 		"TagLoaderMixin",
 		"MainMixin",
-		"BiomeAccessor"
+		"BiomeAccessor",
+		"StructureFeatureAccessor",
+		"StructureFeaturesAccessor"
 	],
 	"injectors": {
 		"defaultRequire": 1

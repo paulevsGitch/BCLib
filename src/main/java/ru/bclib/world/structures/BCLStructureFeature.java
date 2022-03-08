@@ -1,22 +1,27 @@
 package ru.bclib.world.structures;
 
 import com.google.common.collect.Lists;
-import net.fabricmc.fabric.api.structure.v1.FabricStructureBuilder;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.core.QuartPos;
-import net.minecraft.data.BuiltinRegistries;
-import net.minecraft.data.worldgen.StructureFeatures;
+import net.minecraft.core.Registry;
 import net.minecraft.data.worldgen.StructureSets;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
 import net.minecraft.world.level.levelgen.feature.StructureFeature;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
 import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
-import net.minecraft.world.level.levelgen.structure.BuiltinStructures;
+import net.minecraft.world.level.levelgen.structure.StructureSet;
 import net.minecraft.world.level.levelgen.structure.pieces.PieceGeneratorSupplier;
 import net.minecraft.world.level.levelgen.structure.placement.RandomSpreadStructurePlacement;
 import net.minecraft.world.level.levelgen.structure.placement.RandomSpreadType;
+import ru.bclib.api.tag.TagAPI;
+import ru.bclib.mixin.common.StructureFeatureAccessor;
+import ru.bclib.mixin.common.StructureFeaturesAccessor;
 
 import java.util.List;
 import java.util.Random;
@@ -24,11 +29,14 @@ import java.util.Random;
 public class BCLStructureFeature {
 	private static final Random RANDOM = new Random(354);
 	private final StructureFeature<NoneFeatureConfiguration> structure;
-	private final ConfiguredStructureFeature<?, ?> featureConfigured;
+	private final Holder<ConfiguredStructureFeature<?, ?>> featureConfigured;
 	private final GenerationStep.Decoration featureStep;
 	private final List<ResourceLocation> biomes = Lists.newArrayList();
 	private final ResourceLocation id;
-	
+	public final TagKey<Biome> biomeTag;
+	public final ResourceKey<ConfiguredStructureFeature<?, ?>> structureKey;
+	public final ResourceKey<StructureSet> structureSetKey;
+
 	public BCLStructureFeature(ResourceLocation id, StructureFeature<NoneFeatureConfiguration> structure, GenerationStep.Decoration step, int spacing, int separation) {
 		this.id = id;
 		this.featureStep = step;
@@ -42,14 +50,15 @@ public class BCLStructureFeature {
 		//public static final StructureFeature<NoneFeatureConfiguration> JUNGLE_TEMPLE =
 		//      StructureFeature.register("jungle_pyramid", new JunglePyramidFeature(NoneFeatureConfiguration.CODEC), GenerationStep.Decoration.SURFACE_STRUCTURES);
 		//
+
 		final RandomSpreadStructurePlacement spreadConfig = new RandomSpreadStructurePlacement(spacing, separation, RandomSpreadType.LINEAR, RANDOM.nextInt(8192));
-		this.structure = FabricStructureBuilder
-			.create(id, structure)
-			.step(step)
-			.defaultConfig(spacing, separation, RANDOM.nextInt(8192))
-			.register();
-		this.featureConfigured = this.structure.configured(NoneFeatureConfiguration.NONE);
-		BuiltinRegistries.register(BuiltinRegistries.CONFIGURED_STRUCTURE_FEATURE, id, this.featureConfigured);
+		this.structureKey = ResourceKey.create(Registry.CONFIGURED_STRUCTURE_FEATURE_REGISTRY, id);
+		this.structureSetKey = ResourceKey.create(Registry.STRUCTURE_SET_REGISTRY, id);
+
+		this.biomeTag = TagAPI.makeBiomeTag(id.getNamespace(), "has_structure/"+id.getPath());
+		this.structure = StructureFeatureAccessor.callRegister(id.toString(), structure, step);
+		this.featureConfigured = StructureFeaturesAccessor.callRegister(structureKey, this.structure.configured(NoneFeatureConfiguration.NONE, biomeTag));
+		StructureSets.register(structureSetKey, featureConfigured, spreadConfig);
 		//TODO: 1.18 check if structures are added correctly
 		//FlatChunkGeneratorConfigAccessor.getStructureToFeatures().put(this.structure, this.featureConfigured);
 	}
