@@ -3,7 +3,7 @@ package ru.bclib.world.generator;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.Registry;
-import net.minecraft.resources.RegistryLookupCodec;
+import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biome.BiomeCategory;
@@ -15,6 +15,7 @@ import ru.bclib.api.biomes.BiomeAPI;
 import ru.bclib.config.ConfigKeeper.StringArrayEntry;
 import ru.bclib.config.Configs;
 import ru.bclib.interfaces.BiomeMap;
+import ru.bclib.mixin.common.BiomeAccessor;
 import ru.bclib.world.biomes.BCLBiome;
 import ru.bclib.world.generator.map.MapStack;
 import ru.bclib.world.generator.map.hex.HexBiomeMap;
@@ -23,13 +24,22 @@ import ru.bclib.world.generator.map.square.SquareBiomeMap;
 import java.util.List;
 
 public class BCLibNetherBiomeSource extends BCLBiomeSource {
-	public static final Codec<BCLibNetherBiomeSource> CODEC = RecordCodecBuilder.create((instance) -> {
-		return instance.group(RegistryLookupCodec.create(Registry.BIOME_REGISTRY).forGetter((theEndBiomeSource) -> {
-			return theEndBiomeSource.biomeRegistry;
-		}), Codec.LONG.fieldOf("seed").stable().forGetter((theEndBiomeSource) -> {
-			return theEndBiomeSource.seed;
-		})).apply(instance, instance.stable(BCLibNetherBiomeSource::new));
-	});
+
+	public static final Codec<BCLibNetherBiomeSource> CODEC = RecordCodecBuilder
+			.create(instance -> instance
+					.group(RegistryOps
+									.retrieveRegistry(Registry.BIOME_REGISTRY)
+									.forGetter(source -> source.biomeRegistry)
+							,
+							Codec
+									.LONG
+									.fieldOf("seed")
+									.stable()
+									.forGetter(source -> source.seed)
+					)
+					.apply(instance, instance.stable(BCLibNetherBiomeSource::new))
+			);
+
 	private BiomeMap biomeMap;
 
 	private static boolean forceLegacyGenerator = false;
@@ -95,7 +105,7 @@ public class BCLibNetherBiomeSource extends BCLBiomeSource {
 				return true;
 			}
 			
-			if (GeneratorOptions.addNetherBiomesByCategory() && biome.getBiomeCategory() == BiomeCategory.NETHER) {
+			if (GeneratorOptions.addNetherBiomesByCategory() && (biome instanceof BiomeAccessor) && ((BiomeAccessor)(Object)biome).bclib_getBiomeCategory()== BiomeCategory.NETHER) {
 				return true;
 			}
 			

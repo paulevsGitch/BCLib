@@ -6,7 +6,6 @@ import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.registry.FlammableBlockRegistry;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.Tag;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -106,39 +105,39 @@ public abstract class ComplexMaterial {
 	
 	/**
 	 * Adds custom block tag for this {@link ComplexMaterial}, tag can be created with {@link TagAPI} or you can use one of already created tags.
-	 * @param tag {@link Tag.Named} for {@link Block}
+	 * @param tag {@link TagKey} for {@link Block}
 	 */
-	protected void addBlockTag(Tag.Named<Block> tag) {
-		String key = tag.getName().getPath().replace(getBaseName() + "_", "");
+	protected void addBlockTag(TagKey<Block> tag) {
+		String key = tag.location().getPath().replace(getBaseName() + "_", "");
 		blockTags.put(key, tag);
 	}
 	
 	/**
-	 * Adds custom iten tag for this {@link ComplexMaterial}, tag can be created with {@link TagAPI} or you can use one of already created tags.
-	 * @param tag {@link Tag.Named} for {@link Item}
+	 * Adds custom item tag for this {@link ComplexMaterial}, tag can be created with {@link TagAPI} or you can use one of already created tags.
+	 * @param tag {@link TagKey} for {@link Item}
 	 */
-	protected void addItemTag(Tag.Named<Item> tag) {
-		String key = tag.getName().getPath().replace(getBaseName() + "_", "");
+	protected void addItemTag(TagKey<Item> tag) {
+		String key = tag.location().getPath().replace(getBaseName() + "_", "");
 		itemTags.put(key, tag);
 	}
 	
 	/**
-	 * Get custom {@link Block} {@link Tag.Named} from this {@link ComplexMaterial}.
+	 * Get custom {@link Block} {@link TagKey} from this {@link ComplexMaterial}.
 	 * @param key {@link String} tag name (path of its {@link ResourceLocation}), for inner tags created inside material its tag suffix.
-	 * @return {@link Tag.Named} for {@link Block} or {@code null} if nothing is stored.
+	 * @return {@link TagKey} for {@link Block} or {@code null} if nothing is stored.
 	 */
 	@Nullable
-	public Tag.Named<Block> getBlockTag(String key) {
+	public TagKey<Block> getBlockTag(String key) {
 		return blockTags.get(key);
 	}
 	
 	/**
-	 * Get custom {@link Item} {@link Tag.Named} from this {@link ComplexMaterial}.
+	 * Get custom {@link Item} {@link TagKey} from this {@link ComplexMaterial}.
 	 * @param key {@link String} tag name (path of its {@link ResourceLocation}), for inner tags created inside material its tag suffix.
-	 * @return {@link Tag.Named} for {@link Item} or {@code null} if nothing is stored.
+	 * @return {@link TagKey} for {@link Item} or {@code null} if nothing is stored.
 	 */
 	@Nullable
-	public Tag.Named<Item> getItemTag(String key) {
+	public TagKey<Item> getItemTag(String key) {
 		return itemTags.get(key);
 	}
 	

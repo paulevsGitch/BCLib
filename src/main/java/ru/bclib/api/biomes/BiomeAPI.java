@@ -646,14 +646,14 @@ public class BiomeAPI {
 	private static void addBiomeFeature(Biome biome, Decoration step, List<PlacedFeature> featureList) {
 		BiomeGenerationSettingsAccessor accessor = (BiomeGenerationSettingsAccessor) biome.getGenerationSettings();
 		List<List<Supplier<PlacedFeature>>> allFeatures = CollectionsUtil.getMutable(accessor.bclib_getFeatures());
-		Set<PlacedFeature> set = CollectionsUtil.getMutable(accessor.bclib_getFeatureSet());
+		Set<PlacedFeature> set = CollectionsUtil.getMutable(accessor.bclib_getFeatureSet().get());
 		List<Supplier<PlacedFeature>> features = getFeaturesList(allFeatures, step);
 		for (var feature : featureList) {
 			features.add(() -> feature);
 			set.add(feature);
 		}
 		accessor.bclib_setFeatures(allFeatures);
-		accessor.bclib_setFeatureSet(set);
+		accessor.bclib_setFeatureSet(()-> set);
 	}
 	
 	/**
@@ -667,7 +667,7 @@ public class BiomeAPI {
 	private static void addStepFeaturesToBiome(Biome biome, Map<Decoration, List<Supplier<PlacedFeature>>> featureMap) {
 		BiomeGenerationSettingsAccessor accessor = (BiomeGenerationSettingsAccessor) biome.getGenerationSettings();
 		List<List<Supplier<PlacedFeature>>> allFeatures = CollectionsUtil.getMutable(accessor.bclib_getFeatures());
-		Set<PlacedFeature> set = CollectionsUtil.getMutable(accessor.bclib_getFeatureSet());
+		Set<PlacedFeature> set = CollectionsUtil.getMutable(accessor.bclib_getFeatureSet().get());
 		
 		for (Decoration step: featureMap.keySet()) {
 			List<Supplier<PlacedFeature>> features = getFeaturesList(allFeatures, step);
@@ -679,7 +679,7 @@ public class BiomeAPI {
 			}
 		}
 		accessor.bclib_setFeatures(allFeatures);
-		accessor.bclib_setFeatureSet(set);
+		accessor.bclib_setFeatureSet(() -> set);
 	}
 	
 	/**
@@ -752,11 +752,11 @@ public class BiomeAPI {
 	/**
 	 * Get biome surface block. Can be used to get terrain material for features or other things.
 	 * @param pos {@link BlockPos} position to get block.
-	 * @param biome {@link Biome} to get block from.
+	 * @param biome {@link Holder<Biome>} to get block from.
 	 * @param level {@link ServerLevel} current server level.
 	 * @return {@link BlockState} with the biome surface or AIR if it fails.
 	 */
-	public static BlockState getBiomeSurfaceBlock(BlockPos pos, Biome biome, ServerLevel level) {
+	public static BlockState getBiomeSurfaceBlock(BlockPos pos,  Holder<Biome> biome, ServerLevel level) {
 		ChunkGenerator generator = level.getChunkSource().getGenerator();
 		if (generator instanceof NoiseBasedChunkGenerator) {
 			SurfaceProvider provider = SurfaceProvider.class.cast(generator);

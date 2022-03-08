@@ -4,7 +4,6 @@
 	"package": "ru.bclib.mixin.common",
 	"compatibilityLevel": "JAVA_17",
 	"mixins": [
-		"SimpleReloadableResourceManagerMixin",
 		"BiomeGenerationSettingsAccessor",
 		"shears.DiggingEnchantmentMixin",
 		"shears.ItemPredicateBuilderMixin",
@@ -42,7 +41,8 @@
 		"AnvilBlockMixin",
 		"AnvilMenuMixin",
 		"TagLoaderMixin",
-		"MainMixin"
+		"MainMixin",
+		"BiomeAccessor"
 	],
 	"injectors": {
 		"defaultRequire": 1

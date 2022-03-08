@@ -242,7 +242,15 @@ public class TagAPI {
 		}
 	}
 
+	public static boolean isToolWithMineableTag(ItemStack stack, TagKey<Block> tag){
+		return isToolWithUntypedMineableTag(stack, tag.location());
+	}
+
 	public static boolean isToolWithMineableTag(ItemStack stack, TagLocation<Block> tag){
+		return isToolWithUntypedMineableTag(stack, tag);
+	}
+
+	private static boolean isToolWithUntypedMineableTag(ItemStack stack, ResourceLocation tag){
 		if (stack.getItem() instanceof DiggerItemAccessor dig){
 			return dig.bclib_getBlockTag().location().equals(tag);
 		}

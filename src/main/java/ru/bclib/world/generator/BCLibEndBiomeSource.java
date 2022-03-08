@@ -3,7 +3,7 @@ package ru.bclib.world.generator;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.Registry;
-import net.minecraft.resources.RegistryLookupCodec;
+import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biome.BiomeCategory;
@@ -29,13 +29,8 @@ import java.util.List;
 import java.util.function.Function;
 
 public class BCLibEndBiomeSource extends BCLBiomeSource {
-	public static final Codec<BCLibEndBiomeSource> CODEC = RecordCodecBuilder.create((instance) -> {
-		return instance.group(RegistryLookupCodec.create(Registry.BIOME_REGISTRY).forGetter((theEndBiomeSource) -> {
-			return theEndBiomeSource.biomeRegistry;
-		}), Codec.LONG.fieldOf("seed").stable().forGetter((theEndBiomeSource) -> {
-			return theEndBiomeSource.seed;
-		})).apply(instance, instance.stable(BCLibEndBiomeSource::new));
-	});
+	public static final Codec<BCLibEndBiomeSource> CODEC = RecordCodecBuilder.create((instance) -> instance.group(RegistryOps
+			.retrieveRegistry(Registry.BIOME_REGISTRY).forGetter((theEndBiomeSource) -> theEndBiomeSource.biomeRegistry), Codec.LONG.fieldOf("seed").stable().forGetter((theEndBiomeSource) -> theEndBiomeSource.seed)).apply(instance, instance.stable(BCLibEndBiomeSource::new)));
 	private static final OpenSimplexNoise SMALL_NOISE = new OpenSimplexNoise(8324);
 	private Function<Point, Boolean> endLandFunction;
 

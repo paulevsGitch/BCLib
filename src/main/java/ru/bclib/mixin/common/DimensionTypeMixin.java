@@ -4,12 +4,17 @@ import com.mojang.serialization.Lifecycle;
 import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.WritableRegistry;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.BiomeSource;
+import net.minecraft.world.level.biome.MultiNoiseBiomeSource;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
+import net.minecraft.world.level.levelgen.structure.StructureSet;
 import net.minecraft.world.level.levelgen.synth.NormalNoise;
+import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -23,41 +28,40 @@ import java.util.OptionalInt;
 @Mixin(DimensionType.class)
 public class DimensionTypeMixin {
 	@Inject(
-		method = "defaultDimensions(Lnet/minecraft/core/RegistryAccess;JZ)Lnet/minecraft/core/MappedRegistry;",
+		method = "defaultDimensions(Lnet/minecraft/core/RegistryAccess;JZ)Lnet/minecraft/core/Registry;",
 		locals = LocalCapture.CAPTURE_FAILHARD,
 		at = @At("TAIL")
 	)
-	private static void bclib_updateDimensions(RegistryAccess registryAccess, long seed, boolean bl, CallbackInfoReturnable<MappedRegistry<LevelStem>> info, MappedRegistry<LevelStem> mappedRegistry, Registry<DimensionType> registry, Registry<Biome> biomeRegistry, Registry<NoiseGeneratorSettings> noiseSettingsRegistry, Registry<NormalNoise.NoiseParameters> noiseParamRegistry) {
-		int id = mappedRegistry.getId(mappedRegistry.get(LevelStem.NETHER));
-		mappedRegistry.registerOrOverride(
-			OptionalInt.of(id),
-			LevelStem.NETHER,
-			new LevelStem(
-				() -> registry.getOrThrow(DimensionType.NETHER_LOCATION),
-				new NoiseBasedChunkGenerator(
-					noiseParamRegistry,
-					new BCLibNetherBiomeSource(biomeRegistry, seed),
-					seed,
-					() -> noiseSettingsRegistry.getOrThrow(NoiseGeneratorSettings.NETHER)
-				)
-			),
-			Lifecycle.stable()
+	private static void bclib_updateDimensions(RegistryAccess registryAccess, long seed, boolean bl, CallbackInfoReturnable<MappedRegistry<LevelStem>> info, @NotNull MappedRegistry<LevelStem> writableRegistry, Registry<DimensionType> registry, Registry<Biome> biomeRegistry, Registry<StructureSet> structureRegistry, Registry<NoiseGeneratorSettings> noiseSettingsRegistry, Registry<NormalNoise.NoiseParameters> noiseParamRegistry) {
+		int id = writableRegistry.getId(writableRegistry.get(LevelStem.NETHER));
+		writableRegistry.register(
+				LevelStem.NETHER, 
+				new LevelStem(
+						registry.getOrCreateHolder(DimensionType.NETHER_LOCATION),
+						new NoiseBasedChunkGenerator(
+								structureRegistry,
+								noiseParamRegistry,
+								new BCLibNetherBiomeSource(biomeRegistry, seed),
+								seed,
+								noiseSettingsRegistry.getOrCreateHolder(NoiseGeneratorSettings.NETHER))
+				),
+				Lifecycle.stable()
 		);
-		
-		id = mappedRegistry.getId(mappedRegistry.get(LevelStem.END));
-		mappedRegistry.registerOrOverride(
-			OptionalInt.of(id),
-			LevelStem.END,
-			new LevelStem(
-				() -> registry.getOrThrow(DimensionType.END_LOCATION),
-				new NoiseBasedChunkGenerator(
-					noiseParamRegistry,
-					new BCLibEndBiomeSource(biomeRegistry, seed),
-					seed,
-					() -> noiseSettingsRegistry.getOrThrow(NoiseGeneratorSettings.END)
-				)
-			),
-			Lifecycle.stable()
+
+
+		id = writableRegistry.getId(writableRegistry.get(LevelStem.END));
+		writableRegistry.register(
+				LevelStem.END,
+				new LevelStem(
+						registry.getOrCreateHolder(DimensionType.END_LOCATION),
+						new NoiseBasedChunkGenerator(
+								structureRegistry,
+								noiseParamRegistry,
+								new BCLibEndBiomeSource(biomeRegistry, seed),
+								seed,
+								noiseSettingsRegistry.getOrCreateHolder(NoiseGeneratorSettings.END))
+				),
+				Lifecycle.stable()
 		);
 	}
 }

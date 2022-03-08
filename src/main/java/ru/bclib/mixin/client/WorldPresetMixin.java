@@ -13,7 +13,7 @@ import ru.bclib.api.biomes.BiomeAPI;
 @Mixin(WorldPreset.class)
 public class WorldPresetMixin {
 	@Inject(method = "create", at = @At("HEAD"))
-	private void bclib_create(RegistryAccess.RegistryHolder registryHolder, long l, boolean bl, boolean bl2, CallbackInfoReturnable<WorldGenSettings> info) {
-		BiomeAPI.initRegistry(registryHolder.registryOrThrow(Registry.BIOME_REGISTRY));
+	private void bclib_create(RegistryAccess registryAccess, long l, boolean bl, boolean bl2, CallbackInfoReturnable<WorldGenSettings> info) {
+		BiomeAPI.initRegistry(registryAccess.registryOrThrow(Registry.BIOME_REGISTRY));
 	}
 }
