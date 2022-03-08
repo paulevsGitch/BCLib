@@ -5,13 +5,18 @@ import net.fabricmc.fabric.api.structure.v1.FabricStructureBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.QuartPos;
 import net.minecraft.data.BuiltinRegistries;
+import net.minecraft.data.worldgen.StructureFeatures;
+import net.minecraft.data.worldgen.StructureSets;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
 import net.minecraft.world.level.levelgen.feature.StructureFeature;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
 import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
+import net.minecraft.world.level.levelgen.structure.BuiltinStructures;
 import net.minecraft.world.level.levelgen.structure.pieces.PieceGeneratorSupplier;
+import net.minecraft.world.level.levelgen.structure.placement.RandomSpreadStructurePlacement;
+import net.minecraft.world.level.levelgen.structure.placement.RandomSpreadType;
 
 import java.util.List;
 import java.util.Random;
@@ -27,6 +32,17 @@ public class BCLStructureFeature {
 	public BCLStructureFeature(ResourceLocation id, StructureFeature<NoneFeatureConfiguration> structure, GenerationStep.Decoration step, int spacing, int separation) {
 		this.id = id;
 		this.featureStep = step;
+		//parts from vanilla for Structure generation
+		//public static final ResourceKey<ConfiguredStructureFeature<?, ?>> JUNGLE_TEMPLE =
+		//     BuiltinStructures.createKey("jungle_pyramid");
+		//public static final Holder<ConfiguredStructureFeature<?, ?>> JUNGLE_TEMPLE =
+		//     StructureFeatures.register(BuiltinStructures.JUNGLE_TEMPLE, StructureFeature.JUNGLE_TEMPLE.configured(NoneFeatureConfiguration.INSTANCE, BiomeTags.HAS_JUNGLE_TEMPLE));
+		//public static final Holder<StructureSet> JUNGLE_TEMPLES =
+		//      StructureSets.register(BuiltinStructureSets.JUNGLE_TEMPLES, StructureFeatures.JUNGLE_TEMPLE, new RandomSpreadStructurePlacement(32, 8, RandomSpreadType.LINEAR, 14357619));
+		//public static final StructureFeature<NoneFeatureConfiguration> JUNGLE_TEMPLE =
+		//      StructureFeature.register("jungle_pyramid", new JunglePyramidFeature(NoneFeatureConfiguration.CODEC), GenerationStep.Decoration.SURFACE_STRUCTURES);
+		//
+		final RandomSpreadStructurePlacement spreadConfig = new RandomSpreadStructurePlacement(spacing, separation, RandomSpreadType.LINEAR, RANDOM.nextInt(8192));
 		this.structure = FabricStructureBuilder
 			.create(id, structure)
 			.step(step)
