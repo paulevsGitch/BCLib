@@ -75,7 +75,7 @@ public class BiomeAPI {
 	
 	private static final Map<ResourceLocation, BCLBiome> ID_MAP = Maps.newHashMap();
 	private static final Map<Biome, BCLBiome> CLIENT = Maps.newHashMap();
-	private static Registry<Holder<Biome>> biomeRegistry;
+	private static Registry<Biome> biomeRegistry;
 	
 	private static final Map<PlacedFeature, Integer> FEATURE_ORDER = Maps.newHashMap();
 	private static final MutableInt FEATURE_ORDER_ID = new MutableInt(0);
@@ -94,8 +94,8 @@ public class BiomeAPI {
 	public static final BCLBiome END_MIDLANDS = registerSubBiome(THE_END, getFromRegistry(Biomes.END_MIDLANDS).value(), 0.5F);
 	public static final BCLBiome END_HIGHLANDS = registerSubBiome(THE_END, getFromRegistry(Biomes.END_HIGHLANDS).value(), 0.5F);
 	
-	public static final BCLBiome END_BARRENS = registerEndVoidBiome(getFromRegistry(new ResourceLocation("end_barrens")).value());
-	public static final BCLBiome SMALL_END_ISLANDS = registerEndVoidBiome(getFromRegistry(new ResourceLocation("small_end_islands")).value());
+	public static final BCLBiome END_BARRENS = registerEndVoidBiome(getFromRegistry(new ResourceLocation("end_barrens")));
+	public static final BCLBiome SMALL_END_ISLANDS = registerEndVoidBiome(getFromRegistry(new ResourceLocation("small_end_islands")));
 
 	private static void initFeatureOrder() {
 		if (!FEATURE_ORDER.isEmpty()) {
@@ -123,7 +123,7 @@ public class BiomeAPI {
 	 * Initialize registry for current server.
 	 * @param biomeRegistry - {@link Registry} for {@link Biome}.
 	 */
-	public static void initRegistry(Registry<Holder<Biome>> biomeRegistry) {
+	public static void initRegistry(Registry<Biome> biomeRegistry) {
 		if (biomeRegistry != BiomeAPI.biomeRegistry) {
 			BiomeAPI.biomeRegistry = biomeRegistry;
 			CLIENT.clear();
@@ -143,15 +143,17 @@ public class BiomeAPI {
 	
 	/**
 	 * Register {@link BCLBiome} instance and its {@link Biome} if necessary.
-	 * @param biome {@link BCLBiome}
+	 * @param bclbiome {@link BCLBiome}
 	 * @return {@link BCLBiome}
 	 */
-	public static BCLBiome registerBiome(BCLBiome biome) {
-		if (BuiltinRegistries.BIOME.get(biome.getID()) == null) {
-			Registry.register(BuiltinRegistries.BIOME, biome.getID(), biome.getBiome());
+	public static BCLBiome registerBiome(BCLBiome bclbiome) {
+		if (BuiltinRegistries.BIOME.get(bclbiome.getID()) == null) {
+			final Biome biome = bclbiome.getBiome();
+			ResourceLocation loc = bclbiome.getID();
+			Registry.register(BuiltinRegistries.BIOME, loc, biome);
 		}
-		ID_MAP.put(biome.getID(), biome);
-		return biome;
+		ID_MAP.put(bclbiome.getID(), bclbiome);
+		return bclbiome;
 	}
 	
 	public static BCLBiome registerSubBiome(BCLBiome parent, BCLBiome subBiome) {
@@ -273,8 +275,8 @@ public class BiomeAPI {
 	 * @param biome {@link BCLBiome}
 	 * @return {@link BCLBiome}
 	 */
-	public static BCLBiome registerEndVoidBiome(Biome biome) {
-		BCLBiome bclBiome = new BCLBiome(biome, null);
+	public static BCLBiome registerEndVoidBiome(Holder<Biome> biome) {
+		BCLBiome bclBiome = new BCLBiome(biome.value(), null);
 		
 		END_VOID_BIOME_PICKER.addBiome(bclBiome);
 		registerBiome(bclBiome);
@@ -288,8 +290,8 @@ public class BiomeAPI {
 	 * @param genChance float generation chance.
 	 * @return {@link BCLBiome}
 	 */
-	public static BCLBiome registerEndVoidBiome(Biome biome, float genChance) {
-		BCLBiome bclBiome = new BCLBiome(biome, VanillaBiomeSettings.createVanilla().setGenChance(genChance).build());
+	public static BCLBiome registerEndVoidBiome(Holder<Biome> biome, float genChance) {
+		BCLBiome bclBiome = new BCLBiome(biome.value(), VanillaBiomeSettings.createVanilla().setGenChance(genChance).build());
 		
 		END_VOID_BIOME_PICKER.addBiome(bclBiome);
 		registerBiome(bclBiome);
@@ -301,7 +303,7 @@ public class BiomeAPI {
 	 * @param biome - {@link Biome} from world.
 	 * @return {@link BCLBiome} or {@code BiomeAPI.EMPTY_BIOME}.
 	 */
-	public static BCLBiome getFromBiome(Holder<Biome> biome) {
+	public static BCLBiome getFromBiome(Biome biome) {
 		if (biomeRegistry == null) {
 			return EMPTY_BIOME;
 		}
@@ -334,7 +336,7 @@ public class BiomeAPI {
 	public static ResourceKey getBiomeKey(Biome biome) {
 		return BuiltinRegistries.BIOME
 			.getResourceKey(biome)
-			.orElse(null);
+			.orElseGet(() -> biomeRegistry != null ? biomeRegistry.getResourceKey(biome).orElse(null) : null);
 	}
 	
 	/**
@@ -344,9 +346,9 @@ public class BiomeAPI {
 	 */
 	public static ResourceLocation getBiomeID(Biome biome) {
 		ResourceLocation id = BuiltinRegistries.BIOME.getKey(biome);
-		// if (id == null && biomeRegistry != null) {
-		//	id = biomeRegistry.getKey(biome);
-		//}
+		if (id == null && biomeRegistry != null) {
+			id = biomeRegistry.getKey(biome);
+		}
 		return id == null ? EMPTY_BIOME.getID() : id;
 	}
 

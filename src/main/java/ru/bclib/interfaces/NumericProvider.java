@@ -12,7 +12,7 @@ import java.util.function.Function;
 
 public interface NumericProvider {
 	ResourceKey<Registry<Codec<? extends NumericProvider>>> NUMERIC_PROVIDER_REGISTRY = ResourceKey.createRegistryKey(BCLib.makeID("worldgen/numeric_provider"));
-	Registry<Codec<? extends NumericProvider>> NUMERIC_PROVIDER = new MappedRegistry<>(NUMERIC_PROVIDER_REGISTRY, Lifecycle.experimental());
+	Registry<Codec<? extends NumericProvider>> NUMERIC_PROVIDER = new MappedRegistry<>(NUMERIC_PROVIDER_REGISTRY, Lifecycle.experimental(), null);
 	Codec<NumericProvider> CODEC = NUMERIC_PROVIDER.byNameCodec().dispatch(NumericProvider::pcodec, Function.identity());
 	int getNumber(SurfaceRulesContextAccessor context);
 

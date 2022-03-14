@@ -31,7 +31,7 @@ public class BCLibNetherBiomeSource extends BCLBiomeSource {
 			.create(instance -> instance
 					.group(RegistryOps
 									.retrieveRegistry(Registry.BIOME_REGISTRY)
-									.forGetter(source -> null)
+									.forGetter(source -> source.biomeRegistry)
 							,
 							Codec
 									.LONG
@@ -67,7 +67,7 @@ public class BCLibNetherBiomeSource extends BCLBiomeSource {
 		BCLibNetherBiomeSource.worldHeight = worldHeight;
 	}
 	
-	public BCLibNetherBiomeSource(Registry<Holder<Biome>> biomeRegistry, long seed) {
+	public BCLibNetherBiomeSource(Registry<Biome> biomeRegistry, long seed) {
 		super(biomeRegistry, seed, getBiomes(biomeRegistry));
 		
 		BiomeAPI.NETHER_BIOME_PICKER.clearMutables();
@@ -97,34 +97,37 @@ public class BCLibNetherBiomeSource extends BCLBiomeSource {
 		initMap();
 	}
 	
-	private static List<Holder<Biome>> getBiomes(Registry<Holder<Biome>> biomeRegistry) {
+	private static List<Holder<Biome>> getBiomes(Registry<Biome> biomeRegistry) {
 		List<String> include = Configs.BIOMES_CONFIG.getEntry("force_include", "nether_biomes", StringArrayEntry.class).getValue();
-		
-		return biomeRegistry.stream().filter(biome -> {
-			ResourceLocation key = biomeRegistry.getKey(biome);
-			
-			if (include.contains(key.toString())) {
-				return true;
-			}
-			
-			if (GeneratorOptions.addNetherBiomesByCategory() && (biome instanceof BiomeAccessor) && ((BiomeAccessor)(Object)biome).bclib_getBiomeCategory()== BiomeCategory.NETHER) {
-				return true;
-			}
-			
-			BCLBiome bclBiome = BiomeAPI.getBiome(key);
-			if (bclBiome != BiomeAPI.EMPTY_BIOME) {
-				if (bclBiome.getParentBiome() != null) {
-					bclBiome = bclBiome.getParentBiome();
-				}
-				key = bclBiome.getID();
-			}
-			final boolean isNetherBiome;
-			if ((Object)biome instanceof BiomeAccessor bacc) {
-				isNetherBiome = bacc.bclib_getBiomeCategory() == BiomeCategory.NETHER;
-			} else {
-				isNetherBiome = false;
-			}
-			return BiomeAPI.NETHER_BIOME_PICKER.containsImmutable(key) || (isNetherBiome && BiomeAPI.isDatapackBiome(key));
+
+		return biomeRegistry.stream()
+				.filter(biome -> biomeRegistry.getResourceKey(biome).isPresent())
+				.map(biome -> biomeRegistry.getOrCreateHolder(biomeRegistry.getResourceKey(biome).get()))
+				.filter(biome -> {
+					ResourceLocation key = biome.unwrapKey().orElseThrow().location();
+
+					if (include.contains(key.toString())) {
+						return true;
+					}
+
+					if (GeneratorOptions.addNetherBiomesByCategory() && (biome instanceof BiomeAccessor) && ((BiomeAccessor)(Object)biome).bclib_getBiomeCategory()== BiomeCategory.NETHER) {
+						return true;
+					}
+
+					BCLBiome bclBiome = BiomeAPI.getBiome(key);
+					if (bclBiome != BiomeAPI.EMPTY_BIOME) {
+						if (bclBiome.getParentBiome() != null) {
+							bclBiome = bclBiome.getParentBiome();
+						}
+						key = bclBiome.getID();
+					}
+					final boolean isNetherBiome;
+					if ((Object)biome instanceof BiomeAccessor bacc) {
+						isNetherBiome = bacc.bclib_getBiomeCategory() == BiomeCategory.NETHER;
+					} else {
+						isNetherBiome = false;
+					}
+					return BiomeAPI.NETHER_BIOME_PICKER.containsImmutable(key) || (isNetherBiome && BiomeAPI.isDatapackBiome(key));
 		}).toList();
 	}
 	

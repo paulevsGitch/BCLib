@@ -45,7 +45,7 @@ public class BCLibEndBiomeSource extends BCLBiomeSource {
 	private BiomeMap mapVoid;
 	private final Point pos;
 	
-	public BCLibEndBiomeSource(Registry<Holder<Biome>> biomeRegistry, long seed) {
+	public BCLibEndBiomeSource(Registry<Biome> biomeRegistry, long seed) {
 		super(biomeRegistry, seed, getBiomes(biomeRegistry));
 
 		BiomeAPI.END_LAND_BIOME_PICKER.clearMutables();
@@ -53,7 +53,7 @@ public class BCLibEndBiomeSource extends BCLBiomeSource {
 		
 		List<String> includeVoid = Configs.BIOMES_CONFIG.getEntry("force_include", "end_void_biomes", StringArrayEntry.class).getValue();
 		this.possibleBiomes().forEach(biome -> {
-			ResourceLocation key = biomeRegistry.getKey(biome);
+			ResourceLocation key = biome.unwrapKey().orElseThrow().location();
 			String group = key.getNamespace() + "." + key.getPath();
 			
 			if (!BiomeAPI.hasBiome(key)) {
@@ -98,8 +98,8 @@ public class BCLibEndBiomeSource extends BCLBiomeSource {
 			this.mapVoid = new HexBiomeMap(seed, GeneratorOptions.getBiomeSizeEndVoid(), BiomeAPI.END_VOID_BIOME_PICKER);
 		}
 		
-		this.centerBiome = biomeRegistry.get(Biomes.THE_END.location());
-		this.barrens = biomeRegistry.get(Biomes.END_BARRENS.location());
+		this.centerBiome = biomeRegistry.getOrCreateHolder(Biomes.THE_END);
+		this.barrens = biomeRegistry.getOrCreateHolder(Biomes.END_BARRENS);
 
 		WorldgenRandom chunkRandom = new WorldgenRandom(new LegacyRandomSource(seed));
 		chunkRandom.consumeCount(17292);
@@ -109,35 +109,39 @@ public class BCLibEndBiomeSource extends BCLBiomeSource {
 		this.pos = new Point();
 	}
 	
-	private static List<Holder<Biome>> getBiomes(Registry<Holder<Biome>> biomeRegistry) {
+	private static List<Holder<Biome>> getBiomes(Registry<Biome> biomeRegistry) {
 		List<String> includeLand = Configs.BIOMES_CONFIG.getEntry("force_include", "end_land_biomes", StringArrayEntry.class).getValue();
 		List<String> includeVoid = Configs.BIOMES_CONFIG.getEntry("force_include", "end_void_biomes", StringArrayEntry.class).getValue();
 		
-		return biomeRegistry.stream().filter(biome -> {
-			ResourceLocation key = biomeRegistry.getKey(biome);
-			
-			if (includeLand.contains(key.toString()) || includeVoid.contains(key.toString())) {
-				return true;
-			}
+		return biomeRegistry.stream()
+				.filter(biome -> biomeRegistry.getResourceKey(biome).isPresent())
+				.map(biome -> biomeRegistry.getOrCreateHolder(biomeRegistry.getResourceKey(biome).get()))
+				.filter(biome -> {
+					ResourceLocation key = biome.unwrapKey().orElseThrow().location();
 
-			final boolean isEndBiome;
-			if ((Object)biome instanceof BiomeAccessor bacc) {
-				isEndBiome = bacc.bclib_getBiomeCategory() == BiomeCategory.THEEND;
-				if (GeneratorOptions.addEndBiomesByCategory() && isEndBiome) {
-					return true;
-				}
-			} else {
-				isEndBiome = false;
-			}
-			
-			BCLBiome bclBiome = BiomeAPI.getBiome(key);
-			if (bclBiome != BiomeAPI.EMPTY_BIOME) {
-				if (bclBiome.getParentBiome() != null) {
-					bclBiome = bclBiome.getParentBiome();
-				}
-				key = bclBiome.getID();
-			}
-			return BiomeAPI.END_LAND_BIOME_PICKER.containsImmutable(key) || BiomeAPI.END_VOID_BIOME_PICKER.containsImmutable(key) || (isEndBiome && BiomeAPI.isDatapackBiome(key));
+
+					if (includeLand.contains(key.toString()) || includeVoid.contains(key.toString())) {
+						return true;
+					}
+
+					final boolean isEndBiome;
+					if ((Object)biome instanceof BiomeAccessor bacc) {
+						isEndBiome = bacc.bclib_getBiomeCategory() == BiomeCategory.THEEND;
+						if (GeneratorOptions.addEndBiomesByCategory() && isEndBiome) {
+							return true;
+						}
+					} else {
+						isEndBiome = false;
+					}
+
+					BCLBiome bclBiome = BiomeAPI.getBiome(key);
+					if (bclBiome != BiomeAPI.EMPTY_BIOME) {
+						if (bclBiome.getParentBiome() != null) {
+							bclBiome = bclBiome.getParentBiome();
+						}
+						key = bclBiome.getID();
+					}
+					return BiomeAPI.END_LAND_BIOME_PICKER.containsImmutable(key) || BiomeAPI.END_VOID_BIOME_PICKER.containsImmutable(key) || (isEndBiome && BiomeAPI.isDatapackBiome(key));
 		}).toList();
 	}
 	

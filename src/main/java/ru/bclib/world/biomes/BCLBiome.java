@@ -191,7 +191,7 @@ public class BCLBiome extends BCLBiomeSettings {
 	 * Recursively update biomes to correct world biome registry instances, for internal usage only.
 	 * @param biomeRegistry {@link Registry} for {@link Biome}.
 	 */
-	public void updateActualBiomes(Registry<Holder<Biome>> biomeRegistry) {
+	public void updateActualBiomes(Registry<Biome> biomeRegistry) {
 		subbiomes.forEach((sub) -> {
 			if (sub != this) {
 				sub.updateActualBiomes(biomeRegistry);
@@ -201,8 +201,8 @@ public class BCLBiome extends BCLBiomeSettings {
 			edge.updateActualBiomes(biomeRegistry);
 		}
 
-		final ResourceKey<Holder<Biome>> key = ResourceKey.create(biomeRegistry.key(), biomeID);
-		this.actualBiome = biomeRegistry.get(key);
+		final ResourceKey<Biome> key = biomeRegistry.getResourceKey(biomeRegistry.get(biomeID)).orElseThrow();
+		this.actualBiome = biomeRegistry.getOrCreateHolder(key);
 		if (actualBiome==null) {
 			BCLib.LOGGER.error("Unable to find actual Biome for " + biomeID);
 		}
