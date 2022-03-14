@@ -191,7 +191,7 @@ public class BCLBiome extends BCLBiomeSettings {
 	 * Recursively update biomes to correct world biome registry instances, for internal usage only.
 	 * @param biomeRegistry {@link Registry} for {@link Biome}.
 	 */
-	public void updateActualBiomes(Registry<Biome> biomeRegistry) {
+	public void updateActualBiomes(Registry<Holder<Biome>> biomeRegistry) {
 		subbiomes.forEach((sub) -> {
 			if (sub != this) {
 				sub.updateActualBiomes(biomeRegistry);
@@ -200,12 +200,15 @@ public class BCLBiome extends BCLBiomeSettings {
 		if (edge != null && edge != this) {
 			edge.updateActualBiomes(biomeRegistry);
 		}
-		this.actualBiome = biomeRegistry.getHolder(ResourceKey.create(Registry.BIOME_REGISTRY, biomeID)).orElse(null);
+
+		final ResourceKey<Holder<Biome>> key = ResourceKey.create(biomeRegistry.key(), biomeID);
+		this.actualBiome = biomeRegistry.get(key);
 		if (actualBiome==null) {
 			BCLib.LOGGER.error("Unable to find actual Biome for " + biomeID);
 		}
 		
 		if (!this.structures.isEmpty()) {
+			//TODO: 1.18.2 This need to be done by BiomeTags now
 			structures.forEach(s -> BiomeAPI.addBiomeStructure(BiomeAPI.getBiomeKey(actualBiome), s));
 		}
 		

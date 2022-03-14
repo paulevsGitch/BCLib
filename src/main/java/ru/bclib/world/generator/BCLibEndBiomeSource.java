@@ -1,10 +1,13 @@
 package ru.bclib.world.generator;
 
+import com.mojang.datafixers.kinds.Applicative;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.RegistryOps;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biome.BiomeCategory;
@@ -31,8 +34,7 @@ import java.util.List;
 import java.util.function.Function;
 
 public class BCLibEndBiomeSource extends BCLBiomeSource {
-	public static Codec<BCLibEndBiomeSource> CODEC = RecordCodecBuilder.create((instance) -> instance.group(RegistryOps
-			.retrieveRegistry(Registry.BIOME_REGISTRY).forGetter((theEndBiomeSource) -> theEndBiomeSource.biomeRegistry), Codec.LONG.fieldOf("seed").stable().forGetter((theEndBiomeSource) -> theEndBiomeSource.seed)).apply(instance, instance.stable(BCLibEndBiomeSource::new)));
+	public static Codec<BCLibEndBiomeSource> CODEC = RecordCodecBuilder.create((instance) -> instance.group(RegistryOps.retrieveRegistry(Registry.BIOME_REGISTRY).forGetter((theEndBiomeSource) -> null), Codec.LONG.fieldOf("seed").stable().forGetter((theEndBiomeSource) -> theEndBiomeSource.seed)).apply(instance, instance.stable(BCLibEndBiomeSource::new)));
 	private static final OpenSimplexNoise SMALL_NOISE = new OpenSimplexNoise(8324);
 	private Function<Point, Boolean> endLandFunction;
 
@@ -43,7 +45,7 @@ public class BCLibEndBiomeSource extends BCLBiomeSource {
 	private BiomeMap mapVoid;
 	private final Point pos;
 	
-	public BCLibEndBiomeSource(Registry<Biome> biomeRegistry, long seed) {
+	public BCLibEndBiomeSource(Registry<Holder<Biome>> biomeRegistry, long seed) {
 		super(biomeRegistry, seed, getBiomes(biomeRegistry));
 
 		BiomeAPI.END_LAND_BIOME_PICKER.clearMutables();
@@ -51,11 +53,11 @@ public class BCLibEndBiomeSource extends BCLBiomeSource {
 		
 		List<String> includeVoid = Configs.BIOMES_CONFIG.getEntry("force_include", "end_void_biomes", StringArrayEntry.class).getValue();
 		this.possibleBiomes().forEach(biome -> {
-			ResourceLocation key = biomeRegistry.getKey(biome.value());
+			ResourceLocation key = biomeRegistry.getKey(biome);
 			String group = key.getNamespace() + "." + key.getPath();
 			
 			if (!BiomeAPI.hasBiome(key)) {
-				BCLBiome bclBiome = new BCLBiome(key, biome);
+				BCLBiome bclBiome = new BCLBiome(key, biome.value());
 				
 				if (includeVoid.contains(key.toString())) {
 					BiomeAPI.END_VOID_BIOME_PICKER.addBiomeMutable(bclBiome);
@@ -96,8 +98,8 @@ public class BCLibEndBiomeSource extends BCLBiomeSource {
 			this.mapVoid = new HexBiomeMap(seed, GeneratorOptions.getBiomeSizeEndVoid(), BiomeAPI.END_VOID_BIOME_PICKER);
 		}
 		
-		this.centerBiome = biomeRegistry.getHolderOrThrow(Biomes.THE_END);
-		this.barrens = biomeRegistry.getHolderOrThrow(Biomes.END_BARRENS);
+		this.centerBiome = biomeRegistry.get(Biomes.THE_END.location());
+		this.barrens = biomeRegistry.get(Biomes.END_BARRENS.location());
 
 		WorldgenRandom chunkRandom = new WorldgenRandom(new LegacyRandomSource(seed));
 		chunkRandom.consumeCount(17292);
@@ -107,7 +109,7 @@ public class BCLibEndBiomeSource extends BCLBiomeSource {
 		this.pos = new Point();
 	}
 	
-	private static List<Biome> getBiomes(Registry<Biome> biomeRegistry) {
+	private static List<Holder<Biome>> getBiomes(Registry<Holder<Biome>> biomeRegistry) {
 		List<String> includeLand = Configs.BIOMES_CONFIG.getEntry("force_include", "end_land_biomes", StringArrayEntry.class).getValue();
 		List<String> includeVoid = Configs.BIOMES_CONFIG.getEntry("force_include", "end_void_biomes", StringArrayEntry.class).getValue();
 		
