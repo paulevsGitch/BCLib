@@ -94,7 +94,7 @@ public class BCLStructureFeature {
 		return structure;
 	}
 	
-	public ConfiguredStructureFeature<?, ?> getFeatureConfigured() {
+	public Holder<ConfiguredStructureFeature<?, ?>> getFeatureConfigured() {
 		return featureConfigured;
 	}
 	

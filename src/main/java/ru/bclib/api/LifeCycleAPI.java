@@ -1,5 +1,6 @@
 package ru.bclib.api;
 
+import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
@@ -49,7 +50,7 @@ public class LifeCycleAPI {
 			LevelStorageSource.LevelStorageAccess levelStorageAccess,
 			ServerLevelData serverLevelData,
 			ResourceKey<Level> resourceKey,
-			DimensionType dimensionType,
+			Holder<DimensionType> dimensionType,
 			ChunkProgressListener chunkProgressListener,
 			ChunkGenerator chunkGenerator,
 			boolean bl,
@@ -114,7 +115,7 @@ public class LifeCycleAPI {
 									 LevelStorageSource.LevelStorageAccess levelStorageAccess,
 									 ServerLevelData serverLevelData,
 									 ResourceKey<Level> resourceKey,
-									 DimensionType dimensionType,
+									 Holder<DimensionType> dimensionType,
 									 ChunkProgressListener chunkProgressListener,
 									 ChunkGenerator chunkGenerator,
 									 boolean bl,

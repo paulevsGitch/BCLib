@@ -1,5 +1,6 @@
 package ru.bclib.mixin.common;
 
+import net.minecraft.core.HolderSet;
 import net.minecraft.world.level.biome.BiomeGenerationSettings;
 import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.GenerationStep.Carving;
@@ -17,11 +18,11 @@ import java.util.function.Supplier;
 @Mixin(BiomeGenerationSettings.class)
 public interface BiomeGenerationSettingsAccessor {
 	@Accessor("features")
-	List<List<Supplier<PlacedFeature>>> bclib_getFeatures();
+	List<HolderSet<PlacedFeature>> bclib_getFeatures();
 	
 	@Accessor("features")
 	@Mutable
-	void bclib_setFeatures(List<List<Supplier<PlacedFeature>>> value);
+	void bclib_setFeatures(List<HolderSet<PlacedFeature>> value);
 	
 	@Accessor("featureSet")
 	Supplier<Set<PlacedFeature>> bclib_getFeatureSet();
@@ -30,8 +31,8 @@ public interface BiomeGenerationSettingsAccessor {
 	void bclib_setFeatureSet(Supplier<Set<PlacedFeature>> features);
 	
 	@Accessor("carvers")
-	Map<Carving, List<Supplier<ConfiguredWorldCarver<?>>>> bclib_getCarvers();
+	Map<GenerationStep.Carving, HolderSet<ConfiguredWorldCarver<?>>> bclib_getCarvers();
 	
 	@Accessor("carvers")
-	void bclib_setCarvers(Map<GenerationStep.Carving, List<Supplier<ConfiguredWorldCarver<?>>>> features);
+	void bclib_setCarvers(Map<GenerationStep.Carving, HolderSet<ConfiguredWorldCarver<?>>> features);
 }

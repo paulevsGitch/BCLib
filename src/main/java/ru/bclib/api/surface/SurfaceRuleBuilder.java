@@ -75,7 +75,7 @@ public class SurfaceRuleBuilder {
 	public SurfaceRuleBuilder subsurface(BlockState state, int depth) {
 		entryInstance = getFromCache("subsurface_" + depth + "_" + state.toString(), () -> {
 			RuleSource rule = SurfaceRules.state(state);
-			rule = SurfaceRules.ifTrue(SurfaceRules.stoneDepthCheck(depth, false, false, CaveSurface.FLOOR), rule);
+			rule = SurfaceRules.ifTrue(SurfaceRules.stoneDepthCheck(depth, false, CaveSurface.FLOOR), rule);
 			return new SurfaceRuleEntry(3, rule);
 		});
 		rules.add(entryInstance);
@@ -117,7 +117,7 @@ public class SurfaceRuleBuilder {
 	public SurfaceRuleBuilder belowFloor(BlockState state, int height, NoiseCondition noise) {
 		entryInstance = getFromCache("below_floor_" + height + "_" + state.toString() + "_" + noise.getClass().getSimpleName(), () -> {
 			RuleSource rule = SurfaceRules.state(state);
-			rule = SurfaceRules.ifTrue(SurfaceRules.stoneDepthCheck(height, false, false, CaveSurface.FLOOR), SurfaceRules.ifTrue(noise, rule));
+			rule = SurfaceRules.ifTrue(SurfaceRules.stoneDepthCheck(height, false, CaveSurface.FLOOR), SurfaceRules.ifTrue(noise, rule));
 			return new SurfaceRuleEntry(3, rule);
 		});
 		rules.add(entryInstance);
@@ -133,7 +133,7 @@ public class SurfaceRuleBuilder {
 	public SurfaceRuleBuilder belowFloor(BlockState state, int height) {
 		entryInstance = getFromCache("below_floor_" + height + "_" + state.toString(), () -> {
 			RuleSource rule = SurfaceRules.state(state);
-			rule = SurfaceRules.ifTrue(SurfaceRules.stoneDepthCheck(height, false, false, CaveSurface.FLOOR), rule);
+			rule = SurfaceRules.ifTrue(SurfaceRules.stoneDepthCheck(height, false, CaveSurface.FLOOR), rule);
 			return new SurfaceRuleEntry(3, rule);
 		});
 		rules.add(entryInstance);
@@ -163,7 +163,7 @@ public class SurfaceRuleBuilder {
 	public SurfaceRuleBuilder aboveCeil(BlockState state, int height) {
 		entryInstance = getFromCache("above_ceil_" + height + "_" + state.toString(), () -> {
 			RuleSource rule = SurfaceRules.state(state);
-			rule = SurfaceRules.ifTrue(SurfaceRules.stoneDepthCheck(height, false, false, CaveSurface.CEILING), rule);
+			rule = SurfaceRules.ifTrue(SurfaceRules.stoneDepthCheck(height, false, CaveSurface.CEILING), rule);
 			return new SurfaceRuleEntry(3, rule);
 		});
 		rules.add(entryInstance);
@@ -179,7 +179,7 @@ public class SurfaceRuleBuilder {
 	public SurfaceRuleBuilder steep(BlockState state, int depth) {
 		entryInstance = getFromCache("steep_" + depth + "_" + state.toString(), () -> {
 			RuleSource rule = SurfaceRules.state(state);
-			rule = SurfaceRules.ifTrue(SurfaceRules.stoneDepthCheck(depth, false, false, CaveSurface.FLOOR), rule);
+			rule = SurfaceRules.ifTrue(SurfaceRules.stoneDepthCheck(depth, false, CaveSurface.FLOOR), rule);
 			rule = SurfaceRules.ifTrue(SurfaceRules.steep(), rule);
 			int priority = depth < 1 ? 0 : 1;
 			return new SurfaceRuleEntry(priority, rule);

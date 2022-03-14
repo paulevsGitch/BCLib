@@ -44,7 +44,8 @@ public class FeatureSaplingBlock extends SaplingBlock implements RenderLayerProv
 	
 	public FeatureSaplingBlock(Function<BlockState, Feature<?>> featureSupplier) {
 		this(FabricBlockSettings.of(Material.PLANT)
-		   .breakByHand(true)
+						//TODO: 1.18.2 Check if this is still ok
+						//.breakByHand(true)
 		   .collidable(false)
 		   .instabreak()
 		   .sound(SoundType.GRASS)
@@ -55,7 +56,8 @@ public class FeatureSaplingBlock extends SaplingBlock implements RenderLayerProv
 	
 	public FeatureSaplingBlock(int light, Function<BlockState, Feature<?>> featureSupplier) {
 		this(FabricBlockSettings.of(Material.PLANT)
-		   .breakByHand(true)
+						//TODO: 1.18.2 Check if this is still ok
+						//.breakByHand(true)
 		   .collidable(false)
 		   .luminance(light)
 		   .instabreak()

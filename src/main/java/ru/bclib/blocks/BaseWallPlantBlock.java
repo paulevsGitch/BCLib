@@ -39,7 +39,8 @@ public abstract class BaseWallPlantBlock extends BasePlantBlock {
 		this(
 			FabricBlockSettings
 				.of(Material.PLANT)
-				.breakByHand(true)
+					//TODO: 1.18.2 Check if this is still ok
+					//.breakByHand(true)
 				.sound(SoundType.GRASS)
 				.noCollission()
 		);
@@ -49,7 +50,8 @@ public abstract class BaseWallPlantBlock extends BasePlantBlock {
 		this(
 			FabricBlockSettings
 				.of(Material.PLANT)
-				.breakByHand(true)
+					//TODO: 1.18.2 Check if this is still ok
+					//.breakByHand(true)
 				.luminance(light)
 				.sound(SoundType.GRASS)
 				.noCollission()

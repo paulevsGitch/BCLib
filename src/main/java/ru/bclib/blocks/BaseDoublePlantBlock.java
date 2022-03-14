@@ -31,6 +31,7 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import ru.bclib.client.render.BCLRenderLayer;
 import ru.bclib.interfaces.RenderLayerProvider;
+import ru.bclib.items.tool.BaseShearsItem;
 import ru.bclib.util.BlocksHelper;
 
 import java.util.List;
@@ -54,7 +55,8 @@ public abstract class BaseDoublePlantBlock extends BaseBlockNotFull implements R
 	public BaseDoublePlantBlock(int light) {
 		this(
 			FabricBlockSettings.of(Material.PLANT)
-				.breakByHand(true)
+					//TODO: 1.18.2 Check if this is still ok
+					//.breakByHand(true)
 				.sound(SoundType.GRASS)
 				.lightLevel((state) -> state.getValue(TOP) ? light : 0)
 				.noCollission()
@@ -117,7 +119,8 @@ public abstract class BaseDoublePlantBlock extends BaseBlockNotFull implements R
 		}
 		
 		ItemStack tool = builder.getParameter(LootContextParams.TOOL);
-		if (tool != null && FabricToolTags.SHEARS.contains(tool.getItem()) || EnchantmentHelper.getItemEnchantmentLevel(
+		//TODO: 1.18.2 Test if shearing still works
+		if (tool != null && BaseShearsItem.isShear(tool) || EnchantmentHelper.getItemEnchantmentLevel(
 			Enchantments.SILK_TOUCH,
 			tool
 		) > 0) {

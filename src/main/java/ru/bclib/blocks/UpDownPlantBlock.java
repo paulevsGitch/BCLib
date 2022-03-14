@@ -29,6 +29,7 @@ import ru.bclib.api.tag.TagAPI.TagLocation;
 import ru.bclib.client.render.BCLRenderLayer;
 import ru.bclib.interfaces.RenderLayerProvider;
 import ru.bclib.interfaces.TagProvider;
+import ru.bclib.items.tool.BaseShearsItem;
 
 import java.util.List;
 
@@ -83,7 +84,8 @@ public abstract class UpDownPlantBlock extends BaseBlockNotFull implements Rende
 	@Override
 	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
 		ItemStack tool = builder.getParameter(LootContextParams.TOOL);
-		if (tool != null && FabricToolTags.SHEARS.contains(tool.getItem()) || EnchantmentHelper.getItemEnchantmentLevel(
+		//TODO: 1.18.2 Test if shearing still works
+		if (tool != null && BaseShearsItem.isShear(tool) || EnchantmentHelper.getItemEnchantmentLevel(
 			Enchantments.SILK_TOUCH,
 			tool
 		) > 0) {

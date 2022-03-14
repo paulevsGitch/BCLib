@@ -35,6 +35,7 @@ import ru.bclib.api.tag.TagAPI.TagLocation;
 import ru.bclib.client.render.BCLRenderLayer;
 import ru.bclib.interfaces.RenderLayerProvider;
 import ru.bclib.interfaces.TagProvider;
+import ru.bclib.items.tool.BaseShearsItem;
 
 import java.util.List;
 import java.util.Random;
@@ -57,7 +58,8 @@ public abstract class UnderwaterPlantBlock extends BaseBlockNotFull implements R
 		this(
 			FabricBlockSettings
 				.of(Material.WATER_PLANT)
-				.breakByHand(true)
+					//TODO: 1.18.2 Check if this is still ok
+					//.breakByHand(true)
 				.luminance(light)
 				.sound(SoundType.WET_GRASS)
 				.noCollission()
@@ -105,7 +107,8 @@ public abstract class UnderwaterPlantBlock extends BaseBlockNotFull implements R
 	@Override
 	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
 		ItemStack tool = builder.getParameter(LootContextParams.TOOL);
-		if (tool != null && FabricToolTags.SHEARS.contains(tool.getItem()) || EnchantmentHelper.getItemEnchantmentLevel(
+		//TODO: Test is shearing still works
+		if (tool != null && BaseShearsItem.isShear(tool) || EnchantmentHelper.getItemEnchantmentLevel(
 			Enchantments.SILK_TOUCH,
 			tool
 		) > 0) {

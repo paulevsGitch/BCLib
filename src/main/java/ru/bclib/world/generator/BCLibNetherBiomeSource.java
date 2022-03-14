@@ -71,7 +71,7 @@ public class BCLibNetherBiomeSource extends BCLBiomeSource {
 		BiomeAPI.NETHER_BIOME_PICKER.clearMutables();
 		
 		this.possibleBiomes().forEach(biome -> {
-			ResourceLocation key = biomeRegistry.getKey(biome);
+			ResourceLocation key = biomeRegistry.getKey(biome.value());
 			
 			if (!BiomeAPI.hasBiome(key)) {
 				BCLBiome bclBiome = new BCLBiome(key, biome);

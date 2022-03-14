@@ -30,6 +30,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import ru.bclib.blocks.BlockProperties.TripleShape;
 import ru.bclib.client.render.BCLRenderLayer;
 import ru.bclib.interfaces.RenderLayerProvider;
+import ru.bclib.items.tool.BaseShearsItem;
 import ru.bclib.util.BlocksHelper;
 
 import java.util.List;
@@ -110,7 +111,8 @@ public class BaseVineBlock extends BaseBlockNotFull implements RenderLayerProvid
 	@Override
 	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
 		ItemStack tool = builder.getParameter(LootContextParams.TOOL);
-		if (tool != null && FabricToolTags.SHEARS.contains(tool.getItem()) || EnchantmentHelper.getItemEnchantmentLevel(
+		//TODO: Test if shearing still works
+		if (tool != null && BaseShearsItem.isShear(tool) || EnchantmentHelper.getItemEnchantmentLevel(
 			Enchantments.SILK_TOUCH,
 			tool
 		) > 0) {

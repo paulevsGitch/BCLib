@@ -2,6 +2,7 @@ package ru.bclib.world.generator;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceLocation;
@@ -19,6 +20,7 @@ import ru.bclib.api.biomes.BiomeAPI;
 import ru.bclib.config.ConfigKeeper.StringArrayEntry;
 import ru.bclib.config.Configs;
 import ru.bclib.interfaces.BiomeMap;
+import ru.bclib.mixin.common.BiomeAccessor;
 import ru.bclib.noise.OpenSimplexNoise;
 import ru.bclib.world.biomes.BCLBiome;
 import ru.bclib.world.generator.map.hex.HexBiomeMap;
@@ -29,14 +31,14 @@ import java.util.List;
 import java.util.function.Function;
 
 public class BCLibEndBiomeSource extends BCLBiomeSource {
-	public static final Codec<BCLibEndBiomeSource> CODEC = RecordCodecBuilder.create((instance) -> instance.group(RegistryOps
+	public static Codec<BCLibEndBiomeSource> CODEC = RecordCodecBuilder.create((instance) -> instance.group(RegistryOps
 			.retrieveRegistry(Registry.BIOME_REGISTRY).forGetter((theEndBiomeSource) -> theEndBiomeSource.biomeRegistry), Codec.LONG.fieldOf("seed").stable().forGetter((theEndBiomeSource) -> theEndBiomeSource.seed)).apply(instance, instance.stable(BCLibEndBiomeSource::new)));
 	private static final OpenSimplexNoise SMALL_NOISE = new OpenSimplexNoise(8324);
 	private Function<Point, Boolean> endLandFunction;
 
 	private final SimplexNoise noise;
-	private final Biome centerBiome;
-	private final Biome barrens;
+	private final Holder<Biome> centerBiome;
+	private final Holder<Biome> barrens;
 	private BiomeMap mapLand;
 	private BiomeMap mapVoid;
 	private final Point pos;
@@ -49,7 +51,7 @@ public class BCLibEndBiomeSource extends BCLBiomeSource {
 		
 		List<String> includeVoid = Configs.BIOMES_CONFIG.getEntry("force_include", "end_void_biomes", StringArrayEntry.class).getValue();
 		this.possibleBiomes().forEach(biome -> {
-			ResourceLocation key = biomeRegistry.getKey(biome);
+			ResourceLocation key = biomeRegistry.getKey(biome.value());
 			String group = key.getNamespace() + "." + key.getPath();
 			
 			if (!BiomeAPI.hasBiome(key)) {
@@ -94,8 +96,8 @@ public class BCLibEndBiomeSource extends BCLBiomeSource {
 			this.mapVoid = new HexBiomeMap(seed, GeneratorOptions.getBiomeSizeEndVoid(), BiomeAPI.END_VOID_BIOME_PICKER);
 		}
 		
-		this.centerBiome = biomeRegistry.getOrThrow(Biomes.THE_END);
-		this.barrens = biomeRegistry.getOrThrow(Biomes.END_BARRENS);
+		this.centerBiome = biomeRegistry.getHolderOrThrow(Biomes.THE_END);
+		this.barrens = biomeRegistry.getHolderOrThrow(Biomes.END_BARRENS);
 
 		WorldgenRandom chunkRandom = new WorldgenRandom(new LegacyRandomSource(seed));
 		chunkRandom.consumeCount(17292);
@@ -115,9 +117,15 @@ public class BCLibEndBiomeSource extends BCLBiomeSource {
 			if (includeLand.contains(key.toString()) || includeVoid.contains(key.toString())) {
 				return true;
 			}
-			
-			if (GeneratorOptions.addEndBiomesByCategory() && biome.getBiomeCategory() == BiomeCategory.THEEND) {
-				return true;
+
+			final boolean isEndBiome;
+			if ((Object)biome instanceof BiomeAccessor bacc) {
+				isEndBiome = bacc.bclib_getBiomeCategory() == BiomeCategory.THEEND;
+				if (GeneratorOptions.addEndBiomesByCategory() && isEndBiome) {
+					return true;
+				}
+			} else {
+				isEndBiome = false;
 			}
 			
 			BCLBiome bclBiome = BiomeAPI.getBiome(key);
@@ -127,12 +135,12 @@ public class BCLibEndBiomeSource extends BCLBiomeSource {
 				}
 				key = bclBiome.getID();
 			}
-			return BiomeAPI.END_LAND_BIOME_PICKER.containsImmutable(key) || BiomeAPI.END_VOID_BIOME_PICKER.containsImmutable(key) || (biome.getBiomeCategory() == BiomeCategory.THEEND && BiomeAPI.isDatapackBiome(key));
+			return BiomeAPI.END_LAND_BIOME_PICKER.containsImmutable(key) || BiomeAPI.END_VOID_BIOME_PICKER.containsImmutable(key) || (isEndBiome && BiomeAPI.isDatapackBiome(key));
 		}).toList();
 	}
 	
 	@Override
-	public Biome getNoiseBiome(int biomeX, int biomeY, int biomeZ, Climate.Sampler sampler) {
+	public Holder<Biome> getNoiseBiome(int biomeX, int biomeY, int biomeZ, Climate.Sampler sampler) {
 		long posX = biomeX << 2;
 		long posZ = biomeZ << 2;
 		long farEndBiomes = GeneratorOptions.getFarEndBiomes();

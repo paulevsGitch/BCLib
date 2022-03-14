@@ -1,6 +1,7 @@
 package ru.bclib.integration;
 
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.data.BuiltinRegistries;
 import net.minecraft.resources.ResourceKey;
@@ -37,6 +38,10 @@ public abstract class ModIntegration {
 	public ResourceLocation getID(String name) {
 		return new ResourceLocation(modID, name);
 	}
+
+	public ResourceKey<PlacedFeature> getFeatureKey(String name) {
+		return ResourceKey.create(Registry.PLACED_FEATURE_REGISTRY, getID(name));
+	}
 	
 	public Block getBlock(String name) {
 		return Registry.BLOCK.get(getID(name));
@@ -61,7 +66,7 @@ public abstract class ModIntegration {
 	public BCLFeature getFeature(String featureID, String placedFeatureID, GenerationStep.Decoration featureStep) {
 		ResourceLocation id = getID(featureID);
 		Feature<?> feature = Registry.FEATURE.get(id);
-		PlacedFeature featureConfigured = BuiltinRegistries.PLACED_FEATURE.get(getID(placedFeatureID));
+		Holder<PlacedFeature> featureConfigured = BuiltinRegistries.PLACED_FEATURE.getHolder(getFeatureKey(placedFeatureID)).orElse(null);
 		return new BCLFeature(id, feature, featureStep, featureConfigured);
 	}
 	

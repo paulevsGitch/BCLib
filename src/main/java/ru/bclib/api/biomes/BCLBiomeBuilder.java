@@ -2,9 +2,12 @@ package ru.bclib.api.biomes;
 
 import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
 import net.minecraft.core.Holder;
+import net.minecraft.core.HolderSet;
+import net.minecraft.core.Registry;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.data.BuiltinRegistries;
 import net.minecraft.data.worldgen.BiomeDefaultFeatures;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.Music;
 import net.minecraft.sounds.SoundEvent;
@@ -546,8 +549,8 @@ public class BCLBiomeBuilder {
 	 * @param structure {@link ConfiguredStructureFeature} to add.
 	 * @return same {@link BCLBiomeBuilder} instance.
 	 */
-	public BCLBiomeBuilder structure(ConfiguredStructureFeature<?, ?> structure) {
-		structures.add(structure);
+	public BCLBiomeBuilder structure(Holder<ConfiguredStructureFeature<?, ?>> structure) {
+		structures.add(structure.value());
 		return this;
 	}
 	
@@ -672,7 +675,7 @@ public class BCLBiomeBuilder {
 		builder.mobSpawnSettings(getSpawns().build());
 		builder.specialEffects(getEffects().build());
 		
-		Map<Decoration, List<Supplier<PlacedFeature>>> defferedFeatures = new HashMap<>();
+		Map<Decoration, HolderSet<PlacedFeature>> defferedFeatures = new HashMap<>();
 		BiomeGenerationSettingsAccessor acc = BiomeGenerationSettingsAccessor.class.cast(getGeneration().build());
 		if (acc != null) {
 			builder.generationSettings(new BiomeGenerationSettings.Builder().build());
@@ -700,8 +703,9 @@ public class BCLBiomeBuilder {
 			.setEdge(edge)
 			.setVertical(vertical)
 			.build();
-		
-		final T res = biomeConstructor.apply(biomeID, builder.build(), settings);
+
+		final Biome biome = builder.build();
+		final T res = biomeConstructor.apply(biomeID, biome, settings);
 		res.attachStructures(structures);
 		res.setSurface(surfaceRule);
 		res.setFeatures(defferedFeatures);
