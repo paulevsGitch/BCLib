@@ -34,7 +34,8 @@ public class DimensionTypeMixin {
 	)
 	private static void bclib_updateDimensions(RegistryAccess registryAccess, long seed, boolean bl, CallbackInfoReturnable<Registry> info, WritableRegistry writableRegistry, Registry registry, Registry biomeRegistry, Registry structureRegistry, Registry noiseSettingsRegistry, Registry noiseParamRegistry) {
 		int id = writableRegistry.getId(writableRegistry.get(LevelStem.NETHER));
-		writableRegistry.register(
+		writableRegistry.registerOrOverride(
+				OptionalInt.of(id),
 				LevelStem.NETHER, 
 				new LevelStem(
 						registry.getOrCreateHolder(DimensionType.NETHER_LOCATION),
@@ -50,7 +51,8 @@ public class DimensionTypeMixin {
 
 
 		id = writableRegistry.getId(writableRegistry.get(LevelStem.END));
-		writableRegistry.register(
+		writableRegistry.registerOrOverride(
+				OptionalInt.of(id),
 				LevelStem.END,
 				new LevelStem(
 						registry.getOrCreateHolder(DimensionType.END_LOCATION),
