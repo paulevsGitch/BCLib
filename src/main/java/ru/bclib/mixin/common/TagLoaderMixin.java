@@ -20,7 +20,6 @@ public class TagLoaderMixin {
 	
 	@ModifyArg(method = "loadAndBuild", at = @At(value = "INVOKE", target = "Lnet/minecraft/tags/TagLoader;build(Ljava/util/Map;)Ljava/util/Map;"))
 	public Map<ResourceLocation, Tag.Builder> be_modifyTags(Map<ResourceLocation, Tag.Builder> tagsMap) {
-		//TODO: 1.18.2 Check if this still works as expected
 		return TagAPI.apply(directory, tagsMap);
 	}
 }

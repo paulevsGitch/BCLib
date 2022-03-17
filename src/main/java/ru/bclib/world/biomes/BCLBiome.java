@@ -18,6 +18,7 @@ import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import org.jetbrains.annotations.Nullable;
 import ru.bclib.BCLib;
 import ru.bclib.api.biomes.BiomeAPI;
+import ru.bclib.api.tag.TagAPI;
 import ru.bclib.util.WeightedList;
 
 import java.util.List;
@@ -210,7 +211,7 @@ public class BCLBiome extends BCLBiomeSettings {
 		
 		if (!this.structureTags.isEmpty()) {
 			//TODO: 1.18.2 This need to be done by BiomeTags now
-			structureTags.forEach(tagKey -> {System.out.println("Code to add Tags to Biomes should go here. " + tagKey);});
+			structureTags.forEach(tagKey -> TagAPI.addBiomeTag(tagKey, actualBiome.value()));
 		}
 		
 		if (this.surfaceInit != null) {
