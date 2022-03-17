@@ -38,6 +38,9 @@ public class BCLStructureFeature {
 	public final ResourceKey<StructureSet> structureSetKey;
 
 	public BCLStructureFeature(ResourceLocation id, StructureFeature<NoneFeatureConfiguration> structure, GenerationStep.Decoration step, int spacing, int separation) {
+		this(id, structure, step, spacing, separation, false);
+	}
+	public BCLStructureFeature(ResourceLocation id, StructureFeature<NoneFeatureConfiguration> structure, GenerationStep.Decoration step, int spacing, int separation, boolean adaptNoise) {
 		this.id = id;
 		this.featureStep = step;
 		//parts from vanilla for Structure generation
@@ -57,7 +60,7 @@ public class BCLStructureFeature {
 
 		this.biomeTag = TagAPI.makeBiomeTag(id.getNamespace(), "has_structure/"+id.getPath());
 		this.structure = StructureFeatureAccessor.callRegister(id.toString(), structure, step);
-		this.featureConfigured = StructureFeaturesAccessor.callRegister(structureKey, this.structure.configured(NoneFeatureConfiguration.NONE, biomeTag));
+		this.featureConfigured = StructureFeaturesAccessor.callRegister(structureKey, this.structure.configured(NoneFeatureConfiguration.NONE, biomeTag, adaptNoise));
 		StructureSets.register(structureSetKey, featureConfigured, spreadConfig);
 		//TODO: 1.18 check if structures are added correctly
 		//FlatChunkGeneratorConfigAccessor.getStructureToFeatures().put(this.structure, this.featureConfigured);

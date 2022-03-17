@@ -302,14 +302,14 @@ public class BiomeAPI {
 	
 	/**
 	 * Get {@link BCLBiome} from {@link Biome} instance on server. Used to convert world biomes to BCLBiomes.
-	 * @param biome - {@link Biome} from world.
+	 * @param biome - {@link Holder<Biome>} from world.
 	 * @return {@link BCLBiome} or {@code BiomeAPI.EMPTY_BIOME}.
 	 */
-	public static BCLBiome getFromBiome(Biome biome) {
+	public static BCLBiome getFromBiome(Holder<Biome> biome) {
 		if (biomeRegistry == null) {
 			return EMPTY_BIOME;
 		}
-		return ID_MAP.getOrDefault(biomeRegistry.getKey(biome), EMPTY_BIOME);
+		return ID_MAP.getOrDefault(biome.unwrapKey().orElseThrow().location(), EMPTY_BIOME);
 	}
 	
 	/**
@@ -738,7 +738,7 @@ public class BiomeAPI {
 	 * @param minGroupCount minimum mobs in group.
 	 * @param maxGroupCount maximum mobs in group.
 	 */
-	public static <M extends Mob> void addBiomeMobSpawn(Biome biome, BCLEntityWrapper<M> entityType, int weight, int minGroupCount, int maxGroupCount) {
+	public static <M extends Mob> void addBiomeMobSpawn(Holder<Biome> biome, BCLEntityWrapper<M> entityType, int weight, int minGroupCount, int maxGroupCount) {
 		if (entityType.canSpawn()){
 			addBiomeMobSpawn(biome, entityType.type(), weight, minGroupCount, maxGroupCount);
 		}
@@ -752,9 +752,9 @@ public class BiomeAPI {
 	 * @param minGroupCount minimum mobs in group.
 	 * @param maxGroupCount maximum mobs in group.
 	 */
-	public static <M extends Mob> void addBiomeMobSpawn(Biome biome, EntityType<M> entityType, int weight, int minGroupCount, int maxGroupCount) {
+	public static <M extends Mob> void addBiomeMobSpawn(Holder<Biome> biome, EntityType<M> entityType, int weight, int minGroupCount, int maxGroupCount) {
 		final MobCategory category = entityType.getCategory();
-		MobSpawnSettingsAccessor accessor = (MobSpawnSettingsAccessor) biome.getMobSettings();
+		MobSpawnSettingsAccessor accessor = (MobSpawnSettingsAccessor) biome.value().getMobSettings();
 		Map<MobCategory, WeightedRandomList<SpawnerData>> spawners = CollectionsUtil.getMutable(accessor.bcl_getSpawners());
 		List<SpawnerData> mobs = spawners.containsKey(category) ? CollectionsUtil.getMutable(spawners.get(category).unwrap()) : Lists.newArrayList();
 		mobs.add(new SpawnerData(entityType, weight, minGroupCount, maxGroupCount));
