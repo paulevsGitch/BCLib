@@ -26,13 +26,7 @@ public interface BiomeGenerationSettingsAccessor {
 	void bclib_setFeatures(List<HolderSet<PlacedFeature>> value);
 	
 	@Accessor("featureSet")
-	Supplier<Set<PlacedFeature>> bclib_getFeatureSet();
-	
-	@Accessor("featureSet")
 	void bclib_setFeatureSet(Supplier<Set<PlacedFeature>> featureSet);
-
-	@Accessor("flowerFeatures")
-	Supplier<List<ConfiguredFeature<?, ?>>> bclib_getFlowerFeatures();
 
 	@Accessor("flowerFeatures")
 	void bclib_setFlowerFeatures(Supplier<List<ConfiguredFeature<?, ?>>> flowerFeatures);

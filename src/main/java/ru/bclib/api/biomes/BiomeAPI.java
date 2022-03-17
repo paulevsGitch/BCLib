@@ -672,6 +672,7 @@ public class BiomeAPI {
 
 		accessor.bclib_setFeatures(allFeatures);
 		accessor.bclib_setFeatureSet(featureSet);
+		accessor.bclib_setFlowerFeatures(flowerFeatures);
 	}
 	
 	/**
@@ -694,7 +695,7 @@ public class BiomeAPI {
 	 * @param carver {@link ConfiguredWorldCarver} to add.
 	 * @param stage {@link Carving} stage.
 	 */
-	public static void addBiomeCarver(Biome biome, Holder<ConfiguredWorldCarver<?>> carver, Carving stage) {
+	public static void addBiomeCarver(Biome biome, Holder<? extends ConfiguredWorldCarver<?>> carver, Carving stage) {
 		BiomeGenerationSettingsAccessor accessor = (BiomeGenerationSettingsAccessor) biome.getGenerationSettings();
 		Map<Carving, HolderSet<ConfiguredWorldCarver<?>>> carverMap = CollectionsUtil.getMutable(accessor.bclib_getCarvers());
 		HolderSet<ConfiguredWorldCarver<?>> carvers = carverMap.get(stage);
@@ -705,7 +706,7 @@ public class BiomeAPI {
 		} else {
 			carverList = carvers.stream().toList();
 		}
-		carverList.add(carver);
+		carverList.add((Holder<ConfiguredWorldCarver<?>>)carver);
 		carverMap.put(stage, HolderSet.direct(carverList));
 		accessor.bclib_setCarvers(carverMap);
 	}

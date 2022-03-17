@@ -31,7 +31,9 @@ import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import ru.bclib.api.surface.SurfaceRuleBuilder;
 import ru.bclib.entity.BCLEntityWrapper;
 import ru.bclib.mixin.common.BiomeGenerationSettingsAccessor;
+import ru.bclib.util.CollectionsUtil;
 import ru.bclib.util.ColorUtil;
+import ru.bclib.util.Pair;
 import ru.bclib.util.TriFunction;
 import ru.bclib.world.biomes.BCLBiome;
 import ru.bclib.world.biomes.BCLBiomeSettings;
@@ -54,6 +56,7 @@ public class BCLBiomeBuilder {
 	private static final SurfaceRules.ConditionSource SURFACE_NOISE = SurfaceRules.noiseCondition(Noises.SOUL_SAND_LAYER, -0.012);
 	
 	private List<TagKey<Biome>> structureTags = new ArrayList<>(8);
+	private List<Pair<GenerationStep.Carving, Holder<? extends ConfiguredWorldCarver<?>>>> carvers = new ArrayList<>(1);
 	private BiomeGenerationSettings.Builder generationSettings;
 	private BiomeSpecialEffects.Builder effectsBuilder;
 	private MobSpawnSettings.Builder spawnSettings;
@@ -92,6 +95,7 @@ public class BCLBiomeBuilder {
 		INSTANCE.height = 0.1F;
 		INSTANCE.vertical = false;
 		INSTANCE.edge = null;
+		INSTANCE.carvers.clear();
 		return INSTANCE;
 	}
 	
@@ -563,7 +567,11 @@ public class BCLBiomeBuilder {
 	 */
 	public  BCLBiomeBuilder carver(GenerationStep.Carving step, Holder<? extends ConfiguredWorldCarver<?>> carver) {
 		final ResourceLocation immutableID = biomeID;
-		carver.unwrapKey().ifPresent(key -> BiomeModifications.addCarver( ctx -> ctx.getBiomeKey().location().equals(immutableID), step, (ResourceKey<ConfiguredWorldCarver<?>>) key));
+		var oKey = carver.unwrapKey();
+		if (oKey.isPresent()) {
+			BiomeModifications.addCarver(ctx -> ctx.getBiomeKey().location().equals(immutableID), step, (ResourceKey<ConfiguredWorldCarver<?>>) oKey.get());
+		}
+		//carvers.add(new Pair<>(step, carver));
 		return this;
 	}
 	
@@ -619,8 +627,8 @@ public class BCLBiomeBuilder {
 		this.height = height;
 		return this;
 	}
-	
-	
+
+
 	
 	/**
 	 * Make this a vertical Biome
@@ -639,7 +647,7 @@ public class BCLBiomeBuilder {
 	public BCLBiome build() {
 		return build((BiomeSupplier<BCLBiome>)BCLBiome::new);
 	}
-	
+
 	/**
 	 * Finalize biome creation.
 	 * @param biomeConstructor {@link BiFunction} biome constructor.
@@ -648,6 +656,21 @@ public class BCLBiomeBuilder {
 	@Deprecated(forRemoval = true)
 	public <T extends BCLBiome> T build(BiFunction<ResourceLocation, Biome, T> biomeConstructor) {
 		return build((id, biome, settings)->biomeConstructor.apply(id, biome));
+	}
+
+	private static BiomeGenerationSettings fixGenerationSettings(BiomeGenerationSettings settings){
+		//Fabric Biome Modification API can not handle an empty carver map, thus we will create one with
+		//an empty HolderSet for every possible step:
+		//https://github.com/FabricMC/fabric/issues/2079
+		//TODO: Remove, once fabric gets fixed
+		if (settings instanceof BiomeGenerationSettingsAccessor acc){
+			Map<GenerationStep.Carving, HolderSet<ConfiguredWorldCarver<?>>> carvers = CollectionsUtil.getMutable(acc.bclib_getCarvers());
+			for (GenerationStep.Carving step : GenerationStep.Carving.values()){
+				carvers.computeIfAbsent(step, __->HolderSet.direct(Lists.newArrayList()));
+			}
+			acc.bclib_setCarvers(carvers);
+		}
+		return  settings;
 	}
 
 	/**
@@ -668,7 +691,7 @@ public class BCLBiomeBuilder {
 		Map<Decoration, List<Holder<PlacedFeature>>> defferedFeatures = Maps.newHashMap();
 		BiomeGenerationSettingsAccessor acc = BiomeGenerationSettingsAccessor.class.cast(getGeneration().build());
 		if (acc != null) {
-			builder.generationSettings(new BiomeGenerationSettings.Builder().build());
+			builder.generationSettings(fixGenerationSettings(new BiomeGenerationSettings.Builder().build()));
 			List<HolderSet<PlacedFeature>> decorations = acc.bclib_getFeatures();
 			for (Decoration d : Decoration.values()) {
 				int i = d.ordinal();
@@ -681,7 +704,7 @@ public class BCLBiomeBuilder {
 
 			}
 		} else {
-			builder.generationSettings(getGeneration().build());
+			builder.generationSettings(fixGenerationSettings(getGeneration().build()));
 		}
 		
 		BCLBiomeSettings settings = BCLBiomeSettings.createBCL()
@@ -698,6 +721,8 @@ public class BCLBiomeBuilder {
 		res.attachStructures(structureTags);
 		res.setSurface(surfaceRule);
 		res.setFeatures(defferedFeatures);
+
+		//carvers.forEach(cfg -> BiomeAPI.addBiomeCarver(biome, cfg.second, cfg.first));
 		return res;
 	}
 	
