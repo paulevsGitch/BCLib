@@ -36,6 +36,7 @@ public class BCLStructureFeature {
 	public final TagKey<Biome> biomeTag;
 	public final ResourceKey<ConfiguredStructureFeature<?, ?>> structureKey;
 	public final ResourceKey<StructureSet> structureSetKey;
+	public final RandomSpreadStructurePlacement spreadConfig;
 
 	public BCLStructureFeature(ResourceLocation id, StructureFeature<NoneFeatureConfiguration> structure, GenerationStep.Decoration step, int spacing, int separation) {
 		this(id, structure, step, spacing, separation, false);
@@ -54,7 +55,7 @@ public class BCLStructureFeature {
 		//      StructureFeature.register("jungle_pyramid", new JunglePyramidFeature(NoneFeatureConfiguration.CODEC), GenerationStep.Decoration.SURFACE_STRUCTURES);
 		//
 
-		final RandomSpreadStructurePlacement spreadConfig = new RandomSpreadStructurePlacement(spacing, separation, RandomSpreadType.LINEAR, RANDOM.nextInt(8192));
+		this.spreadConfig = new RandomSpreadStructurePlacement(spacing, separation, RandomSpreadType.LINEAR, RANDOM.nextInt(8192));
 		this.structureKey = ResourceKey.create(Registry.CONFIGURED_STRUCTURE_FEATURE_REGISTRY, id);
 		this.structureSetKey = ResourceKey.create(Registry.STRUCTURE_SET_REGISTRY, id);
 
