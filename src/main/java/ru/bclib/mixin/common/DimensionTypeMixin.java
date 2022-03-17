@@ -32,7 +32,7 @@ public class DimensionTypeMixin {
 		locals = LocalCapture.CAPTURE_FAILHARD,
 		at = @At("TAIL")
 	)
-	private static void bclib_updateDimensions(RegistryAccess registryAccess, long seed, boolean bl, CallbackInfoReturnable<MappedRegistry<LevelStem>> info, @NotNull MappedRegistry<LevelStem> writableRegistry, Registry<DimensionType> registry, Registry<Biome> biomeRegistry, Registry<StructureSet> structureRegistry, Registry<NoiseGeneratorSettings> noiseSettingsRegistry, Registry<NormalNoise.NoiseParameters> noiseParamRegistry) {
+	private static void bclib_updateDimensions(RegistryAccess registryAccess, long seed, boolean bl, CallbackInfoReturnable<Registry> info, WritableRegistry writableRegistry, Registry registry, Registry biomeRegistry, Registry structureRegistry, Registry noiseSettingsRegistry, Registry noiseParamRegistry) {
 		int id = writableRegistry.getId(writableRegistry.get(LevelStem.NETHER));
 		writableRegistry.register(
 				LevelStem.NETHER, 
