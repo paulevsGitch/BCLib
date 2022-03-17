@@ -4,6 +4,7 @@ import net.minecraft.data.worldgen.placement.PlacementUtils;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.level.levelgen.GenerationStep.Decoration;
+import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
 import net.minecraft.world.level.levelgen.placement.BiomeFilter;
@@ -18,12 +19,12 @@ import ru.bclib.world.features.BCLFeature;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BCLFeatureBuilder {
+public class BCLFeatureBuilder <FC extends FeatureConfiguration, F extends Feature<FC>>{
 	private static final BCLFeatureBuilder INSTANCE = new BCLFeatureBuilder();
 	private List<PlacementModifier> modifications = new ArrayList<>(16);
 	private ResourceLocation featureID;
 	private Decoration decoration;
-	private Feature<?> feature;
+	private F feature;
 	
 	private BCLFeatureBuilder() {}
 	
@@ -134,10 +135,9 @@ public class BCLFeatureBuilder {
 	 * @param configuration any {@link FeatureConfiguration} for provided {@link Feature}.
 	 * @return created {@link BCLFeature} instance.
 	 */
-	public <FC extends FeatureConfiguration> BCLFeature build(FC configuration) {
+	public BCLFeature build(FC configuration) {
 		PlacementModifier [] modifiers = modifications.toArray(new PlacementModifier [modifications.size()]);
-		PlacedFeature configured = ((Feature<FC>) feature).configured(configuration).placed(modifiers);
-		return new BCLFeature(featureID, feature, decoration, configured);
+		return new BCLFeature(featureID, feature, decoration, configuration, modifiers);
 	}
 	
 	/**
@@ -146,6 +146,6 @@ public class BCLFeatureBuilder {
 	 * @return created {@link BCLFeature} instance.
 	 */
 	public BCLFeature build() {
-		return build(FeatureConfiguration.NONE);
+		return build((FC)FeatureConfiguration.NONE);
 	}
 }

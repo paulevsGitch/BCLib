@@ -19,6 +19,7 @@ import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import ru.bclib.BCLib;
+import ru.bclib.api.tag.TagAPI;
 import ru.bclib.world.features.BCLFeature;
 
 import java.lang.reflect.Constructor;
@@ -66,8 +67,8 @@ public abstract class ModIntegration {
 	public BCLFeature getFeature(String featureID, String placedFeatureID, GenerationStep.Decoration featureStep) {
 		ResourceLocation id = getID(featureID);
 		Feature<?> feature = Registry.FEATURE.get(id);
-		Holder<PlacedFeature> featureConfigured = BuiltinRegistries.PLACED_FEATURE.getHolder(getFeatureKey(placedFeatureID)).orElse(null);
-		return new BCLFeature(id, feature, featureStep, featureConfigured);
+		Holder<PlacedFeature> featurePlaced = BuiltinRegistries.PLACED_FEATURE.getHolder(getFeatureKey(placedFeatureID)).orElse(null);
+		return new BCLFeature(id, feature, featureStep, featurePlaced);
 	}
 	
 	public BCLFeature getFeature(String name, GenerationStep.Decoration featureStep) {
@@ -203,16 +204,11 @@ public abstract class ModIntegration {
 	
 	public TagKey<Item> getItemTag(String name) {
 		ResourceLocation id = getID(name);
-		Tag<Item> tag = ItemTags.getAllTags().getTag(id);
-
-		//return tag == null ? (TagKey<Item>) TagRegistry.item(id) : (TagKey<Item>) tag;
-		return tag == null ? (TagKey<Item>) TagFactory.ITEM.create(id) : (TagKey<Item>) tag;
+		return TagAPI.makeItemTag(id);
 	}
 	
 	public TagKey<Block> getBlockTag(String name) {
 		ResourceLocation id = getID(name);
-		Tag<Block> tag = BlockTags.getAllTags().getTag(id);
-		//return tag == null ? (Named<Block>) TagRegistry.block(id) : (Named<Block>) tag;
-		return tag == null ? (TagKey<Block>) TagFactory.BLOCK.create(id) : (TagKey<Block>) tag;
+		return TagAPI.makeBlockTag(id);
 	}
 }

@@ -62,6 +62,16 @@ public class TagAPI {
 	public static TagKey<Block> makeBlockTag(String modID, String name) {
 		return makeTag(Registry.BLOCK, new TagLocation<>(modID, name));
 	}
+
+	/**
+	 * Get or create {@link Block} {@link TagKey} with mod namespace.
+	 *
+	 * @param id - {@link String} id for the tag;
+	 * @return {@link Block} {@link TagKey}.
+	 */
+	public static TagKey<Block> makeBlockTag(ResourceLocation id) {
+		return makeTag(Registry.BLOCK, new TagLocation<>(id));
+	}
 	
 	/**
 	 * Get or create {@link Item} {@link TagKey} with mod namespace.
@@ -72,6 +82,16 @@ public class TagAPI {
 	 */
 	public static TagKey<Item> makeItemTag(String modID, String name) {
 		return makeTag(Registry.ITEM, new TagLocation<>(modID, name));
+	}
+
+	/**
+	 * Get or create {@link Item} {@link TagKey} with mod namespace.
+	 *
+	 * @param id - {@link String} id for the tag;
+	 * @return {@link Item} {@link TagKey}.
+	 */
+	public static TagKey<Item> makeItemTag(ResourceLocation id) {
+		return makeTag(Registry.ITEM, new TagLocation<>(id));
 	}
 	
 	/**
@@ -208,6 +228,7 @@ public class TagAPI {
 	 * @return The {@code tagsMap} Parameter.
 	 */
 	public static <T> Map<ResourceLocation, Tag.Builder> apply(String directory, Map<ResourceLocation, Tag.Builder> tagsMap) {
+		System.out.println("TAG DIRECTORY: " + directory);
 		final BiConsumer<ResourceLocation, Set<ResourceLocation>> consumer;
 		consumer = (id, ids) -> apply(tagsMap.computeIfAbsent(id, key -> Tag.Builder.tag()), ids);
 		if ("tags/blocks".equals(directory)) {

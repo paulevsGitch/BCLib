@@ -1,5 +1,7 @@
 package ru.bclib.api.biomes;
 
+import com.google.common.base.Suppliers;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -39,6 +41,7 @@ import net.minecraft.world.level.levelgen.SurfaceRules.RuleSource;
 import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
+import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraft.world.level.levelgen.structure.StructureSet;
 import org.apache.commons.lang3.mutable.MutableInt;
@@ -77,7 +80,7 @@ public class BiomeAPI {
 	private static final Map<Biome, BCLBiome> CLIENT = Maps.newHashMap();
 	private static Registry<Biome> biomeRegistry;
 	
-	private static final Map<PlacedFeature, Integer> FEATURE_ORDER = Maps.newHashMap();
+	private static final Map<Holder<PlacedFeature>, Integer> FEATURE_ORDER = Maps.newHashMap();
 	private static final MutableInt FEATURE_ORDER_ID = new MutableInt(0);
 
 	private static final Map<ResourceKey, List<BiConsumer<ResourceLocation, Holder<Biome>>>> MODIFICATIONS = Maps.newHashMap();
@@ -113,8 +116,7 @@ public class BiomeAPI {
 			.map(Entry::getValue)
 			.map(biome -> (BiomeGenerationSettingsAccessor) biome.getGenerationSettings())
 			.map(BiomeGenerationSettingsAccessor::bclib_getFeatures)
-			.forEach(stepFeatureSuppliers -> stepFeatureSuppliers.forEach(step -> step.forEach(featureSupplier -> {
-				PlacedFeature feature = featureSupplier.value();
+			.forEach(stepFeatureSuppliers -> stepFeatureSuppliers.forEach(step -> step.forEach(feature -> {
 				FEATURE_ORDER.computeIfAbsent(feature, f -> FEATURE_ORDER_ID.getAndIncrement());
 			})));
 	}
@@ -427,7 +429,7 @@ public class BiomeAPI {
 		
 		FabricBiomesData.END_VOID_BIOMES.forEach((key, weight) -> {
 			if (!hasBiome(key.location())) {
-				registerEndVoidBiome(BuiltinRegistries.BIOME.get(key), weight);
+				registerEndVoidBiome(BuiltinRegistries.BIOME.getOrCreateHolder(key), weight);
 			}
 		});
 	}
@@ -581,12 +583,12 @@ public class BiomeAPI {
 	public static void sortBiomeFeatures(Holder<Biome> biome) {
 		BiomeGenerationSettings settings = biome.value().getGenerationSettings();
 		BiomeGenerationSettingsAccessor accessor = (BiomeGenerationSettingsAccessor) settings;
-		List<List<Supplier<PlacedFeature>>> featureList = CollectionsUtil.getMutable(accessor.bclib_getFeatures());
+		List<HolderSet<PlacedFeature>> featureList = CollectionsUtil.getMutable(accessor.bclib_getFeatures());
 		final int size = featureList.size();
 		for (int i = 0; i < size; i++) {
-			List<Supplier<PlacedFeature>> features = CollectionsUtil.getMutable(featureList.get(i));
+			List<Holder<PlacedFeature>> features = getFeaturesListCopy(featureList, i);
 			sortFeatures(features);
-			featureList.set(i, features);
+			featureList.set(i, HolderSet.direct(features));
 		}
 		accessor.bclib_setFeatures(featureList);
 	}
@@ -652,20 +654,24 @@ public class BiomeAPI {
 	 * Adds new features to existing biome.
 	 * @param biome {@link Biome} to add features in.
 	 * @param step a {@link Decoration} step for the feature.
-	 * @param featureList List of {@link ConfiguredFeature} to add.
+	 * @param additionalFeatures List of {@link ConfiguredFeature} to add.
 	 */
-	private static void addBiomeFeature(Holder<Biome> biome, Decoration step, List<Holder<PlacedFeature>> featureList) {
+	private static void addBiomeFeature(Holder<Biome> biome, Decoration step, List<Holder<PlacedFeature>> additionalFeatures) {
 		BiomeGenerationSettingsAccessor accessor = (BiomeGenerationSettingsAccessor) biome.value().getGenerationSettings();
 		List<HolderSet<PlacedFeature>> allFeatures = CollectionsUtil.getMutable(accessor.bclib_getFeatures());
-		Set<PlacedFeature> set = CollectionsUtil.getMutable(accessor.bclib_getFeatureSet().get());
-		HolderSet<PlacedFeature> features = getFeaturesList(allFeatures, step);
-		for (var feature : featureList) {
-			features.
-			features.add(() -> feature);
-			set.add(feature);
+		List<Holder<PlacedFeature>> features = getFeaturesListCopy(allFeatures, step);
+
+		for (var feature : additionalFeatures) {
+			if (!features.contains(feature))
+				features.add(feature);
 		}
+
+		allFeatures.set(step.ordinal(), HolderSet.direct(features));
+		final Supplier<List<ConfiguredFeature<?, ?>>> flowerFeatures = Suppliers.memoize(() -> allFeatures.stream().flatMap(HolderSet::stream).map(Holder::value).flatMap(PlacedFeature::getFeatures).filter(configuredFeature -> configuredFeature.feature() == Feature.FLOWER).collect(ImmutableList.toImmutableList()));
+		final Supplier<Set<PlacedFeature>> featureSet = Suppliers.memoize(() -> allFeatures.stream().flatMap(HolderSet::stream).map(Holder::value).collect(Collectors.toSet()));
+
 		accessor.bclib_setFeatures(allFeatures);
-		accessor.bclib_setFeatureSet(()-> set);
+		accessor.bclib_setFeatureSet(featureSet);
 	}
 	
 	/**
@@ -676,22 +682,10 @@ public class BiomeAPI {
 	 * @param biome {@link Biome} to add features in.
 	 * @param featureMap Map of {@link ConfiguredFeature} to add.
 	 */
-	private static void addStepFeaturesToBiome(Holder<Biome> biome, Map<Decoration, List<Supplier<PlacedFeature>>> featureMap) {
-		BiomeGenerationSettingsAccessor accessor = (BiomeGenerationSettingsAccessor) biome.value().getGenerationSettings();
-		List<List<Supplier<PlacedFeature>>> allFeatures = CollectionsUtil.getMutable(accessor.bclib_getFeatures());
-		Set<PlacedFeature> set = CollectionsUtil.getMutable(accessor.bclib_getFeatureSet().get());
-		
+	private static void addStepFeaturesToBiome(Holder<Biome> biome, Map<Decoration, List<Holder<PlacedFeature>>> featureMap) {
 		for (Decoration step: featureMap.keySet()) {
-			List<Supplier<PlacedFeature>> features = getFeaturesList(allFeatures, step);
-			List<Supplier<PlacedFeature>> featureList = featureMap.get(step);
-			
-			for (Supplier<PlacedFeature> feature : featureList) {
-				features.add(feature);
-				set.add(feature.get());
-			}
+			addBiomeFeature(biome, step, featureMap.get(step));
 		}
-		accessor.bclib_setFeatures(allFeatures);
-		accessor.bclib_setFeatureSet(() -> set);
 	}
 	
 	/**
@@ -700,13 +694,20 @@ public class BiomeAPI {
 	 * @param carver {@link ConfiguredWorldCarver} to add.
 	 * @param stage {@link Carving} stage.
 	 */
-	public static void addBiomeCarver(Biome biome, ConfiguredWorldCarver carver, Carving stage) {
+	public static void addBiomeCarver(Biome biome, Holder<ConfiguredWorldCarver<?>> carver, Carving stage) {
 		BiomeGenerationSettingsAccessor accessor = (BiomeGenerationSettingsAccessor) biome.getGenerationSettings();
-		Map<Carving, HolderSet<ConfiguredWorldCarver<?>>> carvers = CollectionsUtil.getMutable(accessor.bclib_getCarvers());
-		HolderSet<ConfiguredWorldCarver<?>> carverList = CollectionsUtil.getMutable(carvers.getOrDefault(stage, new ArrayList<>()));
-		carvers.put(stage, carverList);
-		carverList.add(() -> carver);
-		accessor.bclib_setCarvers(carvers);
+		Map<Carving, HolderSet<ConfiguredWorldCarver<?>>> carverMap = CollectionsUtil.getMutable(accessor.bclib_getCarvers());
+		HolderSet<ConfiguredWorldCarver<?>> carvers = carverMap.get(stage);
+
+		List<Holder<ConfiguredWorldCarver<?>>> carverList;
+		if (carvers==null) {
+			carverList = Lists.newArrayList();
+		} else {
+			carverList = carvers.stream().toList();
+		}
+		carverList.add(carver);
+		carverMap.put(stage, HolderSet.direct(carverList));
+		accessor.bclib_setCarvers(carverMap);
 	}
 	
 	/**
@@ -866,25 +867,24 @@ public class BiomeAPI {
 		}
 	}
 	
-	private static void sortFeatures(List<Supplier<PlacedFeature>> features) {
+	private static void sortFeatures(List<Holder<PlacedFeature>> features) {
 		initFeatureOrder();
 		
-		Set<PlacedFeature> featuresWithoutDuplicates = Sets.newHashSet();
-		features.forEach(provider -> featuresWithoutDuplicates.add(provider.get()));
+		Set<Holder<PlacedFeature>> featuresWithoutDuplicates = Sets.newHashSet();
+		features.forEach(holder -> featuresWithoutDuplicates.add(holder));
 		
 		if (featuresWithoutDuplicates.size() != features.size()) {
 			features.clear();
-			featuresWithoutDuplicates.forEach(feature -> features.add(() -> feature));
+			featuresWithoutDuplicates.forEach(feature -> features.add(feature));
 		}
 		
-		features.forEach(provider -> {
-			PlacedFeature feature = provider.get();
+		features.forEach(feature -> {
 			FEATURE_ORDER.computeIfAbsent(feature, f -> FEATURE_ORDER_ID.getAndIncrement());
 		});
 		
 		features.sort((f1, f2) -> {
-			int v1 = FEATURE_ORDER.getOrDefault(f1.get(), 70000);
-			int v2 = FEATURE_ORDER.getOrDefault(f2.get(), 70000);
+			int v1 = FEATURE_ORDER.getOrDefault(f1, 70000);
+			int v2 = FEATURE_ORDER.getOrDefault(f2, 70000);
 			return Integer.compare(v1, v2);
 		});
 	}
@@ -906,14 +906,15 @@ public class BiomeAPI {
 		lists.set(index, list);
 		return list;
 	}
+
+	private static List<Holder<PlacedFeature>> getFeaturesListCopy(List<HolderSet<PlacedFeature>> features, Decoration step) {
+		return getFeaturesListCopy(features, step.ordinal());
+	}
 	
-	private static HolderSet<PlacedFeature> getFeaturesList(List<HolderSet<PlacedFeature>> features, Decoration step) {
-		int index = step.ordinal();
+	private static List<Holder<PlacedFeature>> getFeaturesListCopy(List<HolderSet<PlacedFeature>> features, int index) {
 		while (features.size() <= index) {
 			features.add(HolderSet.direct(Lists.newArrayList()));
 		}
-		HolderSet<PlacedFeature> mutable = features.get(index);
-		features.set(index, mutable);
-		return mutable;
+		return features.get(index).stream().collect(Collectors.toList());
 	}
 }

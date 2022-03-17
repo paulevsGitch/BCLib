@@ -4,12 +4,14 @@ import com.google.gson.JsonObject;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.TagParser;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.Tag;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.GsonHelper;
@@ -142,12 +144,13 @@ public class AnvilRecipe implements Recipe<Container>, UnknownReceipBookCategory
 
 	@Override
 	public NonNullList<Ingredient> getIngredients() {
+		;
 		NonNullList<Ingredient> defaultedList = NonNullList.create();
-		defaultedList.add(Ingredient.of(CommonItemTags.HAMMERS
-			.getValues()
-			.stream()
-			.filter(hammer -> ((TieredItem) hammer).getTier().getLevel() >= toolLevel)
-			.map(ItemStack::new)));
+		defaultedList.add(Ingredient.of(Registry.ITEM.stream()
+				.filter(item->item.builtInRegistryHolder().is(CommonItemTags.HAMMERS))
+				.filter(hammer -> ((TieredItem) hammer).getTier().getLevel() >= toolLevel)
+				.map(ItemStack::new))
+		);
 		defaultedList.add(input);
 		return defaultedList;
 	}

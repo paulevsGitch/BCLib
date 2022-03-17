@@ -5,6 +5,7 @@ import net.minecraft.world.level.biome.BiomeGenerationSettings;
 import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.GenerationStep.Carving;
 import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
+import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
@@ -28,7 +29,13 @@ public interface BiomeGenerationSettingsAccessor {
 	Supplier<Set<PlacedFeature>> bclib_getFeatureSet();
 	
 	@Accessor("featureSet")
-	void bclib_setFeatureSet(Supplier<Set<PlacedFeature>> features);
+	void bclib_setFeatureSet(Supplier<Set<PlacedFeature>> featureSet);
+
+	@Accessor("flowerFeatures")
+	Supplier<List<ConfiguredFeature<?, ?>>> bclib_getFlowerFeatures();
+
+	@Accessor("flowerFeatures")
+	void bclib_setFlowerFeatures(Supplier<List<ConfiguredFeature<?, ?>>> flowerFeatures);
 	
 	@Accessor("carvers")
 	Map<GenerationStep.Carving, HolderSet<ConfiguredWorldCarver<?>>> bclib_getCarvers();

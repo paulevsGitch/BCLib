@@ -2,11 +2,13 @@ package ru.bclib.world.biomes;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.data.BuiltinRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.GenerationStep.Decoration;
 import net.minecraft.world.level.levelgen.SurfaceRules;
@@ -18,15 +20,14 @@ import ru.bclib.BCLib;
 import ru.bclib.api.biomes.BiomeAPI;
 import ru.bclib.util.WeightedList;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 public class BCLBiome extends BCLBiomeSettings {
-	private final List<ConfiguredStructureFeature> structures = Lists.newArrayList();
+	private final Set<TagKey<Biome>> structureTags = Sets.newHashSet();
 	private final WeightedList<BCLBiome> subbiomes = new WeightedList<>();
 	private final Map<String, Object> customData = Maps.newHashMap();
 	private final ResourceLocation biomeID;
@@ -207,15 +208,17 @@ public class BCLBiome extends BCLBiomeSettings {
 			BCLib.LOGGER.error("Unable to find actual Biome for " + biomeID);
 		}
 		
-		if (!this.structures.isEmpty()) {
+		if (!this.structureTags.isEmpty()) {
 			//TODO: 1.18.2 This need to be done by BiomeTags now
-			structures.forEach(s -> BiomeAPI.addBiomeStructure(BiomeAPI.getBiomeKey(actualBiome), s));
+			structureTags.forEach(tagKey -> {System.out.println("Code to add Tags to Biomes should go here. " + tagKey);});
 		}
 		
 		if (this.surfaceInit != null) {
 			surfaceInit.accept(actualBiome);
 		}
 	}
+
+
 	
 	/**
 	 * Getter for custom data. Will get custom data object or null if object doesn't exists.
@@ -283,8 +286,8 @@ public class BCLBiome extends BCLBiomeSettings {
 	 * Adds structures to this biome. For internal use only.
 	 * Used inside {@link ru.bclib.api.biomes.BCLBiomeBuilder}.
 	 */
-	public void attachStructures(List<ConfiguredStructureFeature> structures) {
-		this.structures.addAll(structures);
+	public void attachStructures(List<TagKey<Biome>> structures) {
+		this.structureTags.addAll(structures);
 	}
 	
 	/**
@@ -303,13 +306,13 @@ public class BCLBiome extends BCLBiomeSettings {
 		};
 	}
 	
-	private Map<Decoration, List<Supplier<PlacedFeature>>> features = new HashMap<>(0);
+	private Map<Decoration, List<Holder<PlacedFeature>>> features = Maps.newHashMap();
 	
 	/**
 	 * Sets the biome features.
 	 * @param features the feature list.
 	 */
-	public void setFeatures(Map<Decoration, List<Supplier<PlacedFeature>>> features) {
+	public void setFeatures(Map<Decoration, List<Holder<PlacedFeature>>> features) {
 		this.features = features;
 	}
 	
@@ -317,7 +320,7 @@ public class BCLBiome extends BCLBiomeSettings {
 	 * Returns the built-in set of Features for this biome (as they were set with {@link #setFeatures(Map)})
 	 * @return List of all features
 	 */
-	public Map<Decoration, List<Supplier<PlacedFeature>>> getFeatures(){
+	public Map<Decoration, List<Holder<PlacedFeature>>> getFeatures(){
 		return features;
 	}
 	

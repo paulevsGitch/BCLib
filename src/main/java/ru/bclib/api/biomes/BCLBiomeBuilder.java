@@ -1,16 +1,17 @@
 package ru.bclib.api.biomes;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
-import net.minecraft.core.Registry;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.data.BuiltinRegistries;
 import net.minecraft.data.worldgen.BiomeDefaultFeatures;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.Music;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
@@ -44,13 +45,9 @@ import ru.bclib.world.biomes.BCLBiomeSettings;
 import ru.bclib.world.features.BCLFeature;
 import ru.bclib.world.structures.BCLStructureFeature;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class BCLBiomeBuilder {
@@ -61,7 +58,7 @@ public class BCLBiomeBuilder {
 	private static final BCLBiomeBuilder INSTANCE = new BCLBiomeBuilder();
 	private static final SurfaceRules.ConditionSource SURFACE_NOISE = SurfaceRules.noiseCondition(Noises.SOUL_SAND_LAYER, -0.012);
 	
-	private List<ConfiguredStructureFeature> structures = new ArrayList<>(16);
+	private List<TagKey<Biome>> structureTags = new ArrayList<>(8);
 	private BiomeGenerationSettings.Builder generationSettings;
 	private BiomeSpecialEffects.Builder effectsBuilder;
 	private MobSpawnSettings.Builder spawnSettings;
@@ -91,7 +88,7 @@ public class BCLBiomeBuilder {
 		INSTANCE.generationSettings = null;
 		INSTANCE.effectsBuilder = null;
 		INSTANCE.spawnSettings = null;
-		INSTANCE.structures.clear();
+		INSTANCE.structureTags.clear();
 		INSTANCE.temperature = 1.0F;
 		INSTANCE.fogDensity = 1.0F;
 		INSTANCE.edgeSize = 0;
@@ -546,11 +543,11 @@ public class BCLBiomeBuilder {
 	
 	/**
 	 * Adds new structure feature into the biome.
-	 * @param structure {@link ConfiguredStructureFeature} to add.
+	 * @param structureTag {@link TagKey} to add.
 	 * @return same {@link BCLBiomeBuilder} instance.
 	 */
-	public BCLBiomeBuilder structure(Holder<ConfiguredStructureFeature<?, ?>> structure) {
-		structures.add(structure.value());
+	public BCLBiomeBuilder structure(TagKey<Biome> structureTag) {
+		structureTags.add(structureTag);
 		return this;
 	}
 	
@@ -561,7 +558,7 @@ public class BCLBiomeBuilder {
 	 */
 	public BCLBiomeBuilder structure(BCLStructureFeature structure) {
 		structure.addInternalBiome(biomeID);
-		return structure(structure.getFeatureConfigured());
+		return structure(structure.biomeTag);
 	}
 	
 	/**
@@ -659,7 +656,7 @@ public class BCLBiomeBuilder {
 	public <T extends BCLBiome> T build(BiFunction<ResourceLocation, Biome, T> biomeConstructor) {
 		return build((id, biome, settings)->biomeConstructor.apply(id, biome));
 	}
-	
+
 	/**
 	 * Finalize biome creation.
 	 * @param biomeConstructor {@link BiomeSupplier} biome constructor.
@@ -674,24 +671,23 @@ public class BCLBiomeBuilder {
 		
 		builder.mobSpawnSettings(getSpawns().build());
 		builder.specialEffects(getEffects().build());
-		
-		Map<Decoration, HolderSet<PlacedFeature>> defferedFeatures = new HashMap<>();
+
+		Map<Decoration, List<Holder<PlacedFeature>>> defferedFeatures = Maps.newHashMap();
 		BiomeGenerationSettingsAccessor acc = BiomeGenerationSettingsAccessor.class.cast(getGeneration().build());
 		if (acc != null) {
 			builder.generationSettings(new BiomeGenerationSettings.Builder().build());
-			var decorations = acc.bclib_getFeatures();
+			List<HolderSet<PlacedFeature>> decorations = acc.bclib_getFeatures();
 			for (Decoration d : Decoration.values()) {
 				int i = d.ordinal();
-				if (i >= 0 && i < decorations.size()) {
-					var features = decorations.get(i);
+				if (i>=0 && i<decorations.size()) {
+					HolderSet<PlacedFeature> features = decorations.get(i);
 					defferedFeatures.put(d, features.stream().collect(Collectors.toList()));
+				} else {
+					defferedFeatures.put(d, Lists.newArrayList());
 				}
-				else {
-					defferedFeatures.put(d, new ArrayList<>(0));
-				}
+
 			}
-		}
-		else {
+		} else {
 			builder.generationSettings(getGeneration().build());
 		}
 		
@@ -706,7 +702,7 @@ public class BCLBiomeBuilder {
 
 		final Biome biome = builder.build();
 		final T res = biomeConstructor.apply(biomeID, biome, settings);
-		res.attachStructures(structures);
+		res.attachStructures(structureTags);
 		res.setSurface(surfaceRule);
 		res.setFeatures(defferedFeatures);
 		return res;
