@@ -54,5 +54,7 @@
 	"title.bclib.datafixer.error.continue": "Proceed and mark as fixed",
 	
 	"title.config.bclib.client.rendering.customFogRendering": "Custom Fog Rendering",
-	"title.config.bclib.client.rendering.netherThickFog": "Nether Thick Fog"
+	"title.config.bclib.client.rendering.netherThickFog": "Nether Thick Fog",
+
+	"tooltip.bclib.place_on": "Survives on: %s"
 }

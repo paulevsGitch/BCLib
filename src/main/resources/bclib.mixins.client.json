@@ -13,7 +13,8 @@
 		"ModelBakeryMixin",
 		"WorldPresetMixin",
 		"MinecraftMixin",
-		"GameMixin"
+		"GameMixin",
+		"BlockMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
