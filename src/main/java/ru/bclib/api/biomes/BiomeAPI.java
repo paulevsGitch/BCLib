@@ -504,9 +504,9 @@ public class BiomeAPI {
 		final BiomeSource source = chunkGenerator.getBiomeSource();
 		final Set<Holder<Biome>> biomes = source.possibleBiomes();
 
-		//TODO: 1.18.2 Is this stilla valid way to determine the correct noiseGeneratorSettings for the level?
-
-		final Registry<StructureSet> structureSetRegistry;
+		if (chunkGenerator instanceof NoiseGeneratorSettingsProvider gen)
+			noiseGeneratorSettings = gen.bclib_getNoiseGeneratorSettings();
+		/*final Registry<StructureSet> structureSetRegistry;
 		if (chunkGenerator instanceof ChunkGeneratorAccessor acc) {
 			structureSetRegistry = acc.bclib_getStructureSetsRegistry();
 		} else {
@@ -524,7 +524,7 @@ public class BiomeAPI {
 				.filter(gen-> structureSetRegistry!=null && (gen instanceof NoiseGeneratorSettingsProvider) && (gen instanceof ChunkGeneratorAccessor) && ((ChunkGeneratorAccessor)gen).bclib_getStructureSetsRegistry()==structureSetRegistry)
 				.map(gen->((NoiseGeneratorSettingsProvider)gen).bclib_getNoiseGeneratorSettings())
 				.findFirst()
-				.orElse(null);
+				.orElse(null);*/
 
 
 		// Datapacks (like Amplified Nether)will change the GeneratorSettings upon load, so we will
@@ -566,11 +566,6 @@ public class BiomeAPI {
 			modifications.forEach(consumer -> {
 				consumer.accept(biomeID, biome);
 			});
-		}
-		
-		final BCLBiome bclBiome = BiomeAPI.getBiome(biome);
-		if (bclBiome != null) {
-			addStepFeaturesToBiome(biome, bclBiome.getFeatures());
 		}
 		
 		sortBiomeFeatures(biome);
@@ -673,20 +668,6 @@ public class BiomeAPI {
 		accessor.bclib_setFeatures(allFeatures);
 		accessor.bclib_setFeatureSet(featureSet);
 		accessor.bclib_setFlowerFeatures(flowerFeatures);
-	}
-	
-	/**
-	 * For internal use only!
-	 *
-	 * Adds new features to existing biome. Called from {@link #applyModificationsAndUpdateFeatures(List, Holder)}} when the Biome is
-	 * present in any {@link BiomeSource}
-	 * @param biome {@link Biome} to add features in.
-	 * @param featureMap Map of {@link ConfiguredFeature} to add.
-	 */
-	private static void addStepFeaturesToBiome(Holder<Biome> biome, Map<Decoration, List<Holder<PlacedFeature>>> featureMap) {
-		for (Decoration step: featureMap.keySet()) {
-			addBiomeFeature(biome, step, featureMap.get(step));
-		}
 	}
 	
 	/**

@@ -26,14 +26,14 @@ public class NoiseGeneratorSettingsMixin implements SurfaceRuleProvider {
 	private SurfaceRules.RuleSource bclib_originalSurfaceRule;
 	private Set<BiomeSource> bclib_biomeSources = new HashSet<>();
 
-	private void bclib_updateCutomRules(){
+	private void bclib_updateCustomRules(){
 		bclib_setCustomRules(BiomeAPI.getRuleSources(bclib_biomeSources));
 	}
 
 	@Override
 	public void bclib_addBiomeSource(BiomeSource source) {
 		bclib_biomeSources.add(source);
-		bclib_updateCutomRules();
+		bclib_updateCustomRules();
 	}
 
 	@Override

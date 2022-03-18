@@ -688,24 +688,7 @@ public class BCLBiomeBuilder {
 		builder.mobSpawnSettings(getSpawns().build());
 		builder.specialEffects(getEffects().build());
 
-		Map<Decoration, List<Holder<PlacedFeature>>> defferedFeatures = Maps.newHashMap();
-		BiomeGenerationSettingsAccessor acc = BiomeGenerationSettingsAccessor.class.cast(getGeneration().build());
-		if (acc != null) {
-			builder.generationSettings(fixGenerationSettings(new BiomeGenerationSettings.Builder().build()));
-			List<HolderSet<PlacedFeature>> decorations = acc.bclib_getFeatures();
-			for (Decoration d : Decoration.values()) {
-				int i = d.ordinal();
-				if (i>=0 && i<decorations.size()) {
-					HolderSet<PlacedFeature> features = decorations.get(i);
-					defferedFeatures.put(d, features.stream().collect(Collectors.toList()));
-				} else {
-					defferedFeatures.put(d, Lists.newArrayList());
-				}
-
-			}
-		} else {
-			builder.generationSettings(fixGenerationSettings(getGeneration().build()));
-		}
+		builder.generationSettings(fixGenerationSettings(getGeneration().build()));
 		
 		BCLBiomeSettings settings = BCLBiomeSettings.createBCL()
 			.setTerrainHeight(height)
@@ -720,7 +703,6 @@ public class BCLBiomeBuilder {
 		final T res = biomeConstructor.apply(biomeID, biome, settings);
 		res.attachStructures(structureTags);
 		res.setSurface(surfaceRule);
-		res.setFeatures(defferedFeatures);
 
 		//carvers.forEach(cfg -> BiomeAPI.addBiomeCarver(biome, cfg.second, cfg.first));
 		return res;

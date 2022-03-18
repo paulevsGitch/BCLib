@@ -306,25 +306,7 @@ public class BCLBiome extends BCLBiomeSettings {
 			}
 		};
 	}
-	
-	private Map<Decoration, List<Holder<PlacedFeature>>> features = Maps.newHashMap();
-	
-	/**
-	 * Sets the biome features.
-	 * @param features the feature list.
-	 */
-	public void setFeatures(Map<Decoration, List<Holder<PlacedFeature>>> features) {
-		this.features = features;
-	}
-	
-	/**
-	 * Returns the built-in set of Features for this biome (as they were set with {@link #setFeatures(Map)})
-	 * @return List of all features
-	 */
-	public Map<Decoration, List<Holder<PlacedFeature>>> getFeatures(){
-		return features;
-	}
-	
+
 	/**
 	 * Returns the group used in the config Files for this biome
 	 *
