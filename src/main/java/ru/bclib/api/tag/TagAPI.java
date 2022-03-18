@@ -35,7 +35,6 @@ public class TagAPI {
 	 * @return {@link TagKey}.
 	 */
 	public static <T> TagKey<T> makeTag(Registry<T> registry, TagLocation<T> id) {
-		//TODO: 1.18.2 check if registry.key() gets the correct result
 		return registry
 				.getTagNames()
 				.filter(tagKey -> tagKey.location().equals(id))
