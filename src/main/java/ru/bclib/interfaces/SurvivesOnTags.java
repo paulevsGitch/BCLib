@@ -5,8 +5,10 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.NetherrackBlock;
 import net.minecraft.world.level.block.state.BlockState;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,7 +24,12 @@ public interface SurvivesOnTags extends SurvivesOnSpecialGround{
                 .map(named->named.get())
                 .flatMap(named->named.stream())
                 .filter(block -> block != Blocks.AIR && block != null)
-                .map(block ->new ItemStack(block.value()).getHoverName().getString())
+                .map(block -> {
+                    ItemStack stack = new ItemStack(block.value());
+                    if (stack.hasCustomHoverName()) return stack.getHoverName().getString();
+                    else return block.value().getName().getString();
+                })
+                .sorted(Comparator.naturalOrder())
                 .collect(Collectors.joining(", "));
     }
 

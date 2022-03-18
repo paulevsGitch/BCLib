@@ -17,22 +17,18 @@ public interface SurvivesOnSpecialGround {
     String getSurvivableBlocksString();
 
     @Environment(EnvType.CLIENT)
-    static List<String>  splitLines(String input){
-        final int MAX_LEN = 30;
-        final int MAX_LEN_SECOND = 40;
+    static List<String>  splitLines(String input) {
+        final int MAX_LEN = 45;
         List<String> lines = Lists.newArrayList();
-        int maxLen = MAX_LEN;
 
-        while (input.length()>maxLen){
-            int idx = input.lastIndexOf(",", maxLen);
+        while (input.length()>MAX_LEN){
+            int idx = input.lastIndexOf(",", MAX_LEN);
             if (idx>=0) {
                 lines.add( input.substring(0, idx+1).trim());
-                input = input.substring(idx+1, input.length()).trim();
+                input = input.substring(idx+1).trim();
             } else {
                 break;
             }
-
-            maxLen = MAX_LEN_SECOND;
         }
         lines.add(input.trim());
 
@@ -41,15 +37,17 @@ public interface SurvivesOnSpecialGround {
 
     @Environment(EnvType.CLIENT)
     static void appendHoverText(List<Component> list, String description) {
-        final int MAX_LINES = 5;
+        final int MAX_LINES = 7;
         List<String>  lines = splitLines(description);
-        if (lines.size()>0) {
+        if (lines.size()==1) {
             list.add(new TranslatableComponent("tooltip.bclib.place_on", lines.get(0)).withStyle(ChatFormatting.GREEN));
-        }
-        for (int i=1; i<Math.min(lines.size(),MAX_LINES); i++){
-            String line = lines.get(i);
-            if (i==MAX_LINES-1 && i<lines.size()-1) line +=" ...";
-            list.add(new TextComponent("    " + line).withStyle(ChatFormatting.GREEN));
+        } else if (lines.size()>1) {
+            list.add(new TranslatableComponent("tooltip.bclib.place_on", "").withStyle(ChatFormatting.GREEN));
+            for (int i = 0; i < Math.min(lines.size(), MAX_LINES); i++) {
+               String line = lines.get(i);
+                if (i == MAX_LINES - 1 && i < lines.size() - 1) line += " ...";
+                list.add(new TextComponent("  " + line).withStyle(ChatFormatting.GREEN));
+            }
         }
     }
 

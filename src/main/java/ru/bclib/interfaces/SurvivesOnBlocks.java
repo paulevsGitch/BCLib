@@ -5,6 +5,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -15,8 +16,13 @@ public interface SurvivesOnBlocks extends SurvivesOnSpecialGround{
     default String getSurvivableBlocksString(){
         return getSurvivableBlocks()
                 .stream()
-                .filter(block -> block!= Blocks.AIR)
-                .map(block ->new ItemStack(block).getHoverName().getString())
+                .filter(block -> block!= Blocks.AIR && block!=null)
+                .map(block -> {
+                    ItemStack stack = new ItemStack(block);
+                    if (stack.hasCustomHoverName()) return stack.getHoverName().getString();
+                    else return block.getName().getString();
+                })
+                .sorted(Comparator.naturalOrder())
                 .collect(Collectors.joining(", "));
     }
 
