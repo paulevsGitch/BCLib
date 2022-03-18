@@ -35,12 +35,14 @@ import ru.bclib.api.tag.TagAPI.TagLocation;
 import ru.bclib.client.render.BCLRenderLayer;
 import ru.bclib.interfaces.RenderLayerProvider;
 import ru.bclib.interfaces.TagProvider;
+import ru.bclib.interfaces.tools.AddMineableHoe;
+import ru.bclib.interfaces.tools.AddMineableShears;
 import ru.bclib.items.tool.BaseShearsItem;
 
 import java.util.List;
 import java.util.Random;
 
-public abstract class UnderwaterPlantBlock extends BaseBlockNotFull implements RenderLayerProvider, BonemealableBlock, LiquidBlockContainer, TagProvider {
+public abstract class UnderwaterPlantBlock extends BaseBlockNotFull implements RenderLayerProvider, BonemealableBlock, LiquidBlockContainer, AddMineableShears, AddMineableHoe {
 	private static final VoxelShape SHAPE = Block.box(4, 0, 4, 12, 14, 12);
 	
 	public UnderwaterPlantBlock() {
@@ -161,10 +163,5 @@ public abstract class UnderwaterPlantBlock extends BaseBlockNotFull implements R
 	public FluidState getFluidState(BlockState state) {
 		return Fluids.WATER.getSource(false);
 	}
-	
-	@Override
-	public void addTags(List<TagLocation<Block>> blockTags, List<TagLocation<Item>> itemTags) {
-		blockTags.add(NamedMineableTags.SHEARS);
-		blockTags.add(NamedMineableTags.HOE);
-	}
+
 }
