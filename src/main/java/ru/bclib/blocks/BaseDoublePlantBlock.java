@@ -45,8 +45,6 @@ public abstract class BaseDoublePlantBlock extends BaseBlockNotFull implements R
 	public BaseDoublePlantBlock() {
 		this(
 			FabricBlockSettings.of(Material.PLANT)
-					//TODO: 1.18.2 make sure this works with the new tag system
-					//.breakByHand(true)
 				.sound(SoundType.GRASS)
 				.noCollission()
 		);
@@ -55,8 +53,6 @@ public abstract class BaseDoublePlantBlock extends BaseBlockNotFull implements R
 	public BaseDoublePlantBlock(int light) {
 		this(
 			FabricBlockSettings.of(Material.PLANT)
-					//TODO: 1.18.2 Check if this is still ok
-					//.breakByHand(true)
 				.sound(SoundType.GRASS)
 				.lightLevel((state) -> state.getValue(TOP) ? light : 0)
 				.noCollission()

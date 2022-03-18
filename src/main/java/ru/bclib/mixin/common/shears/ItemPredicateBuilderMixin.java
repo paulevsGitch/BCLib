@@ -23,7 +23,6 @@ public abstract class ItemPredicateBuilderMixin {
 	@Inject(method = "matches", at = @At("HEAD"), cancellable = true)
 	void bclib_of(ItemStack itemStack, CallbackInfoReturnable<Boolean> cir) {
 		if (this.items != null && this.items.size() == 1 && this.items.contains(Items.SHEARS)) {
-			//TODO: 1.18.2 See if removing minable_shears test is having an efffect...
 			if (itemStack.is(CommonItemTags.SHEARS) ){
 				cir.setReturnValue(true);
 			}

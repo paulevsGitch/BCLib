@@ -42,7 +42,6 @@ public class BCLFeature {
 
 	private static <FC extends FeatureConfiguration, F extends Feature<FC>> Holder<PlacedFeature> buildPlacedFeature(ResourceLocation id, F feature, FC configuration, PlacementModifier[] modifiers) {
 		Holder<ConfiguredFeature<?, ?>> configuredFeature;
-		//TODO: 1.18.2 Check if this cast is working
 		if (!BuiltinRegistries.CONFIGURED_FEATURE.containsKey(id)) {
 			configuredFeature = (Holder<ConfiguredFeature<?, ?>>)(Object)FeatureUtils.register(id.toString(), feature, configuration);
 		} else  {

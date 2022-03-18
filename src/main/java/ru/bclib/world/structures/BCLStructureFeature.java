@@ -63,8 +63,6 @@ public class BCLStructureFeature {
 		this.structure = StructureFeatureAccessor.callRegister(id.toString(), structure, step);
 		this.featureConfigured = StructureFeaturesAccessor.callRegister(structureKey, this.structure.configured(NoneFeatureConfiguration.NONE, biomeTag, adaptNoise));
 		StructureSets.register(structureSetKey, featureConfigured, spreadConfig);
-		//TODO: 1.18 check if structures are added correctly
-		//FlatChunkGeneratorConfigAccessor.getStructureToFeatures().put(this.structure, this.featureConfigured);
 	}
 
 	/**

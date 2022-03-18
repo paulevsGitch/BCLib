@@ -28,9 +28,7 @@ public class StripableBarkBlock extends BaseBarkBlock {
 	@Override
 	@SuppressWarnings("deprecation")
 	public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-		//TODO: 1.18.2 check
 		if (TagAPI.isToolWithMineableTag(player.getMainHandItem(), NamedMineableTags.AXE)){
-		//if (FabricToolTags.AXES.contains(player.getMainHandItem().getItem())) {
 			world.playSound(player, pos, SoundEvents.AXE_STRIP, SoundSource.BLOCKS, 1.0F, 1.0F);
 			if (!world.isClientSide) {
 				world.setBlock(pos,

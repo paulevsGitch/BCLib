@@ -20,7 +20,6 @@ public class BaseShearsItem extends ShearsItem {
 
 	public static boolean isShear(ItemStack itemStack, Item item){
 		if (item == Items.SHEARS){
-			//TODO: 1.18.2 see if removing SHEARS_MINEABLE causes any problems... It should not, since it is a Block-Tag
 			return itemStack.is(item) | itemStack.is(CommonItemTags.SHEARS);
 		} else {
 			return itemStack.is(item);

@@ -19,8 +19,6 @@ public abstract class WallMushroomBlock extends BaseWallPlantBlock {
 		this(
 			FabricBlockSettings
 				.of(Material.PLANT)
-				//TODO: 1.18.2 Check if this is still ok
-					//..breakByHand(true)
 				.luminance(light)
 				.destroyTime(0.2F)
 				.sound(SoundType.GRASS)

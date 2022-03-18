@@ -53,8 +53,6 @@ public class BaseVineBlock extends BaseBlockNotFull implements RenderLayerProvid
 		this(
 			FabricBlockSettings
 				.of(Material.PLANT)
-					//TODO: 1.18.2 make sure this works with the new tag system
-					//.breakByHand(true)
 				.sound(SoundType.GRASS)
 				.lightLevel((state) -> bottomOnly ? state.getValue(SHAPE) == TripleShape.BOTTOM ? light : 0 : light)
 				.noCollission()
@@ -111,7 +109,6 @@ public class BaseVineBlock extends BaseBlockNotFull implements RenderLayerProvid
 	@Override
 	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
 		ItemStack tool = builder.getParameter(LootContextParams.TOOL);
-		//TODO: Test if shearing still works
 		if (tool != null && BaseShearsItem.isShear(tool) || EnchantmentHelper.getItemEnchantmentLevel(
 			Enchantments.SILK_TOUCH,
 			tool

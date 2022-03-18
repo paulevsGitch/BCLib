@@ -20,8 +20,6 @@ public abstract class UnderwaterPlantWithAgeBlock extends UnderwaterPlantBlock {
 		super(
 			FabricBlockSettings
 				.of(Material.WATER_PLANT)
-				//TODO: 1.18.2 Check if this is still ok
-				//.breakByHand(true)
 				.sound(SoundType.WET_GRASS)
 				.randomTicks()
 				.noCollission()

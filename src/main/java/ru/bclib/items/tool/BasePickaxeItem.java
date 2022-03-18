@@ -9,7 +9,6 @@ import net.minecraft.world.item.Tier;
 import ru.bclib.client.models.ModelsHelper;
 import ru.bclib.interfaces.ItemModelProvider;
 
-//TODO: 1.18.2 See if mining speed is still ok.
 public class BasePickaxeItem extends PickaxeItem implements ItemModelProvider {
 	public BasePickaxeItem(Tier material, int attackDamage, float attackSpeed, Properties settings) {
 		super(material, attackDamage, attackSpeed, settings);

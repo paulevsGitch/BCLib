@@ -210,7 +210,6 @@ public class BCLBiome extends BCLBiomeSettings {
 		}
 		
 		if (!this.structureTags.isEmpty()) {
-			//TODO: 1.18.2 This need to be done by BiomeTags now
 			structureTags.forEach(tagKey -> TagAPI.addBiomeTag(tagKey, actualBiome.value()));
 		}
 		

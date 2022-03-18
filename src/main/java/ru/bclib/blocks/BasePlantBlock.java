@@ -47,7 +47,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
-public abstract class BasePlantBlock extends BaseBlockNotFull implements RenderLayerProvider, BonemealableBlock, AddMineableShears, AddMineableHoe {
+public abstract class BasePlantBlock extends BaseBlockNotFull implements RenderLayerProvider, BonemealableBlock{
 	private static final VoxelShape SHAPE = Block.box(4, 0, 4, 12, 14, 12);
 	
 	public BasePlantBlock() {
@@ -62,8 +62,6 @@ public abstract class BasePlantBlock extends BaseBlockNotFull implements RenderL
 		this(
 			FabricBlockSettings
 				.of(replaceable ? Material.REPLACEABLE_PLANT : Material.PLANT)
-					//TODO: 1.18.2 make sure this works with the new tag system
-					//.breakByHand(true)
 				.sound(SoundType.GRASS)
 				.noCollission()
 		);
@@ -73,8 +71,6 @@ public abstract class BasePlantBlock extends BaseBlockNotFull implements RenderL
 		this(
 			FabricBlockSettings
 				.of(replaceable ? Material.REPLACEABLE_PLANT : Material.PLANT)
-				//TODO: 1.18.2 Check if this is still ok
-					//.breakByHand(true)
 				.luminance(light)
 				.sound(SoundType.GRASS)
 				.noCollission()

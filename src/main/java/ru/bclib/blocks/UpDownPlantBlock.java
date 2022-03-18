@@ -41,8 +41,6 @@ public abstract class UpDownPlantBlock extends BaseBlockNotFull implements Rende
 	public UpDownPlantBlock() {
 		this(FabricBlockSettings
 			.of(Material.PLANT)
-			//TODO: 1.18.2 make sure this works with the new tag system
-			//.breakByHand(true)
 			.sound(SoundType.GRASS)
 			.noCollission()
 		);
@@ -86,7 +84,6 @@ public abstract class UpDownPlantBlock extends BaseBlockNotFull implements Rende
 	@Override
 	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
 		ItemStack tool = builder.getParameter(LootContextParams.TOOL);
-		//TODO: 1.18.2 Test if shearing still works
 		if (tool != null && BaseShearsItem.isShear(tool) || EnchantmentHelper.getItemEnchantmentLevel(
 			Enchantments.SILK_TOUCH,
 			tool
