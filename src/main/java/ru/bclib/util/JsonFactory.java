@@ -30,7 +30,7 @@ public class JsonFactory {
 	
 	public static JsonObject getJsonObject(InputStream stream) {
 		try {
-			Reader reader = new InputStreamReader(stream);
+			Reader reader = new InputStreamReader(stream,StandardCharsets.UTF_8);
 			JsonElement json = loadJson(reader);
 			if (json != null && json.isJsonObject()) {
 				JsonObject jsonObject = json.getAsJsonObject();
@@ -83,7 +83,7 @@ public class JsonFactory {
 	
 	public static JsonElement loadJson(File jsonFile) {
 		if (jsonFile.exists()) {
-			try (Reader reader = new FileReader(jsonFile)) {
+			try (Reader reader = new FileReader(jsonFile, StandardCharsets.UTF_8)) {
 				return loadJson(reader);
 			}
 			catch (Exception ex) {
@@ -98,7 +98,7 @@ public class JsonFactory {
 	}
 	
 	public static void storeJson(File jsonFile, JsonElement jsonObject) {
-		try (FileWriter writer = new FileWriter(jsonFile)) {
+		try (FileWriter writer = new FileWriter(jsonFile,StandardCharsets.UTF_8)) {
 			String json = GSON.toJson(jsonObject);
 			writer.write(json);
 			writer.flush();
@@ -109,7 +109,7 @@ public class JsonFactory {
 	}
 	
 	public static void storeJson(OutputStream outStream, JsonElement jsonObject) {
-		OutputStreamWriter writer = new OutputStreamWriter(outStream);
+		OutputStreamWriter writer = new OutputStreamWriter(outStream,StandardCharsets.UTF_8);
 		GSON.toJson(jsonObject, writer);
 		try {
 			writer.flush();
