@@ -22,6 +22,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 
 public class JsonFactory {
 	public final static Gson GSON = new GsonBuilder().setPrettyPrinting()
@@ -69,7 +70,7 @@ public class JsonFactory {
 			Resource resource = manager.getResource(location);
 			if (resource != null) {
 				InputStream stream = resource.getInputStream();
-				InputStreamReader reader = new InputStreamReader(stream);
+				InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8);
 				obj = JsonFactory.GSON.fromJson(reader, JsonObject.class);
 				reader.close();
 				stream.close();
