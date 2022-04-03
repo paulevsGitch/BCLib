@@ -79,8 +79,8 @@ public abstract class ModIntegration {
 		return BuiltinRegistries.CONFIGURED_FEATURE.get(getID(name));
 	}
 	
-	public Biome getBiome(String name) {
-		return BuiltinRegistries.BIOME.get(getID(name));
+	public Holder<Biome> getBiome(String name) {
+		return BuiltinRegistries.BIOME.getHolder(getKey(name)).orElseThrow();
 	}
 	
 	public Class<?> getClass(String path) {

@@ -93,7 +93,7 @@ public class BiomeAPI {
 	public static final BCLBiome SOUL_SAND_VALLEY_BIOME = registerNetherBiome(getFromRegistry(Biomes.SOUL_SAND_VALLEY).value());
 	public static final BCLBiome BASALT_DELTAS_BIOME = registerNetherBiome(getFromRegistry(Biomes.BASALT_DELTAS).value());
 	
-	public static final BCLBiome THE_END = registerEndLandBiome(getFromRegistry(Biomes.THE_END).value());
+	public static final BCLBiome THE_END = registerEndLandBiome(getFromRegistry(Biomes.THE_END));
 	public static final BCLBiome END_MIDLANDS = registerSubBiome(THE_END, getFromRegistry(Biomes.END_MIDLANDS).value(), 0.5F);
 	public static final BCLBiome END_HIGHLANDS = registerSubBiome(THE_END, getFromRegistry(Biomes.END_HIGHLANDS).value(), 0.5F);
 	
@@ -232,8 +232,8 @@ public class BiomeAPI {
 	 * @param biome {@link BCLBiome}
 	 * @return {@link BCLBiome}
 	 */
-	public static BCLBiome registerEndLandBiome(Biome biome) {
-		BCLBiome bclBiome = new BCLBiome(biome, null);
+	public static BCLBiome registerEndLandBiome(Holder<Biome> biome) {
+		BCLBiome bclBiome = new BCLBiome(biome.value(), null);
 		
 		END_LAND_BIOME_PICKER.addBiome(bclBiome);
 		registerBiome(bclBiome);
@@ -247,8 +247,8 @@ public class BiomeAPI {
 	 * @param genChance float generation chance.
 	 * @return {@link BCLBiome}
 	 */
-	public static BCLBiome registerEndLandBiome(Biome biome, float genChance) {
-		BCLBiome bclBiome = new BCLBiome(biome, VanillaBiomeSettings.createVanilla().setGenChance(genChance).build());
+	public static BCLBiome registerEndLandBiome(Holder<Biome> biome, float genChance) {
+		BCLBiome bclBiome = new BCLBiome(biome.value(), VanillaBiomeSettings.createVanilla().setGenChance(genChance).build());
 		
 		END_LAND_BIOME_PICKER.addBiome(bclBiome);
 		registerBiome(bclBiome);
@@ -423,7 +423,7 @@ public class BiomeAPI {
 		
 		FabricBiomesData.END_LAND_BIOMES.forEach((key, weight) -> {
 			if (!hasBiome(key.location())) {
-				registerEndLandBiome(BuiltinRegistries.BIOME.get(key), weight);
+				registerEndLandBiome(BuiltinRegistries.BIOME.getHolder(key).orElseThrow(), weight);
 			}
 		});
 		

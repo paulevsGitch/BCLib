@@ -61,6 +61,11 @@ public class BCLFeatureBuilder <FC extends FeatureConfiguration, F extends Featu
 		modifications.add(modifier);
 		return this;
 	}
+
+	public BCLFeatureBuilder modifier(List<PlacementModifier> modifiers) {
+		modifications.addAll(modifiers);
+		return this;
+	}
 	
 	/**
 	 * Generate feature in certain iterations (per chunk).
