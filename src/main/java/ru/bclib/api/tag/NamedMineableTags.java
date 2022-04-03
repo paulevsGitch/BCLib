@@ -10,4 +10,5 @@ public class NamedMineableTags {
 	public static final TagLocation<Block> SHEARS = new TagLocation<>("fabric", "mineable/shears");
 	public static final TagLocation<Block> SHOVEL = new TagLocation<>("mineable/shovel");
 	public static final TagLocation<Block> SWORD = new TagLocation<>("fabric", "mineable/sword");
+	public static final TagLocation<Block> HAMMER = new TagLocation<>("c", "mineable/hammer");
 }

@@ -132,6 +132,9 @@ public class PostInitAPI {
 			if (block instanceof AddMineableSword) {
 				TagAPI.addBlockTags(block, NamedMineableTags.SWORD);
 			}
+			if (block instanceof AddMineableHammer) {
+				TagAPI.addBlockTags(block, NamedMineableTags.HAMMER);
+			}
 		}
 		if (block instanceof TagProvider) {
 			TagProvider.class.cast(block).addTags(blockTags, itemTags);
