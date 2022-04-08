@@ -100,8 +100,8 @@ public class WoodenComplexMaterial extends ComplexMaterial {
 	}
 
 	final protected void initBase(FabricBlockSettings blockSettings, FabricItemSettings itemSettings) {
-		TagLocation<Block> tagBlockLog = new TagLocation<>(getBlockTag(TAG_LOGS).getName());
-		TagLocation<Item> tagItemLog = new TagLocation<>(getItemTag(TAG_LOGS).getName());
+		TagLocation<Block> tagBlockLog = TagLocation.of(getBlockTag(TAG_LOGS));
+		TagLocation<Item> tagItemLog = TagLocation.of(getItemTag(TAG_LOGS));
 
 		addBlockEntry(
 				new BlockEntry(BLOCK_STRIPPED_LOG, (complexMaterial, settings) -> new BaseRotatedPillarBlock(settings))

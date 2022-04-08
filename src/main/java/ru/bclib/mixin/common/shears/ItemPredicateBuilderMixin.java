@@ -1,6 +1,5 @@
 package ru.bclib.mixin.common.shears;
 
-import net.fabricmc.fabric.api.tool.attribute.v1.FabricToolTags;
 import net.minecraft.advancements.critereon.ItemPredicate;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -24,7 +23,7 @@ public abstract class ItemPredicateBuilderMixin {
 	@Inject(method = "matches", at = @At("HEAD"), cancellable = true)
 	void bclib_of(ItemStack itemStack, CallbackInfoReturnable<Boolean> cir) {
 		if (this.items != null && this.items.size() == 1 && this.items.contains(Items.SHEARS)) {
-			if (itemStack.is(CommonItemTags.SHEARS) || itemStack.is(FabricToolTags.SHEARS)){
+			if (itemStack.is(CommonItemTags.SHEARS) ){
 				cir.setReturnValue(true);
 			}
 		}

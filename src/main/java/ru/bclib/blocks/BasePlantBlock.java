@@ -4,7 +4,6 @@ import com.google.common.collect.Lists;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
-import net.fabricmc.fabric.api.tool.attribute.v1.FabricToolTags;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -40,12 +39,15 @@ import ru.bclib.client.models.PatternsHelper;
 import ru.bclib.client.render.BCLRenderLayer;
 import ru.bclib.interfaces.RenderLayerProvider;
 import ru.bclib.interfaces.TagProvider;
+import ru.bclib.interfaces.tools.AddMineableHoe;
+import ru.bclib.interfaces.tools.AddMineableShears;
+import ru.bclib.items.tool.BaseShearsItem;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
-public abstract class BasePlantBlock extends BaseBlockNotFull implements RenderLayerProvider, BonemealableBlock, TagProvider {
+public abstract class BasePlantBlock extends BaseBlockNotFull implements RenderLayerProvider, BonemealableBlock{
 	private static final VoxelShape SHAPE = Block.box(4, 0, 4, 12, 14, 12);
 	
 	public BasePlantBlock() {
@@ -60,7 +62,6 @@ public abstract class BasePlantBlock extends BaseBlockNotFull implements RenderL
 		this(
 			FabricBlockSettings
 				.of(replaceable ? Material.REPLACEABLE_PLANT : Material.PLANT)
-				.breakByHand(true)
 				.sound(SoundType.GRASS)
 				.noCollission()
 		);
@@ -70,7 +71,6 @@ public abstract class BasePlantBlock extends BaseBlockNotFull implements RenderL
 		this(
 			FabricBlockSettings
 				.of(replaceable ? Material.REPLACEABLE_PLANT : Material.PLANT)
-				.breakByHand(true)
 				.luminance(light)
 				.sound(SoundType.GRASS)
 				.noCollission()
@@ -116,7 +116,8 @@ public abstract class BasePlantBlock extends BaseBlockNotFull implements RenderL
 	@Override
 	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
 		ItemStack tool = builder.getParameter(LootContextParams.TOOL);
-		if (tool != null && FabricToolTags.SHEARS.contains(tool.getItem()) || EnchantmentHelper.getItemEnchantmentLevel(
+		//TODO: 1.18.2 Test if shearing still works
+		if (tool != null && BaseShearsItem.isShear(tool) || EnchantmentHelper.getItemEnchantmentLevel(
 			Enchantments.SILK_TOUCH,
 			tool
 		) > 0) {
@@ -166,11 +167,5 @@ public abstract class BasePlantBlock extends BaseBlockNotFull implements RenderL
 	public BlockModel getBlockModel(ResourceLocation resourceLocation, BlockState blockState) {
 		Optional<String> pattern = PatternsHelper.createJson(BasePatterns.BLOCK_CROSS, resourceLocation);
 		return ModelsHelper.fromPattern(pattern);
-	}
-	
-	@Override
-	public void addTags(List<TagLocation<Block>> blockTags, List<TagLocation<Item>> itemTags) {
-		blockTags.add(NamedMineableTags.SHEARS);
-		blockTags.add(NamedMineableTags.HOE);
 	}
 }

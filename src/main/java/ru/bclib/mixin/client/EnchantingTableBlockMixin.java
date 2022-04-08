@@ -15,13 +15,13 @@ public abstract class EnchantingTableBlockMixin extends Block {
 		super(settings);
 	}
 	
-	@Redirect(method = "animateTick", at = @At(
+	@Redirect(method = "isValidBookShelf", at = @At(
 		value = "INVOKE",
 		target = "Lnet/minecraft/world/level/block/state/BlockState;is(Lnet/minecraft/world/level/block/Block;)Z"),
 		require = -1,
 		expect = -1
 	)
-	private boolean bclib_isBookshelf(BlockState state, Block block) {
+	private static boolean bclib_isBookshelf(BlockState state, Block block) {
 		return block == Blocks.BOOKSHELF ? state.is(CommonBlockTags.BOOKSHELVES) : state.is(block);
 	}
 }

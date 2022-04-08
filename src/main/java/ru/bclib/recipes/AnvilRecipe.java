@@ -4,12 +4,16 @@ import com.google.gson.JsonObject;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
 import net.minecraft.core.NonNullList;
+import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.TagParser;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.Tag;
+import net.minecraft.tags.TagKey;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.Container;
 import net.minecraft.world.InteractionHand;
@@ -41,6 +45,10 @@ public class AnvilRecipe implements Recipe<Container>, UnknownReceipBookCategory
 			new Serializer()
 	);
 	public final static ResourceLocation ID = BCLib.makeID(GROUP);
+
+	public static void register(){
+
+	}
 
 	private final ResourceLocation id;
 	private final Ingredient input;
@@ -116,7 +124,8 @@ public class AnvilRecipe implements Recipe<Container>, UnknownReceipBookCategory
 
 	public boolean matches(Container craftingInventory) {
 		ItemStack hammer = craftingInventory.getItem(1);
-		if (hammer.isEmpty() || !CommonItemTags.HAMMERS.contains(hammer.getItem())) {
+		//TODO: 1.18.2 Test if hammer still works
+		if (hammer.isEmpty() || !hammer.is(CommonItemTags.HAMMERS)) {
 			return false;
 		}
 		ItemStack material = craftingInventory.getItem(0);
@@ -139,12 +148,13 @@ public class AnvilRecipe implements Recipe<Container>, UnknownReceipBookCategory
 
 	@Override
 	public NonNullList<Ingredient> getIngredients() {
+		;
 		NonNullList<Ingredient> defaultedList = NonNullList.create();
-		defaultedList.add(Ingredient.of(CommonItemTags.HAMMERS
-			.getValues()
-			.stream()
-			.filter(hammer -> ((TieredItem) hammer).getTier().getLevel() >= toolLevel)
-			.map(ItemStack::new)));
+		defaultedList.add(Ingredient.of(Registry.ITEM.stream()
+				.filter(item->item.builtInRegistryHolder().is(CommonItemTags.HAMMERS))
+				.filter(hammer -> ((TieredItem) hammer).getTier().getLevel() >= toolLevel)
+				.map(ItemStack::new))
+		);
 		defaultedList.add(input);
 		return defaultedList;
 	}
@@ -209,7 +219,7 @@ public class AnvilRecipe implements Recipe<Container>, UnknownReceipBookCategory
 			return this;
 		}
 
-		public Builder setInput(Tag<Item> inputTag) {
+		public Builder setInput(TagKey<Item> inputTag) {
 			this.setInput(Ingredient.of(inputTag));
 			return this;
 		}

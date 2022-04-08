@@ -2,112 +2,178 @@ package ru.bclib.api.tag;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import net.fabricmc.fabric.api.tag.TagFactory;
-import net.fabricmc.fabric.impl.tag.extension.TagDelegate;
 import net.minecraft.core.Registry;
+import net.minecraft.data.BuiltinRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.tags.BlockTags;
-import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.Tag;
-import net.minecraft.tags.Tag.Named;
-import net.minecraft.tags.TagCollection;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import ru.bclib.api.biomes.BiomeAPI;
+import ru.bclib.mixin.common.DiggerItemAccessor;
 
-import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
-import java.util.function.Supplier;
+import java.util.function.BiConsumer;
 
 public class TagAPI {
 	private static final Map<ResourceLocation, Set<ResourceLocation>> TAGS_BLOCK = Maps.newConcurrentMap();
 	private static final Map<ResourceLocation, Set<ResourceLocation>> TAGS_ITEM = Maps.newConcurrentMap();
+	private static final Map<ResourceLocation, Set<ResourceLocation>> TAGS_BIOME = Maps.newConcurrentMap();
 	
 	/**
-	 * Get or create {@link Tag.Named}.
+	 * Get or create {@link TagKey}.
 	 *
-	 * @param containerSupplier - {@link TagCollection} {@link Supplier} tag collection;
+	 * @param registry - {@link Registry<T>} tag collection;
 	 * @param id				- {@link ResourceLocation} tag id.
-	 * @return {@link Tag.Named}.
+	 * @return {@link TagKey}.
 	 */
-	public static <T> TagNamed<T> makeTag(Supplier<TagCollection<T>> containerSupplier, TagLocation<T> id) {
-		Tag<T> tag = containerSupplier.get().getTag(id);
-		return tag == null ? new Delegate<>(id, containerSupplier) : CommonDelegate.proxy((Named<T>) tag);
+	public static <T> TagKey<T> makeTag(Registry<T> registry, TagLocation<T> id) {
+		return registry
+				.getTagNames()
+				.filter(tagKey -> tagKey.location().equals(id))
+				.findAny()
+				.orElse(TagKey.create(registry.key(), id));
 	}
-	
+
 	/**
-	 * Get or create {@link Block} {@link Tag.Named} with mod namespace.
+	 * Get or create {@link Block} {@link TagKey} with mod namespace.
 	 *
 	 * @param modID - {@link String} mod namespace (mod id);
 	 * @param name  - {@link String} tag name.
-	 * @return {@link Block} {@link Tag.Named}.
+	 * @return {@link Block} {@link TagKey}.
 	 */
-	public static TagNamed<Block> makeBlockTag(String modID, String name) {
-		return makeTag(BlockTags::getAllTags, new TagLocation<>(modID, name));
+	public static TagKey<Biome> makeBiomeTag(String modID, String name) {
+		return TagKey.create(Registry.BIOME_REGISTRY, new ResourceLocation(modID, name));
 	}
+
 	
 	/**
-	 * Get or create {@link Item} {@link Tag.Named} with mod namespace.
+	 * Get or create {@link Block} {@link TagKey} with mod namespace.
 	 *
 	 * @param modID - {@link String} mod namespace (mod id);
 	 * @param name  - {@link String} tag name.
-	 * @return {@link Item} {@link Tag.Named}.
+	 * @return {@link Block} {@link TagKey}.
 	 */
-	public static TagNamed<Item> makeItemTag(String modID, String name) {
-		return makeTag(ItemTags::getAllTags, new TagLocation<>(modID, name));
+	public static TagKey<Block> makeBlockTag(String modID, String name) {
+		return makeTag(Registry.BLOCK, new TagLocation<>(modID, name));
+	}
+
+	/**
+	 * Get or create {@link Block} {@link TagKey} with mod namespace.
+	 *
+	 * @param id - {@link String} id for the tag;
+	 * @return {@link Block} {@link TagKey}.
+	 */
+	public static TagKey<Block> makeBlockTag(ResourceLocation id) {
+		return makeTag(Registry.BLOCK, new TagLocation<>(id));
 	}
 	
 	/**
-	 * Get or create {@link Block} {@link Tag.Named}.
+	 * Get or create {@link Item} {@link TagKey} with mod namespace.
+	 *
+	 * @param modID - {@link String} mod namespace (mod id);
+	 * @param name  - {@link String} tag name.
+	 * @return {@link Item} {@link TagKey}.
+	 */
+	public static TagKey<Item> makeItemTag(String modID, String name) {
+		return makeTag(Registry.ITEM, new TagLocation<>(modID, name));
+	}
+
+	/**
+	 * Get or create {@link Item} {@link TagKey} with mod namespace.
+	 *
+	 * @param id - {@link String} id for the tag;
+	 * @return {@link Item} {@link TagKey}.
+	 */
+	public static TagKey<Item> makeItemTag(ResourceLocation id) {
+		return makeTag(Registry.ITEM, new TagLocation<>(id));
+	}
+	
+	/**
+	 * Get or create {@link Block} {@link TagKey}.
 	 *
 	 * @param name - {@link String} tag name.
-	 * @return {@link Block} {@link Tag.Named}.
+	 * @return {@link Block} {@link TagKey}.
 	 * @see <a href="https://fabricmc.net/wiki/tutorial:tags">Fabric Wiki (Tags)</a>
 	 */
-	public static TagNamed<Block> makeCommonBlockTag(String name) {
-		return makeTag(BlockTags::getAllTags, new TagLocation<>("c", name));
+	public static TagKey<Block> makeCommonBlockTag(String name) {
+		return makeTag(Registry.BLOCK, new TagLocation<>("c", name));
 	}
 	
 	/**
-	 * Get or create {@link Item} {@link Tag.Named}.
+	 * Get or create {@link Item} {@link TagKey}.
 	 *
 	 * @param name - {@link String} tag name.
-	 * @return {@link Item} {@link Tag.Named}.
+	 * @return {@link Item} {@link TagKey}.
 	 * @see <a href="https://fabricmc.net/wiki/tutorial:tags">Fabric Wiki (Tags)</a>
 	 */
-	public static TagNamed<Item> makeCommonItemTag(String name) {
-		return makeTag(ItemTags::getAllTags, new TagLocation<>("c", name));
-	}
-	
-	/**
-	 * Get or create Minecraft {@link Block} {@link Tag.Named}.
-	 *
-	 * @param name - {@link String} tag name.
-	 * @return {@link Block} {@link Tag.Named}.
-	 */
-	@Deprecated(forRemoval = true)
-	public static TagNamed<Block> getMCBlockTag(String name) {
-		ResourceLocation id = new ResourceLocation(name);
-		Tag<Block> tag = BlockTags.getAllTags().getTag(id);
-		return CommonDelegate.proxy(tag == null ? (Named<Block>) TagFactory.BLOCK.create(id): (Named<Block>) tag);
+	public static TagKey<Item> makeCommonItemTag(String name) {
+		return makeTag(Registry.ITEM, new TagLocation<>("c", name));
 	}
 	
 	/**
 	 * Initializes basic tags. Should be called only in BCLib main class.
 	 */
 	public static void init() {
-		addBlockTag(CommonBlockTags.BOOKSHELVES.getName(), Blocks.BOOKSHELF);
-		addBlockTag(CommonBlockTags.CHEST.getName(), Blocks.CHEST);
-		addItemTag(CommonItemTags.CHEST.getName(), Items.CHEST);
-		addItemTag(CommonItemTags.IRON_INGOTS.getName(), Items.IRON_INGOT);
-		addItemTag(CommonItemTags.FURNACES.getName(), Blocks.FURNACE);
+		addBlockTag(CommonBlockTags.BOOKSHELVES, Blocks.BOOKSHELF);
+		addBlockTag(CommonBlockTags.CHEST, Blocks.CHEST);
+		addItemTag(CommonItemTags.CHEST, Items.CHEST);
+		addItemTag(CommonItemTags.IRON_INGOTS, Items.IRON_INGOT);
+		addItemTag(CommonItemTags.FURNACES, Blocks.FURNACE);
 	}
-	
+
+	/**
+	 * Adds multiple Tags to one Biome.
+	 * @param tagIDs array of {@link TagLocation<Biome>} tag IDs.
+	 * @param biome The {@link Biome} to add tag.
+	 */
+	@SafeVarargs
+	public static void addBiomeTags(Biome biome, TagLocation<Biome>... tagIDs) {
+		for (TagLocation<Biome> tagID : tagIDs) {
+			addBiomeTagUntyped(tagID, biome);
+		}
+	}
+
+	/**
+	 * Adds one Tag to multiple Biomes.
+	 * @param tagID {@link TagLocation<Biome>} tag ID.
+	 * @param biomes array of {@link Biome} to add into tag.
+	 */
+	public static void addBiomeTag(TagLocation<Biome> tagID, Biome... biomes) {
+		addBiomeTagUntyped(tagID, biomes);
+	}
+
+	/**
+	 * Adds one Tag to multiple Biomes.
+	 * @param tagID {@link TagKey<Biome>} tag ID.
+	 * @param biomes array of {@link Biome} to add into tag.
+	 */
+	public static void addBiomeTag(TagKey<Biome> tagID, Biome... biomes) {
+		addBiomeTagUntyped(tagID.location(), biomes);
+	}
+	/**
+	 * Adds one Tag to multiple Biomes.
+	 * @param tagID {@link ResourceLocation} tag ID.
+	 * @param biomes array of {@link Biome} to add into tag.
+	 */
+	protected static void addBiomeTagUntyped(ResourceLocation tagID, Biome... biomes) {
+		Set<ResourceLocation> set = TAGS_BIOME.computeIfAbsent(tagID, k -> Sets.newHashSet());
+		for (Biome biome : biomes) {
+			ResourceLocation id = BiomeAPI.getBiomeID(biome);
+			if (id != null) {
+				set.add(id);
+			}
+		}
+	}
+
+
 	/**
 	 * Adds multiple Tags to one Block.
 	 * @param tagIDs array of {@link TagLocation<Block>} tag IDs.
@@ -127,6 +193,15 @@ public class TagAPI {
 	 */
 	public static void addBlockTag(TagLocation<Block> tagID, Block... blocks) {
 		addBlockTagUntyped(tagID, blocks);
+	}
+
+	/**
+	 * Adds one Tag to multiple Blocks.
+	 * @param tagID {@link TagKey<Block>} tag ID.
+	 * @param blocks array of {@link Block} to add into tag.
+	 */
+	public static void addBlockTag(TagKey<Block> tagID, Block... blocks) {
+		addBlockTagUntyped(tagID.location(), blocks);
 	}
 	
 	/**
@@ -164,6 +239,15 @@ public class TagAPI {
 	public static void addItemTag(TagLocation<Item> tagID, ItemLike... items) {
 		addItemTagUntyped(tagID, items);
 	}
+
+	/**
+	 * Adds one Tag to multiple Items.
+	 * @param tagID {@link TagKey<Item>} tag ID.
+	 * @param items array of {@link ItemLike} to add into tag.
+	 */
+	public static void addItemTag(TagKey<Item> tagID, ItemLike... items) {
+		addItemTagUntyped(tagID.location(), items);
+	}
 	
 	/**
 	 * Adds one Tag to multiple Items.
@@ -190,16 +274,17 @@ public class TagAPI {
 	 * @param tagsMap   The map that will hold the registered Tags
 	 * @return The {@code tagsMap} Parameter.
 	 */
-	public static Map<ResourceLocation, Tag.Builder> apply(String directory, Map<ResourceLocation, Tag.Builder> tagsMap) {
-		Map<ResourceLocation, Set<ResourceLocation>> tagMap = null;
+	public static <T> Map<ResourceLocation, Tag.Builder> apply(String directory, Map<ResourceLocation, Tag.Builder> tagsMap) {
+		final BiConsumer<ResourceLocation, Set<ResourceLocation>> consumer;
+		consumer = (id, ids) -> apply(tagsMap.computeIfAbsent(id, key -> Tag.Builder.tag()), ids);
 		if ("tags/blocks".equals(directory)) {
-			tagMap = TAGS_BLOCK;
+			TAGS_BLOCK.forEach(consumer);
 		}
 		else if ("tags/items".equals(directory)) {
-			tagMap = TAGS_ITEM;
+			TAGS_ITEM.forEach(consumer);
 		}
-		if (tagMap != null) {
-			tagMap.forEach((id, ids) -> apply(tagsMap.computeIfAbsent(id, key -> Tag.Builder.tag()), ids));
+		else if ("tags/worldgen/biome".equals(directory)) {
+			TAGS_BIOME.forEach(consumer);
 		}
 		return tagsMap;
 	}
@@ -215,16 +300,8 @@ public class TagAPI {
 		ids.forEach(value -> builder.addElement(value, "BCLib Code"));
 		return builder;
 	}
-	
-	/**
-	 * Extends {@link Tag.Named} to return a type safe {@link TagLocation}. This Type was introduced to
-	 * allow type-safe definition of Tags using their ResourceLocation.
-	 * @param <T> The Type of the underlying {@link Tag}
-	 */
-	public interface TagNamed<T> extends Tag.Named<T>{
-		TagLocation<T> getName();
-	}
-	
+
+
 	/**
 	 * Extends (without changing) {@link ResourceLocation}. This Type was introduced to allow type-safe definition af
 	 * Tags using their ResourceLocation.
@@ -234,68 +311,32 @@ public class TagAPI {
 		public TagLocation(String string) {
 			super(string);
 		}
-		
+
 		public TagLocation(String string, String string2) {
 			super(string, string2);
 		}
-		
+
 		public TagLocation(ResourceLocation location) {
 			super(location.getNamespace(), location.getPath());
 		}
 
-		public static<R> TagLocation<R> of(Tag.Named<R> tag){
-			return new TagLocation<R>(tag.getName());
+		public static<R> TagLocation<R> of(TagKey<R> tag){
+			return new TagLocation<R>(tag.location());
 		}
 	}
-	
-	private abstract static class CommonDelegate<T>  implements TagNamed<T> {
-		protected final Tag.Named<T> delegate;
-		protected CommonDelegate(Tag.Named<T> source){
-			this.delegate = source;
-		}
-		
-		public static<T> TagNamed<T> proxy(Tag.Named<T> source){
-			if (source instanceof TagNamed typed) return typed;
-			return new ProxyDelegate<>(source);
-		}
-		
-		@Override
-		public boolean contains(T object) {
-			return delegate.contains(object);
-		}
-		
-		@Override
-		public List<T> getValues() {
-			return delegate.getValues();
-		}
-		
-		@Override
-		public T getRandomElement(Random random) {
-			return delegate.getRandomElement(random);
-		}
+
+	public static boolean isToolWithMineableTag(ItemStack stack, TagKey<Block> tag){
+		return isToolWithUntypedMineableTag(stack, tag.location());
 	}
-	
-	private static final class ProxyDelegate<T> extends CommonDelegate<T>{
-		private final TagLocation<T> id;
-		private ProxyDelegate(Tag.Named<T> source) {
-			super( source);
-			id = new TagLocation<>(source.getName()
-										 .getNamespace(), source.getName()
-																.getPath());
-		}
-		@Override
-		public TagLocation<T> getName(){
-			return id;
-		}
+
+	public static boolean isToolWithMineableTag(ItemStack stack, TagLocation<Block> tag){
+		return isToolWithUntypedMineableTag(stack, tag);
 	}
-	
-	private static final class Delegate<T> extends CommonDelegate<T>{
-		public Delegate(TagLocation<T> id, Supplier<TagCollection<T>> containerSupplier) {
-			super( new TagDelegate<>(id, containerSupplier));
+
+	private static boolean isToolWithUntypedMineableTag(ItemStack stack, ResourceLocation tag){
+		if (stack.getItem() instanceof DiggerItemAccessor dig){
+			return dig.bclib_getBlockTag().location().equals(tag);
 		}
-		@Override
-		public TagLocation<T> getName(){
-			return (TagLocation<T>)delegate.getName();
-		}
+		return false;
 	}
 }

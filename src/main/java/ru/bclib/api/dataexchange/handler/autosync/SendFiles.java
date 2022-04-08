@@ -127,7 +127,6 @@ public class SendFiles extends DataHandler.FromServer {
 		if ( Configs.CLIENT_CONFIG.isAcceptingConfigs() ||  Configs.CLIENT_CONFIG.isAcceptingFiles() ||  Configs.CLIENT_CONFIG.isAcceptingMods()) {
 			BCLib.LOGGER.info("Writing Files:");
 			
-			//TODO: Reject files that were not in the last RequestFiles.
 			for (Pair<AutoFileSyncEntry, byte[]> entry : receivedFiles) {
 				final AutoFileSyncEntry e = entry.first;
 				final byte[] data = entry.second;

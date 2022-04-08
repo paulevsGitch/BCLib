@@ -24,6 +24,8 @@ import ru.bclib.client.render.BCLRenderLayer;
 import ru.bclib.interfaces.BlockModelProvider;
 import ru.bclib.interfaces.RenderLayerProvider;
 import ru.bclib.interfaces.TagProvider;
+import ru.bclib.interfaces.tools.AddMineableHoe;
+import ru.bclib.interfaces.tools.AddMineableShears;
 import ru.bclib.items.tool.BaseShearsItem;
 import ru.bclib.util.MHelper;
 
@@ -31,7 +33,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class BaseLeavesBlock extends LeavesBlock implements BlockModelProvider, RenderLayerProvider, TagProvider {
+public class BaseLeavesBlock extends LeavesBlock implements BlockModelProvider, RenderLayerProvider, TagProvider, AddMineableShears, AddMineableHoe {
 	protected final Block sapling;
 
 	private static FabricBlockSettings makeLeaves(MaterialColor color) {
@@ -100,8 +102,6 @@ public class BaseLeavesBlock extends LeavesBlock implements BlockModelProvider, 
 	
 	@Override
 	public void addTags(List<TagLocation<Block>> blockTags, List<TagLocation<Item>> itemTags) {
-		blockTags.add(NamedMineableTags.SHEARS);
-		blockTags.add(NamedMineableTags.HOE);
 		blockTags.add(NamedBlockTags.LEAVES);
 		itemTags.add(NamedItemTags.LEAVES);
 	}

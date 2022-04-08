@@ -20,7 +20,6 @@ public abstract class BasePlantWithAgeBlock extends BasePlantBlock {
 	public BasePlantWithAgeBlock() {
 		this(
 			FabricBlockSettings.of(Material.PLANT)
-				.breakByHand(true)
 				.sound(SoundType.GRASS)
 				.randomTicks()
 				.noCollission()

@@ -2,7 +2,6 @@ package ru.bclib.blocks;
 
 import com.google.common.collect.Lists;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
-import net.fabricmc.fabric.api.tool.attribute.v1.FabricToolTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -31,6 +30,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import ru.bclib.blocks.BlockProperties.TripleShape;
 import ru.bclib.client.render.BCLRenderLayer;
 import ru.bclib.interfaces.RenderLayerProvider;
+import ru.bclib.items.tool.BaseShearsItem;
 import ru.bclib.util.BlocksHelper;
 
 import java.util.List;
@@ -53,7 +53,6 @@ public class BaseVineBlock extends BaseBlockNotFull implements RenderLayerProvid
 		this(
 			FabricBlockSettings
 				.of(Material.PLANT)
-				.breakByHand(true)
 				.sound(SoundType.GRASS)
 				.lightLevel((state) -> bottomOnly ? state.getValue(SHAPE) == TripleShape.BOTTOM ? light : 0 : light)
 				.noCollission()
@@ -110,7 +109,7 @@ public class BaseVineBlock extends BaseBlockNotFull implements RenderLayerProvid
 	@Override
 	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
 		ItemStack tool = builder.getParameter(LootContextParams.TOOL);
-		if (tool != null && FabricToolTags.SHEARS.contains(tool.getItem()) || EnchantmentHelper.getItemEnchantmentLevel(
+		if (tool != null && BaseShearsItem.isShear(tool) || EnchantmentHelper.getItemEnchantmentLevel(
 			Enchantments.SILK_TOUCH,
 			tool
 		) > 0) {

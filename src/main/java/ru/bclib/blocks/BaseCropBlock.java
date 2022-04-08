@@ -39,7 +39,6 @@ public class BaseCropBlock extends BasePlantBlock {
 	public BaseCropBlock(Item drop, Block... terrain) {
 		this(
 			FabricBlockSettings.of(Material.PLANT)
-				.breakByHand(true)
 				.sound(SoundType.GRASS)
 				.randomTicks()
 				.noCollission(),

@@ -3,6 +3,7 @@ package ru.bclib.world.features;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.BlockPos.MutableBlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Holder;
 import net.minecraft.core.Vec3i;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
@@ -50,7 +51,7 @@ public abstract class NBTStructureFeature extends DefaultFeature {
 	protected abstract void addStructureData(StructurePlaceSettings data);
 	
 	protected BlockPos getGround(WorldGenLevel world, BlockPos center) {
-		Biome biome = world.getBiome(center);
+		Holder<Biome> biome = world.getBiome(center);
 		ResourceLocation id = BiomeAPI.getBiomeID(biome);
 		if (id.getNamespace().contains("moutain") || id.getNamespace().contains("lake")) {
 			int y = getAverageY(world, center);
@@ -148,7 +149,7 @@ public abstract class NBTStructureFeature extends DefaultFeature {
 							if (!isTerrain(stateSt)) {
 								if (merge == TerrainMerge.SURFACE) {
 									boolean isTop = mut.getY() == surfMax && state.getMaterial().isSolidBlocking();
-									Biome b = world.getBiome(mut);
+									Holder<Biome> b = world.getBiome(mut);
 									BlockState top = (isTop ? BiomeAPI.findTopMaterial(b) : BiomeAPI.findUnderMaterial(b)).orElse(defaultBlock);
 									BlocksHelper.setWithoutUpdate(world, mut, top);
 								}
@@ -159,7 +160,7 @@ public abstract class NBTStructureFeature extends DefaultFeature {
 							else {
 								if (isTerrain(state) && state.getMaterial().isSolidBlocking()) {
 									if (merge == TerrainMerge.SURFACE) {
-										Biome b = world.getBiome(mut);
+										Holder<Biome> b = world.getBiome(mut);
 										BlockState bottom = BiomeAPI.findUnderMaterial(b).orElse(defaultBlock);
 										BlocksHelper.setWithoutUpdate(world, mut, bottom);
 									}

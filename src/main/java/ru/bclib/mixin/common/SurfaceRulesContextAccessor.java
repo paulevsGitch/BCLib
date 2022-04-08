@@ -1,5 +1,6 @@
 package ru.bclib.mixin.common;
 
+import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.chunk.ChunkAccess;
@@ -25,10 +26,7 @@ public interface SurfaceRulesContextAccessor {
 	int getSurfaceDepth();
 
 	@Accessor("biome")
-	Supplier<Biome> getBiome();
-
-	@Accessor("biomeKey")
-	Supplier<ResourceKey<Biome>> getBiomeKey();
+	Supplier<Holder<Biome>> getBiome();
 
 	@Accessor("chunk")
 	ChunkAccess getChunk();

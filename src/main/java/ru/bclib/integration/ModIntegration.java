@@ -1,7 +1,7 @@
 package ru.bclib.integration;
 
-import net.fabricmc.fabric.api.tag.TagFactory;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.data.BuiltinRegistries;
 import net.minecraft.resources.ResourceKey;
@@ -9,7 +9,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.Tag;
-import net.minecraft.tags.Tag.Named;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
@@ -19,6 +19,7 @@ import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import ru.bclib.BCLib;
+import ru.bclib.api.tag.TagAPI;
 import ru.bclib.world.features.BCLFeature;
 
 import java.lang.reflect.Constructor;
@@ -37,6 +38,10 @@ public abstract class ModIntegration {
 	
 	public ResourceLocation getID(String name) {
 		return new ResourceLocation(modID, name);
+	}
+
+	public ResourceKey<PlacedFeature> getFeatureKey(String name) {
+		return ResourceKey.create(Registry.PLACED_FEATURE_REGISTRY, getID(name));
 	}
 	
 	public Block getBlock(String name) {
@@ -62,8 +67,8 @@ public abstract class ModIntegration {
 	public BCLFeature getFeature(String featureID, String placedFeatureID, GenerationStep.Decoration featureStep) {
 		ResourceLocation id = getID(featureID);
 		Feature<?> feature = Registry.FEATURE.get(id);
-		PlacedFeature featureConfigured = BuiltinRegistries.PLACED_FEATURE.get(getID(placedFeatureID));
-		return new BCLFeature(id, feature, featureStep, featureConfigured);
+		Holder<PlacedFeature> featurePlaced = BuiltinRegistries.PLACED_FEATURE.getHolder(getFeatureKey(placedFeatureID)).orElse(null);
+		return new BCLFeature(id, feature, featureStep, featurePlaced);
 	}
 	
 	public BCLFeature getFeature(String name, GenerationStep.Decoration featureStep) {
@@ -74,8 +79,8 @@ public abstract class ModIntegration {
 		return BuiltinRegistries.CONFIGURED_FEATURE.get(getID(name));
 	}
 	
-	public Biome getBiome(String name) {
-		return BuiltinRegistries.BIOME.get(getID(name));
+	public Holder<Biome> getBiome(String name) {
+		return BuiltinRegistries.BIOME.getHolder(getKey(name)).orElseThrow();
 	}
 	
 	public Class<?> getClass(String path) {
@@ -197,18 +202,13 @@ public abstract class ModIntegration {
 		return null;
 	}
 	
-	public Tag.Named<Item> getItemTag(String name) {
+	public TagKey<Item> getItemTag(String name) {
 		ResourceLocation id = getID(name);
-		Tag<Item> tag = ItemTags.getAllTags().getTag(id);
-
-		//return tag == null ? (Named<Item>) TagRegistry.item(id) : (Named<Item>) tag;
-		return tag == null ? (Named<Item>) TagFactory.ITEM.create(id) : (Named<Item>) tag;
+		return TagAPI.makeItemTag(id);
 	}
 	
-	public Tag.Named<Block> getBlockTag(String name) {
+	public TagKey<Block> getBlockTag(String name) {
 		ResourceLocation id = getID(name);
-		Tag<Block> tag = BlockTags.getAllTags().getTag(id);
-		//return tag == null ? (Named<Block>) TagRegistry.block(id) : (Named<Block>) tag;
-		return tag == null ? (Named<Block>) TagFactory.BLOCK.create(id) : (Named<Block>) tag;
+		return TagAPI.makeBlockTag(id);
 	}
 }

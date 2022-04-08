@@ -37,9 +37,9 @@
 		"bclib.mixins.client.json"
 	],
 	"depends": {
-		"fabricloader": ">=0.12.9",
-		"fabric": ">=0.44.0",
-		"minecraft": "1.18.x"
+		"fabricloader": ">=0.13.3",
+		"fabric": ">=0.48.0",
+		"minecraft": "1.18.2"
 	},
 	"custom":{
 		"modmenu":{

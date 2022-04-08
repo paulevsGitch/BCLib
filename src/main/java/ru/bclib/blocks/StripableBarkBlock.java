@@ -1,7 +1,6 @@
 package ru.bclib.blocks;
 
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
-import net.fabricmc.fabric.api.tool.attribute.v1.FabricToolTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
@@ -15,6 +14,8 @@ import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.MaterialColor;
 import net.minecraft.world.phys.BlockHitResult;
+import ru.bclib.api.tag.NamedMineableTags;
+import ru.bclib.api.tag.TagAPI;
 
 public class StripableBarkBlock extends BaseBarkBlock {
 	private final Block striped;
@@ -27,7 +28,7 @@ public class StripableBarkBlock extends BaseBarkBlock {
 	@Override
 	@SuppressWarnings("deprecation")
 	public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-		if (FabricToolTags.AXES.contains(player.getMainHandItem().getItem())) {
+		if (TagAPI.isToolWithMineableTag(player.getMainHandItem(), NamedMineableTags.AXE)){
 			world.playSound(player, pos, SoundEvents.AXE_STRIP, SoundSource.BLOCKS, 1.0F, 1.0F);
 			if (!world.isClientSide) {
 				world.setBlock(pos,

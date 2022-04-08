@@ -1,25 +1,24 @@
 package ru.bclib.api.biomes;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
+import net.minecraft.core.Holder;
+import net.minecraft.core.HolderSet;
 import net.minecraft.core.particles.ParticleOptions;
-import net.minecraft.data.BuiltinRegistries;
 import net.minecraft.data.worldgen.BiomeDefaultFeatures;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.Music;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.level.biome.AmbientAdditionsSettings;
-import net.minecraft.world.level.biome.AmbientMoodSettings;
-import net.minecraft.world.level.biome.AmbientParticleSettings;
-import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.*;
 import net.minecraft.world.level.biome.Biome.BiomeBuilder;
 import net.minecraft.world.level.biome.Biome.BiomeCategory;
 import net.minecraft.world.level.biome.Biome.Precipitation;
-import net.minecraft.world.level.biome.BiomeGenerationSettings;
-import net.minecraft.world.level.biome.BiomeSpecialEffects;
-import net.minecraft.world.level.biome.MobSpawnSettings;
 import net.minecraft.world.level.biome.MobSpawnSettings.SpawnerData;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -28,12 +27,13 @@ import net.minecraft.world.level.levelgen.GenerationStep.Decoration;
 import net.minecraft.world.level.levelgen.Noises;
 import net.minecraft.world.level.levelgen.SurfaceRules;
 import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
-import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import ru.bclib.api.surface.SurfaceRuleBuilder;
 import ru.bclib.entity.BCLEntityWrapper;
 import ru.bclib.mixin.common.BiomeGenerationSettingsAccessor;
+import ru.bclib.util.CollectionsUtil;
 import ru.bclib.util.ColorUtil;
+import ru.bclib.util.Pair;
 import ru.bclib.util.TriFunction;
 import ru.bclib.world.biomes.BCLBiome;
 import ru.bclib.world.biomes.BCLBiomeSettings;
@@ -41,12 +41,10 @@ import ru.bclib.world.features.BCLFeature;
 import ru.bclib.world.structures.BCLStructureFeature;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class BCLBiomeBuilder {
@@ -57,7 +55,8 @@ public class BCLBiomeBuilder {
 	private static final BCLBiomeBuilder INSTANCE = new BCLBiomeBuilder();
 	private static final SurfaceRules.ConditionSource SURFACE_NOISE = SurfaceRules.noiseCondition(Noises.SOUL_SAND_LAYER, -0.012);
 	
-	private List<ConfiguredStructureFeature> structures = new ArrayList<>(16);
+	private List<TagKey<Biome>> structureTags = new ArrayList<>(8);
+	private List<Pair<GenerationStep.Carving, Holder<? extends ConfiguredWorldCarver<?>>>> carvers = new ArrayList<>(1);
 	private BiomeGenerationSettings.Builder generationSettings;
 	private BiomeSpecialEffects.Builder effectsBuilder;
 	private MobSpawnSettings.Builder spawnSettings;
@@ -87,7 +86,7 @@ public class BCLBiomeBuilder {
 		INSTANCE.generationSettings = null;
 		INSTANCE.effectsBuilder = null;
 		INSTANCE.spawnSettings = null;
-		INSTANCE.structures.clear();
+		INSTANCE.structureTags.clear();
 		INSTANCE.temperature = 1.0F;
 		INSTANCE.fogDensity = 1.0F;
 		INSTANCE.edgeSize = 0;
@@ -96,6 +95,7 @@ public class BCLBiomeBuilder {
 		INSTANCE.height = 0.1F;
 		INSTANCE.vertical = false;
 		INSTANCE.edge = null;
+		INSTANCE.carvers.clear();
 		return INSTANCE;
 	}
 	
@@ -500,7 +500,7 @@ public class BCLBiomeBuilder {
 	 * @param feature {@link PlacedFeature}.
 	 * @return same {@link BCLBiomeBuilder} instance.
 	 */
-	public BCLBiomeBuilder feature(Decoration decoration, PlacedFeature feature) {
+	public BCLBiomeBuilder feature(Decoration decoration, Holder<PlacedFeature> feature) {
 		getGeneration().addFeature(decoration, feature);
 		return this;
 	}
@@ -542,11 +542,11 @@ public class BCLBiomeBuilder {
 	
 	/**
 	 * Adds new structure feature into the biome.
-	 * @param structure {@link ConfiguredStructureFeature} to add.
+	 * @param structureTag {@link TagKey} to add.
 	 * @return same {@link BCLBiomeBuilder} instance.
 	 */
-	public BCLBiomeBuilder structure(ConfiguredStructureFeature<?, ?> structure) {
-		structures.add(structure);
+	public BCLBiomeBuilder structure(TagKey<Biome> structureTag) {
+		structureTags.add(structureTag);
 		return this;
 	}
 	
@@ -557,7 +557,7 @@ public class BCLBiomeBuilder {
 	 */
 	public BCLBiomeBuilder structure(BCLStructureFeature structure) {
 		structure.addInternalBiome(biomeID);
-		return structure(structure.getFeatureConfigured());
+		return structure(structure.biomeTag);
 	}
 	
 	/**
@@ -565,11 +565,13 @@ public class BCLBiomeBuilder {
 	 * @param carver {@link ConfiguredWorldCarver} to add.
 	 * @return same {@link BCLBiomeBuilder} instance.
 	 */
-	public BCLBiomeBuilder carver(GenerationStep.Carving step, ConfiguredWorldCarver<?> carver) {
+	public  BCLBiomeBuilder carver(GenerationStep.Carving step, Holder<? extends ConfiguredWorldCarver<?>> carver) {
 		final ResourceLocation immutableID = biomeID;
-		BuiltinRegistries.CONFIGURED_CARVER
-			.getResourceKey(carver)
-			.ifPresent(key -> BiomeModifications.addCarver(ctx -> ctx.getBiomeKey().location().equals(immutableID), step, key));
+		var oKey = carver.unwrapKey();
+		if (oKey.isPresent()) {
+			BiomeModifications.addCarver(ctx -> ctx.getBiomeKey().location().equals(immutableID), step, (ResourceKey<ConfiguredWorldCarver<?>>) oKey.get());
+		}
+		//carvers.add(new Pair<>(step, carver));
 		return this;
 	}
 	
@@ -625,8 +627,8 @@ public class BCLBiomeBuilder {
 		this.height = height;
 		return this;
 	}
-	
-	
+
+
 	
 	/**
 	 * Make this a vertical Biome
@@ -645,7 +647,7 @@ public class BCLBiomeBuilder {
 	public BCLBiome build() {
 		return build((BiomeSupplier<BCLBiome>)BCLBiome::new);
 	}
-	
+
 	/**
 	 * Finalize biome creation.
 	 * @param biomeConstructor {@link BiFunction} biome constructor.
@@ -655,7 +657,22 @@ public class BCLBiomeBuilder {
 	public <T extends BCLBiome> T build(BiFunction<ResourceLocation, Biome, T> biomeConstructor) {
 		return build((id, biome, settings)->biomeConstructor.apply(id, biome));
 	}
-	
+
+	private static BiomeGenerationSettings fixGenerationSettings(BiomeGenerationSettings settings){
+		//Fabric Biome Modification API can not handle an empty carver map, thus we will create one with
+		//an empty HolderSet for every possible step:
+		//https://github.com/FabricMC/fabric/issues/2079
+		//TODO: Remove, once fabric gets fixed
+		if (settings instanceof BiomeGenerationSettingsAccessor acc){
+			Map<GenerationStep.Carving, HolderSet<ConfiguredWorldCarver<?>>> carvers = CollectionsUtil.getMutable(acc.bclib_getCarvers());
+			for (GenerationStep.Carving step : GenerationStep.Carving.values()){
+				carvers.computeIfAbsent(step, __->HolderSet.direct(Lists.newArrayList()));
+			}
+			acc.bclib_setCarvers(carvers);
+		}
+		return  settings;
+	}
+
 	/**
 	 * Finalize biome creation.
 	 * @param biomeConstructor {@link BiomeSupplier} biome constructor.
@@ -670,26 +687,8 @@ public class BCLBiomeBuilder {
 		
 		builder.mobSpawnSettings(getSpawns().build());
 		builder.specialEffects(getEffects().build());
-		
-		Map<Decoration, List<Supplier<PlacedFeature>>> defferedFeatures = new HashMap<>();
-		BiomeGenerationSettingsAccessor acc = BiomeGenerationSettingsAccessor.class.cast(getGeneration().build());
-		if (acc != null) {
-			builder.generationSettings(new BiomeGenerationSettings.Builder().build());
-			var decorations = acc.bclib_getFeatures();
-			for (Decoration d : Decoration.values()) {
-				int i = d.ordinal();
-				if (i >= 0 && i < decorations.size()) {
-					var features = decorations.get(i);
-					defferedFeatures.put(d, features.stream().collect(Collectors.toList()));
-				}
-				else {
-					defferedFeatures.put(d, new ArrayList<>(0));
-				}
-			}
-		}
-		else {
-			builder.generationSettings(getGeneration().build());
-		}
+
+		builder.generationSettings(fixGenerationSettings(getGeneration().build()));
 		
 		BCLBiomeSettings settings = BCLBiomeSettings.createBCL()
 			.setTerrainHeight(height)
@@ -699,11 +698,13 @@ public class BCLBiomeBuilder {
 			.setEdge(edge)
 			.setVertical(vertical)
 			.build();
-		
-		final T res = biomeConstructor.apply(biomeID, builder.build(), settings);
-		res.attachStructures(structures);
+
+		final Biome biome = builder.build();
+		final T res = biomeConstructor.apply(biomeID, biome, settings);
+		res.attachStructures(structureTags);
 		res.setSurface(surfaceRule);
-		res.setFeatures(defferedFeatures);
+
+		//carvers.forEach(cfg -> BiomeAPI.addBiomeCarver(biome, cfg.second, cfg.first));
 		return res;
 	}
 	

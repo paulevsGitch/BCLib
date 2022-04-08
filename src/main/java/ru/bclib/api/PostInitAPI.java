@@ -10,6 +10,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import ru.bclib.BCLib;
 import ru.bclib.api.biomes.BiomeAPI;
+import ru.bclib.api.tag.NamedMineableTags;
 import ru.bclib.api.tag.TagAPI;
 import ru.bclib.api.tag.TagAPI.TagLocation;
 import ru.bclib.blocks.BaseBarrelBlock;
@@ -23,6 +24,7 @@ import ru.bclib.config.Configs;
 import ru.bclib.interfaces.PostInitable;
 import ru.bclib.interfaces.RenderLayerProvider;
 import ru.bclib.interfaces.TagProvider;
+import ru.bclib.interfaces.tools.*;
 import ru.bclib.registry.BaseBlockEntities;
 
 import java.util.List;
@@ -110,6 +112,29 @@ public class PostInitAPI {
 		}
 		else if (block instanceof BaseFurnaceBlock) {
 			BaseBlockEntities.FURNACE.registerBlock(block);
+		}
+		if (!(block instanceof PreventMineableAdd)) {
+			if (block instanceof AddMineableShears) {
+				TagAPI.addBlockTags(block, NamedMineableTags.SHEARS);
+			}
+			if (block instanceof AddMineableAxe) {
+				TagAPI.addBlockTags(block, NamedMineableTags.AXE);
+			}
+			if (block instanceof AddMineablePickaxe) {
+				TagAPI.addBlockTags(block, NamedMineableTags.PICKAXE);
+			}
+			if (block instanceof AddMineableShovel) {
+				TagAPI.addBlockTags(block, NamedMineableTags.SHOVEL);
+			}
+			if (block instanceof AddMineableHoe) {
+				TagAPI.addBlockTags(block, NamedMineableTags.HOE);
+			}
+			if (block instanceof AddMineableSword) {
+				TagAPI.addBlockTags(block, NamedMineableTags.SWORD);
+			}
+			if (block instanceof AddMineableHammer) {
+				TagAPI.addBlockTags(block, NamedMineableTags.HAMMER);
+			}
 		}
 		if (block instanceof TagProvider) {
 			TagProvider.class.cast(block).addTags(blockTags, itemTags);

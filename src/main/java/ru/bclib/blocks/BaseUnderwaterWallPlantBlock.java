@@ -18,7 +18,6 @@ public abstract class BaseUnderwaterWallPlantBlock extends BaseWallPlantBlock im
 		this(
 			FabricBlockSettings
 				.of(Material.WATER_PLANT)
-				.breakByHand(true)
 				.sound(SoundType.WET_GRASS)
 				.noCollission()
 		);
@@ -28,7 +27,6 @@ public abstract class BaseUnderwaterWallPlantBlock extends BaseWallPlantBlock im
 		this(
 			FabricBlockSettings
 				.of(Material.WATER_PLANT)
-				.breakByHand(true)
 				.luminance(light)
 				.sound(SoundType.WET_GRASS)
 				.noCollission()

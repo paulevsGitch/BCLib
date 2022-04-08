@@ -3,10 +3,9 @@ package ru.bclib.mixin.common;
 import com.mojang.authlib.GameProfileRepository;
 import com.mojang.authlib.minecraft.MinecraftSessionService;
 import com.mojang.datafixers.DataFixer;
-import net.minecraft.core.RegistryAccess.RegistryHolder;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.ServerResources;
+import net.minecraft.server.WorldStem;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.progress.ChunkProgressListenerFactory;
 import net.minecraft.server.packs.repository.PackRepository;
@@ -32,7 +31,7 @@ import java.util.concurrent.CompletableFuture;
 @Mixin(MinecraftServer.class)
 public class MinecraftServerMixin {
 	@Shadow
-	private ServerResources resources;
+	private MinecraftServer.ReloadableResources resources;
 
 	@Final
 	@Shadow
@@ -43,7 +42,7 @@ public class MinecraftServerMixin {
 	protected WorldData worldData;
 
 	@Inject(method = "<init>*", at = @At("TAIL"))
-	private void bclib_onServerInit(Thread thread, RegistryHolder registryHolder, LevelStorageAccess levelStorageAccess, WorldData worldData, PackRepository packRepository, Proxy proxy, DataFixer dataFixer, ServerResources serverResources, MinecraftSessionService minecraftSessionService, GameProfileRepository gameProfileRepository, GameProfileCache gameProfileCache, ChunkProgressListenerFactory chunkProgressListenerFactory, CallbackInfo ci) {
+	private void bclib_onServerInit(Thread thread, LevelStorageAccess levelStorageAccess, PackRepository packRepository, WorldStem worldStem, Proxy proxy, DataFixer dataFixer, MinecraftSessionService minecraftSessionService, GameProfileRepository gameProfileRepository, GameProfileCache gameProfileCache, ChunkProgressListenerFactory chunkProgressListenerFactory, CallbackInfo ci) {
 		DataExchangeAPI.prepareServerside();
 	}
 
@@ -58,7 +57,7 @@ public class MinecraftServerMixin {
 	}
 
 	private void bclib_injectRecipes() {
-		RecipeManagerAccessor accessor = (RecipeManagerAccessor) resources.getRecipeManager();
+		RecipeManagerAccessor accessor = (RecipeManagerAccessor) resources.managers().getRecipeManager();
 		accessor.bclib_setRecipesByName(BCLRecipeManager.getMapByName(accessor.bclib_getRecipesByName()));
 		accessor.bclib_setRecipes(BCLRecipeManager.getMap(accessor.bclib_getRecipes()));
 	}

@@ -1,17 +1,17 @@
 package ru.bclib.blocks;
 
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
-import net.fabricmc.fabric.api.tool.attribute.v1.FabricToolTags;
-import net.fabricmc.fabric.impl.object.builder.FabricBlockInternals;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TieredItem;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.OreBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -19,7 +19,11 @@ import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
+import ru.bclib.api.tag.NamedCommonBlockTags;
+import ru.bclib.api.tag.NamedMineableTags;
+import ru.bclib.api.tag.TagAPI;
 import ru.bclib.interfaces.BlockModelProvider;
+import ru.bclib.interfaces.TagProvider;
 import ru.bclib.util.LootUtil;
 import ru.bclib.util.MHelper;
 
@@ -31,6 +35,7 @@ public class BaseOreBlock extends OreBlock implements BlockModelProvider {
 	private final Supplier<Item> dropItem;
 	private final int minCount;
 	private final int maxCount;
+	private final int miningLevel;
 	
 	public BaseOreBlock(Supplier<Item> drop, int minCount, int maxCount, int experience) {
 		this(drop, minCount, maxCount, experience, 0);
@@ -53,15 +58,11 @@ public class BaseOreBlock extends OreBlock implements BlockModelProvider {
 	}
 	
 	public BaseOreBlock(Properties properties, Supplier<Item> drop, int minCount, int maxCount, int experience, int miningLevel) {
-		super(makeProps(properties, miningLevel), UniformInt.of(experience>0?1:0, experience));
+		super(properties, UniformInt.of(experience>0?1:0, experience));
 		this.dropItem = drop;
 		this.minCount = minCount;
 		this.maxCount = maxCount;
-	}
-	
-	private static Properties makeProps(Properties properties, int level){
-		FabricBlockInternals.computeExtraData(properties).addMiningLevel(FabricToolTags.PICKAXES, level);
-		return properties;
+		this.miningLevel = miningLevel;
 	}
 	
 	@Override
@@ -70,30 +71,35 @@ public class BaseOreBlock extends OreBlock implements BlockModelProvider {
 		return LootUtil
 				.getDrops(this, state, builder)
 				.orElseGet(
-						()->BaseOreBlock.getDroppedItems(this, dropItem.get(), maxCount, minCount, state, builder)
+						()->BaseOreBlock.getDroppedItems(this, dropItem.get(), maxCount, minCount, miningLevel, state, builder)
 				);
 	}
 	
-	public static List<ItemStack> getDroppedItems(ItemLike block, Item dropItem, int maxCount, int minCount, BlockState state, LootContext.Builder builder) {
+	public static List<ItemStack> getDroppedItems(ItemLike block, Item dropItem, int maxCount, int minCount, int miningLevel, BlockState state, LootContext.Builder builder) {
 		ItemStack tool = builder.getParameter(LootContextParams.TOOL);
 		if (tool != null && tool.isCorrectToolForDrops(state)) {
-			if (EnchantmentHelper.getItemEnchantmentLevel(Enchantments.SILK_TOUCH, tool) > 0) {
-				return Collections.singletonList(new ItemStack(block));
+			boolean canMine = miningLevel==0;
+			if (tool.getItem() instanceof TieredItem tired) {
+				canMine = tired.getTier().getLevel()>=miningLevel;
 			}
-			int count;
-			int enchantment = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.BLOCK_FORTUNE, tool);
-			if (enchantment > 0) {
-				int min = Mth.clamp(minCount + enchantment, minCount, maxCount);
-				int max = maxCount + (enchantment / Enchantments.BLOCK_FORTUNE.getMaxLevel());
-				if (min == max) {
-					return Collections.singletonList(new ItemStack(dropItem, max));
+			if (canMine) {
+				if (EnchantmentHelper.getItemEnchantmentLevel(Enchantments.SILK_TOUCH, tool) > 0) {
+					return Collections.singletonList(new ItemStack(block));
 				}
-				count = MHelper.randRange(min, max, MHelper.RANDOM);
+				int count;
+				int enchantment = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.BLOCK_FORTUNE, tool);
+				if (enchantment > 0) {
+					int min = Mth.clamp(minCount + enchantment, minCount, maxCount);
+					int max = maxCount + (enchantment / Enchantments.BLOCK_FORTUNE.getMaxLevel());
+					if (min == max) {
+						return Collections.singletonList(new ItemStack(dropItem, max));
+					}
+					count = MHelper.randRange(min, max, MHelper.RANDOM);
+				} else {
+					count = MHelper.randRange(minCount, maxCount, MHelper.RANDOM);
+				}
+				return Collections.singletonList(new ItemStack(dropItem, count));
 			}
-			else {
-				count = MHelper.randRange(minCount, maxCount, MHelper.RANDOM);
-			}
-			return Collections.singletonList(new ItemStack(dropItem, count));
 		}
 		return Collections.emptyList();
 	}

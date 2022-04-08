@@ -147,24 +147,8 @@ public abstract class DataHandler extends BaseDataHandler {
 		@Environment(EnvType.CLIENT)
 		abstract protected void serializeDataOnClient(FriendlyByteBuf buf);
 
-		@Deprecated(forRemoval = true)
-		protected void deserializeIncomingDataOnServer(FriendlyByteBuf buf, PacketSender responseSender){ }
-
-		//TODO: should be abstract once deserializeIncomingDataOnServer(FriendlyByteBuf buf, PacketSender responseSender) was removed
-
-		protected void deserializeIncomingDataOnServer(FriendlyByteBuf buf, Player player, PacketSender responseSender) {
-			deserializeIncomingDataOnServer(buf, responseSender);
-		}
-
-		@Deprecated(forRemoval = true)
-		protected void runOnServerGameThread(MinecraftServer server){ }
-
-
-		//TODO: should be abstract once   runOnServerGameThread(MinecraftServer server) was  removed
-		protected void runOnServerGameThread(MinecraftServer server, Player player){
-			runOnServerGameThread(server);
-		}
-		
+		protected abstract void deserializeIncomingDataOnServer(FriendlyByteBuf buf, Player player, PacketSender responseSender);
+		protected abstract void runOnServerGameThread(MinecraftServer server, Player player);
 		
 		@Environment(EnvType.CLIENT)
 		@Override

@@ -14,10 +14,12 @@ import ru.bclib.api.tag.TagAPI.TagLocation;
 import ru.bclib.client.render.BCLRenderLayer;
 import ru.bclib.interfaces.RenderLayerProvider;
 import ru.bclib.interfaces.TagProvider;
+import ru.bclib.interfaces.tools.AddMineableHoe;
+import ru.bclib.interfaces.tools.AddMineableShears;
 
 import java.util.List;
 
-public class SimpleLeavesBlock extends BaseBlockNotFull implements RenderLayerProvider, TagProvider {
+public class SimpleLeavesBlock extends BaseBlockNotFull implements RenderLayerProvider, TagProvider, AddMineableShears, AddMineableHoe {
 	public SimpleLeavesBlock(MaterialColor color) {
 		this(
 			FabricBlockSettings
@@ -58,8 +60,6 @@ public class SimpleLeavesBlock extends BaseBlockNotFull implements RenderLayerPr
 	
 	@Override
 	public void addTags(List<TagLocation<Block>> blockTags, List<TagLocation<Item>> itemTags) {
-		blockTags.add(NamedMineableTags.SHEARS);
-		blockTags.add(NamedMineableTags.HOE);
 		blockTags.add(NamedBlockTags.LEAVES);
 		itemTags.add(NamedItemTags.LEAVES);
 	}

@@ -2,7 +2,6 @@ package ru.bclib.blocks;
 
 import com.google.common.collect.Lists;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
-import net.fabricmc.fabric.api.tool.attribute.v1.FabricToolTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.player.Player;
@@ -30,16 +29,18 @@ import ru.bclib.api.tag.TagAPI.TagLocation;
 import ru.bclib.client.render.BCLRenderLayer;
 import ru.bclib.interfaces.RenderLayerProvider;
 import ru.bclib.interfaces.TagProvider;
+import ru.bclib.interfaces.tools.AddMineableHoe;
+import ru.bclib.interfaces.tools.AddMineableShears;
+import ru.bclib.items.tool.BaseShearsItem;
 
 import java.util.List;
 
-public abstract class UpDownPlantBlock extends BaseBlockNotFull implements RenderLayerProvider, TagProvider {
+public abstract class UpDownPlantBlock extends BaseBlockNotFull implements RenderLayerProvider, AddMineableShears, AddMineableHoe {
 	private static final VoxelShape SHAPE = Block.box(4, 0, 4, 12, 16, 12);
 	
 	public UpDownPlantBlock() {
 		this(FabricBlockSettings
 			.of(Material.PLANT)
-			.breakByHand(true)
 			.sound(SoundType.GRASS)
 			.noCollission()
 		);
@@ -83,7 +84,7 @@ public abstract class UpDownPlantBlock extends BaseBlockNotFull implements Rende
 	@Override
 	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
 		ItemStack tool = builder.getParameter(LootContextParams.TOOL);
-		if (tool != null && FabricToolTags.SHEARS.contains(tool.getItem()) || EnchantmentHelper.getItemEnchantmentLevel(
+		if (tool != null && BaseShearsItem.isShear(tool) || EnchantmentHelper.getItemEnchantmentLevel(
 			Enchantments.SILK_TOUCH,
 			tool
 		) > 0) {
@@ -103,11 +104,5 @@ public abstract class UpDownPlantBlock extends BaseBlockNotFull implements Rende
 	public void playerDestroy(Level world, Player player, BlockPos pos, BlockState state, BlockEntity blockEntity, ItemStack stack) {
 		super.playerDestroy(world, player, pos, state, blockEntity, stack);
 		world.neighborChanged(pos, Blocks.AIR, pos.below());
-	}
-	
-	@Override
-	public void addTags(List<TagLocation<Block>> blockTags, List<TagLocation<Item>> itemTags) {
-		blockTags.add(NamedMineableTags.SHEARS);
-		blockTags.add(NamedMineableTags.HOE);
 	}
 }

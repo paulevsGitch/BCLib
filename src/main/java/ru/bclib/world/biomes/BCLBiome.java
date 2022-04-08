@@ -2,10 +2,13 @@ package ru.bclib.world.biomes;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.data.BuiltinRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.GenerationStep.Decoration;
 import net.minecraft.world.level.levelgen.SurfaceRules;
@@ -15,25 +18,25 @@ import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import org.jetbrains.annotations.Nullable;
 import ru.bclib.BCLib;
 import ru.bclib.api.biomes.BiomeAPI;
+import ru.bclib.api.tag.TagAPI;
 import ru.bclib.util.WeightedList;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 public class BCLBiome extends BCLBiomeSettings {
-	private final List<ConfiguredStructureFeature> structures = Lists.newArrayList();
+	private final Set<TagKey<Biome>> structureTags = Sets.newHashSet();
 	private final WeightedList<BCLBiome> subbiomes = new WeightedList<>();
 	private final Map<String, Object> customData = Maps.newHashMap();
 	private final ResourceLocation biomeID;
 	private final Biome biome;
 	
-	private Consumer<Biome> surfaceInit;
+	private Consumer<Holder<Biome>> surfaceInit;
 	private BCLBiome biomeParent;
-	private Biome actualBiome;
+	private Holder<Biome> actualBiome;
 	
 	/**
 	 * Create wrapper for existing biome using its {@link ResourceLocation} identifier.
@@ -65,7 +68,7 @@ public class BCLBiome extends BCLBiomeSettings {
 	 * @param settings The Settings for this Biome or {@code null} if you want to apply default settings
 	 */
 	public BCLBiome(Biome biome, VanillaBiomeSettings settings) {
-		this(BuiltinRegistries.BIOME.getKey(biome), biome, settings);
+		this(BiomeAPI.getBiomeID(biome), biome, settings);
 	}
 	
 	public BCLBiome(ResourceLocation biomeID, Biome biome) {
@@ -164,7 +167,10 @@ public class BCLBiome extends BCLBiomeSettings {
 		return biomeID;
 	}
 	
-	
+
+	public Holder<Biome> getBiomeHolder() {
+		return BuiltinRegistries.BIOME.getOrCreateHolder(BiomeAPI.getBiomeKey(biome));
+	}
 	/**
 	 * Getter for biome from buil-in registry. For datapack biomes will be same as actual biome.
 	 * @return {@link Biome}.
@@ -177,7 +183,7 @@ public class BCLBiome extends BCLBiomeSettings {
 	 * Getter for actual biome (biome from current world registry with same {@link ResourceLocation} id).
 	 * @return {@link Biome}.
 	 */
-	public Biome getActualBiome() {
+	public Holder<Biome> getActualBiome() {
 		return this.actualBiome;
 	}
 	
@@ -196,19 +202,23 @@ public class BCLBiome extends BCLBiomeSettings {
 		if (edge != null && edge != this) {
 			edge.updateActualBiomes(biomeRegistry);
 		}
-		this.actualBiome = biomeRegistry.get(biomeID);
+
+		final ResourceKey<Biome> key = biomeRegistry.getResourceKey(biomeRegistry.get(biomeID)).orElseThrow();
+		this.actualBiome = biomeRegistry.getOrCreateHolder(key);
 		if (actualBiome==null) {
 			BCLib.LOGGER.error("Unable to find actual Biome for " + biomeID);
 		}
 		
-		if (!this.structures.isEmpty()) {
-			structures.forEach(s -> BiomeAPI.addBiomeStructure(BiomeAPI.getBiomeKey(actualBiome), s));
+		if (!this.structureTags.isEmpty()) {
+			structureTags.forEach(tagKey -> TagAPI.addBiomeTag(tagKey, actualBiome.value()));
 		}
 		
 		if (this.surfaceInit != null) {
 			surfaceInit.accept(actualBiome);
 		}
 	}
+
+
 	
 	/**
 	 * Getter for custom data. Will get custom data object or null if object doesn't exists.
@@ -276,8 +286,8 @@ public class BCLBiome extends BCLBiomeSettings {
 	 * Adds structures to this biome. For internal use only.
 	 * Used inside {@link ru.bclib.api.biomes.BCLBiomeBuilder}.
 	 */
-	public void attachStructures(List<ConfiguredStructureFeature> structures) {
-		this.structures.addAll(structures);
+	public void attachStructures(List<TagKey<Biome>> structures) {
+		this.structureTags.addAll(structures);
 	}
 	
 	/**
@@ -295,25 +305,7 @@ public class BCLBiome extends BCLBiomeSettings {
 			}
 		};
 	}
-	
-	private Map<Decoration, List<Supplier<PlacedFeature>>> features = new HashMap<>(0);
-	
-	/**
-	 * Sets the biome features.
-	 * @param features the feature list.
-	 */
-	public void setFeatures(Map<Decoration, List<Supplier<PlacedFeature>>> features) {
-		this.features = features;
-	}
-	
-	/**
-	 * Returns the built-in set of Features for this biome (as they were set with {@link #setFeatures(Map)})
-	 * @return List of all features
-	 */
-	public Map<Decoration, List<Supplier<PlacedFeature>>> getFeatures(){
-		return features;
-	}
-	
+
 	/**
 	 * Returns the group used in the config Files for this biome
 	 *

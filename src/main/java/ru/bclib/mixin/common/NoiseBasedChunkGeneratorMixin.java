@@ -1,18 +1,15 @@
 package ru.bclib.mixin.common;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.StructureFeatureManager;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.Climate;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
-import net.minecraft.world.level.levelgen.Aquifer;
-import net.minecraft.world.level.levelgen.Beardifier;
-import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
-import net.minecraft.world.level.levelgen.NoiseChunk;
-import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
-import net.minecraft.world.level.levelgen.NoiseSampler;
+import net.minecraft.world.level.levelgen.*;
 import net.minecraft.world.level.levelgen.blending.Blender;
 import net.minecraft.world.level.levelgen.carver.CarvingContext;
 import org.spongepowered.asm.mixin.Final;
@@ -30,11 +27,13 @@ import java.util.function.Supplier;
 public abstract class NoiseBasedChunkGeneratorMixin implements SurfaceProvider, NoiseGeneratorSettingsProvider {
 	@Final
 	@Shadow
-	private NoiseSampler sampler;
-	
+	private Climate.Sampler sampler;
+
+	@Shadow @Final private NoiseRouter router;
+
 	@Final
 	@Shadow
-	protected Supplier<NoiseGeneratorSettings> settings;
+	protected Holder<NoiseGeneratorSettings> settings;
 	
 	@Final
 	@Shadow
@@ -45,12 +44,12 @@ public abstract class NoiseBasedChunkGeneratorMixin implements SurfaceProvider, 
 
 	@Override
 	public NoiseGeneratorSettings bclib_getNoiseGeneratorSettings(){
-		return settings.get();
+		return settings.value();
 	}
 	
 	@Override
 	@SuppressWarnings("deprecation")
-	public BlockState bclib_getSurface(BlockPos pos, Biome biome, ServerLevel level) {
+	public BlockState bclib_getSurface(BlockPos pos, Holder<Biome> biome, ServerLevel level) {
 		ChunkAccess chunkAccess = level.getChunk(pos.getX() >> 4, pos.getZ() >> 4);
 		StructureFeatureManager structureFeatureManager = level.structureFeatureManager();
 		NoiseBasedChunkGenerator generator = NoiseBasedChunkGenerator.class.cast(this);
@@ -72,7 +71,7 @@ public abstract class NoiseBasedChunkGeneratorMixin implements SurfaceProvider, 
 		}
 		
 		Beardifier finalBeardifier = beardifier;
-		NoiseChunk noiseChunk = chunkAccess.getOrCreateNoiseChunk(this.sampler, () -> finalBeardifier, this.settings.get(), this.globalFluidPicker, Blender.empty());
+		NoiseChunk noiseChunk = chunkAccess.getOrCreateNoiseChunk(router, () -> finalBeardifier, this.settings.value(), this.globalFluidPicker, Blender.empty());
 		CarvingContext carvingContext = new CarvingContext(generator, level.registryAccess(), chunkAccess.getHeightAccessorForGeneration(), noiseChunk);
 		Optional<BlockState> optional = carvingContext.topMaterial(bpos -> biome, chunkAccess, pos, false);
 		return optional.isPresent() ? optional.get() : bclib_air;

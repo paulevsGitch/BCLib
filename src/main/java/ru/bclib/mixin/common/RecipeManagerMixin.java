@@ -27,7 +27,7 @@ public abstract class RecipeManagerMixin {
 	}
 	
 	@Inject(method = "getRecipeFor", at = @At(value = "HEAD"), cancellable = true)
-	private <C extends Container, T extends Recipe<C>> void bclib_getRecipeFor(RecipeType<T> type, C inventory, Level world, CallbackInfoReturnable<Optional<T>> info) {
+	private <C extends Container, T extends Recipe<C>> void bclib_getRecipeFor(RecipeType<T> type, C inventory, Level level, CallbackInfoReturnable<Optional<T>> info) {
 		Collection<Recipe<C>> values = byType(type).values();
 		List<Recipe<C>> list = new ArrayList<>(values);
 		list.sort((v1, v2) -> {
@@ -35,6 +35,6 @@ public abstract class RecipeManagerMixin {
 			boolean b2 = v2.getId().getNamespace().equals("minecraft");
 			return b1 ^ b2 ? (b1 ? 1 : -1) : 0;
 		});
-		info.setReturnValue(list.stream().flatMap((recipe) -> Util.toStream(type.tryMatch(recipe, world, inventory))).findFirst());
+		info.setReturnValue(list.stream().flatMap(recipe -> type.tryMatch(recipe, level, inventory).stream()).findFirst());
 	}
 }

@@ -3,8 +3,8 @@ package ru.bclib.blocks;
 import com.google.common.collect.Maps;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
-import net.fabricmc.fabric.api.tool.attribute.v1.FabricToolTags;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.core.BlockPos;
@@ -33,6 +33,8 @@ import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
+import ru.bclib.api.tag.NamedMineableTags;
+import ru.bclib.api.tag.TagAPI;
 import ru.bclib.client.models.BasePatterns;
 import ru.bclib.client.models.ModelsHelper;
 import ru.bclib.client.models.PatternsHelper;
@@ -69,7 +71,9 @@ public class BaseTerrainBlock extends BaseBlock {
 	
 	@Override
 	public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-		if (pathBlock != null && FabricToolTags.SHOVELS.contains(player.getMainHandItem().getItem())) {
+		//TODO: 1.18.2 check
+		if (pathBlock != null && TagAPI.isToolWithMineableTag(player.getMainHandItem(), NamedMineableTags.SHOVEL)){
+		//if (pathBlock != null && FabricTagProvider.SHOVELS.contains(player.getMainHandItem().getItem())) {
 			world.playSound(player, pos, SoundEvents.SHOVEL_FLATTEN, SoundSource.BLOCKS, 1.0F, 1.0F);
 			if (!world.isClientSide) {
 				world.setBlockAndUpdate(pos, pathBlock.defaultBlockState());

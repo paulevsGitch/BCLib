@@ -2,7 +2,6 @@ package ru.bclib.blocks;
 
 import com.google.common.collect.Lists;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
-import net.fabricmc.fabric.api.tool.attribute.v1.FabricToolTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -32,6 +31,7 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import ru.bclib.client.render.BCLRenderLayer;
 import ru.bclib.interfaces.RenderLayerProvider;
+import ru.bclib.items.tool.BaseShearsItem;
 import ru.bclib.util.BlocksHelper;
 
 import java.util.List;
@@ -45,7 +45,6 @@ public abstract class BaseDoublePlantBlock extends BaseBlockNotFull implements R
 	public BaseDoublePlantBlock() {
 		this(
 			FabricBlockSettings.of(Material.PLANT)
-				.breakByHand(true)
 				.sound(SoundType.GRASS)
 				.noCollission()
 		);
@@ -54,7 +53,6 @@ public abstract class BaseDoublePlantBlock extends BaseBlockNotFull implements R
 	public BaseDoublePlantBlock(int light) {
 		this(
 			FabricBlockSettings.of(Material.PLANT)
-				.breakByHand(true)
 				.sound(SoundType.GRASS)
 				.lightLevel((state) -> state.getValue(TOP) ? light : 0)
 				.noCollission()
@@ -117,7 +115,8 @@ public abstract class BaseDoublePlantBlock extends BaseBlockNotFull implements R
 		}
 		
 		ItemStack tool = builder.getParameter(LootContextParams.TOOL);
-		if (tool != null && FabricToolTags.SHEARS.contains(tool.getItem()) || EnchantmentHelper.getItemEnchantmentLevel(
+		//TODO: 1.18.2 Test if shearing still works
+		if (tool != null && BaseShearsItem.isShear(tool) || EnchantmentHelper.getItemEnchantmentLevel(
 			Enchantments.SILK_TOUCH,
 			tool
 		) > 0) {

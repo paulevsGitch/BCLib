@@ -13,6 +13,7 @@ import ru.bclib.api.dataexchange.handler.autosync.RequestFiles;
 import ru.bclib.api.dataexchange.handler.autosync.SendFiles;
 import ru.bclib.api.tag.TagAPI;
 import ru.bclib.config.Configs;
+import ru.bclib.recipes.AnvilRecipe;
 import ru.bclib.recipes.CraftingRecipes;
 import ru.bclib.registry.BaseBlockEntities;
 import ru.bclib.registry.BaseRegistry;
@@ -38,6 +39,7 @@ public class BCLib implements ModInitializer {
 		CraftingRecipes.init();
 		WorldDataAPI.registerModCache(MOD_ID);
 		DataExchangeAPI.registerMod(MOD_ID);
+		AnvilRecipe.register();
 		
 		DataExchangeAPI.registerDescriptors(List.of(
 			HelloClient.DESCRIPTOR,

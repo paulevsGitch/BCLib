@@ -2,6 +2,7 @@ package ru.bclib.recipes;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.Tag;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -59,7 +60,7 @@ public class SmithingTableRecipe {
 		return this;
 	}
 	
-	public SmithingTableRecipe setBase(Tag<Item> tag) {
+	public SmithingTableRecipe setBase(TagKey<Item> tag) {
 		this.base = (Ingredient.of(tag));
 		return this;
 	}
@@ -70,7 +71,7 @@ public class SmithingTableRecipe {
 		return this;
 	}
 	
-	public SmithingTableRecipe setAddition(Tag<Item> tag) {
+	public SmithingTableRecipe setAddition(TagKey<Item> tag) {
 		this.addition = (Ingredient.of(tag));
 		return this;
 	}
