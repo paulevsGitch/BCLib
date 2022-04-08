@@ -45,7 +45,7 @@ public class ItemRegistry extends BaseRegistry<Item> {
 			return item;
 		}
 		register(itemId, item);
-		return res;
+		return item;
 	}
 	
 	public Item register(ResourceLocation itemId) {
