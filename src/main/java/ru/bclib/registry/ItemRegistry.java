@@ -44,8 +44,8 @@ public class ItemRegistry extends BaseRegistry<Item> {
 		if (!config.getBoolean("musicDiscs", itemId.getPath(), true)) {
 			return item;
 		}
-		
-		return register(itemId, new BaseDiscItem(power, sound, makeItemSettings().stacksTo(1)));
+		register(itemId, item);
+		return res;
 	}
 	
 	public Item register(ResourceLocation itemId) {
