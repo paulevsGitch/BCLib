@@ -1,6 +1,7 @@
 package ru.bclib.api.tag;
 
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 
 public class CommonBlockTags {
@@ -20,4 +21,6 @@ public class CommonBlockTags {
 	public static final TagKey<Block> WOODEN_BARREL = TagAPI.makeCommonBlockTag("wooden_barrels");
 	public static final TagKey<Block> WOODEN_CHEST = TagAPI.makeCommonBlockTag("wooden_chests");
 	public static final TagKey<Block> WORKBENCHES = TagAPI.makeCommonBlockTag("workbench");
+
+	public static final TagKey<Block> MINABLE_WITH_HAMMER = TagAPI.makeCommonBlockTag("mineable/hammer");
 }
