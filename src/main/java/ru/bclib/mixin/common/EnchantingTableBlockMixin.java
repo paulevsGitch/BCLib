@@ -20,6 +20,6 @@ public abstract class EnchantingTableBlockMixin extends Block {
 	
 	@Inject(method = "isValidBookShelf(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/core/BlockPos;)Z", at = @At("HEAD"), cancellable = true)
 	private static void bclib_isBookshelf(Level level, BlockPos blockPos, BlockPos blockPos2, CallbackInfoReturnable<Boolean> info) {
-		if (level.getBlockState(blockPos2).is(CommonBlockTags.BOOKSHELVES) && level.isEmptyBlock(blockPos.offset(blockPos2.getX() / 2, blockPos2.getY(), blockPos2.getZ() / 2))) info.setReturnValue(true);
+		MethodReplace.addBlockReplace(Blocks.BOOKSHELF, state -> state.is(CommonBlockTags.BOOKSHELVES));
 	}
 }
