@@ -1,7 +1,6 @@
 package ru.bclib.api.biomes;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
@@ -15,10 +14,16 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.level.biome.*;
+import net.minecraft.world.level.biome.AmbientAdditionsSettings;
+import net.minecraft.world.level.biome.AmbientMoodSettings;
+import net.minecraft.world.level.biome.AmbientParticleSettings;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biome.BiomeBuilder;
 import net.minecraft.world.level.biome.Biome.BiomeCategory;
 import net.minecraft.world.level.biome.Biome.Precipitation;
+import net.minecraft.world.level.biome.BiomeGenerationSettings;
+import net.minecraft.world.level.biome.BiomeSpecialEffects;
+import net.minecraft.world.level.biome.MobSpawnSettings;
 import net.minecraft.world.level.biome.MobSpawnSettings.SpawnerData;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -45,7 +50,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 public class BCLBiomeBuilder {
 	@FunctionalInterface

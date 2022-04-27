@@ -9,7 +9,6 @@ import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
 import ru.bclib.api.tag.NamedBlockTags;
 import ru.bclib.api.tag.NamedItemTags;
-import ru.bclib.api.tag.NamedMineableTags;
 import ru.bclib.api.tag.TagAPI.TagLocation;
 import ru.bclib.client.render.BCLRenderLayer;
 import ru.bclib.interfaces.RenderLayerProvider;

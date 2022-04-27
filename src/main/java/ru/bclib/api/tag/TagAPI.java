@@ -3,7 +3,6 @@ package ru.bclib.api.tag;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import net.minecraft.core.Registry;
-import net.minecraft.data.BuiltinRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.tags.Tag;

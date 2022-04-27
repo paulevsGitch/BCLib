@@ -18,7 +18,6 @@ import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import ru.bclib.api.tag.NamedBlockTags;
 import ru.bclib.api.tag.NamedItemTags;
-import ru.bclib.api.tag.NamedMineableTags;
 import ru.bclib.api.tag.TagAPI.TagLocation;
 import ru.bclib.client.render.BCLRenderLayer;
 import ru.bclib.interfaces.BlockModelProvider;

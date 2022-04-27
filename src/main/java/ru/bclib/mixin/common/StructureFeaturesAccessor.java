@@ -3,7 +3,6 @@ package ru.bclib.mixin.common;
 import net.minecraft.core.Holder;
 import net.minecraft.data.worldgen.StructureFeatures;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
 import net.minecraft.world.level.levelgen.feature.StructureFeature;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;

@@ -24,7 +24,14 @@ import ru.bclib.config.Configs;
 import ru.bclib.interfaces.PostInitable;
 import ru.bclib.interfaces.RenderLayerProvider;
 import ru.bclib.interfaces.TagProvider;
-import ru.bclib.interfaces.tools.*;
+import ru.bclib.interfaces.tools.AddMineableAxe;
+import ru.bclib.interfaces.tools.AddMineableHammer;
+import ru.bclib.interfaces.tools.AddMineableHoe;
+import ru.bclib.interfaces.tools.AddMineablePickaxe;
+import ru.bclib.interfaces.tools.AddMineableShears;
+import ru.bclib.interfaces.tools.AddMineableShovel;
+import ru.bclib.interfaces.tools.AddMineableSword;
+import ru.bclib.interfaces.tools.PreventMineableAdd;
 import ru.bclib.registry.BaseBlockEntities;
 
 import java.util.List;

@@ -17,14 +17,13 @@ import java.util.Set;
 
 @Mixin(ItemPredicate.class)
 public abstract class ItemPredicateBuilderMixin {
-	
 	@Shadow @Final private @Nullable Set<Item> items;
 	
 	@Inject(method = "matches", at = @At("HEAD"), cancellable = true)
-	void bclib_of(ItemStack itemStack, CallbackInfoReturnable<Boolean> cir) {
+	void bclib_isShears(ItemStack itemStack, CallbackInfoReturnable<Boolean> info) {
 		if (this.items != null && this.items.size() == 1 && this.items.contains(Items.SHEARS)) {
-			if (itemStack.is(CommonItemTags.SHEARS) ){
-				cir.setReturnValue(true);
+			if (itemStack.is(CommonItemTags.SHEARS)) {
+				info.setReturnValue(true);
 			}
 		}
 	}

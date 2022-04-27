@@ -1,6 +1,5 @@
 package ru.bclib.mixin.common;
 
-import net.minecraft.Util;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.crafting.Recipe;
