@@ -2,12 +2,14 @@ package ru.bclib.blocks;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.resources.model.BlockModelRotation;
 import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.StairBlock;
@@ -20,18 +22,25 @@ import ru.bclib.client.models.BasePatterns;
 import ru.bclib.client.models.ModelsHelper;
 import ru.bclib.client.models.PatternsHelper;
 import ru.bclib.interfaces.BlockModelProvider;
+import ru.bclib.interfaces.CustomItemProvider;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class BaseStairsBlock extends StairBlock implements BlockModelProvider {
+public class BaseStairsBlock extends StairBlock implements BlockModelProvider, CustomItemProvider {
 	private final Block parent;
-	
+	public final boolean fireproof;
+
 	public BaseStairsBlock(Block source) {
+		this(source, false);
+	}
+	
+	public BaseStairsBlock(Block source, boolean fireproof) {
 		super(source.defaultBlockState(), FabricBlockSettings.copyOf(source));
 		this.parent = source;
+		this.fireproof = fireproof;
 	}
 	
 	@Override
@@ -50,20 +59,11 @@ public class BaseStairsBlock extends StairBlock implements BlockModelProvider {
 	@Environment(EnvType.CLIENT)
 	public @Nullable BlockModel getBlockModel(ResourceLocation blockId, BlockState blockState) {
 		ResourceLocation parentId = Registry.BLOCK.getKey(parent);
-		Optional<String> pattern = Optional.empty();
-		switch (blockState.getValue(SHAPE)) {
-			case STRAIGHT:
-				pattern = PatternsHelper.createJson(BasePatterns.BLOCK_STAIR, parentId);
-				break;
-			case INNER_LEFT:
-			case INNER_RIGHT:
-				pattern = PatternsHelper.createJson(BasePatterns.BLOCK_STAIR_INNER, parentId);
-				break;
-			case OUTER_LEFT:
-			case OUTER_RIGHT:
-				pattern = PatternsHelper.createJson(BasePatterns.BLOCK_STAIR_OUTER, parentId);
-				break;
-		}
+		Optional<String> pattern = PatternsHelper.createJson(switch (blockState.getValue(SHAPE)) {
+			case STRAIGHT -> BasePatterns.BLOCK_STAIR;
+			case INNER_LEFT, INNER_RIGHT -> BasePatterns.BLOCK_STAIR_INNER;
+			case OUTER_LEFT, OUTER_RIGHT -> BasePatterns.BLOCK_STAIR_OUTER;
+		}, parentId);
 		return ModelsHelper.fromPattern(pattern);
 	}
 	
@@ -72,18 +72,11 @@ public class BaseStairsBlock extends StairBlock implements BlockModelProvider {
 	public UnbakedModel getModelVariant(ResourceLocation stateId, BlockState blockState, Map<ResourceLocation, UnbakedModel> modelCache) {
 		String state;
 		StairsShape shape = blockState.getValue(SHAPE);
-		switch (shape) {
-			case INNER_LEFT:
-			case INNER_RIGHT:
-				state = "_inner";
-				break;
-			case OUTER_LEFT:
-			case OUTER_RIGHT:
-				state = "_outer";
-				break;
-			default:
-				state = "";
-		}
+		state = switch (shape) {
+			case INNER_LEFT, INNER_RIGHT -> "_inner";
+			case OUTER_LEFT, OUTER_RIGHT -> "_outer";
+			default -> "";
+		};
 		ResourceLocation modelId = new ResourceLocation(stateId.getNamespace(), "block/" + stateId.getPath() + state);
 		registerBlockModel(stateId, modelId, blockState, modelCache);
 		
@@ -112,5 +105,11 @@ public class BaseStairsBlock extends StairBlock implements BlockModelProvider {
 		}
 		BlockModelRotation rotation = BlockModelRotation.by(x, y);
 		return ModelsHelper.createMultiVariant(modelId, rotation.getRotation(), true);
+	}
+
+	@Override
+	public BlockItem getCustomItem(ResourceLocation blockID, FabricItemSettings settings) {
+		if (fireproof) settings = settings.fireproof();
+		return new BlockItem(this, settings);
 	}
 }

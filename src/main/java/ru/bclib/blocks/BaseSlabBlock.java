@@ -27,10 +27,16 @@ import java.util.Optional;
 
 public class BaseSlabBlock extends SlabBlock implements BlockModelProvider {
 	private final Block parent;
-	
+	public final boolean fireproof;
+
 	public BaseSlabBlock(Block source) {
+		this(source, false);
+	}
+
+	public BaseSlabBlock(Block source, boolean fireproof) {
 		super(FabricBlockSettings.copyOf(source));
 		this.parent = source;
+		this.fireproof = fireproof;
 	}
 	
 	@Override

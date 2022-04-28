@@ -128,11 +128,11 @@ public class WoodenComplexMaterial extends ComplexMaterial {
 			.setBlockTags(NamedBlockTags.PLANKS)
 			.setItemTags(NamedItemTags.PLANKS));
 
-		addBlockEntry(new BlockEntry(BLOCK_STAIRS, (complexMaterial, settings) -> new BaseStairsBlock(getBlock(BLOCK_PLANKS)))
+		addBlockEntry(new BlockEntry(BLOCK_STAIRS, (complexMaterial, settings) -> new BaseStairsBlock(getBlock(BLOCK_PLANKS), false))
 			.setBlockTags(NamedBlockTags.WOODEN_STAIRS, NamedBlockTags.STAIRS)
 			.setItemTags(NamedItemTags.WOODEN_STAIRS, NamedItemTags.STAIRS));
 		
-		addBlockEntry(new BlockEntry(BLOCK_SLAB, (complexMaterial, settings) -> new BaseSlabBlock(getBlock(BLOCK_PLANKS)))
+		addBlockEntry(new BlockEntry(BLOCK_SLAB, (complexMaterial, settings) -> new BaseSlabBlock(getBlock(BLOCK_PLANKS), false))
 			.setBlockTags(NamedBlockTags.WOODEN_SLABS, NamedBlockTags.SLABS)
 			.setItemTags(NamedItemTags.WOODEN_SLABS, NamedItemTags.SLABS));
 		
