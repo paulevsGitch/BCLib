@@ -105,8 +105,7 @@ public class BaseSignBlock extends SignBlock implements BlockModelProvider, Cust
 			world.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(world));
 		}
 		if (!canSurvive(state, world, pos)) {
-			return state.getValue(WATERLOGGED) ? state.getFluidState()
-													  .createLegacyBlock() : Blocks.AIR.defaultBlockState();
+			return state.getValue(WATERLOGGED) ? state.getFluidState().createLegacyBlock() : Blocks.AIR.defaultBlockState();
 		}
 		return super.updateShape(state, facing, neighborState, world, pos, neighborPos);
 	}
@@ -126,10 +125,11 @@ public class BaseSignBlock extends SignBlock implements BlockModelProvider, Cust
 	public BlockState getStateForPlacement(BlockPlaceContext ctx) {
 		if (ctx.getClickedFace() == Direction.UP) {
 			FluidState fluidState = ctx.getLevel().getFluidState(ctx.getClickedPos());
-			return this.defaultBlockState()
-					   .setValue(FLOOR, true)
-					   .setValue(ROTATION, Mth.floor((180.0 + ctx.getRotation() * 16.0 / 360.0) + 0.5 - 12) & 15)
-					   .setValue(WATERLOGGED, fluidState.getType() == Fluids.WATER);
+			return this
+				.defaultBlockState()
+				.setValue(FLOOR, true)
+				.setValue(ROTATION, Mth.floor((180.0 + ctx.getRotation() * 16.0 / 360.0) + 0.5 - 12) & 15)
+				.setValue(WATERLOGGED, fluidState.getType() == Fluids.WATER);
 		}
 		else if (ctx.getClickedFace() != Direction.DOWN) {
 			BlockState blockState = this.defaultBlockState();
@@ -144,8 +144,7 @@ public class BaseSignBlock extends SignBlock implements BlockModelProvider, Cust
 					int rot = Mth.floor((180.0 + dir.toYRot() * 16.0 / 360.0) + 0.5 + 4) & 15;
 					blockState = blockState.setValue(ROTATION, rot);
 					if (blockState.canSurvive(worldView, blockPos)) {
-						return blockState.setValue(FLOOR, false)
-										 .setValue(WATERLOGGED, fluidState.getType() == Fluids.WATER);
+						return blockState.setValue(FLOOR, false).setValue(WATERLOGGED, fluidState.getType() == Fluids.WATER);
 					}
 				}
 			}
@@ -163,12 +162,12 @@ public class BaseSignBlock extends SignBlock implements BlockModelProvider, Cust
 	
 	@Override
 	public BlockState rotate(BlockState state, Rotation rotation) {
-		return state.setValue(ROTATION, rotation.rotate((Integer) state.getValue(ROTATION), 16));
+		return state.setValue(ROTATION, rotation.rotate(state.getValue(ROTATION), 16));
 	}
 	
 	@Override
 	public BlockState mirror(BlockState state, Mirror mirror) {
-		return state.setValue(ROTATION, mirror.mirror((Integer) state.getValue(ROTATION), 16));
+		return state.setValue(ROTATION, mirror.mirror(state.getValue(ROTATION), 16));
 	}
 	
 	@Override

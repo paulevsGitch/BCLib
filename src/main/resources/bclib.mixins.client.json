@@ -5,6 +5,7 @@
 	"compatibilityLevel": "JAVA_17",
 	"client": [
 		"ClientRecipeBookMixin",
+		"SignEditScreenMixin",
 		"ModelManagerMixin",
 		"TextureAtlasMixin",
 		"AnvilScreenMixin",
@@ -12,8 +13,8 @@
 		"ModelBakeryMixin",
 		"WorldPresetMixin",
 		"MinecraftMixin",
-		"GameMixin",
-		"BlockMixin"
+		"BlockMixin",
+		"GameMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
