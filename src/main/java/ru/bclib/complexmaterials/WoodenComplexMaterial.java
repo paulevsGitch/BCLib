@@ -380,13 +380,5 @@ public class WoodenComplexMaterial extends ComplexMaterial {
 					  .addMaterial('#', getBlock(BLOCK_SLAB))
 					  .build();
 		}));
-		addRecipeEntry(new RecipeEntry("shulker", (material, config, id) -> {
-			GridRecipe.make(id, Blocks.SHULKER_BOX)
-					  .checkConfig(config)
-					  .setShape("S", "#", "S")
-					  .addMaterial('S', Items.SHULKER_SHELL)
-					  .addMaterial('#', getBlock(BLOCK_CHEST))
-					  .build();
-		}));
 	}
 }

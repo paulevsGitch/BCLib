@@ -35,7 +35,7 @@ public class BaseBookshelfBlock extends BaseBlock {
 	@Override
 	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
 		ItemStack tool = builder.getParameter(LootContextParams.TOOL);
-		if (tool != null && tool.isCorrectToolForDrops(state)) {
+		if (tool != null) {
 			int silk = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.SILK_TOUCH, tool);
 			if (silk > 0) {
 				return Collections.singletonList(new ItemStack(this));
