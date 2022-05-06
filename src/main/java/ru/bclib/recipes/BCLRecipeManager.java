@@ -1,20 +1,44 @@
 package ru.bclib.recipes;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.Container;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import ru.bclib.util.CollectionsUtil;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.function.Function;
 
 public class BCLRecipeManager {
 	private static final Map<RecipeType<?>, Map<ResourceLocation, Recipe<?>>> RECIPES = Maps.newHashMap();
+	private static final Map<RecipeType<?>, Object> SORTED = Maps.newHashMap();
+	private static final String MINECRAFT = "minecraft";
+	
+	public static <C extends Container, T extends Recipe<C>> Optional<T> getSortedRecipe(RecipeType<T> type, C inventory, Level level, Function<RecipeType<T>, Map<ResourceLocation, Recipe<C>>> getter) {
+		List<Recipe<C>> recipes = (List<Recipe<C>>) SORTED.computeIfAbsent(type, t -> {
+			Collection<Recipe<C>> values = getter.apply(type).values();
+			List<Recipe<C>> list = new ArrayList<>(values);
+			list.sort((v1, v2) -> {
+				boolean b1 = v1.getId().getNamespace().equals(MINECRAFT);
+				boolean b2 = v2.getId().getNamespace().equals(MINECRAFT);
+				return b1 ^ b2 ? (b1 ? 1 : -1) : 0;
+			});
+			return ImmutableList.copyOf(list);
+		});
+		return recipes.stream().flatMap(recipe -> type.tryMatch(recipe, level, inventory).stream()).findFirst();
+	}
 	
 	public static void addRecipe(RecipeType<?> type, Recipe<?> recipe) {
 		Map<ResourceLocation, Recipe<?>> list = RECIPES.computeIfAbsent(type, i -> Maps.newHashMap());
@@ -35,6 +59,7 @@ public class BCLRecipeManager {
 			result.put(type, typeList);
 		}
 		
+		SORTED.clear();
 		RECIPES.forEach((type, list) -> {
 			if (list != null) {
 				Map<ResourceLocation, Recipe<?>> typeList = result.computeIfAbsent(type, i -> Maps.newHashMap());
