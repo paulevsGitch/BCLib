@@ -19,6 +19,8 @@ public final class BCLibPatch {
 final class BiomeSourcePatch extends ForcedLevelPatch{
 	private static final String NETHER_BIOME_SOURCE = "bclib:nether_biome_source";
 	private static final String END_BIOME_SOURCE = "bclib:end_biome_source";
+	private static final String MC_NETHER = "minecraft:the_nether";
+	private static final String MC_END = "minecraft:the_end";
 	
 	protected BiomeSourcePatch() {
 		super(BCLib.MOD_ID, "1.2.1");
@@ -32,21 +34,21 @@ final class BiomeSourcePatch extends ForcedLevelPatch{
 		boolean result = false;
 		
 		if (GeneratorOptions.fixNetherBiomeSource()) {
-			if (!dimensions.contains("minecraft:the_nether") || !isBCLibEntry(dimensions.getCompound("minecraft:the_nether"))) {
+			if (!dimensions.contains(MC_NETHER) || !isBCLibEntry(dimensions.getCompound(MC_NETHER))) {
 				CompoundTag dimRoot = new CompoundTag();
 				dimRoot.put("generator", makeNetherGenerator(seed));
-				dimRoot.putString("type", "minecraft:the_nether");
-				dimensions.put("minecraft:the_nether", dimRoot);
+				dimRoot.putString("type", MC_NETHER);
+				dimensions.put(MC_NETHER, dimRoot);
 				result = true;
 			}
 		}
 		
 		if (GeneratorOptions.fixEndBiomeSource()) {
-			if (!dimensions.contains("minecraft:the_end") || !isBCLibEntry(dimensions.getCompound("minecraft:the_end"))) {
+			if (!dimensions.contains(MC_END) || !isBCLibEntry(dimensions.getCompound(MC_END))) {
 				CompoundTag dimRoot = new CompoundTag();
 				dimRoot.put("generator", makeEndGenerator(seed));
-				dimRoot.putString("type", "minecraft:the_end");
-				dimensions.put("minecraft:the_end", dimRoot);
+				dimRoot.putString("type", MC_END);
+				dimensions.put(MC_END, dimRoot);
 				result = true;
 			}
 		}
@@ -59,7 +61,7 @@ final class BiomeSourcePatch extends ForcedLevelPatch{
 		if (type.isEmpty() || type.length() < 5) {
 			return false;
 		}
-		return type.substring(0, 5).equals("bclib");
+		return type.startsWith("bclib");
 	}
 	
 	public static CompoundTag makeNetherGenerator(long seed) {
