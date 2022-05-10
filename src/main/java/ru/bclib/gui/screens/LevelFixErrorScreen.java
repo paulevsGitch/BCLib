@@ -5,7 +5,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
+
 import ru.bclib.gui.gridlayout.GridColumn;
 import ru.bclib.gui.gridlayout.GridLayout;
 import ru.bclib.gui.gridlayout.GridRow;
@@ -16,7 +16,7 @@ public class LevelFixErrorScreen  extends BCLibScreen {
 	final Listener onContinue;
 	
 	public LevelFixErrorScreen(Screen parent, String[] errors, Listener onContinue) {
-		super(parent, new TranslatableComponent("title.bclib.datafixer.error"), 10, true);
+		super(parent, Component.translatable("title.bclib.datafixer.error"), 10, true);
 		this.errors = errors;
 		this.onContinue = onContinue;
 	}
@@ -24,7 +24,7 @@ public class LevelFixErrorScreen  extends BCLibScreen {
 	@Override
 	protected void initLayout() {
 		grid.addSpacerRow();
-		grid.addRow().addMessage(new TranslatableComponent("message.bclib.datafixer.error"), font, GridLayout.Alignment.CENTER);
+		grid.addRow().addMessage(Component.translatable("message.bclib.datafixer.error"), font, GridLayout.Alignment.CENTER);
 		grid.addSpacerRow(8);
 	
 		GridRow row = grid.addRow();
@@ -42,7 +42,7 @@ public class LevelFixErrorScreen  extends BCLibScreen {
 		grid.addSpacerRow(8);
 		row = grid.addRow();
 		row.addFiller();
-		row.addButton(new TranslatableComponent("title.bclib.datafixer.error.continue"), 0.5f, 20, font, (n)-> {
+		row.addButton(Component.translatable("title.bclib.datafixer.error.continue"), 0.5f, 20, font, (n)-> {
 			onClose();
 			onContinue.doContinue(true);
 		});

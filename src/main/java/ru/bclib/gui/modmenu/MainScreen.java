@@ -2,7 +2,7 @@ package ru.bclib.gui.modmenu;
 
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
-import net.minecraft.network.chat.TranslatableComponent;
+
 import org.jetbrains.annotations.Nullable;
 import ru.bclib.config.ConfigKeeper.BooleanEntry;
 import ru.bclib.config.Configs;
@@ -22,11 +22,11 @@ import java.util.function.Supplier;
 public class MainScreen extends GridScreen{
 	
 	public MainScreen(@Nullable Screen parent) {
-		super(parent, new TranslatableComponent("title.bclib.modmenu.main"), 10, false);
+		super(parent, Component.translatable("title.bclib.modmenu.main"), 10, false);
 	}
 	
 	protected <T> TranslatableComponent getComponent(NamedPathConfig config, ConfigTokenDescription<T> option, String type){
-		return new TranslatableComponent(type + ".config." + config.configID + option.getPath() );
+		return Component.translatable(type + ".config." + config.configID + option.getPath() );
 	}
 	
 	Map<GridWidgetWithEnabledState, Supplier<Boolean>> dependentWidgets = new HashMap<>();

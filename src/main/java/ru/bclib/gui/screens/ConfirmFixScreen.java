@@ -6,7 +6,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
+
 import org.jetbrains.annotations.Nullable;
 import ru.bclib.gui.gridlayout.GridCheckboxCell;
 import ru.bclib.gui.gridlayout.GridLayout.Alignment;
@@ -19,10 +19,10 @@ public class ConfirmFixScreen extends BCLibScreen {
 	protected int id;
 	
 	public ConfirmFixScreen(@Nullable Screen parent, ConfirmFixScreen.Listener listener) {
-		super(parent, new TranslatableComponent("bclib.datafixer.backupWarning.title"));
+		super(parent, Component.translatable("bclib.datafixer.backupWarning.title"));
 		this.listener = listener;
 		
-		this.description = new TranslatableComponent("bclib.datafixer.backupWarning.message");
+		this.description = Component.translatable("bclib.datafixer.backupWarning.message");
 	}
 	
 	protected void initLayout() {
@@ -32,12 +32,12 @@ public class ConfirmFixScreen extends BCLibScreen {
 		grid.addSpacerRow();
 		
 		GridRow row = grid.addRow();
-		GridCheckboxCell backup = row.addCheckbox(new TranslatableComponent("bclib.datafixer.backupWarning.backup"), true, BUTTON_HEIGHT, this.font);
+		GridCheckboxCell backup = row.addCheckbox(Component.translatable("bclib.datafixer.backupWarning.backup"), true, BUTTON_HEIGHT, this.font);
 		
 		grid.addSpacerRow(10);
 		
 		row = grid.addRow();
-		GridCheckboxCell fix = row.addCheckbox(new TranslatableComponent("bclib.datafixer.backupWarning.fix"), true, BUTTON_HEIGHT, this.font);
+		GridCheckboxCell fix = row.addCheckbox(Component.translatable("bclib.datafixer.backupWarning.fix"), true, BUTTON_HEIGHT, this.font);
 		
 		grid.addSpacerRow(20);
 		

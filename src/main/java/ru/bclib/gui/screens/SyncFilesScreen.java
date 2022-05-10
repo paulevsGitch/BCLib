@@ -5,7 +5,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
+
 import ru.bclib.api.dataexchange.handler.autosync.HelloClient;
 import ru.bclib.gui.gridlayout.GridCheckboxCell;
 import ru.bclib.gui.gridlayout.GridLayout.Alignment;
@@ -22,10 +22,10 @@ public class SyncFilesScreen extends BCLibScreen {
 	private final boolean shouldDelete;
 	private final HelloClient.IServerModMap serverInfo;
 	public SyncFilesScreen(int modFiles, int configFiles, int singleFiles, int folderFiles, int deleteFiles, HelloClient.IServerModMap serverInfo, Listener listener) {
-		super(new TranslatableComponent("title.bclib.syncfiles"));
+		super(Component.translatable("title.bclib.syncfiles"));
 
 		this.serverInfo = serverInfo;
-		this.description = new TranslatableComponent("message.bclib.syncfiles");
+		this.description = Component.translatable("message.bclib.syncfiles");
 		this.listener = listener;
 		
 		this.hasConfigFiles = configFiles>0;
@@ -47,15 +47,15 @@ public class SyncFilesScreen extends BCLibScreen {
 		
 		final GridCheckboxCell mods;
 		row = grid.addRow();
-		mods = row.addCheckbox(new TranslatableComponent("message.bclib.syncfiles.mods"), hasMods, BUTTON_HEIGHT, this.font);
+		mods = row.addCheckbox(Component.translatable("message.bclib.syncfiles.mods"), hasMods, BUTTON_HEIGHT, this.font);
 		mods.setEnabled(hasMods);
 
 			row.addSpacer();
-			row.addButton(new TranslatableComponent("title.bclib.syncfiles.modInfo"), 20, font, (button)->{
+			row.addButton(Component.translatable("title.bclib.syncfiles.modInfo"), 20, font, (button)->{
 				ModListScreen scr = new ModListScreen(
 						this,
-						new TranslatableComponent("title.bclib.syncfiles.modlist"),
-						new TranslatableComponent("message.bclib.syncfiles.modlist"),
+						Component.translatable("title.bclib.syncfiles.modlist"),
+						Component.translatable("message.bclib.syncfiles.modlist"),
 						ModUtil.getMods(),
 						serverInfo
 						);
@@ -67,7 +67,7 @@ public class SyncFilesScreen extends BCLibScreen {
 		
 		final GridCheckboxCell configs;
 		row = grid.addRow();
-		configs = row.addCheckbox(new TranslatableComponent("message.bclib.syncfiles.configs"), hasConfigFiles, BUTTON_HEIGHT, this.font);
+		configs = row.addCheckbox(Component.translatable("message.bclib.syncfiles.configs"), hasConfigFiles, BUTTON_HEIGHT, this.font);
 		configs.setEnabled(hasConfigFiles);
 		
 		grid.addSpacerRow();
@@ -75,12 +75,12 @@ public class SyncFilesScreen extends BCLibScreen {
 		row = grid.addRow();
 		
 		final GridCheckboxCell folder;
-		folder = row.addCheckbox(new TranslatableComponent("message.bclib.syncfiles.folders"), hasFiles, BUTTON_HEIGHT, this.font);
+		folder = row.addCheckbox(Component.translatable("message.bclib.syncfiles.folders"), hasFiles, BUTTON_HEIGHT, this.font);
 		folder.setEnabled(hasFiles);
 		row.addSpacer();
 		
 		GridCheckboxCell delete;
-		delete = row.addCheckbox(new TranslatableComponent("message.bclib.syncfiles.delete"), shouldDelete, BUTTON_HEIGHT, this.font);
+		delete = row.addCheckbox(Component.translatable("message.bclib.syncfiles.delete"), shouldDelete, BUTTON_HEIGHT, this.font);
 		delete.setEnabled(shouldDelete);
 		
 		

@@ -2,7 +2,7 @@ package ru.bclib.blockentities;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
+
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.FurnaceMenu;
@@ -17,7 +17,7 @@ public class BaseFurnaceBlockEntity extends AbstractFurnaceBlockEntity {
 	}
 	
 	protected Component getDefaultName() {
-		return new TranslatableComponent("container.furnace");
+		return Component.translatable("container.furnace");
 	}
 	
 	protected AbstractContainerMenu createMenu(int syncId, Inventory playerInventory) {

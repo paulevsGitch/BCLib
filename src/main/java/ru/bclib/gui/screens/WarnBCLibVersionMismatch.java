@@ -4,7 +4,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
+
 import ru.bclib.gui.gridlayout.GridLayout.Alignment;
 import ru.bclib.gui.gridlayout.GridRow;
 
@@ -13,9 +13,9 @@ public class WarnBCLibVersionMismatch extends BCLibScreen {
 	private final Component description;
 	private final Listener listener;
 	public WarnBCLibVersionMismatch(Listener listener) {
-		super(new TranslatableComponent("title.bclib.bclibmissmatch"));
+		super(Component.translatable("title.bclib.bclibmissmatch"));
 		
-		this.description = new TranslatableComponent("message.bclib.bclibmissmatch");
+		this.description = Component.translatable("message.bclib.bclibmissmatch");
 		this.listener = listener;
 	}
 	

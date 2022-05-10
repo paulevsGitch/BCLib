@@ -7,7 +7,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
+
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -40,9 +40,9 @@ public interface SurvivesOnSpecialGround {
         final int MAX_LINES = 7;
         List<String>  lines = splitLines(description);
         if (lines.size()==1) {
-            list.add(new TranslatableComponent("tooltip.bclib.place_on", lines.get(0)).withStyle(ChatFormatting.GREEN));
+            list.add(Component.translatable("tooltip.bclib.place_on", lines.get(0)).withStyle(ChatFormatting.GREEN));
         } else if (lines.size()>1) {
-            list.add(new TranslatableComponent("tooltip.bclib.place_on", "").withStyle(ChatFormatting.GREEN));
+            list.add(Component.translatable("tooltip.bclib.place_on", "").withStyle(ChatFormatting.GREEN));
             for (int i = 0; i < Math.min(lines.size(), MAX_LINES); i++) {
                String line = lines.get(i);
                 if (i == MAX_LINES - 1 && i < lines.size() - 1) line += " ...";

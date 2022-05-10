@@ -4,7 +4,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
+
 import ru.bclib.gui.gridlayout.GridLayout.Alignment;
 import ru.bclib.gui.gridlayout.GridRow;
 
@@ -19,9 +19,9 @@ public class ConfirmRestartScreen extends BCLibScreen {
 	}
 
 	public ConfirmRestartScreen(ConfirmRestartScreen.Listener listener, Component message) {
-		super(new TranslatableComponent("title.bclib.confirmrestart"));
+		super(Component.translatable("title.bclib.confirmrestart"));
 
-		this.description = message==null?new TranslatableComponent("message.bclib.confirmrestart"):message;
+		this.description = message==null?Component.translatable("message.bclib.confirmrestart"):message;
 		this.listener = listener;
 	}
 

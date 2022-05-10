@@ -13,7 +13,7 @@ import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
+
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.chunk.storage.RegionFile;
 import net.minecraft.world.level.storage.LevelResource;
@@ -179,7 +179,7 @@ public class DataFixerAPI {
 
 	@Environment(EnvType.CLIENT)
 	private static AtomicProgressListener showProgressScreen(){
-		ProgressScreen ps = new ProgressScreen(Minecraft.getInstance().screen, new TranslatableComponent("title.bclib.datafixer.progress"), new TranslatableComponent("message.bclib.datafixer.progress"));
+		ProgressScreen ps = new ProgressScreen(Minecraft.getInstance().screen, Component.translatable("title.bclib.datafixer.progress"), Component.translatable("message.bclib.datafixer.progress"));
 		Minecraft.getInstance().setScreen(ps);
 		return ps;
 	}
@@ -225,7 +225,7 @@ public class DataFixerAPI {
 
 			Supplier<State> runner = () -> {
 				if (createBackup) {
-					progress.progressStage(new TranslatableComponent("message.bclib.datafixer.progress.waitbackup"));
+					progress.progressStage(Component.translatable("message.bclib.datafixer.progress.waitbackup"));
 					EditWorldScreen.makeBackupAndShowToast(Minecraft.getInstance().getLevelSource(), levelID);
 				}
 
@@ -319,23 +319,23 @@ public class DataFixerAPI {
 		State state = new State();
 		progress.resetAtomic();
 
-		progress.progressStage(new TranslatableComponent("message.bclib.datafixer.progress.reading"));
+		progress.progressStage(Component.translatable("message.bclib.datafixer.progress.reading"));
 		List<File> players = getAllPlayers(dir);
 		List<File> regions = getAllRegions(dir, null);
 		final int maxProgress = players.size()+regions.size()+4;
 		progress.incAtomic(maxProgress);
 
-		progress.progressStage(new TranslatableComponent("message.bclib.datafixer.progress.players"));
+		progress.progressStage(Component.translatable("message.bclib.datafixer.progress.players"));
 		players.parallelStream().forEach((file) -> {
 			fixPlayer(profile, state, file);
 			progress.incAtomic(maxProgress);
 		});
 
-		progress.progressStage(new TranslatableComponent("message.bclib.datafixer.progress.level"));
+		progress.progressStage(Component.translatable("message.bclib.datafixer.progress.level"));
 		fixLevel(profile, state, dir);
 		progress.incAtomic(maxProgress);
 
-		progress.progressStage(new TranslatableComponent("message.bclib.datafixer.progress.worlddata"));
+		progress.progressStage(Component.translatable("message.bclib.datafixer.progress.worlddata"));
 		try {
 			profile.patchWorldData();
 		} catch (PatchDidiFailException e){
@@ -345,14 +345,14 @@ public class DataFixerAPI {
 		}
 		progress.incAtomic(maxProgress);
 
-		progress.progressStage(new TranslatableComponent("message.bclib.datafixer.progress.regions"));
+		progress.progressStage(Component.translatable("message.bclib.datafixer.progress.regions"));
 		regions.parallelStream().forEach((file) -> {
 			fixRegion(profile, state, file);
 			progress.incAtomic(maxProgress);
 		});
 		
 		if (!state.didFail) {
-			progress.progressStage(new TranslatableComponent("message.bclib.datafixer.progress.saving"));
+			progress.progressStage(Component.translatable("message.bclib.datafixer.progress.saving"));
 			profile.markApplied();
 			WorldDataAPI.saveFile(BCLib.MOD_ID);
 		}

@@ -7,7 +7,7 @@ import net.fabricmc.loader.api.metadata.ModEnvironment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.CommonComponents;
-import net.minecraft.network.chat.TranslatableComponent;
+
 import net.minecraft.resources.ResourceLocation;
 import ru.bclib.BCLib;
 import ru.bclib.api.dataexchange.DataExchangeAPI;
@@ -380,7 +380,7 @@ public class HelloClient extends DataHandler.FromServer {
 			showSyncFilesScreen(client, filesToRequest, filesToRemove);
 			return;
 		} else if (serverPublishedModInfo && mismatchingMods.size()>0 && Configs.CLIENT_CONFIG.isShowingModInfo()) {
-			client.setScreen(new ModListScreen(client.screen, new TranslatableComponent("title.bclib.modmissmatch"), new TranslatableComponent("message.bclib.modmissmatch"), CommonComponents.GUI_PROCEED, ModUtil.getMods(), modVersion));
+			client.setScreen(new ModListScreen(client.screen, Component.translatable("title.bclib.modmissmatch"), Component.translatable("message.bclib.modmissmatch"), CommonComponents.GUI_PROCEED, ModUtil.getMods(), modVersion));
 			return;
 		}
 	}
@@ -481,8 +481,8 @@ public class HelloClient extends DataHandler.FromServer {
 	private void requestFileDownloads(List<AutoSyncID> files) {
 		BCLib.LOGGER.info("Starting download of Files:" + files.size());
 
-		final ProgressScreen progress = new ProgressScreen(null, new TranslatableComponent("title.bclib.filesync.progress"), new TranslatableComponent("message.bclib.filesync.progress"));
-		progress.progressStart(new TranslatableComponent("message.bclib.filesync.progress.stage.empty"));
+		final ProgressScreen progress = new ProgressScreen(null, Component.translatable("title.bclib.filesync.progress"), Component.translatable("message.bclib.filesync.progress"));
+		progress.progressStart(Component.translatable("message.bclib.filesync.progress.stage.empty"));
 		ChunkerProgress.setProgressScreen(progress);
 
 		DataExchangeAPI.send(new RequestFiles(files));

@@ -5,7 +5,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.core.Registry;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
+
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
@@ -59,7 +59,7 @@ public class BaseAnvilItem extends BlockItem implements ItemModelProvider {
 			int maxValue = block.getMaxDurability() * 3;
 			float damage = maxValue - destruction;
 			String percents = String.format(Locale.ROOT, "%.0f%%", damage);
-			list.add(new TranslatableComponent("message.bclib.anvil_damage").append(": " + percents));
+			list.add(Component.translatable("message.bclib.anvil_damage").append(": " + percents));
 		}
 	}
 	

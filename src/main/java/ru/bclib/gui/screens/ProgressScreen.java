@@ -8,7 +8,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
+
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.ProgressListener;
 import org.jetbrains.annotations.Nullable;
@@ -138,7 +138,7 @@ public class ProgressScreen extends GridScreen implements ProgressListener, Atom
 	}
 	
 	private Component getProgressComponent(int pg){
-		return new TranslatableComponent("title.bclib.progress").append(": " + pg + "%");
+		return Component.translatable("title.bclib.progress").append(": " + pg + "%");
 	}
 	@Override
 	protected void initLayout() {
