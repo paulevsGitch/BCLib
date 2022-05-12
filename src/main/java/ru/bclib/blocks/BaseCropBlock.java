@@ -27,7 +27,7 @@ import ru.bclib.util.MHelper;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
+import java.util.Random;import net.minecraft.util.RandomSource;
 
 public class BaseCropBlock extends BasePlantBlock {
 	public static final IntegerProperty AGE = IntegerProperty.create("age", 0, 3);
@@ -41,13 +41,14 @@ public class BaseCropBlock extends BasePlantBlock {
 			FabricBlockSettings.of(Material.PLANT)
 				.sound(SoundType.GRASS)
 				.randomTicks()
-				.noCollission(),
+				.noCollission()
+					.offsetType(BlockBehaviour.OffsetType.NONE),
 			drop, terrain
 		);
 	}
 	
 	public BaseCropBlock(BlockBehaviour.Properties properties, Item drop, Block... terrain) {
-		super(properties);
+		super(properties.offsetType(BlockBehaviour.OffsetType.NONE));
 		this.drop = drop;
 		this.terrain = terrain;
 		this.registerDefaultState(defaultBlockState().setValue(AGE, 0));
@@ -88,15 +89,10 @@ public class BaseCropBlock extends BasePlantBlock {
 	}
 	
 	@Override
-	public BlockBehaviour.OffsetType getOffsetType() {
-		return BlockBehaviour.OffsetType.NONE;
-	}
-	
-	@Override
-	public void performBonemeal(ServerLevel world, Random random, BlockPos pos, BlockState state) {
+	public void performBonemeal(ServerLevel level, RandomSource random, BlockPos pos, BlockState state) {
 		int age = state.getValue(AGE);
 		if (age < 3) {
-			BlocksHelper.setWithUpdate(world, pos, state.setValue(AGE, age + 1));
+			BlocksHelper.setWithUpdate(level, pos, state.setValue(AGE, age + 1));
 		}
 	}
 	
@@ -106,13 +102,13 @@ public class BaseCropBlock extends BasePlantBlock {
 	}
 	
 	@Override
-	public boolean isBonemealSuccess(Level world, Random random, BlockPos pos, BlockState state) {
+	public boolean isBonemealSuccess(Level level, RandomSource random, BlockPos pos, BlockState state) {
 		return state.getValue(AGE) < 3;
 	}
 	
 	@Override
 	@SuppressWarnings("deprecation")
-	public void tick(BlockState state, ServerLevel world, BlockPos pos, Random random) {
+	public void tick(BlockState state, ServerLevel world, BlockPos pos, RandomSource random) {
 		super.tick(state, world, pos, random);
 		if (isBonemealSuccess(world, random, pos, state) && random.nextInt(8) == 0) {
 			performBonemeal(world, random, pos, state);

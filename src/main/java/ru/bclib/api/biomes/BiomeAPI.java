@@ -44,7 +44,6 @@ import net.minecraft.world.level.levelgen.SurfaceRules;
 import net.minecraft.world.level.levelgen.SurfaceRules.RuleSource;
 import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
-import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import org.apache.commons.lang3.mutable.MutableInt;
@@ -72,7 +71,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Random;
+import java.util.Random;import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.levelgen.structure.Structure;
+
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
@@ -836,9 +837,9 @@ public class BiomeAPI {
 	
 	static class StructureID {
 		public final ResourceLocation biomeID;
-		public final ConfiguredStructureFeature structure;
+		public final Holder<Structure> structure;
 		
-		StructureID(ResourceLocation biomeID, ConfiguredStructureFeature structure){
+		StructureID(ResourceLocation biomeID, Holder<Structure> structure){
 			this.biomeID = biomeID;
 			this.structure = structure;
 		}

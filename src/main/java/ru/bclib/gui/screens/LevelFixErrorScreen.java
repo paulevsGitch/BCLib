@@ -4,7 +4,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 
 import ru.bclib.gui.gridlayout.GridColumn;
 import ru.bclib.gui.gridlayout.GridLayout;
@@ -31,12 +31,12 @@ public class LevelFixErrorScreen  extends BCLibScreen {
 		row.addSpacer(10);
 		GridColumn col = row.addColumn(300, GridLayout.GridValueType.CONSTANT);
 		for (String error : errors){
-			TextComponent dash = new TextComponent("-");
+			Component dash = Component.literal("-");
 			row = col.addRow();
 			row.addString(dash, this);
 	
 			row.addSpacer(4);
-			row.addString(new TextComponent(error), this);
+			row.addString(Component.literal(error), this);
 		}
 	
 		grid.addSpacerRow(8);

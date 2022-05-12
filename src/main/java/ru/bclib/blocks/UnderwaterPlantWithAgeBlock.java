@@ -11,7 +11,7 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.material.Material;
 
-import java.util.Random;
+import java.util.Random;import net.minecraft.util.RandomSource;
 
 public abstract class UnderwaterPlantWithAgeBlock extends UnderwaterPlantBlock {
 	public static final IntegerProperty AGE = BlockProperties.AGE;
@@ -31,10 +31,10 @@ public abstract class UnderwaterPlantWithAgeBlock extends UnderwaterPlantBlock {
 		stateManager.add(AGE);
 	}
 	
-	public abstract void grow(WorldGenLevel world, Random random, BlockPos pos);
+	public abstract void grow(WorldGenLevel world, RandomSource random, BlockPos pos);
 	
 	@Override
-	public void performBonemeal(ServerLevel world, Random random, BlockPos pos, BlockState state) {
+	public void performBonemeal(ServerLevel world, RandomSource random, BlockPos pos, BlockState state) {
 		if (random.nextInt(4) == 0) {
 			int age = state.getValue(AGE);
 			if (age < 3) {
@@ -48,7 +48,7 @@ public abstract class UnderwaterPlantWithAgeBlock extends UnderwaterPlantBlock {
 	
 	@Override
 	@SuppressWarnings("deprecation")
-	public void tick(BlockState state, ServerLevel world, BlockPos pos, Random random) {
+	public void tick(BlockState state, ServerLevel world, BlockPos pos, RandomSource random) {
 		super.tick(state, world, pos, random);
 		if (isBonemealSuccess(world, random, pos, state)) {
 			performBonemeal(world, random, pos, state);

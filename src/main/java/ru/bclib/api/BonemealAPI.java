@@ -7,7 +7,7 @@ import net.minecraft.world.level.block.Block;
 import ru.bclib.util.WeightedList;
 
 import java.util.Map;
-import java.util.Random;
+import java.util.Random;import net.minecraft.util.RandomSource;
 import java.util.Set;
 
 public class BonemealAPI {
@@ -111,7 +111,7 @@ public class BonemealAPI {
 		list.add(plant, chance);
 	}
 	
-	public static Block getLandGrass(ResourceLocation biomeID, Block terrain, Random random) {
+	public static Block getLandGrass(ResourceLocation biomeID, Block terrain, RandomSource random) {
 		Map<Block, WeightedList<Block>> map = LAND_GRASS_BIOMES.get(biomeID);
 		WeightedList<Block> list = null;
 		if (map != null) {
@@ -126,7 +126,7 @@ public class BonemealAPI {
 		return list == null ? null : list.get(random);
 	}
 	
-	public static Block getWaterGrass(ResourceLocation biomeID, Block terrain, Random random) {
+	public static Block getWaterGrass(ResourceLocation biomeID, Block terrain, RandomSource random) {
 		Map<Block, WeightedList<Block>> map = WATER_GRASS_BIOMES.get(biomeID);
 		WeightedList<Block> list = null;
 		if (map != null) {

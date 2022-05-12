@@ -1,7 +1,6 @@
 package ru.bclib.mixin.client;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.Minecraft.ExperimentalDialogType;
 import net.minecraft.client.color.block.BlockColors;
 import net.minecraft.client.color.item.ItemColors;
 import net.minecraft.client.main.GameConfig;
@@ -45,42 +44,5 @@ public abstract class MinecraftMixin {
 				itemColors.register(provider.getItemProvider(), block.asItem());
 			}
 		});
-	}
-
-	@Shadow protected abstract void doLoadLevel(String string, Function<LevelStorageAccess, WorldStem.DataPackConfigSupplier> function, Function<LevelStorageAccess, WorldStem.WorldDataSupplier> function2, boolean bl, ExperimentalDialogType experimentalDialogType);
-
-	@Shadow
-	@Final
-	private LevelStorageSource levelSource;
-	
-	@Inject(method = "loadLevel", cancellable = true, at = @At("HEAD"))
-	private void bclib_callFixerOnLoad(String levelID, CallbackInfo ci) {
-		DataExchangeAPI.prepareServerside();
-		BiomeAPI.prepareNewLevel();
-		
-		if (DataFixerAPI.fixData(this.levelSource, levelID, true, (appliedFixes) -> {
-			LifeCycleAPI._runBeforeLevelLoad();
-			this.doLoadLevel(levelID, WorldStem.DataPackConfigSupplier::loadFromWorld, WorldStem.WorldDataSupplier::loadFromWorld, false, appliedFixes ? ExperimentalDialogType.NONE : ExperimentalDialogType.BACKUP);
-		})) {
-			//cancle call when fix-screen is presented
-			ci.cancel();
-		}
-		else {
-			LifeCycleAPI._runBeforeLevelLoad();
-			if (Configs.CLIENT_CONFIG.suppressExperimentalDialog()) {
-				this.doLoadLevel(levelID, WorldStem.DataPackConfigSupplier::loadFromWorld, WorldStem.WorldDataSupplier::loadFromWorld, false, ExperimentalDialogType.NONE);
-				//cancle call as we manually start the level load here
-				ci.cancel();
-			}
-		}
-	}
-	
-	@Inject(method = "createLevel", at = @At("HEAD"))
-	private void bclib_initPatchData(String levelID, LevelSettings levelSettings, RegistryAccess registryAccess, WorldGenSettings worldGenSettings, CallbackInfo ci) {
-		DataExchangeAPI.prepareServerside();
-		BiomeAPI.prepareNewLevel();
-		
-		DataFixerAPI.initializeWorldData(this.levelSource, levelID, true);
-		LifeCycleAPI._runBeforeLevelLoad();
 	}
 }

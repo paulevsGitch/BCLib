@@ -1,7 +1,8 @@
 package ru.bclib.util;
 
 import java.util.Locale;
-import java.util.Random;
+import java.util.Random;import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.levelgen.WorldgenRandom;
 
 public class WeighTree<T> {
 	private final float maxWeight;
@@ -18,7 +19,7 @@ public class WeighTree<T> {
 	 * @param random - {@link Random}.
 	 * @return {@link T} value.
 	 */
-	public T get(Random random) {
+	public T get(WorldgenRandom random) {
 		return root.get(random.nextFloat() * maxWeight);
 	}
 	

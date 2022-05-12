@@ -67,9 +67,9 @@ public class JsonFactory {
 										   .getResourceManager();
 		JsonObject obj = null;
 		try {
-			Resource resource = manager.getResource(location);
+			Resource resource = manager.getResource(location).orElse(null);
 			if (resource != null) {
-				InputStream stream = resource.getInputStream();
+				InputStream stream = resource.open();
 				InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8);
 				obj = JsonFactory.GSON.fromJson(reader, JsonObject.class);
 				reader.close();

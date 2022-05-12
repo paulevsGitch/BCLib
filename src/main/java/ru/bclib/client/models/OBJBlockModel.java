@@ -22,6 +22,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
+
+import ru.bclib.BCLib;
 import ru.bclib.util.BlocksHelper;
 import ru.bclib.util.MHelper;
 
@@ -34,7 +36,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
+import java.util.Random;import net.minecraft.util.RandomSource;
 import java.util.Set;
 import java.util.function.Function;
 
@@ -108,7 +110,7 @@ public class OBJBlockModel implements UnbakedModel, BakedModel {
 	// Baked Model //
 	
 	@Override
-	public List<BakedQuad> getQuads(@Nullable BlockState blockState, @Nullable Direction direction, Random random) {
+	public List<BakedQuad> getQuads(@Nullable BlockState blockState, @Nullable Direction direction, RandomSource random) {
 		return direction == null ? quadsBaked : quadsBakedMap.get(direction);
 	}
 	
@@ -148,23 +150,7 @@ public class OBJBlockModel implements UnbakedModel, BakedModel {
 	}
 	
 	private Resource getResource(ResourceLocation location) {
-		Resource resource = null;
-		try {
-			resource = Minecraft.getInstance().getResourceManager().getResource(location);
-		}
-		catch (IOException e) {
-			e.printStackTrace();
-			if (resource != null) {
-				try {
-					resource.close();
-				}
-				catch (IOException ioException) {
-					ioException.printStackTrace();
-				}
-				resource = null;
-			}
-		}
-		return resource;
+		return Minecraft.getInstance().getResourceManager().getResource(location).orElse(null);
 	}
 	
 	private void loadModel(ResourceLocation location, Vector3f offset, byte maxIndex) {
@@ -172,8 +158,14 @@ public class OBJBlockModel implements UnbakedModel, BakedModel {
 		if (resource == null) {
 			return;
 		}
-		InputStream input = resource.getInputStream();
-		
+		InputStream input = null;
+		try {
+			input = resource.open();
+		} catch (IOException e) {
+			BCLib.LOGGER.error("Unable to load Model", e);
+			throw new RuntimeException(e);
+		}
+
 		List<Float> vertecies = new ArrayList<>(12);
 		List<Float> uvs = new ArrayList<>(8);
 		
@@ -265,7 +257,6 @@ public class OBJBlockModel implements UnbakedModel, BakedModel {
 			reader.close();
 			streamReader.close();
 			input.close();
-			resource.close();
 		}
 		catch (IOException e) {
 			e.printStackTrace();

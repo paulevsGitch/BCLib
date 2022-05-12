@@ -8,7 +8,9 @@ import ru.bclib.util.WeightedList;
 import ru.bclib.world.biomes.BCLBiome;
 
 import java.util.List;
-import java.util.Random;
+import java.util.Random;import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.levelgen.WorldgenRandom;
+
 import java.util.Set;
 
 public class BiomePicker {
@@ -39,7 +41,7 @@ public class BiomePicker {
 		}
 	}
 	
-	public BCLBiome getBiome(Random random) {
+	public BCLBiome getBiome(WorldgenRandom random) {
 		return biomes.isEmpty() ? null : tree.get(random);
 	}
 	

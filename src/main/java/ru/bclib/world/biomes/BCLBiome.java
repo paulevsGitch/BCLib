@@ -19,7 +19,9 @@ import ru.bclib.util.WeightedList;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
+import java.util.Random;import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.levelgen.WorldgenRandom;
+
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -133,7 +135,7 @@ public class BCLBiome extends BCLBiomeSettings {
 	 * @param random {@link Random}.
 	 * @return {@link BCLBiome}.
 	 */
-	public BCLBiome getSubBiome(Random random) {
+	public BCLBiome getSubBiome(WorldgenRandom random) {
 		return subbiomes.get(random);
 	}
 	

@@ -8,7 +8,7 @@ import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.inventory.AnvilScreen;
 import net.minecraft.client.gui.screens.inventory.ItemCombinerScreen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -40,8 +40,8 @@ public class AnvilScreenMixin extends ItemCombinerScreen<AnvilMenu> {
 		int x = (width - imageWidth) / 2;
 		int y = (height - imageHeight) / 2;
 		be_buttons.clear();
-		be_buttons.add(new Button(x + 8, y + 45, 15, 20, new TextComponent("<"), b -> be_previousRecipe()));
-		be_buttons.add(new Button(x + 154, y + 45, 15, 20, new TextComponent(">"), b -> be_nextRecipe()));
+		be_buttons.add(new Button(x + 8, y + 45, 15, 20, Component.literal("<"), b -> be_previousRecipe()));
+		be_buttons.add(new Button(x + 154, y + 45, 15, 20, Component.literal(">"), b -> be_nextRecipe()));
 	}
 	
 	@Inject(method = "renderFg", at = @At("TAIL"))

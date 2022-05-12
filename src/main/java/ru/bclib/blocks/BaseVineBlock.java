@@ -34,7 +34,7 @@ import ru.bclib.items.tool.BaseShearsItem;
 import ru.bclib.util.BlocksHelper;
 
 import java.util.List;
-import java.util.Random;
+import java.util.Random;import net.minecraft.util.RandomSource;
 
 @SuppressWarnings("deprecation")
 public class BaseVineBlock extends BaseBlockNotFull implements RenderLayerProvider, BonemealableBlock {
@@ -56,11 +56,12 @@ public class BaseVineBlock extends BaseBlockNotFull implements RenderLayerProvid
 				.sound(SoundType.GRASS)
 				.lightLevel((state) -> bottomOnly ? state.getValue(SHAPE) == TripleShape.BOTTOM ? light : 0 : light)
 				.noCollission()
+					.offsetType(BlockBehaviour.OffsetType.XZ)
 		);
 	}
 	
 	public BaseVineBlock(BlockBehaviour.Properties properties) {
-		super(properties);
+		super(properties.offsetType(BlockBehaviour.OffsetType.XZ));
 		this.registerDefaultState(this.stateDefinition.any().setValue(SHAPE, TripleShape.BOTTOM));
 	}
 	
@@ -73,11 +74,6 @@ public class BaseVineBlock extends BaseBlockNotFull implements RenderLayerProvid
 	public VoxelShape getShape(BlockState state, BlockGetter view, BlockPos pos, CollisionContext ePos) {
 		Vec3 vec3d = state.getOffset(view, pos);
 		return VOXEL_SHAPE.move(vec3d.x, vec3d.y, vec3d.z);
-	}
-	
-	@Override
-	public BlockBehaviour.OffsetType getOffsetType() {
-		return BlockBehaviour.OffsetType.XZ;
 	}
 	
 	public boolean canGenerate(BlockState state, LevelReader world, BlockPos pos) {
@@ -134,19 +130,19 @@ public class BaseVineBlock extends BaseBlockNotFull implements RenderLayerProvid
 	}
 	
 	@Override
-	public boolean isBonemealSuccess(Level world, Random random, BlockPos pos, BlockState state) {
-		while (world.getBlockState(pos).getBlock() == this) {
+	public boolean isBonemealSuccess(Level level, RandomSource random, BlockPos pos, BlockState state) {
+		while (level.getBlockState(pos).getBlock() == this) {
 			pos = pos.below();
 		}
-		return world.isEmptyBlock(pos);
+		return level.isEmptyBlock(pos);
 	}
 	
 	@Override
-	public void performBonemeal(ServerLevel world, Random random, BlockPos pos, BlockState state) {
-		while (world.getBlockState(pos).getBlock() == this) {
+	public void performBonemeal(ServerLevel level, RandomSource random, BlockPos pos, BlockState state) {
+		while (level.getBlockState(pos).getBlock() == this) {
 			pos = pos.below();
 		}
-		world.setBlockAndUpdate(pos, defaultBlockState());
-		BlocksHelper.setWithoutUpdate(world, pos, defaultBlockState());
+		level.setBlockAndUpdate(pos, defaultBlockState());
+		BlocksHelper.setWithoutUpdate(level, pos, defaultBlockState());
 	}
 }

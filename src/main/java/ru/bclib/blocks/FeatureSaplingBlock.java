@@ -35,7 +35,7 @@ import ru.bclib.interfaces.RenderLayerProvider;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
+import java.util.Random;import net.minecraft.util.RandomSource;
 import java.util.function.Function;
 
 public class FeatureSaplingBlock extends SaplingBlock implements RenderLayerProvider, BlockModelProvider {
@@ -84,12 +84,12 @@ public class FeatureSaplingBlock extends SaplingBlock implements RenderLayerProv
 	}
 	
 	@Override
-	public boolean isBonemealSuccess(Level world, Random random, BlockPos pos, BlockState state) {
+	public boolean isBonemealSuccess(Level level, RandomSource random, BlockPos pos, BlockState state) {
 		return random.nextInt(16) == 0;
 	}
 	
 	@Override
-	public void advanceTree(ServerLevel world, BlockPos pos, BlockState blockState, Random random) {
+	public void advanceTree(ServerLevel world, BlockPos pos, BlockState blockState, RandomSource random) {
 		FeaturePlaceContext context = new FeaturePlaceContext(
 			Optional.empty(),
 			world,
@@ -102,12 +102,12 @@ public class FeatureSaplingBlock extends SaplingBlock implements RenderLayerProv
 	}
 	
 	@Override
-	public void randomTick(BlockState state, ServerLevel world, BlockPos pos, Random random) {
+	public void randomTick(BlockState state, ServerLevel world, BlockPos pos, RandomSource random) {
 		this.tick(state, world, pos, random);
 	}
 	
 	@Override
-	public void tick(BlockState state, ServerLevel world, BlockPos pos, Random random) {
+	public void tick(BlockState state, ServerLevel world, BlockPos pos, RandomSource random) {
 		super.tick(state, world, pos, random);
 		if (isBonemealSuccess(world, random, pos, state)) {
 			performBonemeal(world, random, pos, state);

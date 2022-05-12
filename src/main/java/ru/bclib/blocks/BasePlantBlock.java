@@ -39,7 +39,7 @@ import ru.bclib.items.tool.BaseShearsItem;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
+import java.util.Random;import net.minecraft.util.RandomSource;
 
 public abstract class BasePlantBlock extends BaseBlockNotFull implements RenderLayerProvider, BonemealableBlock{
 	private static final VoxelShape SHAPE = Block.box(4, 0, 4, 12, 14, 12);
@@ -58,6 +58,7 @@ public abstract class BasePlantBlock extends BaseBlockNotFull implements RenderL
 				.of(replaceable ? Material.REPLACEABLE_PLANT : Material.PLANT)
 				.sound(SoundType.GRASS)
 				.noCollission()
+					.offsetType(BlockBehaviour.OffsetType.XZ)
 		);
 	}
 	
@@ -68,11 +69,12 @@ public abstract class BasePlantBlock extends BaseBlockNotFull implements RenderL
 				.luminance(light)
 				.sound(SoundType.GRASS)
 				.noCollission()
+					.offsetType(BlockBehaviour.OffsetType.XZ)
 		);
 	}
 	
 	public BasePlantBlock(Properties settings) {
-		super(settings);
+		super(settings.offsetType(BlockBehaviour.OffsetType.XZ));
 	}
 	
 	protected abstract boolean isTerrain(BlockState state);
@@ -82,11 +84,6 @@ public abstract class BasePlantBlock extends BaseBlockNotFull implements RenderL
 	public VoxelShape getShape(BlockState state, BlockGetter view, BlockPos pos, CollisionContext ePos) {
 		Vec3 vec3d = state.getOffset(view, pos);
 		return SHAPE.move(vec3d.x, vec3d.y, vec3d.z);
-	}
-	
-	@Override
-	public BlockBehaviour.OffsetType getOffsetType() {
-		return BlockBehaviour.OffsetType.XZ;
 	}
 	
 	@Override
@@ -133,20 +130,20 @@ public abstract class BasePlantBlock extends BaseBlockNotFull implements RenderL
 	}
 	
 	@Override
-	public boolean isBonemealSuccess(Level world, Random random, BlockPos pos, BlockState state) {
+	public boolean isBonemealSuccess(Level level, RandomSource random, BlockPos pos, BlockState state) {
 		return true;
 	}
 	
 	@Override
-	public void performBonemeal(ServerLevel world, Random random, BlockPos pos, BlockState state) {
+	public void performBonemeal(ServerLevel level, RandomSource random, BlockPos pos, BlockState state) {
 		ItemEntity item = new ItemEntity(
-			world,
+			level,
 			pos.getX() + 0.5,
 			pos.getY() + 0.5,
 			pos.getZ() + 0.5,
 			new ItemStack(this)
 		);
-		world.addFreshEntity(item);
+		level.addFreshEntity(item);
 	}
 	
 	@Override

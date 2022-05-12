@@ -37,7 +37,7 @@ public class BCLRecipeManager {
 			});
 			return ImmutableList.copyOf(list);
 		});
-		return recipes.stream().flatMap(recipe -> type.tryMatch(recipe, level, inventory).stream()).findFirst();
+		return (Optional<T>)recipes.stream().filter(recipe -> recipe.matches(inventory, level)).findFirst();
 	}
 	
 	public static void addRecipe(RecipeType<?> type, Recipe<?> recipe) {

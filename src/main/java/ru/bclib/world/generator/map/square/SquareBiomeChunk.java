@@ -4,7 +4,8 @@ import ru.bclib.interfaces.BiomeChunk;
 import ru.bclib.world.biomes.BCLBiome;
 import ru.bclib.world.generator.BiomePicker;
 
-import java.util.Random;
+import java.util.Random;import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.levelgen.WorldgenRandom;
 
 public class SquareBiomeChunk implements BiomeChunk {
 	private static final int BIT_OFFSET = 4;
@@ -19,7 +20,7 @@ public class SquareBiomeChunk implements BiomeChunk {
 	
 	private final BCLBiome[] biomes;
 	
-	public SquareBiomeChunk(Random random, BiomePicker picker) {
+	public SquareBiomeChunk(WorldgenRandom random, BiomePicker picker) {
 		BCLBiome[] PreBio = new BCLBiome[SM_CAPACITY];
 		biomes = new BCLBiome[CAPACITY];
 		
@@ -53,7 +54,7 @@ public class SquareBiomeChunk implements BiomeChunk {
 		return WIDTH;
 	}
 	
-	private int offsetXZ(int x, Random random) {
+	private int offsetXZ(int x, WorldgenRandom random) {
 		return ((x + random.nextInt(2)) >> 1) & MASK_OFFSET;
 	}
 	

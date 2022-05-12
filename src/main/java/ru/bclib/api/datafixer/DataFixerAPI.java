@@ -156,9 +156,20 @@ public class DataFixerAPI {
 	 */
 	public static void initializeWorldData(LevelStorageSource levelSource, String levelID, boolean newWorld) {
 		wrapCall(levelSource, levelID, (levelStorageAccess) -> {
-			initializeWorldData(levelStorageAccess.getLevelPath(LevelResource.ROOT).toFile(), newWorld);
+			initializeWorldData(levelStorageAccess, newWorld);
 			return true;
 		});
+	}
+
+	/**
+	 * Initializes the DataStorage for this world. If the world is new, the patch registry is initialized to the
+	 * current versions of the plugins.
+	 * @param access levelAccess for the worldd
+	 * @param newWorld {@code true} if this is a fresh world
+	 *
+	 */
+	public static void initializeWorldData(LevelStorageAccess access, boolean newWorld){
+		initializeWorldData(access.getLevelPath(LevelResource.ROOT).toFile(), newWorld);
 	}
 	
 	/**

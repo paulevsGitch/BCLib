@@ -6,9 +6,10 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.BiomeTags;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.biome.Biome.BiomeCategory;
 import net.minecraft.world.level.biome.BiomeSource;
+import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.biome.Climate;
 import org.apache.commons.lang3.function.TriFunction;
 import ru.bclib.BCLib;
@@ -16,7 +17,6 @@ import ru.bclib.api.biomes.BiomeAPI;
 import ru.bclib.config.ConfigKeeper.StringArrayEntry;
 import ru.bclib.config.Configs;
 import ru.bclib.interfaces.BiomeMap;
-import ru.bclib.mixin.common.BiomeAccessor;
 import ru.bclib.world.biomes.BCLBiome;
 import ru.bclib.world.generator.map.MapStack;
 import ru.bclib.world.generator.map.hex.HexBiomeMap;
@@ -31,12 +31,7 @@ public class BCLibNetherBiomeSource extends BCLBiomeSource {
 					.group(RegistryOps
 									.retrieveRegistry(Registry.BIOME_REGISTRY)
 									.forGetter(source -> source.biomeRegistry)
-							,
-							Codec
-									.LONG
-									.fieldOf("seed")
-									.stable()
-									.forGetter(source -> source.seed)
+
 					)
 					.apply(instance, instance.stable(BCLibNetherBiomeSource::new))
 			);
@@ -66,8 +61,8 @@ public class BCLibNetherBiomeSource extends BCLBiomeSource {
 		BCLibNetherBiomeSource.worldHeight = worldHeight;
 	}
 	
-	public BCLibNetherBiomeSource(Registry<Biome> biomeRegistry, long seed) {
-		super(biomeRegistry, seed, getBiomes(biomeRegistry));
+	public BCLibNetherBiomeSource(Registry<Biome> biomeRegistry) {
+		super(biomeRegistry, getBiomes(biomeRegistry));
 		
 		BiomeAPI.NETHER_BIOME_PICKER.clearMutables();
 		
@@ -93,9 +88,15 @@ public class BCLibNetherBiomeSource extends BCLBiomeSource {
 		BiomeAPI.NETHER_BIOME_PICKER.getBiomes().forEach(biome -> biome.updateActualBiomes(biomeRegistry));
 		BiomeAPI.NETHER_BIOME_PICKER.rebuild();
 		
-		initMap();
+		//initMap();
 	}
-	
+
+	@Override
+	public void setSeed(long seed) {
+		super.setSeed(seed);
+		initMap(seed);
+	}
+
 	private static List<Holder<Biome>> getBiomes(Registry<Biome> biomeRegistry) {
 		List<String> include = Configs.BIOMES_CONFIG.getEntry("force_include", "nether_biomes", StringArrayEntry.class).getValue();
 
@@ -109,7 +110,7 @@ public class BCLibNetherBiomeSource extends BCLBiomeSource {
 						return true;
 					}
 
-					if (GeneratorOptions.addNetherBiomesByCategory() && (biome instanceof BiomeAccessor) && ((BiomeAccessor)(Object)biome).bclib_getBiomeCategory()== BiomeCategory.NETHER) {
+					if (GeneratorOptions.addNetherBiomesByTag() && biome.is(BiomeTags.IS_NETHER)) {
 						return true;
 					}
 
@@ -120,31 +121,24 @@ public class BCLibNetherBiomeSource extends BCLBiomeSource {
 						}
 						key = bclBiome.getID();
 					}
-					final boolean isNetherBiome;
-					if ((Object)biome instanceof BiomeAccessor bacc) {
-						isNetherBiome = bacc.bclib_getBiomeCategory() == BiomeCategory.NETHER;
-					} else {
-						isNetherBiome = false;
-					}
+					final boolean isNetherBiome = biome.is(BiomeTags.IS_NETHER);
 					return BiomeAPI.NETHER_BIOME_PICKER.containsImmutable(key) || (isNetherBiome && BiomeAPI.isDatapackBiome(key));
 		}).toList();
 	}
 	
 	@Override
 	public Holder<Biome> getNoiseBiome(int biomeX, int biomeY, int biomeZ, Climate.Sampler var4) {
+		if (biomeMap==null)
+			return this.possibleBiomes().stream().findFirst().get();
+
 		if (lastWorldHeight != worldHeight) {
 			lastWorldHeight = worldHeight;
-			initMap();
+			initMap(this.currentSeed);
 		}
 		if ((biomeX & 63) == 0 && (biomeZ & 63) == 0) {
 			biomeMap.clearCache();
 		}
 		return biomeMap.getBiome(biomeX << 2, biomeY << 2, biomeZ << 2).getActualBiome();
-	}
-	
-	@Override
-	public BiomeSource withSeed(long seed) {
-		return new BCLibNetherBiomeSource(biomeRegistry, seed);
 	}
 	
 	@Override
@@ -156,7 +150,7 @@ public class BCLibNetherBiomeSource extends BCLBiomeSource {
 		Registry.register(Registry.BIOME_SOURCE, BCLib.makeID("nether_biome_source"), CODEC);
 	}
 	
-	private void initMap() {
+	private void initMap(long seed) {
 		boolean useLegacy = GeneratorOptions.useOldBiomeGenerator() || forceLegacyGenerator;
 		TriFunction<Long, Integer, BiomePicker, BiomeMap> mapConstructor = useLegacy ? SquareBiomeMap::new : HexBiomeMap::new;
 		if (worldHeight > 128 && GeneratorOptions.useVerticalBiomes()) {

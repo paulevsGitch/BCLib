@@ -6,7 +6,6 @@ import net.fabricmc.loader.api.metadata.ModEnvironment;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 import ru.bclib.api.dataexchange.handler.autosync.HelloClient;
 import ru.bclib.gui.gridlayout.GridColumn;
 import ru.bclib.gui.gridlayout.GridLayout;
@@ -177,14 +176,14 @@ public class ModListScreen extends BCLibScreen {
 						color = GridLayout.COLOR_DARK_GREEN;
 						typeText = "[OK]";
 					}
-					TextComponent dash = new TextComponent("-");
-					TextComponent typeTextComponent = new TextComponent(typeText);
+					Component dash = Component.literal("-");
+					Component typeTextComponent = Component.literal(typeText);
 					GridRow row = grid.addRow();
 
 					row.addString(dash, parent);
 
 					row.addSpacer(4);
-					row.addString(new TextComponent(name), parent);
+					row.addString(Component.literal(name), parent);
 
 					row.addSpacer(4);
 					row.addString(typeTextComponent, color, parent);
@@ -192,7 +191,7 @@ public class ModListScreen extends BCLibScreen {
 					if (!stateString.isEmpty()) {
 						row = grid.addRow();
 						row.addSpacer(4 + parent.getWidth(dash));
-						row.addString(new TextComponent(stateString), GridLayout.COLOR_GRAY, parent);
+						row.addString(Component.literal(stateString), GridLayout.COLOR_GRAY, parent);
 					}
 
 					grid.addSpacerRow();

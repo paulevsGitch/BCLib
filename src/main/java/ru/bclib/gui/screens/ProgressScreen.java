@@ -7,7 +7,6 @@ import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.ProgressListener;
@@ -161,7 +160,7 @@ public class ProgressScreen extends GridScreen implements ProgressListener, Atom
 		
 		grid.addSpacerRow(20);
 		row = grid.addRow();
-		stage = row.addMessage(stageComponent!=null?stageComponent:new TextComponent(""), font, Alignment.CENTER);
+		stage = row.addMessage(stageComponent!=null?stageComponent:Component.literal(""), font, Alignment.CENTER);
 	}
 	
 	@Override

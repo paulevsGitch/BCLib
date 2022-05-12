@@ -10,19 +10,22 @@ import java.util.List;
 
 public abstract class BCLBiomeSource extends BiomeSource {
 	protected final Registry<Biome> biomeRegistry;
-	protected final long seed;
+	protected long currentSeed;
 
 	private static List<Holder<Biome>> preInit(Registry<Biome> biomeRegistry, List<Holder<Biome>> biomes){
 		biomes.forEach(biome -> BiomeAPI.sortBiomeFeatures(biome));
 		return biomes;
 	}
 
-	protected BCLBiomeSource(Registry<Biome> biomeRegistry, long seed, List<Holder<Biome>> list) {
+	protected BCLBiomeSource(Registry<Biome> biomeRegistry, List<Holder<Biome>> list) {
 		super(preInit(biomeRegistry, list));
 
-		this.seed = seed;
 		this.biomeRegistry = biomeRegistry;
 		
 		BiomeAPI.initRegistry(biomeRegistry);
+	}
+
+	public void setSeed(long seed){
+		this.currentSeed = seed;
 	}
 }

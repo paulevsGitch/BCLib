@@ -5,6 +5,7 @@ import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
@@ -34,7 +35,7 @@ import ru.bclib.interfaces.RenderLayerProvider;
 import ru.bclib.items.tool.BaseShearsItem;
 
 import java.util.List;
-import java.util.Random;
+import java.util.Random;import net.minecraft.util.RandomSource;
 
 public abstract class UnderwaterPlantBlock extends BaseBlockNotFull implements RenderLayerProvider, BonemealableBlock, LiquidBlockContainer {
 	private static final VoxelShape SHAPE = Block.box(4, 0, 4, 12, 14, 12);
@@ -45,6 +46,7 @@ public abstract class UnderwaterPlantBlock extends BaseBlockNotFull implements R
 				.of(Material.WATER_PLANT)
 				.sound(SoundType.WET_GRASS)
 				.noCollission()
+				.offsetType(BlockBehaviour.OffsetType.XZ)
 		);
 	}
 	
@@ -55,6 +57,7 @@ public abstract class UnderwaterPlantBlock extends BaseBlockNotFull implements R
 				.luminance(light)
 				.sound(SoundType.WET_GRASS)
 				.noCollission()
+				.offsetType(BlockBehaviour.OffsetType.XZ)
 		);
 	}
 	
@@ -67,11 +70,6 @@ public abstract class UnderwaterPlantBlock extends BaseBlockNotFull implements R
 	public VoxelShape getShape(BlockState state, BlockGetter view, BlockPos pos, CollisionContext ePos) {
 		Vec3 vec3d = state.getOffset(view, pos);
 		return SHAPE.move(vec3d.x, vec3d.y, vec3d.z);
-	}
-	
-	@Override
-	public BlockBehaviour.OffsetType getOffsetType() {
-		return BlockBehaviour.OffsetType.XZ;
 	}
 	
 	@Override
@@ -121,20 +119,20 @@ public abstract class UnderwaterPlantBlock extends BaseBlockNotFull implements R
 	}
 	
 	@Override
-	public boolean isBonemealSuccess(Level world, Random random, BlockPos pos, BlockState state) {
+	public boolean isBonemealSuccess(Level level, RandomSource random, BlockPos pos, BlockState state) {
 		return true;
 	}
 	
 	@Override
-	public void performBonemeal(ServerLevel world, Random random, BlockPos pos, BlockState state) {
+	public void performBonemeal(ServerLevel level, RandomSource random, BlockPos pos, BlockState state) {
 		ItemEntity item = new ItemEntity(
-			world,
+			level,
 			pos.getX() + 0.5,
 			pos.getY() + 0.5,
 			pos.getZ() + 0.5,
 			new ItemStack(this)
 		);
-		world.addFreshEntity(item);
+		level.addFreshEntity(item);
 	}
 	
 	@Override

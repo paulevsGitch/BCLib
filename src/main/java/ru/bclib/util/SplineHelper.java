@@ -13,7 +13,7 @@ import ru.bclib.sdf.primitive.SDFLine;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
+import java.util.Random;import net.minecraft.util.RandomSource;
 import java.util.function.Function;
 
 public class SplineHelper {

@@ -15,7 +15,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
 
 import java.util.Map;
-import java.util.Random;
+import java.util.Random;import net.minecraft.util.RandomSource;
 
 public class BlocksHelper {
 	private static final Map<Block, Integer> COLOR_BY_BLOCK = Maps.newHashMap();

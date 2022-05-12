@@ -35,7 +35,7 @@ import ru.bclib.client.models.PatternsHelper;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Random;
+import java.util.Random;import net.minecraft.util.RandomSource;
 
 public class TripleTerrainBlock extends BaseTerrainBlock {
 	public static final EnumProperty<TripleShape> SHAPE = BlockProperties.TRIPLE_SHAPE;
@@ -72,7 +72,7 @@ public class TripleTerrainBlock extends BaseTerrainBlock {
 	}
 	
 	@Override
-	public void randomTick(BlockState state, ServerLevel world, BlockPos pos, Random random) {
+	public void randomTick(BlockState state, ServerLevel world, BlockPos pos, RandomSource random) {
 		TripleShape shape = state.getValue(SHAPE);
 		if (shape == TripleShape.BOTTOM) {
 			super.randomTick(state, world, pos, random);

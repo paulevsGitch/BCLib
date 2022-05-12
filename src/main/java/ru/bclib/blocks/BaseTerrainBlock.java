@@ -14,6 +14,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -43,7 +44,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Random;
+import java.util.Random;import net.minecraft.util.RandomSource;
 
 @SuppressWarnings("deprecation")
 public class BaseTerrainBlock extends BaseBlock {
@@ -95,7 +96,7 @@ public class BaseTerrainBlock extends BaseBlock {
 	}
 	
 	@Override
-	public void randomTick(BlockState state, ServerLevel world, BlockPos pos, Random random) {
+	public void randomTick(BlockState state, ServerLevel world, BlockPos pos, RandomSource random) {
 		if (random.nextInt(16) == 0 && !canStay(state, world, pos)) {
 			world.setBlockAndUpdate(pos, getBaseBlock().defaultBlockState());
 		}

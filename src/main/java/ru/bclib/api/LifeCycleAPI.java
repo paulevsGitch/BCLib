@@ -50,9 +50,7 @@ public class LifeCycleAPI {
 			LevelStorageSource.LevelStorageAccess levelStorageAccess,
 			ServerLevelData serverLevelData,
 			ResourceKey<Level> resourceKey,
-			Holder<DimensionType> dimensionType,
 			ChunkProgressListener chunkProgressListener,
-			ChunkGenerator chunkGenerator,
 			boolean bl,
 			long l,
 			List<CustomSpawner> list,
@@ -101,9 +99,7 @@ public class LifeCycleAPI {
 	 * @param levelStorageAccess
 	 * @param serverLevelData
 	 * @param resourceKey
-	 * @param dimensionType
 	 * @param chunkProgressListener
-	 * @param chunkGenerator
 	 * @param bl
 	 * @param l
 	 * @param list
@@ -115,9 +111,7 @@ public class LifeCycleAPI {
 									 LevelStorageSource.LevelStorageAccess levelStorageAccess,
 									 ServerLevelData serverLevelData,
 									 ResourceKey<Level> resourceKey,
-									 Holder<DimensionType> dimensionType,
 									 ChunkProgressListener chunkProgressListener,
-									 ChunkGenerator chunkGenerator,
 									 boolean bl,
 									 long l,
 									 List<CustomSpawner> list,
@@ -129,9 +123,7 @@ public class LifeCycleAPI {
 			levelStorageAccess,
 			serverLevelData,
 			resourceKey,
-			dimensionType,
 			chunkProgressListener,
-			chunkGenerator,
 			bl,
 			l,
 			list,

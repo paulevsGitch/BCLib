@@ -46,8 +46,8 @@ public class MultiPackResourceManagerMixin {
 		}
 
 		ResourceManager resourceManager = this.namespacedManagers.get(resourceLocation.getNamespace());
-		if (resourceManager != null && !resourceManager.hasResource(resourceLocation)) {
-			info.setReturnValue(resourceManager.getResource(bclib_alphaEmissionMaterial));
+		if (resourceManager != null && resourceManager.getResource(resourceLocation).isEmpty()) {
+			info.setReturnValue(resourceManager.getResource(bclib_alphaEmissionMaterial).get());
 		}
 	}
 }

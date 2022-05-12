@@ -37,7 +37,7 @@ import ru.bclib.registry.BaseBlockEntities;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Random;
+import java.util.Random;import net.minecraft.util.RandomSource;
 
 public class BaseBarrelBlock extends BarrelBlock implements BlockModelProvider {
 	public BaseBarrelBlock(Block source) {
@@ -79,7 +79,7 @@ public class BaseBarrelBlock extends BarrelBlock implements BlockModelProvider {
 	}
 	
 	@Override
-	public void tick(BlockState state, ServerLevel world, BlockPos pos, Random random) {
+	public void tick(BlockState state, ServerLevel world, BlockPos pos, RandomSource random) {
 		BlockEntity blockEntity = world.getBlockEntity(pos);
 		if (blockEntity instanceof BaseBarrelBlockEntity) {
 			((BaseBarrelBlockEntity) blockEntity).tick();

@@ -28,7 +28,6 @@ public class SquareBiomeMap implements BiomeMap {
 	private TriConsumer<Integer, Integer, Integer> processor;
 	
 	public SquareBiomeMap(long seed, int size, BiomePicker picker) {
-		maps.clear();
 		random = new WorldgenRandom(new LegacyRandomSource(seed));
 		noiseX = new OpenSimplexNoise(random.nextLong());
 		noiseZ = new OpenSimplexNoise(random.nextLong());

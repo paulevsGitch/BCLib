@@ -41,11 +41,11 @@ public class CustomModelBakery {
 		Registry.BLOCK.stream().parallel().filter(block -> block instanceof BlockModelProvider).forEach(block -> {
 			ResourceLocation blockID = Registry.BLOCK.getKey(block);
 			ResourceLocation storageID = new ResourceLocation(blockID.getNamespace(), "blockstates/" + blockID.getPath() + ".json");
-			if (!resourceManager.hasResource(storageID)) {
+			if (resourceManager.getResource(storageID).isEmpty()) {
 				addBlockModel(blockID, block);
 			}
 			storageID = new ResourceLocation(blockID.getNamespace(), "models/item/" + blockID.getPath() + ".json");
-			if (!resourceManager.hasResource(storageID)) {
+			if (resourceManager.getResource(storageID).isEmpty()) {
 				addItemModel(blockID, (ItemModelProvider) block);
 			}
 		});
@@ -53,7 +53,7 @@ public class CustomModelBakery {
 		Registry.ITEM.stream().parallel().filter(item -> item instanceof ItemModelProvider).forEach(item -> {
 			ResourceLocation registryID = Registry.ITEM.getKey(item);
 			ResourceLocation storageID = new ResourceLocation(registryID.getNamespace(), "models/item/" + registryID.getPath() + ".json");
-			if (!resourceManager.hasResource(storageID)) {
+			if (resourceManager.getResource(storageID).isEmpty()) {
 				addItemModel(registryID, (ItemModelProvider) item);
 			}
 		});

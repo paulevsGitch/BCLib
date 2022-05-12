@@ -14,8 +14,8 @@ public class GeneratorOptions {
 	private static Function<Point, Boolean> endLandFunction;
 	private static boolean customNetherBiomeSource = true;
 	private static boolean customEndBiomeSource = true;
-	private static boolean addNetherBiomesByCategory = false;
-	private static boolean addEndBiomesByCategory = false;
+	private static boolean addNetherBiomesByTag = true;
+	private static boolean addEndBiomesByTag = true;
 	private static boolean useOldBiomeGenerator = false;
 	private static boolean verticalBiomes = true;
 	private static long farEndBiomesSqr = 1000000;
@@ -29,8 +29,8 @@ public class GeneratorOptions {
 		biomeSizeEndVoid = Configs.GENERATOR_CONFIG.getInt("end.biomeMap", "biomeSizeVoid", 256);
 		customNetherBiomeSource = Configs.GENERATOR_CONFIG.getBoolean("options", "customNetherBiomeSource", true);
 		customEndBiomeSource = Configs.GENERATOR_CONFIG.getBoolean("options", "customEndBiomeSource", true);
-		addNetherBiomesByCategory = Configs.GENERATOR_CONFIG.getBoolean("options", "addNetherBiomesByCategory", false);
-		addEndBiomesByCategory = Configs.GENERATOR_CONFIG.getBoolean("options", "addEndBiomesByCategory", false);
+		addNetherBiomesByTag = Configs.GENERATOR_CONFIG.getBoolean("options", "addNetherBiomesByTag", true);
+		addEndBiomesByTag = Configs.GENERATOR_CONFIG.getBoolean("options", "addEndBiomesByTag", true);
 		useOldBiomeGenerator = Configs.GENERATOR_CONFIG.useOldGenerator();
 		verticalBiomes = Configs.GENERATOR_CONFIG.getBoolean("options", "verticalBiomesInTallNether", true);
 		fixEndBiomeSource = Configs.GENERATOR_CONFIG.getBoolean("options.biomeSource", "fixEndBiomeSource", true);
@@ -89,12 +89,12 @@ public class GeneratorOptions {
 		return customEndBiomeSource;
 	}
 	
-	public static boolean addNetherBiomesByCategory() {
-		return addNetherBiomesByCategory;
+	public static boolean addNetherBiomesByTag() {
+		return addNetherBiomesByTag;
 	}
 	
-	public static boolean addEndBiomesByCategory() {
-		return addEndBiomesByCategory;
+	public static boolean addEndBiomesByTag() {
+		return addEndBiomesByTag;
 	}
 	
 	public static boolean useOldBiomeGenerator() {

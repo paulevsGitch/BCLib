@@ -19,7 +19,6 @@ import net.minecraft.world.level.biome.AmbientMoodSettings;
 import net.minecraft.world.level.biome.AmbientParticleSettings;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biome.BiomeBuilder;
-import net.minecraft.world.level.biome.Biome.BiomeCategory;
 import net.minecraft.world.level.biome.Biome.Precipitation;
 import net.minecraft.world.level.biome.BiomeGenerationSettings;
 import net.minecraft.world.level.biome.BiomeSpecialEffects;
@@ -43,7 +42,7 @@ import ru.bclib.util.TriFunction;
 import ru.bclib.world.biomes.BCLBiome;
 import ru.bclib.world.biomes.BCLBiomeSettings;
 import ru.bclib.world.features.BCLFeature;
-import ru.bclib.world.structures.BCLStructureFeature;
+import ru.bclib.world.structures.BCLStructure;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,7 +66,8 @@ public class BCLBiomeBuilder {
 	private SurfaceRules.RuleSource surfaceRule;
 	private Precipitation precipitation;
 	private ResourceLocation biomeID;
-	private BiomeCategory category;
+
+	//BiomeTags.IS_NETHER
 	private float temperature;
 	private float fogDensity;
 	private float genChance;
@@ -86,7 +86,6 @@ public class BCLBiomeBuilder {
 	public static BCLBiomeBuilder start(ResourceLocation biomeID) {
 		INSTANCE.biomeID = biomeID;
 		INSTANCE.precipitation = Precipitation.NONE;
-		INSTANCE.category = BiomeCategory.NONE;
 		INSTANCE.generationSettings = null;
 		INSTANCE.effectsBuilder = null;
 		INSTANCE.spawnSettings = null;
@@ -110,16 +109,6 @@ public class BCLBiomeBuilder {
 	 */
 	public BCLBiomeBuilder precipitation(Precipitation precipitation) {
 		this.precipitation = precipitation;
-		return this;
-	}
-	
-	/**
-	 * Set biome category. Doesn't affect biome worldgen, but Fabric biome modifications can target biome by it.
-	 * @param category {@link BiomeCategory}
-	 * @return same {@link BCLBiomeBuilder} instance.
-	 */
-	public BCLBiomeBuilder category(BiomeCategory category) {
-		this.category = category;
 		return this;
 	}
 	
@@ -556,10 +545,10 @@ public class BCLBiomeBuilder {
 	
 	/**
 	 * Adds new structure feature into thr biome. Will add building biome into the structure list.
-	 * @param structure {@link BCLStructureFeature} to add.
+	 * @param structure {@link BCLStructure} to add.
 	 * @return same {@link BCLBiomeBuilder} instance.
 	 */
-	public BCLBiomeBuilder structure(BCLStructureFeature structure) {
+	public BCLBiomeBuilder structure(BCLStructure structure) {
 		structure.addInternalBiome(biomeID);
 		return structure(structure.biomeTag);
 	}
@@ -685,7 +674,6 @@ public class BCLBiomeBuilder {
 	public <T extends BCLBiome> T build(BiomeSupplier<T> biomeConstructor) {
 		BiomeBuilder builder = new BiomeBuilder()
 			.precipitation(precipitation)
-			.biomeCategory(category)
 			.temperature(temperature)
 			.downfall(downfall);
 		

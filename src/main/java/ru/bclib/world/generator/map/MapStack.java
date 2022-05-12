@@ -9,7 +9,7 @@ import ru.bclib.noise.OpenSimplexNoise;
 import ru.bclib.world.biomes.BCLBiome;
 import ru.bclib.world.generator.BiomePicker;
 
-import java.util.Random;
+import java.util.Random;import net.minecraft.util.RandomSource;
 
 public class MapStack implements BiomeMap {
 	private final OpenSimplexNoise noise;
@@ -35,7 +35,7 @@ public class MapStack implements BiomeMap {
 		}
 		noise = new OpenSimplexNoise(random.nextInt());
 	}
-	
+
 	@Override
 	public void clearCache() {
 		for (BiomeMap map: maps) {

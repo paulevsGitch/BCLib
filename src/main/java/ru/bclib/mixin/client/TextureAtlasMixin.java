@@ -17,6 +17,7 @@ import ru.bclib.BCLib;
 import ru.bclib.client.render.EmissiveTextureInfo;
 
 import java.io.IOException;
+import java.util.Optional;
 
 @Mixin(TextureAtlas.class)
 public class TextureAtlasMixin {
@@ -47,7 +48,8 @@ public class TextureAtlasMixin {
 			location.getNamespace(),
 			"textures/" + location.getPath() + "_e.png"
 		);
-		if (resourceManager.hasResource(emissiveLocation)) {
+		Optional<Resource> emissiveRes = resourceManager.getResource(emissiveLocation);
+		if (emissiveRes.isPresent()) {
 			NativeImage sprite = null;
 			NativeImage emission = null;
 			try {
@@ -55,13 +57,13 @@ public class TextureAtlasMixin {
 					location.getNamespace(),
 					"textures/" + location.getPath() + ".png"
 				);
-				Resource resource = resourceManager.getResource(spriteLocation);
-				sprite = NativeImage.read(resource.getInputStream());
-				resource.close();
+				Resource resource = resourceManager.getResource(spriteLocation).orElse(null);
+				sprite = NativeImage.read(resource.open());
+				sprite.close();
 				
-				resource = resourceManager.getResource(emissiveLocation);
-				emission = NativeImage.read(resource.getInputStream());
-				resource.close();
+				resource = emissiveRes.get();
+				emission = NativeImage.read(resource.open());
+				emission.close();
 			}
 			catch (IOException e) {
 				BCLib.LOGGER.warning(e.getMessage());

@@ -12,7 +12,7 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.material.Material;
 
-import java.util.Random;
+import java.util.Random;import net.minecraft.util.RandomSource;
 
 public abstract class BasePlantWithAgeBlock extends BasePlantBlock {
 	public static final IntegerProperty AGE = BlockProperties.AGE;
@@ -35,27 +35,27 @@ public abstract class BasePlantWithAgeBlock extends BasePlantBlock {
 		stateManager.add(AGE);
 	}
 	
-	public abstract void growAdult(WorldGenLevel world, Random random, BlockPos pos);
+	public abstract void growAdult(WorldGenLevel world, RandomSource random, BlockPos pos);
 	
 	@Override
-	public void performBonemeal(ServerLevel world, Random random, BlockPos pos, BlockState state) {
+	public void performBonemeal(ServerLevel level, RandomSource random, BlockPos pos, BlockState state) {
 		int age = state.getValue(AGE);
 		if (age < 3) {
-			world.setBlockAndUpdate(pos, state.setValue(AGE, age + 1));
+			level.setBlockAndUpdate(pos, state.setValue(AGE, age + 1));
 		}
 		else {
-			growAdult(world, random, pos);
+			growAdult(level, random, pos);
 		}
 	}
 	
 	@Override
-	public boolean isBonemealSuccess(Level world, Random random, BlockPos pos, BlockState state) {
+	public boolean isBonemealSuccess(Level level, RandomSource random, BlockPos pos, BlockState state) {
 		return true;
 	}
 	
 	@Override
 	@SuppressWarnings("deprecation")
-	public void tick(BlockState state, ServerLevel world, BlockPos pos, Random random) {
+	public void tick(BlockState state, ServerLevel world, BlockPos pos, RandomSource random) {
 		super.tick(state, world, pos, random);
 		if (random.nextInt(8) == 0) {
 			performBonemeal(world, random, pos, state);

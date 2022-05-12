@@ -2,7 +2,9 @@ package ru.bclib.util;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
+import java.util.Random;import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.levelgen.WorldgenRandom;
+
 import java.util.function.Consumer;
 
 public class WeightedList<T> {
@@ -28,7 +30,7 @@ public class WeightedList<T> {
 	 * @param random - {@link Random}.
 	 * @return {@link T} value.
 	 */
-	public T get(Random random) {
+	public T get(RandomSource random) {
 		if (maxWeight < 1) {
 			return null;
 		}

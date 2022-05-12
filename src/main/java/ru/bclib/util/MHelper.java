@@ -3,7 +3,7 @@ package ru.bclib.util;
 import com.mojang.math.Vector3f;
 import net.minecraft.core.Vec3i;
 
-import java.util.Random;
+import java.util.Random;import net.minecraft.util.RandomSource;
 
 public class MHelper {
 	private static final Vec3i[] RANDOM_OFFSETS = new Vec3i[3 * 3 * 3 - 1];
@@ -140,7 +140,7 @@ public class MHelper {
 		return h ^ (h >> 16);
 	}
 	
-	public static <T> void shuffle(T[] array, Random random) {
+	public static <T> void shuffle(T[] array, RandomSource random) {
 		for (int i = 0; i < array.length; i++) {
 			int i2 = random.nextInt(array.length);
 			T element = array[i];
@@ -202,7 +202,7 @@ public class MHelper {
 		return new Vector3f(vx, 0, vz);
 	}
 	
-	public static Vec3i[] getOffsets(Random random) {
+	public static Vec3i[] getOffsets(RandomSource random) {
 		shuffle(RANDOM_OFFSETS, random);
 		return RANDOM_OFFSETS;
 	}

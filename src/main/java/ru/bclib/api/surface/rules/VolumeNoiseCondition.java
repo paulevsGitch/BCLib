@@ -1,6 +1,6 @@
 package ru.bclib.api.surface.rules;
 
-import com.mojang.serialization.Codec;
+import net.minecraft.util.KeyDispatchDataCodec;
 import net.minecraft.world.level.levelgen.SurfaceRules.Condition;
 import net.minecraft.world.level.levelgen.SurfaceRules.ConditionSource;
 import net.minecraft.world.level.levelgen.SurfaceRules.Context;
@@ -8,7 +8,7 @@ import net.minecraft.world.level.levelgen.SurfaceRules.LazyCondition;
 import ru.bclib.mixin.common.SurfaceRulesContextAccessor;
 
 public abstract class VolumeNoiseCondition implements NoiseCondition{
-	public abstract Codec<? extends ConditionSource> codec();
+	public abstract KeyDispatchDataCodec<? extends ConditionSource> codec();
 	
 	@Override
 	public final Condition apply(Context context2) {

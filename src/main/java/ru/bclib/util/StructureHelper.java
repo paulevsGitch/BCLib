@@ -17,7 +17,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Enumeration;
-import java.util.Random;
+import java.util.Random;import net.minecraft.util.RandomSource;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -85,11 +85,11 @@ public class StructureHelper {
 		return pos.offset(-offset.x * 0.5, 0, -offset.z * 0.5);
 	}
 	
-	public static void placeCenteredBottom(WorldGenLevel world, BlockPos pos, StructureTemplate structure, Rotation rotation, Mirror mirror, Random random) {
+	public static void placeCenteredBottom(WorldGenLevel world, BlockPos pos, StructureTemplate structure, Rotation rotation, Mirror mirror, RandomSource random) {
 		placeCenteredBottom(world, pos, structure, rotation, mirror, makeBox(pos), random);
 	}
 	
-	public static void placeCenteredBottom(WorldGenLevel world, BlockPos pos, StructureTemplate structure, Rotation rotation, Mirror mirror, BoundingBox bounds, Random random) {
+	public static void placeCenteredBottom(WorldGenLevel world, BlockPos pos, StructureTemplate structure, Rotation rotation, Mirror mirror, BoundingBox bounds, RandomSource random) {
 		BlockPos offset = offsetPos(pos, structure, rotation, mirror);
 		StructurePlaceSettings placementData = new StructurePlaceSettings().setRotation(rotation)
 																		   .setMirror(mirror)

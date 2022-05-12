@@ -3,6 +3,7 @@ package ru.bclib.api.surface.rules;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.Registry;
+import net.minecraft.util.KeyDispatchDataCodec;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.SurfaceRules.Context;
 import net.minecraft.world.level.levelgen.SurfaceRules.RuleSource;
@@ -20,9 +21,11 @@ public record SwitchRuleSource(NumericProvider selector, List<RuleSource> collec
 			RuleSource.CODEC.listOf().fieldOf("collection").forGetter(SwitchRuleSource::collection)
 	).apply(instance, SwitchRuleSource::new));
 
+	private static final KeyDispatchDataCodec<? extends RuleSource> KEY_CODEC = KeyDispatchDataCodec.of(SwitchRuleSource.CODEC);
+
 	@Override
-	public Codec<? extends RuleSource> codec() {
-		return SwitchRuleSource.CODEC;
+	public KeyDispatchDataCodec<? extends RuleSource> codec() {
+		return KEY_CODEC;
 	}
 	
 	@Override

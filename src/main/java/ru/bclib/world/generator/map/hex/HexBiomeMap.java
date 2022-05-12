@@ -11,7 +11,8 @@ import ru.bclib.world.biomes.BCLBiome;
 import ru.bclib.world.generator.BiomePicker;
 
 import java.util.Map;
-import java.util.Random;
+import java.util.Random;import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.levelgen.WorldgenRandom;
 
 public class HexBiomeMap implements BiomeMap {
 	private static final float RAD_INNER = (float) Math.sqrt(3.0) * 0.5F;
@@ -40,7 +41,7 @@ public class HexBiomeMap implements BiomeMap {
 		noiseIterations = (byte) Math.min(Math.ceil(Math.log(scale) / Math.log(2)), 5);
 		this.seed = random.nextInt();
 	}
-	
+
 	@Override
 	public void clearCache() {
 		if (chunks.size() > 127) {
@@ -77,7 +78,7 @@ public class HexBiomeMap implements BiomeMap {
 		final ChunkPos pos = new ChunkPos(cx, cz);
 		HexBiomeChunk chunk = chunks.get(pos);
 		if (chunk == null) {
-			Random random = new Random(MHelper.getSeed(seed, cx, cz));
+			WorldgenRandom random = new WorldgenRandom(RandomSource.create(MHelper.getSeed(seed, cx, cz)));
 			chunk = new HexBiomeChunk(random, picker);
 			if (update && processor != null) {
 				processor.accept(cx, cz, chunk.getSide());

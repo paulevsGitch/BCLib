@@ -8,7 +8,7 @@ import net.minecraft.world.level.LevelAccessor;
 import org.jetbrains.annotations.NotNull;
 import ru.bclib.interfaces.SpawnRule;
 
-import java.util.Random;
+import java.util.Random;import net.minecraft.util.RandomSource;
 
 public class SpawnRuleEntry<M extends Mob> implements Comparable<SpawnRuleEntry> {
 	private final SpawnRule rule;
@@ -19,7 +19,7 @@ public class SpawnRuleEntry<M extends Mob> implements Comparable<SpawnRuleEntry>
 		this.rule = rule;
 	}
 	
-	protected boolean canSpawn(EntityType<M> type, LevelAccessor world, MobSpawnType spawnReason, BlockPos pos, Random random) {
+	protected boolean canSpawn(EntityType<M> type, LevelAccessor world, MobSpawnType spawnReason, BlockPos pos, RandomSource random) {
 		return rule.canSpawn(type, world, spawnReason, pos, random);
 	}
 	

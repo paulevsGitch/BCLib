@@ -3,7 +3,7 @@ package ru.bclib.util;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Random;
+import java.util.Random;import net.minecraft.util.RandomSource;
 
 public class ColorExtractor {
 	private List<Center> centers = new ArrayList<>();

@@ -35,7 +35,7 @@ import ru.bclib.items.tool.BaseShearsItem;
 import ru.bclib.util.BlocksHelper;
 
 import java.util.List;
-import java.util.Random;
+import java.util.Random;import net.minecraft.util.RandomSource;
 
 public abstract class BaseDoublePlantBlock extends BaseBlockNotFull implements RenderLayerProvider, BonemealableBlock {
 	private static final VoxelShape SHAPE = Block.box(4, 2, 4, 12, 16, 12);
@@ -47,6 +47,7 @@ public abstract class BaseDoublePlantBlock extends BaseBlockNotFull implements R
 			FabricBlockSettings.of(Material.PLANT)
 				.sound(SoundType.GRASS)
 				.noCollission()
+					.offsetType(BlockBehaviour.OffsetType.XZ)
 		);
 	}
 	
@@ -56,6 +57,7 @@ public abstract class BaseDoublePlantBlock extends BaseBlockNotFull implements R
 				.sound(SoundType.GRASS)
 				.lightLevel((state) -> state.getValue(TOP) ? light : 0)
 				.noCollission()
+					.offsetType(BlockBehaviour.OffsetType.XZ)
 		);
 	}
 	
@@ -75,12 +77,7 @@ public abstract class BaseDoublePlantBlock extends BaseBlockNotFull implements R
 		Vec3 vec3d = state.getOffset(view, pos);
 		return SHAPE.move(vec3d.x, vec3d.y, vec3d.z);
 	}
-	
-	@Override
-	public BlockBehaviour.OffsetType getOffsetType() {
-		return BlockBehaviour.OffsetType.XZ;
-	}
-	
+
 	@Override
 	@SuppressWarnings("deprecation")
 	public boolean canSurvive(BlockState state, LevelReader world, BlockPos pos) {
@@ -138,20 +135,20 @@ public abstract class BaseDoublePlantBlock extends BaseBlockNotFull implements R
 	}
 	
 	@Override
-	public boolean isBonemealSuccess(Level world, Random random, BlockPos pos, BlockState state) {
+	public boolean isBonemealSuccess(Level level, RandomSource random, BlockPos pos, BlockState state) {
 		return true;
 	}
 	
 	@Override
-	public void performBonemeal(ServerLevel world, Random random, BlockPos pos, BlockState state) {
+	public void performBonemeal(ServerLevel level, RandomSource random, BlockPos pos, BlockState state) {
 		ItemEntity item = new ItemEntity(
-			world,
+			level,
 			pos.getX() + 0.5,
 			pos.getY() + 0.5,
 			pos.getZ() + 0.5,
 			new ItemStack(this)
 		);
-		world.addFreshEntity(item);
+		level.addFreshEntity(item);
 	}
 	
 	@Override

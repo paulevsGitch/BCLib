@@ -41,6 +41,7 @@ public abstract class BaseWallPlantBlock extends BasePlantBlock {
 				.of(Material.PLANT)
 				.sound(SoundType.GRASS)
 				.noCollission()
+					.offsetType( BlockBehaviour.OffsetType.NONE)
 		);
 	}
 	
@@ -51,11 +52,12 @@ public abstract class BaseWallPlantBlock extends BasePlantBlock {
 				.luminance(light)
 				.sound(SoundType.GRASS)
 				.noCollission()
+					.offsetType( BlockBehaviour.OffsetType.NONE)
 		);
 	}
 	
 	public BaseWallPlantBlock(Properties settings) {
-		super(settings);
+		super(settings.offsetType( BlockBehaviour.OffsetType.NONE));
 	}
 	
 	@Override
@@ -66,11 +68,6 @@ public abstract class BaseWallPlantBlock extends BasePlantBlock {
 	@Override
 	public VoxelShape getShape(BlockState state, BlockGetter view, BlockPos pos, CollisionContext ePos) {
 		return SHAPES.get(state.getValue(FACING));
-	}
-	
-	@Override
-	public BlockBehaviour.OffsetType getOffsetType() {
-		return BlockBehaviour.OffsetType.NONE;
 	}
 	
 	@Override

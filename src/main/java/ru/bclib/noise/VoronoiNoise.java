@@ -3,7 +3,7 @@ package ru.bclib.noise;
 import net.minecraft.core.BlockPos;
 import ru.bclib.util.MHelper;
 
-import java.util.Random;
+import java.util.Random;import net.minecraft.util.RandomSource;
 
 public class VoronoiNoise {
 	private static final Random RANDOM = new Random();

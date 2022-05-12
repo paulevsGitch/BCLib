@@ -6,12 +6,12 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.BiomeTags;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.biome.Biome.BiomeCategory;
 import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.biome.Climate;
-import net.minecraft.world.level.biome.TheEndBiomeSource;
 import net.minecraft.world.level.levelgen.LegacyRandomSource;
 import net.minecraft.world.level.levelgen.WorldgenRandom;
 import net.minecraft.world.level.levelgen.synth.SimplexNoise;
@@ -20,7 +20,6 @@ import ru.bclib.api.biomes.BiomeAPI;
 import ru.bclib.config.ConfigKeeper.StringArrayEntry;
 import ru.bclib.config.Configs;
 import ru.bclib.interfaces.BiomeMap;
-import ru.bclib.mixin.common.BiomeAccessor;
 import ru.bclib.noise.OpenSimplexNoise;
 import ru.bclib.world.biomes.BCLBiome;
 import ru.bclib.world.generator.map.hex.HexBiomeMap;
@@ -31,19 +30,19 @@ import java.util.List;
 import java.util.function.Function;
 
 public class BCLibEndBiomeSource extends BCLBiomeSource {
-	public static Codec<BCLibEndBiomeSource> CODEC = RecordCodecBuilder.create((instance) -> instance.group(RegistryOps.retrieveRegistry(Registry.BIOME_REGISTRY).forGetter((theEndBiomeSource) -> null), Codec.LONG.fieldOf("seed").stable().forGetter((theEndBiomeSource) -> theEndBiomeSource.seed)).apply(instance, instance.stable(BCLibEndBiomeSource::new)));
+	public static Codec<BCLibEndBiomeSource> CODEC = RecordCodecBuilder.create((instance) -> instance.group(RegistryOps.retrieveRegistry(Registry.BIOME_REGISTRY).forGetter((theEndBiomeSource) -> null)).apply(instance, instance.stable(BCLibEndBiomeSource::new)));
 	private static final OpenSimplexNoise SMALL_NOISE = new OpenSimplexNoise(8324);
 	private Function<Point, Boolean> endLandFunction;
 
-	private final SimplexNoise noise;
+	private SimplexNoise noise;
 	private final Holder<Biome> centerBiome;
 	private final Holder<Biome> barrens;
 	private BiomeMap mapLand;
 	private BiomeMap mapVoid;
 	private final Point pos;
 	
-	public BCLibEndBiomeSource(Registry<Biome> biomeRegistry, long seed) {
-		super(biomeRegistry, seed, getBiomes(biomeRegistry));
+	public BCLibEndBiomeSource(Registry<Biome> biomeRegistry) {
+		super(biomeRegistry, getBiomes(biomeRegistry));
 
 		BiomeAPI.END_LAND_BIOME_PICKER.clearMutables();
 		BiomeAPI.END_VOID_BIOME_PICKER.clearMutables();
@@ -86,6 +85,15 @@ public class BCLibEndBiomeSource extends BCLBiomeSource {
 		BiomeAPI.END_LAND_BIOME_PICKER.rebuild();
 		BiomeAPI.END_VOID_BIOME_PICKER.rebuild();
 		
+
+		this.centerBiome = biomeRegistry.getOrCreateHolder(Biomes.THE_END);
+		this.barrens = biomeRegistry.getOrCreateHolder(Biomes.END_BARRENS);
+		
+		this.endLandFunction = GeneratorOptions.getEndLandFunction();
+		this.pos = new Point();
+	}
+
+	private void initMap(long seed){
 		if (GeneratorOptions.useOldBiomeGenerator()) {
 			this.mapLand = new SquareBiomeMap(seed, GeneratorOptions.getBiomeSizeEndLand(), BiomeAPI.END_LAND_BIOME_PICKER);
 			this.mapVoid = new SquareBiomeMap(seed, GeneratorOptions.getBiomeSizeEndVoid(), BiomeAPI.END_VOID_BIOME_PICKER);
@@ -94,18 +102,18 @@ public class BCLibEndBiomeSource extends BCLBiomeSource {
 			this.mapLand = new HexBiomeMap(seed, GeneratorOptions.getBiomeSizeEndLand(), BiomeAPI.END_LAND_BIOME_PICKER);
 			this.mapVoid = new HexBiomeMap(seed, GeneratorOptions.getBiomeSizeEndVoid(), BiomeAPI.END_VOID_BIOME_PICKER);
 		}
-		
-		this.centerBiome = biomeRegistry.getOrCreateHolder(Biomes.THE_END);
-		this.barrens = biomeRegistry.getOrCreateHolder(Biomes.END_BARRENS);
 
 		WorldgenRandom chunkRandom = new WorldgenRandom(new LegacyRandomSource(seed));
 		chunkRandom.consumeCount(17292);
 		this.noise = new SimplexNoise(chunkRandom);
-		
-		this.endLandFunction = GeneratorOptions.getEndLandFunction();
-		this.pos = new Point();
 	}
-	
+
+	@Override
+	public void setSeed(long seed) {
+		super.setSeed(seed);
+		initMap(seed);
+	}
+
 	private static List<Holder<Biome>> getBiomes(Registry<Biome> biomeRegistry) {
 		List<String> includeLand = Configs.BIOMES_CONFIG.getEntry("force_include", "end_land_biomes", StringArrayEntry.class).getValue();
 		List<String> includeVoid = Configs.BIOMES_CONFIG.getEntry("force_include", "end_void_biomes", StringArrayEntry.class).getValue();
@@ -121,14 +129,9 @@ public class BCLibEndBiomeSource extends BCLBiomeSource {
 						return true;
 					}
 
-					final boolean isEndBiome;
-					if ((Object)biome instanceof BiomeAccessor bacc) {
-						isEndBiome = bacc.bclib_getBiomeCategory() == BiomeCategory.THEEND;
-						if (GeneratorOptions.addEndBiomesByCategory() && isEndBiome) {
-							return true;
-						}
-					} else {
-						isEndBiome = false;
+					final boolean isEndBiome = biome.is(BiomeTags.IS_END);
+					if (GeneratorOptions.addEndBiomesByTag() && isEndBiome) {
+						return true;
 					}
 
 					BCLBiome bclBiome = BiomeAPI.getBiome(key);
@@ -144,6 +147,8 @@ public class BCLibEndBiomeSource extends BCLBiomeSource {
 	
 	@Override
 	public Holder<Biome> getNoiseBiome(int biomeX, int biomeY, int biomeZ, Climate.Sampler sampler) {
+		if (mapLand==null || mapVoid==null)
+			return this.possibleBiomes().stream().findFirst().get();
 		long posX = biomeX << 2;
 		long posZ = biomeZ << 2;
 		long farEndBiomes = GeneratorOptions.getFarEndBiomes();
@@ -156,7 +161,7 @@ public class BCLibEndBiomeSource extends BCLBiomeSource {
 		
 		if (endLandFunction == null) {
 			if (dist <= farEndBiomes) return centerBiome;
-			float height = TheEndBiomeSource.getHeightValue(
+			float height = getLegacyHeightValue(
 				noise,
 				(biomeX >> 1) + 1,
 				(biomeZ >> 1) + 1
@@ -184,11 +189,29 @@ public class BCLibEndBiomeSource extends BCLBiomeSource {
 		}
 	}
 	
-	@Override
-	public BiomeSource withSeed(long seed) {
-		return new BCLibEndBiomeSource(biomeRegistry, seed);
+	public static float getLegacyHeightValue(SimplexNoise simplexNoise, int i, int j) {
+		int k = i / 2;
+		int l = j / 2;
+		int m = i % 2;
+		int n = j % 2;
+		float f = 100.0f - Mth.sqrt(i * i + j * j) * 8.0f;
+		f = Mth.clamp(f, -100.0f, 80.0f);
+		for (int o = -12; o <= 12; ++o) {
+			for (int p = -12; p <= 12; ++p) {
+				long q = k + o;
+				long r = l + p;
+				if (q * q + r * r <= 4096L || !(simplexNoise.getValue(q, r) < (double)-0.9f)) continue;
+				float g = (Mth.abs(q) * 3439.0f + Mth.abs(r) * 147.0f) % 13.0f + 9.0f;
+				float h = m - o * 2;
+				float s = n - p * 2;
+				float t = 100.0f - Mth.sqrt(h * h + s * s) * g;
+				t = Mth.clamp(t, -100.0f, 80.0f);
+				f = Math.max(f, t);
+			}
+		}
+		return f;
 	}
-	
+
 	@Override
 	protected Codec<? extends BiomeSource> codec() {
 		return CODEC;

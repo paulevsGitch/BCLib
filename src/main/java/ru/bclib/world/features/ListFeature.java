@@ -10,9 +10,9 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemp
 import ru.bclib.util.StructureHelper;
 
 import java.util.List;
-import java.util.Random;
+import java.util.Random;import net.minecraft.util.RandomSource;
 
-public class ListFeature extends NBTStructureFeature {
+public class ListFeature extends NBTFeature {
 	private final List<StructureInfo> list;
 	private StructureInfo selected;
 	
@@ -22,35 +22,35 @@ public class ListFeature extends NBTStructureFeature {
 	}
 	
 	@Override
-	protected StructureTemplate getStructure(WorldGenLevel world, BlockPos pos, Random random) {
+	protected StructureTemplate getStructure(WorldGenLevel world, BlockPos pos, RandomSource random) {
 		selected = list.get(random.nextInt(list.size()));
 		return selected.getStructure();
 	}
 	
 	@Override
-	protected boolean canSpawn(WorldGenLevel world, BlockPos pos, Random random) {
+	protected boolean canSpawn(WorldGenLevel world, BlockPos pos, RandomSource random) {
 		int cx = pos.getX() >> 4;
 		int cz = pos.getZ() >> 4;
 		return ((cx + cz) & 1) == 0 && pos.getY() > 58;// && world.getBlockState(pos.below()).is(EndTags.GEN_TERRAIN);
 	}
 	
 	@Override
-	protected Rotation getRotation(WorldGenLevel world, BlockPos pos, Random random) {
+	protected Rotation getRotation(WorldGenLevel world, BlockPos pos, RandomSource random) {
 		return Rotation.getRandom(random);
 	}
 	
 	@Override
-	protected Mirror getMirror(WorldGenLevel world, BlockPos pos, Random random) {
+	protected Mirror getMirror(WorldGenLevel world, BlockPos pos, RandomSource random) {
 		return Mirror.values()[random.nextInt(3)];
 	}
 	
 	@Override
-	protected int getYOffset(StructureTemplate structure, WorldGenLevel world, BlockPos pos, Random random) {
+	protected int getYOffset(StructureTemplate structure, WorldGenLevel world, BlockPos pos, RandomSource random) {
 		return selected.offsetY;
 	}
 	
 	@Override
-	protected TerrainMerge getTerrainMerge(WorldGenLevel world, BlockPos pos, Random random) {
+	protected TerrainMerge getTerrainMerge(WorldGenLevel world, BlockPos pos, RandomSource random) {
 		return selected.terrainMerge;
 	}
 	

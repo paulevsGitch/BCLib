@@ -233,9 +233,10 @@ public class ColorUtil {
 	public static NativeImage loadImage(ResourceLocation image, int w, int h) {
 		Minecraft minecraft = Minecraft.getInstance();
 		ResourceManager resourceManager = minecraft.getResourceManager();
-		if (resourceManager.hasResource(image)) {
-			try (Resource resource = resourceManager.getResource(image)) {
-				return NativeImage.read(resource.getInputStream());
+		var imgResource = resourceManager.getResource(image);
+		if (imgResource.isPresent()) {
+			try  {
+				return NativeImage.read(imgResource.get().open());
 			}
 			catch (IOException e) {
 				BCLib.LOGGER.warning("Can't load texture image: {}. Will be created empty image.", image);

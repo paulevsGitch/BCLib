@@ -5,7 +5,8 @@ import ru.bclib.world.biomes.BCLBiome;
 import ru.bclib.world.generator.BiomePicker;
 
 import java.util.Arrays;
-import java.util.Random;
+import java.util.Random;import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.levelgen.WorldgenRandom;
 
 public class HexBiomeChunk implements BiomeChunk {
 	private static final short SIDE = 32;
@@ -22,7 +23,7 @@ public class HexBiomeChunk implements BiomeChunk {
 	
 	private final BCLBiome[] biomes = new BCLBiome[SIZE];
 	
-	public HexBiomeChunk(Random random, BiomePicker picker) {
+	public HexBiomeChunk(WorldgenRandom random, BiomePicker picker) {
 		BCLBiome[][] buffers = new BCLBiome[2][SIZE];
 		
 		for (BCLBiome[] buffer: buffers) {

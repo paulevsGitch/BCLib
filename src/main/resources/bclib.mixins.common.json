@@ -13,9 +13,8 @@
 		"SurfaceRulesContextAccessor",
 		"EnchantingTableBlockMixin",
 		"shears.TripWireBlockMixin",
-		"StructureFeaturesAccessor",
+		"StructuresAccessor",
 		"MobSpawnSettingsAccessor",
-		"StructureFeatureAccessor",
 		"shears.BeehiveBlockMixin",
 		"shears.PumpkinBlockMixin",
 		"shears.MushroomCowMixin",
@@ -31,7 +30,6 @@
 		"ChunkGeneratorMixin",
 		"WorldGenRegionMixin",
 		"DiggerItemAccessor",
-		"DimensionTypeMixin",
 		"RecipeManagerMixin",
 		"RecipeManagerMixin",
 		"ShovelItemAccessor",
@@ -45,8 +43,11 @@
 		"AnvilMenuMixin",
 		"ItemStackMixin",
 		"TagLoaderMixin",
-		"BiomeAccessor",
-		"MainMixin"
+		"MainMixin",
+		"WorldPresetsAccessor",
+		"WorldPresetsBootstrapMixin",
+		"WorldOpenFlowsMixin",
+		"WorldGenPropertiesMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

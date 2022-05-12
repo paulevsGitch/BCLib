@@ -34,7 +34,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Random;
+import java.util.Random;import net.minecraft.util.RandomSource;
 
 public abstract class BaseAnvilBlock extends AnvilBlock implements BlockModelProvider, CustomItemProvider {
 	public static final IntegerProperty DESTRUCTION = BlockProperties.DESTRUCTION;
@@ -118,7 +118,7 @@ public abstract class BaseAnvilBlock extends AnvilBlock implements BlockModelPro
 		return 3;
 	}
 	
-	public BlockState damageAnvilUse(BlockState state, Random random) {
+	public BlockState damageAnvilUse(BlockState state, RandomSource random) {
 		IntegerProperty durability = getDurabilityProp();
 		int value = state.getValue(durability);
 		if (value < getMaxDurability() && random.nextInt(8) == 0) {

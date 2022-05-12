@@ -1,7 +1,7 @@
 package ru.bclib.mixin.common;
 
 import net.minecraft.core.Registry;
-import net.minecraft.world.level.StructureFeatureManager;
+import net.minecraft.world.level.StructureManager;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkGenerator;
@@ -26,7 +26,7 @@ public class ChunkGeneratorMixin implements ChunkGeneratorAccessor {
 	}
 	
 	@Inject(method = "applyBiomeDecoration", at = @At("HEAD"))
-	private void bclib_obBiomeGenerate(WorldGenLevel worldGenLevel, ChunkAccess chunkAccess, StructureFeatureManager structureFeatureManager, CallbackInfo ci) {
+	private void bclib_obBiomeGenerate(WorldGenLevel worldGenLevel, ChunkAccess chunkAccess, StructureManager structureFeatureManager, CallbackInfo ci) {
 		bclib_featureIteratorSeed = 0;
 	}
 

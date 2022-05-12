@@ -3,6 +3,7 @@ package ru.bclib.client.models;
 import com.google.common.collect.Maps;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 
 import java.io.BufferedReader;
@@ -53,7 +54,10 @@ public class PatternsHelper {
 	
 	public static Optional<String> createJson(ResourceLocation patternId, Map<String, String> textures) {
 		ResourceManager resourceManager = Minecraft.getInstance().getResourceManager();
-		try (InputStream input = resourceManager.getResource(patternId).getInputStream()) {
+		Optional<Resource> patternRes = resourceManager.getResource(patternId);
+		if (patternRes.isEmpty()) return Optional.empty();
+
+		try (InputStream input = patternRes.get().open()) {
 			String json = JSON_CACHE.get(patternId);
 			if (json == null) {
 				json = new BufferedReader(new InputStreamReader(input, StandardCharsets.UTF_8)).lines().collect(Collectors.joining());

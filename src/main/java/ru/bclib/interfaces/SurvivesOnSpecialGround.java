@@ -6,7 +6,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.state.BlockState;
@@ -46,7 +46,7 @@ public interface SurvivesOnSpecialGround {
             for (int i = 0; i < Math.min(lines.size(), MAX_LINES); i++) {
                String line = lines.get(i);
                 if (i == MAX_LINES - 1 && i < lines.size() - 1) line += " ...";
-                list.add(new TextComponent("  " + line).withStyle(ChatFormatting.GREEN));
+                list.add(Component.literal("  " + line).withStyle(ChatFormatting.GREEN));
             }
         }
     }
