@@ -14,8 +14,8 @@ import ru.bclib.api.biomes.BiomeAPI;
 
 @Mixin(CreateWorldScreen.class)
 public class CreateWorldScreenMixin {
-	@Inject(method = "<init>", at = @At("HEAD"))
-	private static void bcl_init(Screen screen,
+	@Inject(method = "<init>", at = @At("TAIL"))
+	private void bcl_init(Screen screen,
 								 DataPackConfig dataPackConfig,
 								 WorldGenSettingsComponent worldGenSettingsComponent,
 								 CallbackInfo ci) {
