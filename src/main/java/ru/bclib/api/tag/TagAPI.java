@@ -1,8 +1,10 @@
 package ru.bclib.api.tag;
 
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+
+import net.minecraft.core.DefaultedRegistry;
 import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.tags.Tag;
@@ -14,17 +16,37 @@ import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorPreset;
+
 import ru.bclib.api.biomes.BiomeAPI;
 import ru.bclib.mixin.common.DiggerItemAccessor;
 
 import java.util.Map;
 import java.util.Set;
-import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 public class TagAPI {
-	private static final Map<ResourceLocation, Set<ResourceLocation>> TAGS_BLOCK = Maps.newConcurrentMap();
-	private static final Map<ResourceLocation, Set<ResourceLocation>> TAGS_ITEM = Maps.newConcurrentMap();
-	private static final Map<ResourceLocation, Set<ResourceLocation>> TAGS_BIOME = Maps.newConcurrentMap();
+	private static final Map<String, TagType<?>> TYPES = Maps.newHashMap();
+
+	public static TagType.RegistryBacked<Block> BLOCKS = registerType(Registry.BLOCK);
+	public static TagType.RegistryBacked<Item> ITEMS = registerType(Registry.ITEM);
+	public static TagType.Simple<Biome> BIOMES = registerType(Registry.BIOME_REGISTRY, "tags/worldgen/biome", b->BiomeAPI.getBiomeID(b));
+
+	private static <T> TagType.RegistryBacked<T> registerType(DefaultedRegistry<T> registry) {
+		TagType<T> type = new TagType.RegistryBacked<>(registry);
+		return (TagType.RegistryBacked<T>)TYPES.computeIfAbsent(type.directory, (dir)->type);
+	}
+
+	public static <T> TagType.Simple<T> registerType(ResourceKey<? extends Registry<T>> registry, String directory, Function<T, ResourceLocation> locationProvider) {
+		return (TagType.Simple<T>)TYPES.computeIfAbsent(directory, (dir)->new TagType.Simple<>(registry, dir, locationProvider));
+	}
+
+	public static <T> TagType.UnTyped<T> registerType(ResourceKey<? extends Registry<T>> registry, String directory) {
+		return (TagType.UnTyped<T>)TYPES.computeIfAbsent(directory, (dir)->new TagType.UnTyped<>(registry, dir));
+	}
+
+
+
 	
 	/**
 	 * Get or create {@link TagKey}.
@@ -33,6 +55,7 @@ public class TagAPI {
 	 * @param id				- {@link ResourceLocation} tag id.
 	 * @return {@link TagKey}.
 	 */
+	@Deprecated(forRemoval = true)
 	public static <T> TagKey<T> makeTag(Registry<T> registry, TagLocation<T> id) {
 		return registry
 				.getTagNames()
@@ -49,7 +72,7 @@ public class TagAPI {
 	 * @return {@link Block} {@link TagKey}.
 	 */
 	public static TagKey<Biome> makeBiomeTag(String modID, String name) {
-		return TagKey.create(Registry.BIOME_REGISTRY, new ResourceLocation(modID, name));
+		return BIOMES.makeTag(new ResourceLocation(modID, name));
 	}
 
 	
@@ -61,7 +84,7 @@ public class TagAPI {
 	 * @return {@link Block} {@link TagKey}.
 	 */
 	public static TagKey<Block> makeBlockTag(String modID, String name) {
-		return makeTag(Registry.BLOCK, new TagLocation<>(modID, name));
+		return BLOCKS.makeTag(new ResourceLocation(modID, name));
 	}
 
 	/**
@@ -71,7 +94,7 @@ public class TagAPI {
 	 * @return {@link Block} {@link TagKey}.
 	 */
 	public static TagKey<Block> makeBlockTag(ResourceLocation id) {
-		return makeTag(Registry.BLOCK, new TagLocation<>(id));
+		return BLOCKS.makeTag(id);
 	}
 	
 	/**
@@ -82,7 +105,7 @@ public class TagAPI {
 	 * @return {@link Item} {@link TagKey}.
 	 */
 	public static TagKey<Item> makeItemTag(String modID, String name) {
-		return makeTag(Registry.ITEM, new TagLocation<>(modID, name));
+		return ITEMS.makeTag(new ResourceLocation(modID, name));
 	}
 
 	/**
@@ -92,7 +115,7 @@ public class TagAPI {
 	 * @return {@link Item} {@link TagKey}.
 	 */
 	public static TagKey<Item> makeItemTag(ResourceLocation id) {
-		return makeTag(Registry.ITEM, new TagLocation<>(id));
+		return ITEMS.makeTag(id);
 	}
 	
 	/**
@@ -103,7 +126,7 @@ public class TagAPI {
 	 * @see <a href="https://fabricmc.net/wiki/tutorial:tags">Fabric Wiki (Tags)</a>
 	 */
 	public static TagKey<Block> makeCommonBlockTag(String name) {
-		return makeTag(Registry.BLOCK, new TagLocation<>("c", name));
+		return BLOCKS.makeCommonTag(name);
 	}
 	
 	/**
@@ -114,7 +137,7 @@ public class TagAPI {
 	 * @see <a href="https://fabricmc.net/wiki/tutorial:tags">Fabric Wiki (Tags)</a>
 	 */
 	public static TagKey<Item> makeCommonItemTag(String name) {
-		return makeTag(Registry.ITEM, new TagLocation<>("c", name));
+		return ITEMS.makeCommonTag(name);
 	}
 	
 	/**
@@ -134,10 +157,9 @@ public class TagAPI {
 	 * @param biome The {@link Biome} to add tag.
 	 */
 	@SafeVarargs
+	@Deprecated(forRemoval = true)
 	public static void addBiomeTags(Biome biome, TagLocation<Biome>... tagIDs) {
-		for (TagLocation<Biome> tagID : tagIDs) {
-			addBiomeTagUntyped(tagID, biome);
-		}
+		BIOMES.add(biome, tagIDs);
 	}
 
 	/**
@@ -145,8 +167,10 @@ public class TagAPI {
 	 * @param tagID {@link TagLocation<Biome>} tag ID.
 	 * @param biomes array of {@link Biome} to add into tag.
 	 */
+
+	@Deprecated(forRemoval = true)
 	public static void addBiomeTag(TagLocation<Biome> tagID, Biome... biomes) {
-		addBiomeTagUntyped(tagID, biomes);
+		BIOMES.add(tagID, biomes);
 	}
 
 	/**
@@ -155,21 +179,7 @@ public class TagAPI {
 	 * @param biomes array of {@link Biome} to add into tag.
 	 */
 	public static void addBiomeTag(TagKey<Biome> tagID, Biome... biomes) {
-		addBiomeTagUntyped(tagID.location(), biomes);
-	}
-	/**
-	 * Adds one Tag to multiple Biomes.
-	 * @param tagID {@link ResourceLocation} tag ID.
-	 * @param biomes array of {@link Biome} to add into tag.
-	 */
-	protected static void addBiomeTagUntyped(ResourceLocation tagID, Biome... biomes) {
-		Set<ResourceLocation> set = TAGS_BIOME.computeIfAbsent(tagID, k -> Sets.newHashSet());
-		for (Biome biome : biomes) {
-			ResourceLocation id = BiomeAPI.getBiomeID(biome);
-			if (id != null) {
-				set.add(id);
-			}
-		}
+		BIOMES.add(tagID, biomes);
 	}
 
 
@@ -179,10 +189,9 @@ public class TagAPI {
 	 * @param block The {@link Block} to add tag.
 	 */
 	@SafeVarargs
+	@Deprecated(forRemoval = true)
 	public static void addBlockTags(Block block, TagLocation<Block>... tagIDs) {
-		for (TagLocation<Block> tagID : tagIDs) {
-			addBlockTagUntyped(tagID, block);
-		}
+		BLOCKS.add(block, tagIDs);
 	}
 	
 	/**
@@ -190,8 +199,9 @@ public class TagAPI {
 	 * @param tagID {@link TagLocation<Block>} tag ID.
 	 * @param blocks array of {@link Block} to add into tag.
 	 */
+	@Deprecated(forRemoval = true)
 	public static void addBlockTag(TagLocation<Block> tagID, Block... blocks) {
-		addBlockTagUntyped(tagID, blocks);
+		BLOCKS.add(tagID, blocks);
 	}
 
 	/**
@@ -200,22 +210,7 @@ public class TagAPI {
 	 * @param blocks array of {@link Block} to add into tag.
 	 */
 	public static void addBlockTag(TagKey<Block> tagID, Block... blocks) {
-		addBlockTagUntyped(tagID.location(), blocks);
-	}
-	
-	/**
-	 * Adds one Tag to multiple Blocks.
-	 * @param tagID {@link ResourceLocation} tag ID.
-	 * @param blocks array of {@link Block} to add into tag.
-	 */
-	protected static void addBlockTagUntyped(ResourceLocation tagID, Block... blocks) {
-		Set<ResourceLocation> set = TAGS_BLOCK.computeIfAbsent(tagID, k -> Sets.newHashSet());
-		for (Block block : blocks) {
-			ResourceLocation id = Registry.BLOCK.getKey(block);
-			if (id != Registry.BLOCK.getDefaultKey()) {
-				set.add(id);
-			}
-		}
+		BLOCKS.add(tagID, blocks);
 	}
 	
 	/**
@@ -223,11 +218,10 @@ public class TagAPI {
 	 * @param tagIDs array of {@link TagLocation<Item>} tag IDs.
 	 * @param item The {@link Item} to add tag.
 	 */
+	@Deprecated(forRemoval = true)
 	@SafeVarargs
 	public static void addItemTags(ItemLike item, TagLocation<Item>... tagIDs) {
-		for (TagLocation<Item> tagID : tagIDs) {
-			addItemTagUntyped(tagID, item);
-		}
+		ITEMS.add(item.asItem(), tagIDs);
 	}
 	
 	/**
@@ -235,8 +229,21 @@ public class TagAPI {
 	 * @param tagID {@link TagLocation<Item>} tag ID.
 	 * @param items array of {@link ItemLike} to add into tag.
 	 */
+	@Deprecated(forRemoval = true)
+	public static void addItemTag(TagLocation<Item> tagID, Item... items) {
+		ITEMS.add(tagID, items);
+	}
+
+	/**
+	 * Adds one Tag to multiple Items.
+	 * @param tagID {@link TagLocation<Item>} tag ID.
+	 * @param items array of {@link ItemLike} to add into tag.
+	 */
+	@Deprecated(forRemoval = true)
 	public static void addItemTag(TagLocation<Item> tagID, ItemLike... items) {
-		addItemTagUntyped(tagID, items);
+		for(ItemLike i : items) {
+			ITEMS.add(i.asItem(), tagID);
+		}
 	}
 
 	/**
@@ -245,22 +252,18 @@ public class TagAPI {
 	 * @param items array of {@link ItemLike} to add into tag.
 	 */
 	public static void addItemTag(TagKey<Item> tagID, ItemLike... items) {
-		addItemTagUntyped(tagID.location(), items);
-	}
-	
-	/**
-	 * Adds one Tag to multiple Items.
-	 * @param tagID {@link ResourceLocation} tag ID.
-	 * @param items array of {@link ItemLike} to add into tag.
-	 */
-	protected static void addItemTagUntyped(ResourceLocation tagID, ItemLike... items) {
-		Set<ResourceLocation> set = TAGS_ITEM.computeIfAbsent(tagID, k -> Sets.newHashSet());
-		for (ItemLike item : items) {
-			ResourceLocation id = Registry.ITEM.getKey(item.asItem());
-			if (id != Registry.ITEM.getDefaultKey()) {
-				set.add(id);
-			}
+		for(ItemLike i : items){
+			ITEMS.add(i.asItem(), tagID);
 		}
+	}
+
+	/**
+	* Adds one Tag to multiple Items.
+	* @param tagID {@link TagKey<Item>} tag ID.
+	* @param items array of {@link ItemLike} to add into tag.
+	*/
+	public static void addItemTag(TagKey<Item> tagID, Item... items) {
+		ITEMS.add(tagID, items);
 	}
 	
 	/**
@@ -274,17 +277,23 @@ public class TagAPI {
 	 * @return The {@code tagsMap} Parameter.
 	 */
 	public static <T> Map<ResourceLocation, Tag.Builder> apply(String directory, Map<ResourceLocation, Tag.Builder> tagsMap) {
-		final BiConsumer<ResourceLocation, Set<ResourceLocation>> consumer;
-		consumer = (id, ids) -> apply(tagsMap.computeIfAbsent(id, key -> Tag.Builder.tag()), ids);
-		if ("tags/blocks".equals(directory)) {
-			TAGS_BLOCK.forEach(consumer);
+		TagType<?> type = TYPES.get(directory);
+		if (type!=null){
+			type.forEach((id, ids) -> apply(tagsMap.computeIfAbsent(id, key -> Tag.Builder.tag()), ids));
 		}
-		else if ("tags/items".equals(directory)) {
-			TAGS_ITEM.forEach(consumer);
-		}
-		else if ("tags/worldgen/biome".equals(directory)) {
-			TAGS_BIOME.forEach(consumer);
-		}
+
+//		final BiConsumer<ResourceLocation, Set<ResourceLocation>> consumer;
+//		consumer = (id, ids) -> apply(tagsMap.computeIfAbsent(id, key -> Tag.Builder.tag()), ids);
+//
+//		if ("tags/blocks".equals(directory)) {
+//			TAGS_BLOCK.forEach(consumer);
+//		}
+//		else if ("tags/items".equals(directory)) {
+//			TAGS_ITEM.forEach(consumer);
+//		}
+//		else if ("tags/worldgen/biome".equals(directory)) {
+//			TAGS_BIOME.forEach(consumer);
+//		}
 		return tagsMap;
 	}
 	
