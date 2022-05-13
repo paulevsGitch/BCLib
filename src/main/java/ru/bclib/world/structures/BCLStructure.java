@@ -1,30 +1,33 @@
 package ru.bclib.world.structures;
 
 import com.google.common.collect.Lists;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Holder;
-import net.minecraft.core.QuartPos;
-import net.minecraft.core.Registry;
+
+import net.minecraft.core.*;
+import net.minecraft.data.BuiltinRegistries;
 import net.minecraft.data.worldgen.StructureSets;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.GenerationStep;
-import net.minecraft.world.level.levelgen.structure.Structure;
+import net.minecraft.world.level.levelgen.structure.*;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
 import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
-import net.minecraft.world.level.levelgen.structure.StructureSet;
 import net.minecraft.world.level.levelgen.structure.pieces.PieceGeneratorSupplier;
 import net.minecraft.world.level.levelgen.structure.placement.RandomSpreadStructurePlacement;
 import net.minecraft.world.level.levelgen.structure.placement.RandomSpreadType;
+
+import com.mojang.serialization.Codec;
 import ru.bclib.api.tag.TagAPI;
 import ru.bclib.mixin.common.StructuresAccessor;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
+import java.util.function.Function;
 
-public class BCLStructure {
+public class BCLStructure<S extends Structure> {
 	private static final Random RANDOM = new Random(354);
 
 	private final Holder<Structure> structure;
@@ -33,13 +36,37 @@ public class BCLStructure {
 	private final ResourceLocation id;
 	public final TagKey<Biome> biomeTag;
 	public final ResourceKey<Structure> structureKey;
+	public final S baseStructure;
 	public final ResourceKey<StructureSet> structureSetKey;
 	public final RandomSpreadStructurePlacement spreadConfig;
 
-	public BCLStructure(ResourceLocation id, Structure structure, GenerationStep.Decoration step, int spacing, int separation) {
-		this(id, structure, step, spacing, separation, false);
+	public final StructureType<S> structureType;
+
+
+	private static HolderSet<Biome> biomes(TagKey<Biome> tagKey) {
+		return BuiltinRegistries.BIOME.getOrCreateTag(tagKey);
 	}
-	public BCLStructure(ResourceLocation id, Structure structure, GenerationStep.Decoration step, int spacing, int separation, boolean adaptNoise) {
+	private static Structure.StructureSettings structure(TagKey<Biome> tagKey, Map<MobCategory, StructureSpawnOverride> map, GenerationStep.Decoration decoration, TerrainAdjustment terrainAdjustment) {
+		return new Structure.StructureSettings(biomes(tagKey), map, decoration, terrainAdjustment);
+	}
+
+	private static Structure.StructureSettings structure(TagKey<Biome> tagKey, GenerationStep.Decoration decoration, TerrainAdjustment terrainAdjustment) {
+		return structure(tagKey, Map.of(), decoration, terrainAdjustment);
+	}
+
+	public static <S extends Structure> StructureType<S> registerStructureType(ResourceLocation id, Codec<S> codec) {
+		return Registry.register(Registry.STRUCTURE_TYPES, id, () -> codec);
+	}
+	public BCLStructure(ResourceLocation id, Function<Structure.StructureSettings, S> structureBuilder, GenerationStep.Decoration step, int spacing, int separation, Codec<S> codec) {
+		this(id, structureBuilder, step, spacing, separation, false, codec);
+	}
+	public BCLStructure(ResourceLocation id, Function<Structure.StructureSettings, S> structureBuilder, GenerationStep.Decoration step, int spacing, int separation, boolean adaptNoise, Codec<S> codec) {
+		this(id, structureBuilder, step, spacing, separation, adaptNoise, registerStructureType(id, codec));
+	}
+	public BCLStructure(ResourceLocation id, Function<Structure.StructureSettings, S> structureBuilder, GenerationStep.Decoration step, int spacing, int separation, StructureType<S> structureType) {
+		this(id, structureBuilder, step, spacing, separation, false, structureType);
+	}
+	public BCLStructure(ResourceLocation id, Function<Structure.StructureSettings, S> structureBuilder, GenerationStep.Decoration step, int spacing, int separation, boolean adaptNoise, StructureType<S> structureType) {
 		this.id = id;
 		this.featureStep = step;
 		//parts from vanilla for Structure generation
@@ -56,9 +83,11 @@ public class BCLStructure {
 		this.spreadConfig = new RandomSpreadStructurePlacement(spacing, separation, RandomSpreadType.LINEAR, RANDOM.nextInt(8192));
 		this.structureKey = ResourceKey.create(Registry.STRUCTURE_REGISTRY, id);
 		this.structureSetKey = ResourceKey.create(Registry.STRUCTURE_SET_REGISTRY, id);
+		this.structureType = structureType;
 
 		this.biomeTag = TagAPI.makeBiomeTag(id.getNamespace(), "has_structure/"+id.getPath());
-		this.structure = StructuresAccessor.callRegister(structureKey, structure);
+		this.baseStructure = structureBuilder.apply(structure(biomeTag, featureStep, TerrainAdjustment.NONE));
+		this.structure = StructuresAccessor.callRegister(structureKey, this.baseStructure);
 		StructureSets.register(structureSetKey, this.structure, spreadConfig);
 	}
 

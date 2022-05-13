@@ -20,6 +20,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import ru.bclib.api.LifeCycleAPI;
 import ru.bclib.api.biomes.BiomeAPI;
+import ru.bclib.world.generator.BCLBiomeSource;
 import ru.bclib.world.generator.BCLibNetherBiomeSource;
 
 import java.util.List;
@@ -62,6 +63,9 @@ public abstract class ServerLevelMixin extends Level {
 		
 		if (level.dimension() == Level.NETHER) {
 			BCLibNetherBiomeSource.setWorldHeight(level.getChunkSource().getGenerator().getGenDepth());
+		}
+		if (levelStem.generator().getBiomeSource() instanceof BCLBiomeSource source){
+			source.setSeed(level.getSeed());
 		}
 		
 		if (bclib_lastWorld != null && bclib_lastWorld.equals(levelStorageAccess.getLevelId())) {

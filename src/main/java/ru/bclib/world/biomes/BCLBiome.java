@@ -1,5 +1,6 @@
 package ru.bclib.world.biomes;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import net.minecraft.core.Holder;
@@ -9,6 +10,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.Climate;
 import net.minecraft.world.level.levelgen.SurfaceRules;
 import net.minecraft.world.level.levelgen.SurfaceRules.RuleSource;
 import org.jetbrains.annotations.Nullable;
@@ -31,6 +33,8 @@ public class BCLBiome extends BCLBiomeSettings {
 	private final Map<String, Object> customData = Maps.newHashMap();
 	private final ResourceLocation biomeID;
 	private final Biome biome;
+
+	private final List<Climate.ParameterPoint> parameterPoints = Lists.newArrayList();
 	
 	private Consumer<Holder<Biome>> surfaceInit;
 	private BCLBiome biomeParent;
@@ -286,6 +290,18 @@ public class BCLBiome extends BCLBiomeSettings {
 	 */
 	public void attachStructures(List<TagKey<Biome>> structures) {
 		this.structureTags.addAll(structures);
+	}
+
+	/**
+	 * Adds structures to this biome. For internal use only.
+	 * Used inside {@link ru.bclib.api.biomes.BCLBiomeBuilder}.
+	 */
+	public void addClimateParameters(List<Climate.ParameterPoint> params) {
+		this.parameterPoints.addAll(params);
+	}
+
+	public void forEachClimateParameter(Consumer<Climate.ParameterPoint> consumer){
+		this.parameterPoints.forEach(consumer);
 	}
 	
 	/**

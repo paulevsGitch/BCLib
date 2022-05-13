@@ -28,6 +28,7 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.ModifyArgs;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import ru.bclib.BCLib;
+import ru.bclib.api.LifeCycleAPI;
 import ru.bclib.world.generator.BCLibEndBiomeSource;
 import ru.bclib.world.generator.BCLibNetherBiomeSource;
 
@@ -52,12 +53,15 @@ public abstract class WorldPresetsBootstrapMixin {
 
     @ModifyArg(method="run", at=@At(value="INVOKE", ordinal = 0, target="Lnet/minecraft/world/level/levelgen/presets/WorldPresets$Bootstrap;registerCustomOverworldPreset(Lnet/minecraft/resources/ResourceKey;Lnet/minecraft/world/level/dimension/LevelStem;)Lnet/minecraft/core/Holder;"))
     private LevelStem bcl_getOverworldStem(LevelStem overworldStem){
+        BCLibNetherBiomeSource netherSource = new BCLibNetherBiomeSource(this.biomes);
+        BCLibEndBiomeSource endSource = new BCLibEndBiomeSource(this.biomes);
+
         LevelStem bclNether = new LevelStem(
                 this.netherDimensionType,
                 new NoiseBasedChunkGenerator(
                         this.structureSets,
                         this.noises,
-                        new BCLibNetherBiomeSource(this.biomes),
+                        netherSource,
                         this.netherNoiseSettings)
         );
 
@@ -66,7 +70,7 @@ public abstract class WorldPresetsBootstrapMixin {
                 new NoiseBasedChunkGenerator(
                         this.structureSets,
                         this.noises,
-                        new BCLibEndBiomeSource(this.biomes),
+                        endSource,
                         this.endNoiseSettings)
         );
         WorldPreset preset = new WorldPreset(Map.of(LevelStem.OVERWORLD, overworldStem, LevelStem.NETHER, bclNether, LevelStem.END, bclEnd));

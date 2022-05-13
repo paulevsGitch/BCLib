@@ -7,6 +7,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.WorldStem;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.progress.ChunkProgressListener;
 import net.minecraft.server.level.progress.ChunkProgressListenerFactory;
 import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.server.players.GameProfileCache;
@@ -60,5 +61,10 @@ public class MinecraftServerMixin {
 		RecipeManagerAccessor accessor = (RecipeManagerAccessor) resources.managers().getRecipeManager();
 		accessor.bclib_setRecipesByName(BCLRecipeManager.getMapByName(accessor.bclib_getRecipesByName()));
 		accessor.bclib_setRecipes(BCLRecipeManager.getMap(accessor.bclib_getRecipes()));
+	}
+
+	@Inject(method = "createLevels", at = @At(value = "HEAD"))
+	private void bcl_createLevel(ChunkProgressListener chunkProgressListener, CallbackInfo ci){
+		System.out.println(this.worldData);
 	}
 }

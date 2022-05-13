@@ -2,15 +2,17 @@ package ru.bclib.world.generator;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+
+import net.minecraft.core.DefaultedRegistry;
 import net.minecraft.core.Holder;
+import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.Registry;
+import net.minecraft.data.BuiltinRegistries;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BiomeTags;
-import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.biome.BiomeSource;
-import net.minecraft.world.level.biome.Biomes;
-import net.minecraft.world.level.biome.Climate;
+import net.minecraft.world.level.biome.*;
+
 import org.apache.commons.lang3.function.TriFunction;
 import ru.bclib.BCLib;
 import ru.bclib.api.biomes.BiomeAPI;
@@ -60,7 +62,6 @@ public class BCLibNetherBiomeSource extends BCLBiomeSource {
 	public static void setWorldHeight(int worldHeight) {
 		BCLibNetherBiomeSource.worldHeight = worldHeight;
 	}
-	
 	public BCLibNetherBiomeSource(Registry<Biome> biomeRegistry) {
 		super(biomeRegistry, getBiomes(biomeRegistry));
 		
@@ -87,15 +88,17 @@ public class BCLibNetherBiomeSource extends BCLBiomeSource {
 		
 		BiomeAPI.NETHER_BIOME_PICKER.getBiomes().forEach(biome -> biome.updateActualBiomes(biomeRegistry));
 		BiomeAPI.NETHER_BIOME_PICKER.rebuild();
-		
-		//initMap();
-	}
 
+		initMap(0);
+	}
 	@Override
 	public void setSeed(long seed) {
+		seed = 0;
 		super.setSeed(seed);
 		initMap(seed);
 	}
+
+
 
 	private static List<Holder<Biome>> getBiomes(Registry<Biome> biomeRegistry) {
 		List<String> include = Configs.BIOMES_CONFIG.getEntry("force_include", "nether_biomes", StringArrayEntry.class).getValue();
@@ -138,7 +141,13 @@ public class BCLibNetherBiomeSource extends BCLBiomeSource {
 		if ((biomeX & 63) == 0 && (biomeZ & 63) == 0) {
 			biomeMap.clearCache();
 		}
-		return biomeMap.getBiome(biomeX << 2, biomeY << 2, biomeZ << 2).getActualBiome();
+		BCLBiome bb = biomeMap.getBiome(biomeX << 2, biomeY << 2, biomeZ << 2);
+		if(biomeRegistry.getId(bb.getActualBiome().value())<0) debug(bb, biomeRegistry);
+		return bb.getActualBiome();
+	}
+
+	public static<T> void debug(Object el, Registry<T> reg){
+		System.out.println("Unknown " + el + " in " + reg);
 	}
 	
 	@Override

@@ -14,15 +14,9 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.level.biome.AmbientAdditionsSettings;
-import net.minecraft.world.level.biome.AmbientMoodSettings;
-import net.minecraft.world.level.biome.AmbientParticleSettings;
-import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.*;
 import net.minecraft.world.level.biome.Biome.BiomeBuilder;
 import net.minecraft.world.level.biome.Biome.Precipitation;
-import net.minecraft.world.level.biome.BiomeGenerationSettings;
-import net.minecraft.world.level.biome.BiomeSpecialEffects;
-import net.minecraft.world.level.biome.MobSpawnSettings;
 import net.minecraft.world.level.biome.MobSpawnSettings.SpawnerData;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -67,6 +61,8 @@ public class BCLBiomeBuilder {
 	private Precipitation precipitation;
 	private ResourceLocation biomeID;
 
+	private List<Climate.ParameterPoint> parameters = Lists.newArrayList();
+
 	//BiomeTags.IS_NETHER
 	private float temperature;
 	private float fogDensity;
@@ -99,7 +95,13 @@ public class BCLBiomeBuilder {
 		INSTANCE.vertical = false;
 		INSTANCE.edge = null;
 		INSTANCE.carvers.clear();
+		INSTANCE.parameters.clear();
 		return INSTANCE;
+	}
+
+	public BCLBiomeBuilder addNetherClimateParamater(float temperature, float humidity){
+		parameters.add(Climate.parameters(temperature, humidity, 0,0,0,0,0));
+		return this;
 	}
 	
 	/**
@@ -695,6 +697,7 @@ public class BCLBiomeBuilder {
 		final T res = biomeConstructor.apply(biomeID, biome, settings);
 		res.attachStructures(structureTags);
 		res.setSurface(surfaceRule);
+		res.addClimateParameters(parameters);
 
 		//carvers.forEach(cfg -> BiomeAPI.addBiomeCarver(biome, cfg.second, cfg.first));
 		return res;
