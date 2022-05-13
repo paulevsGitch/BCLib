@@ -12,9 +12,6 @@ import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.structure.*;
-import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
-import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
-import net.minecraft.world.level.levelgen.structure.pieces.PieceGeneratorSupplier;
 import net.minecraft.world.level.levelgen.structure.placement.RandomSpreadStructurePlacement;
 import net.minecraft.world.level.levelgen.structure.placement.RandomSpreadType;
 
@@ -42,6 +39,8 @@ public class BCLStructure<S extends Structure> {
 
 	public final StructureType<S> structureType;
 
+	public final Codec<S> STRUCTURE_CODEC;
+
 
 	private static HolderSet<Biome> biomes(TagKey<Biome> tagKey) {
 		return BuiltinRegistries.BIOME.getOrCreateTag(tagKey);
@@ -54,21 +53,18 @@ public class BCLStructure<S extends Structure> {
 		return structure(tagKey, Map.of(), decoration, terrainAdjustment);
 	}
 
-	public static <S extends Structure> StructureType<S> registerStructureType(ResourceLocation id, Codec<S> codec) {
+	private static <S extends Structure> StructureType<S> registerStructureType(ResourceLocation id, Codec<S> codec) {
 		return Registry.register(Registry.STRUCTURE_TYPES, id, () -> codec);
 	}
-	public BCLStructure(ResourceLocation id, Function<Structure.StructureSettings, S> structureBuilder, GenerationStep.Decoration step, int spacing, int separation, Codec<S> codec) {
-		this(id, structureBuilder, step, spacing, separation, false, codec);
+	public BCLStructure(ResourceLocation id, Function<Structure.StructureSettings, S> structureBuilder, GenerationStep.Decoration step, int spacing, int separation) {
+		this(id, structureBuilder, step, spacing, separation, false);
 	}
-	public BCLStructure(ResourceLocation id, Function<Structure.StructureSettings, S> structureBuilder, GenerationStep.Decoration step, int spacing, int separation, boolean adaptNoise, Codec<S> codec) {
-		this(id, structureBuilder, step, spacing, separation, adaptNoise, registerStructureType(id, codec));
-	}
-	public BCLStructure(ResourceLocation id, Function<Structure.StructureSettings, S> structureBuilder, GenerationStep.Decoration step, int spacing, int separation, StructureType<S> structureType) {
-		this(id, structureBuilder, step, spacing, separation, false, structureType);
-	}
-	public BCLStructure(ResourceLocation id, Function<Structure.StructureSettings, S> structureBuilder, GenerationStep.Decoration step, int spacing, int separation, boolean adaptNoise, StructureType<S> structureType) {
+
+	public BCLStructure(ResourceLocation id, Function<Structure.StructureSettings, S> structureBuilder, GenerationStep.Decoration step, int spacing, int separation, boolean adaptNoise) {
 		this.id = id;
 		this.featureStep = step;
+
+		this.STRUCTURE_CODEC = Structure.simpleCodec(structureBuilder);
 		//parts from vanilla for Structure generation
 		//public static final ResourceKey<ConfiguredStructure<?, ?>> JUNGLE_TEMPLE =
 		//     BuiltinStructures.createKey("jungle_pyramid");
@@ -83,7 +79,7 @@ public class BCLStructure<S extends Structure> {
 		this.spreadConfig = new RandomSpreadStructurePlacement(spacing, separation, RandomSpreadType.LINEAR, RANDOM.nextInt(8192));
 		this.structureKey = ResourceKey.create(Registry.STRUCTURE_REGISTRY, id);
 		this.structureSetKey = ResourceKey.create(Registry.STRUCTURE_SET_REGISTRY, id);
-		this.structureType = structureType;
+		this.structureType = registerStructureType(id, STRUCTURE_CODEC);
 
 		this.biomeTag = TagAPI.makeBiomeTag(id.getNamespace(), "has_structure/"+id.getPath());
 		this.baseStructure = structureBuilder.apply(structure(biomeTag, featureStep, TerrainAdjustment.NONE));
