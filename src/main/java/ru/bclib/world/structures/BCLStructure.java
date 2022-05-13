@@ -67,10 +67,9 @@ public class BCLStructure {
 	 * height=5 in the middle of the chunk.
 	 *
 	 * @param context The context to test with.
-	 * @param <C> The FeatureConfiguration of the Context
 	 * @return true, if this feature can spawn in the current biome
 	 */
-	public static <C extends FeatureConfiguration> boolean isValidBiome(PieceGeneratorSupplier.Context<C> context) {
+	public static boolean isValidBiome(Structure.GenerationContext context) {
 		return isValidBiome(context, 5);
 	}
 	/**
@@ -79,10 +78,9 @@ public class BCLStructure {
 	 *
 	 * @param context The context to test with.
 	 * @param yPos The Height to test for
-	 * @param <C> The FeatureConfiguration of the Context
 	 * @return true, if this feature can spawn in the current biome
 	 */
-	public static <C extends FeatureConfiguration> boolean isValidBiome(PieceGeneratorSupplier.Context<C> context, int yPos) {
+	public static boolean isValidBiome(Structure.GenerationContext context, int yPos) {
 		BlockPos blockPos = context.chunkPos().getMiddleBlockPosition(yPos);
 		return context.validBiome().test(
 			context
