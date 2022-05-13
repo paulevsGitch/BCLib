@@ -19,13 +19,14 @@ public abstract class BCLBiomeSource extends BiomeSource {
 
 	protected BCLBiomeSource(Registry<Biome> biomeRegistry, List<Holder<Biome>> list) {
 		super(preInit(biomeRegistry, list));
-
+		System.out.println(this + " with Registry: "+biomeRegistry);
 		this.biomeRegistry = biomeRegistry;
 		
 		BiomeAPI.initRegistry(biomeRegistry);
 	}
 
 	public void setSeed(long seed){
+		System.out.println(this+" set Seed: " + seed);
 		this.currentSeed = seed;
 	}
 }
