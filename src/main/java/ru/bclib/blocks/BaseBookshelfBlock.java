@@ -18,12 +18,13 @@ import org.jetbrains.annotations.Nullable;
 import ru.bclib.client.models.BasePatterns;
 import ru.bclib.client.models.ModelsHelper;
 import ru.bclib.client.models.PatternsHelper;
+import ru.bclib.interfaces.LootProvider;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-public class BaseBookshelfBlock extends BaseBlock {
+public class BaseBookshelfBlock extends BaseBlock implements LootProvider {
 	public BaseBookshelfBlock(Block source) {
 		this(FabricBlockSettings.copyOf(source));
 	}
@@ -33,7 +34,7 @@ public class BaseBookshelfBlock extends BaseBlock {
 	}
 	
 	@Override
-	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
+	public List<ItemStack> getLoot(BlockState state, LootContext.Builder builder) {
 		ItemStack tool = builder.getParameter(LootContextParams.TOOL);
 		if (tool != null) {
 			int silk = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.SILK_TOUCH, tool);

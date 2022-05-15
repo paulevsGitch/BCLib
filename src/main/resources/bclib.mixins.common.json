@@ -27,6 +27,7 @@
 		"NetherBiomeDataMixin",
 		"PistonBaseBlockMixin",
 		"TheEndBiomeDataMixin",
+		"BlockBehaviourMixin",
 		"BlockStateBaseMixin",
 		"ChunkGeneratorMixin",
 		"WorldGenRegionMixin",

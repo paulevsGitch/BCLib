@@ -22,13 +22,14 @@ import ru.bclib.client.models.ModelsHelper;
 import ru.bclib.client.models.PatternsHelper;
 import ru.bclib.interfaces.BlockModelProvider;
 import ru.bclib.interfaces.CustomItemProvider;
+import ru.bclib.interfaces.LootProvider;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class BaseSlabBlock extends SlabBlock implements BlockModelProvider, CustomItemProvider {
+public class BaseSlabBlock extends SlabBlock implements BlockModelProvider, CustomItemProvider, LootProvider {
 	private final Block parent;
 	public final boolean fireproof;
 
@@ -43,8 +44,7 @@ public class BaseSlabBlock extends SlabBlock implements BlockModelProvider, Cust
 	}
 	
 	@Override
-	@SuppressWarnings("deprecation")
-	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
+	public List<ItemStack> getLoot(BlockState state, LootContext.Builder builder) {
 		int count = state.getValue(TYPE) == SlabType.DOUBLE ? 2 : 1;
 		return Collections.singletonList(new ItemStack(this, count));
 	}

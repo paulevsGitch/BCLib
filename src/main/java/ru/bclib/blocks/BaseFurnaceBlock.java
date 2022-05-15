@@ -31,6 +31,7 @@ import ru.bclib.client.models.ModelsHelper;
 import ru.bclib.client.models.PatternsHelper;
 import ru.bclib.client.render.BCLRenderLayer;
 import ru.bclib.interfaces.BlockModelProvider;
+import ru.bclib.interfaces.LootProvider;
 import ru.bclib.interfaces.RenderLayerProvider;
 import ru.bclib.registry.BaseBlockEntities;
 
@@ -38,7 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class BaseFurnaceBlock extends FurnaceBlock implements BlockModelProvider, RenderLayerProvider {
+public class BaseFurnaceBlock extends FurnaceBlock implements BlockModelProvider, RenderLayerProvider, LootProvider {
 	public BaseFurnaceBlock(Block source) {
 		this(FabricBlockSettings.copyOf(source).lightLevel(state -> state.getValue(LIT) ? 13 : 0));
 	}
@@ -103,8 +104,7 @@ public class BaseFurnaceBlock extends FurnaceBlock implements BlockModelProvider
 	}
 	
 	@Override
-	@SuppressWarnings("deprecation")
-	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
+	public List<ItemStack> getLoot(BlockState state, LootContext.Builder builder) {
 		List<ItemStack> drop = Lists.newArrayList(new ItemStack(this));
 		BlockEntity blockEntity = builder.getOptionalParameter(LootContextParams.BLOCK_ENTITY);
 		if (blockEntity instanceof BaseFurnaceBlockEntity) {

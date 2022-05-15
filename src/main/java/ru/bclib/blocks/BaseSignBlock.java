@@ -36,7 +36,6 @@ import net.minecraft.world.level.block.state.properties.WoodType;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
@@ -44,13 +43,11 @@ import ru.bclib.blockentities.BaseSignBlockEntity;
 import ru.bclib.client.models.ModelsHelper;
 import ru.bclib.interfaces.BlockModelProvider;
 import ru.bclib.interfaces.CustomItemProvider;
+import ru.bclib.interfaces.LootProvider;
 import ru.bclib.util.BlocksHelper;
 
-import java.util.Collections;
-import java.util.List;
-
 @SuppressWarnings("deprecation")
-public class BaseSignBlock extends SignBlock implements BlockModelProvider, CustomItemProvider {
+public class BaseSignBlock extends SignBlock implements BlockModelProvider, CustomItemProvider, LootProvider {
 	public static final IntegerProperty ROTATION = BlockStateProperties.ROTATION_16;
 	public static final BooleanProperty FLOOR = BooleanProperty.create("floor");
 	private static final VoxelShape[] WALL_SHAPES = new VoxelShape[] {
@@ -168,11 +165,6 @@ public class BaseSignBlock extends SignBlock implements BlockModelProvider, Cust
 	@Override
 	public BlockState mirror(BlockState state, Mirror mirror) {
 		return state.setValue(ROTATION, mirror.mirror(state.getValue(ROTATION), 16));
-	}
-	
-	@Override
-	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
-		return Collections.singletonList(new ItemStack(this));
 	}
 	
 	@Override

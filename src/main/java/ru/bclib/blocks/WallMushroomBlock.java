@@ -32,7 +32,7 @@ public abstract class WallMushroomBlock extends BaseWallPlantBlock {
 	}
 	
 	@Override
-	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
+	public List<ItemStack> getLoot(BlockState state, LootContext.Builder builder) {
 		return Lists.newArrayList(new ItemStack(this));
 	}
 	

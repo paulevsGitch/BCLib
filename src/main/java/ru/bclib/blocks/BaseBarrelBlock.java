@@ -24,7 +24,6 @@ import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 import ru.bclib.blockentities.BaseBarrelBlockEntity;
@@ -32,14 +31,14 @@ import ru.bclib.client.models.BasePatterns;
 import ru.bclib.client.models.ModelsHelper;
 import ru.bclib.client.models.PatternsHelper;
 import ru.bclib.interfaces.BlockModelProvider;
+import ru.bclib.interfaces.LootProvider;
 import ru.bclib.registry.BaseBlockEntities;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 
-public class BaseBarrelBlock extends BarrelBlock implements BlockModelProvider {
+public class BaseBarrelBlock extends BarrelBlock implements BlockModelProvider, LootProvider {
 	public BaseBarrelBlock(Block source) {
 		this(FabricBlockSettings.copyOf(source).noOcclusion());
 	}
@@ -51,14 +50,6 @@ public class BaseBarrelBlock extends BarrelBlock implements BlockModelProvider {
 	@Override
 	public BlockEntity newBlockEntity(BlockPos blockPos, BlockState blockState) {
 		return BaseBlockEntities.BARREL.create(blockPos, blockState);
-	}
-	
-	@Override
-	@SuppressWarnings("deprecation")
-	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
-		List<ItemStack> drop = super.getDrops(state, builder);
-		drop.add(new ItemStack(this.asItem()));
-		return drop;
 	}
 	
 	@Override

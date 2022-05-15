@@ -30,6 +30,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import ru.bclib.client.render.BCLRenderLayer;
+import ru.bclib.interfaces.LootProvider;
 import ru.bclib.interfaces.RenderLayerProvider;
 import ru.bclib.items.tool.BaseShearsItem;
 import ru.bclib.util.BlocksHelper;
@@ -37,7 +38,7 @@ import ru.bclib.util.BlocksHelper;
 import java.util.List;
 import java.util.Random;
 
-public abstract class BaseDoublePlantBlock extends BaseBlockNotFull implements RenderLayerProvider, BonemealableBlock {
+public abstract class BaseDoublePlantBlock extends BaseBlockNotFull implements RenderLayerProvider, BonemealableBlock, LootProvider {
 	private static final VoxelShape SHAPE = Block.box(4, 2, 4, 12, 16, 12);
 	public static final IntegerProperty ROTATION = BlockProperties.ROTATION;
 	public static final BooleanProperty TOP = BooleanProperty.create("top");
@@ -109,7 +110,7 @@ public abstract class BaseDoublePlantBlock extends BaseBlockNotFull implements R
 	}
 	
 	@Override
-	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
+	public List<ItemStack> getLoot(BlockState state, LootContext.Builder builder) {
 		if (state.getValue(TOP)) {
 			return Lists.newArrayList();
 		}

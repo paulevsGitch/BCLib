@@ -5,36 +5,27 @@ import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.CraftingTableBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.storage.loot.LootContext;
 import org.jetbrains.annotations.Nullable;
 import ru.bclib.client.models.BasePatterns;
 import ru.bclib.client.models.ModelsHelper;
 import ru.bclib.client.models.PatternsHelper;
 import ru.bclib.interfaces.BlockModelProvider;
+import ru.bclib.interfaces.LootProvider;
 
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Optional;
 
-public class BaseCraftingTableBlock extends CraftingTableBlock implements BlockModelProvider {
+public class BaseCraftingTableBlock extends CraftingTableBlock implements BlockModelProvider, LootProvider {
 	public BaseCraftingTableBlock(Block source) {
 		this(FabricBlockSettings.copyOf(source));
 	}
 	
 	public BaseCraftingTableBlock(BlockBehaviour.Properties properties) {
 		super(properties);
-	}
-	
-	@Override
-	@SuppressWarnings("deprecation")
-	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
-		return Collections.singletonList(new ItemStack(this.asItem()));
 	}
 	
 	@Override

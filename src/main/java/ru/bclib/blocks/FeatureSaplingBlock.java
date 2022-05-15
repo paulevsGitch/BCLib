@@ -8,7 +8,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
@@ -21,7 +20,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
 import net.minecraft.world.level.material.Material;
-import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
@@ -30,15 +28,14 @@ import ru.bclib.client.models.ModelsHelper;
 import ru.bclib.client.models.PatternsHelper;
 import ru.bclib.client.render.BCLRenderLayer;
 import ru.bclib.interfaces.BlockModelProvider;
+import ru.bclib.interfaces.LootProvider;
 import ru.bclib.interfaces.RenderLayerProvider;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.function.Function;
 
-public class FeatureSaplingBlock extends SaplingBlock implements RenderLayerProvider, BlockModelProvider {
+public class FeatureSaplingBlock extends SaplingBlock implements RenderLayerProvider, BlockModelProvider, LootProvider {
 	private static final VoxelShape SHAPE = Block.box(4, 0, 4, 12, 14, 12);
 	private final Function<BlockState, Feature<?>> feature;
 	
@@ -70,11 +67,6 @@ public class FeatureSaplingBlock extends SaplingBlock implements RenderLayerProv
 	
 	protected Feature<?> getFeature(BlockState state) {
 		return feature.apply(state);
-	}
-	
-	@Override
-	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
-		return Collections.singletonList(new ItemStack(this));
 	}
 	
 	@Override

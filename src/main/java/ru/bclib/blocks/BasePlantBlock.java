@@ -34,6 +34,7 @@ import ru.bclib.client.models.BasePatterns;
 import ru.bclib.client.models.ModelsHelper;
 import ru.bclib.client.models.PatternsHelper;
 import ru.bclib.client.render.BCLRenderLayer;
+import ru.bclib.interfaces.LootProvider;
 import ru.bclib.interfaces.RenderLayerProvider;
 import ru.bclib.items.tool.BaseShearsItem;
 
@@ -41,7 +42,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
-public abstract class BasePlantBlock extends BaseBlockNotFull implements RenderLayerProvider, BonemealableBlock{
+public abstract class BasePlantBlock extends BaseBlockNotFull implements RenderLayerProvider, BonemealableBlock, LootProvider {
 	private static final VoxelShape SHAPE = Block.box(4, 0, 4, 12, 14, 12);
 	
 	public BasePlantBlock() {
@@ -108,7 +109,7 @@ public abstract class BasePlantBlock extends BaseBlockNotFull implements RenderL
 	}
 	
 	@Override
-	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
+	public List<ItemStack> getLoot(BlockState state, LootContext.Builder builder) {
 		ItemStack tool = builder.getParameter(LootContextParams.TOOL);
 		//TODO: 1.18.2 Test if shearing still works
 		if (tool != null && BaseShearsItem.isShear(tool) || EnchantmentHelper.getItemEnchantmentLevel(
