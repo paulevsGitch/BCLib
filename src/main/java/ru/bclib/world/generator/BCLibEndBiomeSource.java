@@ -125,7 +125,9 @@ public class BCLibEndBiomeSource extends BCLBiomeSource {
                                     return true;
                                 }
 
-                                final boolean isEndBiome = biome.is(BiomeTags.IS_END);
+                                final boolean isEndBiome = biome.is(BiomeTags.IS_END)  ||
+                                        BiomeAPI.wasRegisteredAsEndVoidBiome(key) ||
+                                        BiomeAPI.wasRegisteredAsEndLandBiome(key);
                                 if (GeneratorOptions.addEndBiomesByTag() && isEndBiome) {
                                     return true;
                                 }

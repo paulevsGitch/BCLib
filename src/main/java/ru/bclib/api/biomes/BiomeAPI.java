@@ -82,6 +82,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class BiomeAPI {
+	enum Dimension {OVERWORLD, NETHER, END_LAND, END_VOID, UNDEFINED};
 	/**
 	 * Empty biome used as default value if requested biome doesn't exist or linked. Shouldn't be registered anywhere to prevent bugs.
 	 * Have {@code Biomes.THE_VOID} as the reference biome.
@@ -89,6 +90,7 @@ public class BiomeAPI {
 	public static final BCLBiome EMPTY_BIOME = new BCLBiome(Biomes.THE_VOID.location());
 	
 	private static final Map<ResourceLocation, BCLBiome> ID_MAP = Maps.newHashMap();
+	private static final Map<ResourceLocation, Dimension> DIMENSION_MAP = Maps.newHashMap();
 	private static final Map<Biome, BCLBiome> CLIENT = Maps.newHashMap();
 	public static Registry<Biome> biomeRegistry;
 	
@@ -158,22 +160,31 @@ public class BiomeAPI {
 	/**
 	 * Register {@link BCLBiome} instance and its {@link Biome} if necessary.
 	 * @param bclbiome {@link BCLBiome}
+	 * @param dim The Dimension fo rthis Biome
 	 * @return {@link BCLBiome}
 	 */
-	public static BCLBiome registerBiome(BCLBiome bclbiome) {
+	public static BCLBiome registerBiome(BCLBiome bclbiome, Dimension dim) {
 		if (BuiltinRegistries.BIOME.get(bclbiome.getID()) == null) {
 			final Biome biome = bclbiome.getBiome();
 			ResourceLocation loc = bclbiome.getID();
 			Registry.register(BuiltinRegistries.BIOME, loc, biome);
 		}
 		ID_MAP.put(bclbiome.getID(), bclbiome);
+		DIMENSION_MAP.put(bclbiome.getID(), dim);
 		bclbiome.afterRegistration();
 		return bclbiome;
 	}
 	
 	public static BCLBiome registerSubBiome(BCLBiome parent, BCLBiome subBiome) {
-		registerBiome(subBiome);
+		final Dimension dim = DIMENSION_MAP.getOrDefault(parent.getID(), Dimension.UNDEFINED);
+		registerBiome(subBiome, dim);
 		parent.addSubBiome(subBiome);
+
+		if (dim==Dimension.NETHER) {
+			TagAPI.addBiomeTag(BiomeTags.IS_NETHER, subBiome.getBiome());
+		} else if (dim==Dimension.END_LAND || dim==Dimension.END_VOID) {
+			TagAPI.addBiomeTag(BiomeTags.IS_END, subBiome.getBiome());
+		}
 		return subBiome;
 	}
 	
@@ -189,7 +200,7 @@ public class BiomeAPI {
 	 * @return {@link BCLBiome}
 	 */
 	public static BCLBiome registerNetherBiome(BCLBiome bclBiome) {
-		registerBiome(bclBiome);
+		registerBiome(bclBiome, Dimension.NETHER);
 
 		ResourceKey<Biome> key = BiomeAPI.getBiomeKeyOrThrow(bclBiome.getBiomeHolder());
 		bclBiome.forEachClimateParameter(p -> NetherBiomeData.addNetherBiome(key, p));
@@ -205,7 +216,7 @@ public class BiomeAPI {
 	 */
 	public static BCLBiome registerNetherBiome(Biome biome) {
 		BCLBiome bclBiome = new BCLBiome(biome, null);
-		registerBiome(bclBiome);
+		registerBiome(bclBiome, Dimension.NETHER);
 		TagAPI.addBiomeTag(BiomeTags.IS_NETHER, bclBiome.getBiome());
 		return bclBiome;
 	}
@@ -217,7 +228,7 @@ public class BiomeAPI {
 	 * @return {@link BCLBiome}
 	 */
 	public static BCLBiome registerEndLandBiome(BCLBiome biome) {
-		registerBiome(biome);
+		registerBiome(biome, Dimension.END_LAND);
 		
 		float weight = biome.getGenChance();
 		ResourceKey<Biome> key = BiomeAPI.getBiomeKey(biome.getBiome());
@@ -235,7 +246,7 @@ public class BiomeAPI {
 	public static BCLBiome registerEndLandBiome(Holder<Biome> biome) {
 		BCLBiome bclBiome = new BCLBiome(biome.value(), null);
 		
-		registerBiome(bclBiome);
+		registerBiome(bclBiome, Dimension.END_LAND);
 		return bclBiome;
 	}
 	
@@ -249,7 +260,7 @@ public class BiomeAPI {
 	public static BCLBiome registerEndLandBiome(Holder<Biome> biome, float genChance) {
 		BCLBiome bclBiome = new BCLBiome(biome.value(), VanillaBiomeSettings.createVanilla().setGenChance(genChance).build());
 		
-		registerBiome(bclBiome);
+		registerBiome(bclBiome, Dimension.END_LAND);
 		return bclBiome;
 	}
 	
@@ -260,7 +271,7 @@ public class BiomeAPI {
 	 * @return {@link BCLBiome}
 	 */
 	public static BCLBiome registerEndVoidBiome(BCLBiome biome) {
-		registerBiome(biome);
+		registerBiome(biome, Dimension.END_VOID);
 		
 		float weight = biome.getGenChance();
 		ResourceKey<Biome> key = BiomeAPI.getBiomeKeyOrThrow(biome.getBiomeHolder());
@@ -277,7 +288,7 @@ public class BiomeAPI {
 	public static BCLBiome registerEndVoidBiome(Holder<Biome> biome) {
 		BCLBiome bclBiome = new BCLBiome(biome.value(), null);
 		
-		registerBiome(bclBiome);
+		registerBiome(bclBiome, Dimension.END_VOID);
 		return bclBiome;
 	}
 	
@@ -291,7 +302,7 @@ public class BiomeAPI {
 	public static BCLBiome registerEndVoidBiome(Holder<Biome> biome, float genChance) {
 		BCLBiome bclBiome = new BCLBiome(biome.value(), VanillaBiomeSettings.createVanilla().setGenChance(genChance).build());
 		
-		registerBiome(bclBiome);
+		registerBiome(bclBiome, Dimension.END_VOID);
 		return bclBiome;
 	}
 	
@@ -441,6 +452,21 @@ public class BiomeAPI {
 	
 	public static boolean isDatapackBiome(ResourceLocation biomeID) {
 		return getFromRegistry(biomeID) == null;
+	}
+
+	public static boolean wasRegisteredAsNetherBiome(ResourceLocation biomeID) {
+		if (!DIMENSION_MAP.containsKey(biomeID)) return false;
+		return DIMENSION_MAP.get(biomeID)==Dimension.NETHER;
+	}
+
+	public static boolean wasRegisteredAsEndLandBiome(ResourceLocation biomeID) {
+		if (!DIMENSION_MAP.containsKey(biomeID)) return false;
+		return DIMENSION_MAP.get(biomeID)==Dimension.END_LAND;
+	}
+
+	public static boolean wasRegisteredAsEndVoidBiome(ResourceLocation biomeID) {
+		if (!DIMENSION_MAP.containsKey(biomeID)) return false;
+		return DIMENSION_MAP.get(biomeID)==Dimension.END_VOID;
 	}
 	
 	/**

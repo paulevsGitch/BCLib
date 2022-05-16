@@ -113,7 +113,10 @@ public class BCLibNetherBiomeSource extends BCLBiomeSource {
                                 if (exclude.contains(strLocation)) return false;
                                 if (include.contains(strLocation)) return true;
 
-                                return NetherBiomeData.canGenerateInNether(biome.unwrapKey().get()) || biome.is(BiomeTags.IS_NETHER);
+                                return
+                                        NetherBiomeData.canGenerateInNether(biome.unwrapKey().get()) ||
+                                        biome.is(BiomeTags.IS_NETHER) ||
+                                        BiomeAPI.wasRegisteredAsNetherBiome(location);
                             }).toList();
     }
 
