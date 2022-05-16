@@ -52,7 +52,7 @@ public class MapStack implements BiomeMap {
 	}
 	
 	@Override
-	public BCLBiome getBiome(double x, double y, double z) {
+	public BiomePicker.Entry getBiome(double x, double y, double z) {
 		int mapIndex;
 		
 		if (y < minValue) {
@@ -70,7 +70,7 @@ public class MapStack implements BiomeMap {
 	}
 	
 	private void onChunkCreation(int cx, int cz, int side) {
-		BCLBiome[][] biomeMap = new BCLBiome[side][side];
+		BiomePicker.Entry[][] biomeMap = new BiomePicker.Entry[side][side];
 		BiomeChunk[] chunks = new BiomeChunk[maps.length];
 		
 		boolean isNoEmpty = false;
@@ -79,8 +79,8 @@ public class MapStack implements BiomeMap {
 			for (int x = 0; x < side; x++) {
 				for (int z = 0; z < side; z++) {
 					if (biomeMap[x][z] == null) {
-						BCLBiome biome = chunks[i].getBiome(x, z);
-						if (biome.isVertical()) {
+						BiomePicker.Entry biome = chunks[i].getBiome(x, z);
+						if (biome.bclBiome.isVertical()) {
 							biomeMap[x][z] = biome;
 							isNoEmpty = true;
 						}

@@ -54,6 +54,8 @@ public class BCLibEndBiomeSource extends BCLBiomeSource {
     private BiomeMap mapLand;
     private BiomeMap mapVoid;
 
+    private final BiomePicker endLandBiomePicker;
+    private final BiomePicker endVoidBiomePicker;
 
     public BCLibEndBiomeSource(Registry<Biome> biomeRegistry, long seed) {
         this(biomeRegistry);
@@ -63,8 +65,8 @@ public class BCLibEndBiomeSource extends BCLBiomeSource {
     public BCLibEndBiomeSource(Registry<Biome> biomeRegistry) {
         super(biomeRegistry, getBiomes(biomeRegistry));
 
-        BiomeAPI.END_LAND_BIOME_PICKER.clearMutables();
-        BiomeAPI.END_VOID_BIOME_PICKER.clearMutables();
+        endLandBiomePicker = new BiomePicker(biomeRegistry);
+        endVoidBiomePicker = new BiomePicker(biomeRegistry);
 
         List<String> includeVoid = Configs.BIOMES_CONFIG.getEntry("force_include",
                                                                   "end_void_biomes",
@@ -77,32 +79,24 @@ public class BCLibEndBiomeSource extends BCLBiomeSource {
                 BCLBiome bclBiome = new BCLBiome(key, biome.value());
 
                 if (includeVoid.contains(key.toString())) {
-                    BiomeAPI.END_VOID_BIOME_PICKER.addBiomeMutable(bclBiome);
+                    endVoidBiomePicker.addBiome(bclBiome);
                 } else {
-                    BiomeAPI.END_LAND_BIOME_PICKER.addBiomeMutable(bclBiome);
+                    endLandBiomePicker.addBiome(bclBiome);
                 }
             } else {
                 BCLBiome bclBiome = BiomeAPI.getBiome(key);
                 if (bclBiome != BiomeAPI.EMPTY_BIOME) {
                     if (bclBiome.getParentBiome() == null) {
-                        if (!BiomeAPI.END_LAND_BIOME_PICKER.containsImmutable(key) && !BiomeAPI.END_VOID_BIOME_PICKER.containsImmutable(
-                                key)) {
-                            if (includeVoid.contains(key.toString())) {
-                                BiomeAPI.END_VOID_BIOME_PICKER.addBiomeMutable(bclBiome);
-                            } else {
-                                BiomeAPI.END_LAND_BIOME_PICKER.addBiomeMutable(bclBiome);
-                            }
+                        if (includeVoid.contains(key.toString())) {
+                            endVoidBiomePicker.addBiome(bclBiome);
+                        } else {
+                            endLandBiomePicker.addBiome(bclBiome);
                         }
+
                     }
                 }
             }
         });
-
-        BiomeAPI.END_LAND_BIOME_PICKER.getBiomes().forEach(biome -> biome.updateActualBiomes(biomeRegistry));
-        BiomeAPI.END_VOID_BIOME_PICKER.getBiomes().forEach(biome -> biome.updateActualBiomes(biomeRegistry));
-
-        BiomeAPI.END_LAND_BIOME_PICKER.rebuild();
-        BiomeAPI.END_VOID_BIOME_PICKER.rebuild();
 
 
         this.centerBiome = biomeRegistry.getOrCreateHolder(Biomes.THE_END);
@@ -143,8 +137,7 @@ public class BCLibEndBiomeSource extends BCLBiomeSource {
                                     }
                                     key = bclBiome.getID();
                                 }
-                                return BiomeAPI.END_LAND_BIOME_PICKER.containsImmutable(key) || BiomeAPI.END_VOID_BIOME_PICKER.containsImmutable(
-                                        key) || (isEndBiome && BiomeAPI.isDatapackBiome(key));
+                                return isEndBiome;
                             }).toList();
     }
 
@@ -179,17 +172,17 @@ public class BCLibEndBiomeSource extends BCLBiomeSource {
         if (GeneratorOptions.useOldBiomeGenerator()) {
             this.mapLand = new SquareBiomeMap(seed,
                                               GeneratorOptions.getBiomeSizeEndLand(),
-                                              BiomeAPI.END_LAND_BIOME_PICKER);
+                                              endLandBiomePicker);
             this.mapVoid = new SquareBiomeMap(seed,
                                               GeneratorOptions.getBiomeSizeEndVoid(),
-                                              BiomeAPI.END_VOID_BIOME_PICKER);
+                                              endVoidBiomePicker);
         } else {
             this.mapLand = new HexBiomeMap(seed,
                                            GeneratorOptions.getBiomeSizeEndLand(),
-                                           BiomeAPI.END_LAND_BIOME_PICKER);
+                                           endLandBiomePicker);
             this.mapVoid = new HexBiomeMap(seed,
                                            GeneratorOptions.getBiomeSizeEndVoid(),
-                                           BiomeAPI.END_VOID_BIOME_PICKER);
+                                           endVoidBiomePicker);
         }
 
         WorldgenRandom chunkRandom = new WorldgenRandom(new LegacyRandomSource(seed));
@@ -230,16 +223,16 @@ public class BCLibEndBiomeSource extends BCLBiomeSource {
             }
 
             if (height < -10F) {
-                return mapVoid.getBiome(posX, biomeY << 2, posZ).getActualBiome();
+                return mapVoid.getBiome(posX, biomeY << 2, posZ).actual;
             } else {
-                return mapLand.getBiome(posX, biomeY << 2, posZ).getActualBiome();
+                return mapLand.getBiome(posX, biomeY << 2, posZ).actual;
             }
         } else {
             pos.setLocation(biomeX, biomeZ);
             if (endLandFunction.apply(pos)) {
-                return dist <= farEndBiomes ? centerBiome : mapLand.getBiome(posX, biomeY << 2, posZ).getActualBiome();
+                return dist <= farEndBiomes ? centerBiome : mapLand.getBiome(posX, biomeY << 2, posZ).actual;
             } else {
-                return dist <= farEndBiomes ? barrens : mapVoid.getBiome(posX, biomeY << 2, posZ).getActualBiome();
+                return dist <= farEndBiomes ? barrens : mapVoid.getBiome(posX, biomeY << 2, posZ).actual;
             }
         }
     }

@@ -21,12 +21,12 @@ public class HexBiomeChunk implements BiomeChunk {
 	private static final byte SIDE_PRE_OFFSET = (byte) Math.round(Math.log(SIDE_PRE) / Math.log(2));
 	private static final short[][] NEIGHBOURS;
 	
-	private final BCLBiome[] biomes = new BCLBiome[SIZE];
+	private final BiomePicker.Entry[] biomes = new BiomePicker.Entry[SIZE];
 	
 	public HexBiomeChunk(WorldgenRandom random, BiomePicker picker) {
-		BCLBiome[][] buffers = new BCLBiome[2][SIZE];
+		BiomePicker.Entry[][] buffers = new BiomePicker.Entry[2][SIZE];
 		
-		for (BCLBiome[] buffer: buffers) {
+		for (BiomePicker.Entry[] buffer: buffers) {
 			Arrays.fill(buffer, null);
 		}
 		
@@ -41,9 +41,9 @@ public class HexBiomeChunk implements BiomeChunk {
 		boolean hasEmptyCells = true;
 		byte bufferIndex = 0;
 		while (hasEmptyCells) {
-			BCLBiome[] inBuffer = buffers[bufferIndex];
+			BiomePicker.Entry[] inBuffer = buffers[bufferIndex];
 			bufferIndex = (byte) ((bufferIndex + 1) & 1);
-			BCLBiome[] outBuffer = buffers[bufferIndex];
+			BiomePicker.Entry[] outBuffer = buffers[bufferIndex];
 			hasEmptyCells = false;
 			
 			for (short index = SIDE; index < MAX_SIDE; index++) {
@@ -64,8 +64,8 @@ public class HexBiomeChunk implements BiomeChunk {
 				}
 			}
 		}
-		
-		BCLBiome[] outBuffer = buffers[bufferIndex];
+
+		BiomePicker.Entry[] outBuffer = buffers[bufferIndex];
 		byte preN = (byte) (SIDE_MASK - 2);
 		for (byte index = 0; index < SIDE; index++) {
 			outBuffer[getIndex(index, (byte) 0)] = outBuffer[getIndex(index, (byte) 2)];
@@ -86,7 +86,7 @@ public class HexBiomeChunk implements BiomeChunk {
 		System.arraycopy(outBuffer, 0, this.biomes, 0, SIZE);
 	}
 	
-	private void circle(BCLBiome[] buffer, short center, BCLBiome biome, BCLBiome mask) {
+	private void circle(BiomePicker.Entry[] buffer, short center, BiomePicker.Entry biome, BiomePicker.Entry mask) {
 		if (buffer[center] == mask) {
 			buffer[center] = biome;
 		}
@@ -108,12 +108,12 @@ public class HexBiomeChunk implements BiomeChunk {
 	}
 	
 	@Override
-	public BCLBiome getBiome(int x, int z) {
+	public BiomePicker.Entry getBiome(int x, int z) {
 		return biomes[getIndex(wrap(x), wrap(z))];
 	}
 	
 	@Override
-	public void setBiome(int x, int z, BCLBiome biome) {
+	public void setBiome(int x, int z, BiomePicker.Entry biome) {
 		biomes[getIndex(wrap(x), wrap(z))] = biome;
 	}
 	

@@ -45,16 +45,16 @@ public class SquareBiomeMap implements BiomeMap {
 	}
 	
 	@Override
-	public BCLBiome getBiome(double x, double y, double z) {
-		BCLBiome biome = getRawBiome(x, z);
+	public BiomePicker.Entry getBiome(double x, double y, double z) {
+		BiomePicker.Entry biome = getRawBiome(x, z);
 		
 		if (biome.getEdge() != null || (biome.getParentBiome() != null && biome.getParentBiome().getEdge() != null)) {
-			BCLBiome search = biome;
+			BiomePicker.Entry search = biome;
 			if (biome.getParentBiome() != null) {
 				search = biome.getParentBiome();
 			}
 			
-			int size = search.getEdgeSize();
+			int size = search.bclBiome.getEdgeSize();
 			boolean edge = !search.isSame(getRawBiome(x + size, z));
 			edge = edge || !search.isSame(getRawBiome(x - size, z));
 			edge = edge || !search.isSame(getRawBiome(x, z + size));
@@ -96,7 +96,7 @@ public class SquareBiomeMap implements BiomeMap {
 		return chunk;
 	}
 	
-	private BCLBiome getRawBiome(double bx, double bz) {
+	private BiomePicker.Entry getRawBiome(double bx, double bz) {
 		double x = bx * size / sizeXZ;
 		double z = bz * size / sizeXZ;
 		

@@ -33,5 +33,6 @@ public class Configs {
 		BIOMES_CONFIG.keeper.registerEntry(new ConfigKey("end_land_biomes", "force_include"), new StringArrayEntry(Collections.EMPTY_LIST));
 		BIOMES_CONFIG.keeper.registerEntry(new ConfigKey("end_void_biomes", "force_include"), new StringArrayEntry(Collections.EMPTY_LIST));
 		BIOMES_CONFIG.keeper.registerEntry(new ConfigKey("nether_biomes", "force_include"), new StringArrayEntry(Collections.EMPTY_LIST));
+		BIOMES_CONFIG.keeper.registerEntry(new ConfigKey("nether_biomes", "force_exclude"), new StringArrayEntry(Collections.EMPTY_LIST));
 	}
 }

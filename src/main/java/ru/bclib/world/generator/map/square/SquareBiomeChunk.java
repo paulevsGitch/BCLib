@@ -18,11 +18,11 @@ public class SquareBiomeChunk implements BiomeChunk {
 	private static final int SM_CAPACITY = SM_WIDTH * SM_WIDTH;
 	private static final int CAPACITY = WIDTH * WIDTH;
 	
-	private final BCLBiome[] biomes;
+	private final BiomePicker.Entry[] biomes;
 	
 	public SquareBiomeChunk(WorldgenRandom random, BiomePicker picker) {
-		BCLBiome[] PreBio = new BCLBiome[SM_CAPACITY];
-		biomes = new BCLBiome[CAPACITY];
+		BiomePicker.Entry[] PreBio = new BiomePicker.Entry[SM_CAPACITY];
+		biomes = new BiomePicker.Entry[CAPACITY];
 		
 		for (int x = 0; x < SM_WIDTH; x++) {
 			int offset = x << SM_BIT_OFFSET;
@@ -40,12 +40,12 @@ public class SquareBiomeChunk implements BiomeChunk {
 	}
 	
 	@Override
-	public BCLBiome getBiome(int x, int z) {
+	public BiomePicker.Entry getBiome(int x, int z) {
 		return biomes[getIndex(x & MASK_WIDTH, z & MASK_WIDTH)];
 	}
 	
 	@Override
-	public void setBiome(int x, int z, BCLBiome biome) {
+	public void setBiome(int x, int z, BiomePicker.Entry biome) {
 		biomes[getIndex(x & MASK_WIDTH, z & MASK_WIDTH)] = biome;
 	}
 	

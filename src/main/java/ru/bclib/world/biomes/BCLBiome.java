@@ -25,6 +25,7 @@ import java.util.Random;import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.levelgen.WorldgenRandom;
 
 import java.util.Set;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class BCLBiome extends BCLBiomeSettings {
@@ -38,7 +39,6 @@ public class BCLBiome extends BCLBiomeSettings {
 	
 	private Consumer<Holder<Biome>> surfaceInit;
 	private BCLBiome biomeParent;
-	private Holder<Biome> actualBiome;
 	
 	/**
 	 * Create wrapper for existing biome using its {@link ResourceLocation} identifier.
@@ -142,6 +142,11 @@ public class BCLBiome extends BCLBiomeSettings {
 	public BCLBiome getSubBiome(WorldgenRandom random) {
 		return subbiomes.get(random);
 	}
+
+	public void forEachSubBiome(BiConsumer<BCLBiome, Float> consumer){
+		for (int i=0; i<subbiomes.size();i++)
+			consumer.accept(subbiomes.get(i), subbiomes.getWeight(i));
+	}
 	
 	/**
 	 * Getter for parent {@link BCLBiome} or null if there are no parent biome.
@@ -181,42 +186,43 @@ public class BCLBiome extends BCLBiomeSettings {
 		return biome;
 	}
 	
-	/**
-	 * Getter for actual biome (biome from current world registry with same {@link ResourceLocation} id).
-	 * @return {@link Biome}.
-	 */
-	public Holder<Biome> getActualBiome() {
-		return this.actualBiome;
-	}
-	
-	
-	
-	/**
-	 * Recursively update biomes to correct world biome registry instances, for internal usage only.
-	 * @param biomeRegistry {@link Registry} for {@link Biome}.
-	 */
-	public void updateActualBiomes(Registry<Biome> biomeRegistry) {
-		subbiomes.forEach((sub) -> {
-			if (sub != this) {
-				sub.updateActualBiomes(biomeRegistry);
-			}
-		});
-		if (edge != null && edge != this) {
-			edge.updateActualBiomes(biomeRegistry);
-		}
+//	/**
+//	 * Recursively update biomes to correct world biome registry instances, for internal usage only.
+//	 * @param biomeRegistry {@link Registry} for {@link Biome}.
+//	 */
+//	public void updateActualBiomes(Registry<Biome> biomeRegistry) {
+//		subbiomes.forEach((sub) -> {
+//			if (sub != this) {
+//				sub.updateActualBiomes(biomeRegistry);
+//			}
+//		});
+//		if (edge != null && edge != this) {
+//			edge.updateActualBiomes(biomeRegistry);
+//		}
+//
+//		final ResourceKey<Biome> key = biomeRegistry.getResourceKey(biomeRegistry.get(biomeID)).orElseThrow();
+//		Holder<Biome> aBiome = biomeRegistry.getOrCreateHolder(key);
+//		if (aBiome != actualBiome && actualBiome != null) {
+//			System.out.println("Changed actual Biome");
+//		}
+//		this.actualBiome = aBiome;
+//		if (actualBiome == null) {
+//			BCLib.LOGGER.error("Unable to find actual Biome for " + biomeID);
+//		}
+//	}
 
-		final ResourceKey<Biome> key = biomeRegistry.getResourceKey(biomeRegistry.get(biomeID)).orElseThrow();
-		this.actualBiome = biomeRegistry.getOrCreateHolder(key);
-		if (actualBiome==null) {
-			BCLib.LOGGER.error("Unable to find actual Biome for " + biomeID);
-		}
-		
+	/**
+	 * For internal use from BiomeAPI only
+	 */
+	public void afterRegistration(){
 		if (!this.structureTags.isEmpty()) {
-			structureTags.forEach(tagKey -> TagAPI.addBiomeTag(tagKey, actualBiome.value()));
+			structureTags.forEach(tagKey ->
+										  TagAPI.addBiomeTag(tagKey, biome)
+								 );
 		}
 		
 		if (this.surfaceInit != null) {
-			surfaceInit.accept(actualBiome);
+			surfaceInit.accept(getBiomeHolder());
 		}
 	}
 
@@ -229,6 +235,7 @@ public class BCLBiome extends BCLBiomeSettings {
 	 */
 	@Nullable
 	@SuppressWarnings("unchecked")
+	@Deprecated(forRemoval = true)
 	public <T> T getCustomData(String name) {
 		return (T) customData.get(name);
 	}
@@ -240,6 +247,7 @@ public class BCLBiome extends BCLBiomeSettings {
 	 * @return object value or default value.
 	 */
 	@SuppressWarnings("unchecked")
+	@Deprecated(forRemoval = true)
 	public <T> T getCustomData(String name, T defaultValue) {
 		return (T) customData.getOrDefault(name, defaultValue);
 	}
@@ -309,8 +317,8 @@ public class BCLBiome extends BCLBiomeSettings {
 	 * @param surface {@link SurfaceRules.RuleSource} rule.
 	 */
 	public void setSurface(RuleSource surface) {
-		this.surfaceInit = (actualBiome) -> {
-			ResourceKey key = BiomeAPI.getBiomeKey(actualBiome);
+		this.surfaceInit = (b) -> {
+			final ResourceKey key = BiomeAPI.getBiomeKey(b);
 			if (key == null) {
 				BCLib.LOGGER.warning("BCL Biome " + biomeID + " does not have registry key!");
 			}
@@ -331,62 +339,4 @@ public class BCLBiome extends BCLBiomeSettings {
 	}
 	
 	private boolean didLoadConfig = false;
-	
-//	/**
-//	 * Set gen chance for this biome, default value is 1.0.
-//	 * @param genChance chance of this biome to be generated.
-//	 * @return same {@link BCLBiome}.
-//	 */
-//	public BCLBiome setGenChance(float genChance) {
-//		super.setGenChance(genChance);
-//		return this;
-//	}
-//
-//	/**
-//	 * Setter for terrain height, can be used in custom terrain generator.
-//	 * @param terrainHeight a relative float terrain height value.
-//	 * @return same {@link BCLBiome}.
-//	 */
-//	public BCLBiome setTerrainHeight(float terrainHeight) {
-//		super.setTerrainHeight(genChance);
-//		return this;
-//	}
-//
-//	/**
-//	 * Set biome vertical distribution (for tall Nether only).
-//	 * @return same {@link BCLBiome}.
-//	 */
-//	public BCLBiome setVertical() {
-//		return setVertical(true);
-//	}
-//
-//	/**
-//	 * Set biome vertical distribution (for tall Nether only).
-//	 * @param vertical {@code boolean} value.
-//	 * @return same {@link BCLBiome}.
-//	 */
-//	public BCLBiome setVertical(boolean vertical) {
-//		super.setVertical(vertical);
-//		return this;
-//	}
-//
-//	/**
-//	 * Sets fog density for this biome.
-//	 * @param fogDensity
-//	 * @return same {@link BCLBiome}.
-//	 */
-//	public BCLBiome setFogDensity(float fogDensity) {
-//		super.setFogDensity(fogDensity);
-//		return this;
-//	}
-//
-//	/**
-//	 * Set edges size for this biome. Size is in blocks.
-//	 * @param size as a float value.
-//	 * @return same {@link BCLBiome}.
-//	 */
-//	public BCLBiome setEdgeSize(int size) {
-//		edgeSize = size;
-//		return this;
-//	}
 }

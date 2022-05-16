@@ -4,6 +4,7 @@
 	"package": "ru.bclib.mixin.common",
 	"compatibilityLevel": "JAVA_17",
 	"mixins": [
+		"BiomeMixin",
 		"BiomeGenerationSettingsAccessor",
 		"shears.DiggingEnchantmentMixin",
 		"shears.ItemPredicateBuilderMixin",

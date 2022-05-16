@@ -8,6 +8,8 @@ import net.minecraft.tags.BiomeTags;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.level.biome.*;
 
+import net.fabricmc.fabric.impl.biome.NetherBiomeData;
+
 import com.mojang.datafixers.kinds.Applicative;
 import com.mojang.datafixers.util.Either;
 import com.mojang.datafixers.util.Pair;
@@ -48,30 +50,26 @@ public class BCLibNetherBiomeSource extends BCLBiomeSource {
                     .apply(instance, instance.stable(BCLibNetherBiomeSource::new))
                    );
     private BiomeMap biomeMap;
+    private final BiomePicker biomePicker;
 	public BCLibNetherBiomeSource(Registry<Biome> biomeRegistry) {
         super(biomeRegistry, getBiomes(biomeRegistry));
-        BiomeAPI.NETHER_BIOME_PICKER.clearMutables();
+        biomePicker = new BiomePicker(biomeRegistry);
 
         this.possibleBiomes().forEach(biome -> {
             ResourceLocation key = biome.unwrapKey().orElseThrow().location();
 
             if (!BiomeAPI.hasBiome(key)) {
                 BCLBiome bclBiome = new BCLBiome(key, biome.value());
-                BiomeAPI.NETHER_BIOME_PICKER.addBiomeMutable(bclBiome);
+                biomePicker.addBiome(bclBiome);
             } else {
                 BCLBiome bclBiome = BiomeAPI.getBiome(key);
                 if (bclBiome != BiomeAPI.EMPTY_BIOME) {
                     if (bclBiome.getParentBiome() == null) {
-                        if (!BiomeAPI.NETHER_BIOME_PICKER.containsImmutable(key)) {
-                            BiomeAPI.NETHER_BIOME_PICKER.addBiomeMutable(bclBiome);
-                        }
+                        biomePicker.addBiome(bclBiome);
                     }
                 }
             }
         });
-
-        BiomeAPI.NETHER_BIOME_PICKER.getBiomes().forEach(biome -> biome.updateActualBiomes(biomeRegistry));
-        BiomeAPI.NETHER_BIOME_PICKER.rebuild();
 	}
 
     public BCLibNetherBiomeSource(Registry<Biome> biomeRegistry, long seed) {
@@ -103,31 +101,19 @@ public class BCLibNetherBiomeSource extends BCLBiomeSource {
     private static List<Holder<Biome>> getBiomes(Registry<Biome> biomeRegistry) {
         List<String> include = Configs.BIOMES_CONFIG.getEntry("force_include", "nether_biomes", StringArrayEntry.class)
                                                     .getValue();
+        List<String> exclude = Configs.BIOMES_CONFIG.getEntry("force_exclude", "nether_biomes", StringArrayEntry.class)
+                                                    .getValue();
 
         return biomeRegistry.stream()
                             .filter(biome -> biomeRegistry.getResourceKey(biome).isPresent())
                             .map(biome -> biomeRegistry.getOrCreateHolder(biomeRegistry.getResourceKey(biome).get()))
                             .filter(biome -> {
-                                ResourceLocation key = biome.unwrapKey().orElseThrow().location();
+                                ResourceLocation location = biome.unwrapKey().orElseThrow().location();
+                                final String strLocation = location.toString();
+                                if (exclude.contains(strLocation)) return false;
+                                if (include.contains(strLocation)) return true;
 
-                                if (include.contains(key.toString())) {
-                                    return true;
-                                }
-
-                                if (GeneratorOptions.addNetherBiomesByTag() && biome.is(BiomeTags.IS_NETHER)) {
-                                    return true;
-                                }
-
-                                BCLBiome bclBiome = BiomeAPI.getBiome(key);
-                                if (bclBiome != BiomeAPI.EMPTY_BIOME) {
-                                    if (bclBiome.getParentBiome() != null) {
-                                        bclBiome = bclBiome.getParentBiome();
-                                    }
-                                    key = bclBiome.getID();
-                                }
-                                final boolean isNetherBiome = biome.is(BiomeTags.IS_NETHER);
-                                return BiomeAPI.NETHER_BIOME_PICKER.containsImmutable(key) || (isNetherBiome && BiomeAPI.isDatapackBiome(
-                                        key));
+                                return NetherBiomeData.canGenerateInNether(biome.unwrapKey().get()) || biome.is(BiomeTags.IS_NETHER);
                             }).toList();
     }
 
@@ -141,8 +127,8 @@ public class BCLibNetherBiomeSource extends BCLBiomeSource {
 
     @Override
     public void setSeed(long seed) {
-
         super.setSeed(seed);
+        biomePicker.rebuild();
         initMap(seed);
     }
 
@@ -158,8 +144,8 @@ public class BCLibNetherBiomeSource extends BCLBiomeSource {
         if ((biomeX & 63) == 0 && (biomeZ & 63) == 0) {
             biomeMap.clearCache();
         }
-        BCLBiome bb = biomeMap.getBiome(biomeX << 2, biomeY << 2, biomeZ << 2);
-        return bb.getActualBiome();
+        BiomePicker.Entry bb = biomeMap.getBiome(biomeX << 2, biomeY << 2, biomeZ << 2);
+        return bb.actual;
     }
 
     @Override
@@ -176,7 +162,7 @@ public class BCLibNetherBiomeSource extends BCLBiomeSource {
             this.biomeMap = new MapStack(
                     seed,
                     GeneratorOptions.getBiomeSizeNether(),
-                    BiomeAPI.NETHER_BIOME_PICKER,
+                    biomePicker,
                     GeneratorOptions.getVerticalBiomeSizeNether(),
                     worldHeight,
                     mapConstructor
@@ -184,12 +170,12 @@ public class BCLibNetherBiomeSource extends BCLBiomeSource {
         } else {
             this.biomeMap = mapConstructor.apply(seed,
                                                  GeneratorOptions.getBiomeSizeNether(),
-                                                 BiomeAPI.NETHER_BIOME_PICKER);
+                                                 biomePicker);
         }
     }
 
     @Override
     public String toString() {
-        return "BCLib - Nether BiomeSource";
+        return "BCLib - Nether BiomeSource ("+Integer.toHexString(hashCode())+")";
     }
 }

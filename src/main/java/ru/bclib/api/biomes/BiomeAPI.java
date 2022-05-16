@@ -18,6 +18,7 @@ import net.minecraft.data.BuiltinRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.tags.BiomeTags;
 import net.minecraft.util.random.WeightedRandomList;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
@@ -49,6 +50,7 @@ import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.jetbrains.annotations.Nullable;
 import ru.bclib.BCLib;
+import ru.bclib.api.tag.TagAPI;
 import ru.bclib.entity.BCLEntityWrapper;
 import ru.bclib.interfaces.BiomeSourceAccessor;
 import ru.bclib.interfaces.NoiseGeneratorSettingsProvider;
@@ -86,13 +88,9 @@ public class BiomeAPI {
 	 */
 	public static final BCLBiome EMPTY_BIOME = new BCLBiome(Biomes.THE_VOID.location());
 	
-	public static final BiomePicker NETHER_BIOME_PICKER = new BiomePicker();
-	public static final BiomePicker END_LAND_BIOME_PICKER = new BiomePicker();
-	public static final BiomePicker END_VOID_BIOME_PICKER = new BiomePicker();
-	
 	private static final Map<ResourceLocation, BCLBiome> ID_MAP = Maps.newHashMap();
 	private static final Map<Biome, BCLBiome> CLIENT = Maps.newHashMap();
-	private static Registry<Biome> biomeRegistry;
+	public static Registry<Biome> biomeRegistry;
 	
 	private static final Map<Holder<PlacedFeature>, Integer> FEATURE_ORDER = Maps.newHashMap();
 	private static final MutableInt FEATURE_ORDER_ID = new MutableInt(0);
@@ -169,6 +167,7 @@ public class BiomeAPI {
 			Registry.register(BuiltinRegistries.BIOME, loc, biome);
 		}
 		ID_MAP.put(bclbiome.getID(), bclbiome);
+		bclbiome.afterRegistration();
 		return bclbiome;
 	}
 	
@@ -186,16 +185,16 @@ public class BiomeAPI {
 	/**
 	 * Register {@link BCLBiome} instance and its {@link Biome} if necessary.
 	 * After that biome will be added to BCLib Nether Biome Generator and into Fabric Biome API.
-	 * @param biome {@link BCLBiome}
+	 * @param bclBiome {@link BCLBiome}
 	 * @return {@link BCLBiome}
 	 */
-	public static BCLBiome registerNetherBiome(BCLBiome biome) {
-		registerBiome(biome);
-		NETHER_BIOME_PICKER.addBiome(biome);
-		ResourceKey<Biome> key = BiomeAPI.getBiomeKeyOrThrow(biome.getBiomeHolder());
+	public static BCLBiome registerNetherBiome(BCLBiome bclBiome) {
+		registerBiome(bclBiome);
 
-		biome.forEachClimateParameter(p -> NetherBiomeData.addNetherBiome(key, p));
-		return biome;
+		ResourceKey<Biome> key = BiomeAPI.getBiomeKeyOrThrow(bclBiome.getBiomeHolder());
+		bclBiome.forEachClimateParameter(p -> NetherBiomeData.addNetherBiome(key, p));
+		TagAPI.addBiomeTag(BiomeTags.IS_NETHER, bclBiome.getBiome());
+		return bclBiome;
 	}
 	
 	/**
@@ -206,9 +205,8 @@ public class BiomeAPI {
 	 */
 	public static BCLBiome registerNetherBiome(Biome biome) {
 		BCLBiome bclBiome = new BCLBiome(biome, null);
-		
-		NETHER_BIOME_PICKER.addBiome(bclBiome);
 		registerBiome(bclBiome);
+		TagAPI.addBiomeTag(BiomeTags.IS_NETHER, bclBiome.getBiome());
 		return bclBiome;
 	}
 	
@@ -221,7 +219,6 @@ public class BiomeAPI {
 	public static BCLBiome registerEndLandBiome(BCLBiome biome) {
 		registerBiome(biome);
 		
-		END_LAND_BIOME_PICKER.addBiome(biome);
 		float weight = biome.getGenChance();
 		ResourceKey<Biome> key = BiomeAPI.getBiomeKey(biome.getBiome());
 		TheEndBiomeData.addEndBiomeReplacement(Biomes.END_HIGHLANDS, key, weight);
@@ -238,7 +235,6 @@ public class BiomeAPI {
 	public static BCLBiome registerEndLandBiome(Holder<Biome> biome) {
 		BCLBiome bclBiome = new BCLBiome(biome.value(), null);
 		
-		END_LAND_BIOME_PICKER.addBiome(bclBiome);
 		registerBiome(bclBiome);
 		return bclBiome;
 	}
@@ -253,7 +249,6 @@ public class BiomeAPI {
 	public static BCLBiome registerEndLandBiome(Holder<Biome> biome, float genChance) {
 		BCLBiome bclBiome = new BCLBiome(biome.value(), VanillaBiomeSettings.createVanilla().setGenChance(genChance).build());
 		
-		END_LAND_BIOME_PICKER.addBiome(bclBiome);
 		registerBiome(bclBiome);
 		return bclBiome;
 	}
@@ -267,7 +262,6 @@ public class BiomeAPI {
 	public static BCLBiome registerEndVoidBiome(BCLBiome biome) {
 		registerBiome(biome);
 		
-		END_VOID_BIOME_PICKER.addBiome(biome);
 		float weight = biome.getGenChance();
 		ResourceKey<Biome> key = BiomeAPI.getBiomeKeyOrThrow(biome.getBiomeHolder());
 		TheEndBiomeData.addEndBiomeReplacement(Biomes.SMALL_END_ISLANDS, key, weight);
@@ -283,7 +277,6 @@ public class BiomeAPI {
 	public static BCLBiome registerEndVoidBiome(Holder<Biome> biome) {
 		BCLBiome bclBiome = new BCLBiome(biome.value(), null);
 		
-		END_VOID_BIOME_PICKER.addBiome(bclBiome);
 		registerBiome(bclBiome);
 		return bclBiome;
 	}
@@ -298,7 +291,6 @@ public class BiomeAPI {
 	public static BCLBiome registerEndVoidBiome(Holder<Biome> biome, float genChance) {
 		BCLBiome bclBiome = new BCLBiome(biome.value(), VanillaBiomeSettings.createVanilla().setGenChance(genChance).build());
 		
-		END_VOID_BIOME_PICKER.addBiome(bclBiome);
 		registerBiome(bclBiome);
 		return bclBiome;
 	}
@@ -449,18 +441,6 @@ public class BiomeAPI {
 	
 	public static boolean isDatapackBiome(ResourceLocation biomeID) {
 		return getFromRegistry(biomeID) == null;
-	}
-	
-	public static boolean isNetherBiome(ResourceLocation biomeID) {
-		return pickerHasBiome(NETHER_BIOME_PICKER, biomeID);
-	}
-	
-	public static boolean isEndBiome(ResourceLocation biomeID) {
-		return pickerHasBiome(END_LAND_BIOME_PICKER, biomeID) || pickerHasBiome(END_VOID_BIOME_PICKER, biomeID);
-	}
-	
-	private static boolean pickerHasBiome(BiomePicker picker, ResourceLocation key) {
-		return picker.getBiomes().stream().filter(biome -> biome.getID().equals(key)).findFirst().isPresent();
 	}
 	
 	/**

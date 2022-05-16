@@ -14,7 +14,6 @@ public class GeneratorOptions {
 	private static Function<Point, Boolean> endLandFunction;
 	private static boolean customNetherBiomeSource = true;
 	private static boolean customEndBiomeSource = true;
-	private static boolean addNetherBiomesByTag = true;
 	private static boolean addEndBiomesByTag = true;
 	private static boolean useOldBiomeGenerator = false;
 	private static boolean verticalBiomes = true;
@@ -29,7 +28,6 @@ public class GeneratorOptions {
 		biomeSizeEndVoid = Configs.GENERATOR_CONFIG.getInt("end.biomeMap", "biomeSizeVoid", 256);
 		customNetherBiomeSource = Configs.GENERATOR_CONFIG.getBoolean("options", "customNetherBiomeSource", true);
 		customEndBiomeSource = Configs.GENERATOR_CONFIG.getBoolean("options", "customEndBiomeSource", true);
-		addNetherBiomesByTag = Configs.GENERATOR_CONFIG.getBoolean("options", "addNetherBiomesByTag", true);
 		addEndBiomesByTag = Configs.GENERATOR_CONFIG.getBoolean("options", "addEndBiomesByTag", true);
 		useOldBiomeGenerator = Configs.GENERATOR_CONFIG.useOldGenerator();
 		verticalBiomes = Configs.GENERATOR_CONFIG.getBoolean("options", "verticalBiomesInTallNether", true);
@@ -87,10 +85,6 @@ public class GeneratorOptions {
 	
 	public static boolean customEndBiomeSource() {
 		return customEndBiomeSource;
-	}
-	
-	public static boolean addNetherBiomesByTag() {
-		return addNetherBiomesByTag;
 	}
 	
 	public static boolean addEndBiomesByTag() {

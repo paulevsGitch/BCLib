@@ -19,7 +19,7 @@ public abstract class BCLBiomeSource extends BiomeSource {
 
 	protected BCLBiomeSource(Registry<Biome> biomeRegistry, List<Holder<Biome>> list) {
 		super(preInit(biomeRegistry, list));
-		System.out.println(this + " with Registry: "+biomeRegistry);
+		System.out.println(this + " with Registry: "+ biomeRegistry.getClass().getName() + "@" + Integer.toHexString(biomeRegistry.hashCode()));
 		this.biomeRegistry = biomeRegistry;
 		
 		BiomeAPI.initRegistry(biomeRegistry);

@@ -2,74 +2,106 @@ package ru.bclib.world.generator;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+
+import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import ru.bclib.util.WeighTree;
 import ru.bclib.util.WeightedList;
 import ru.bclib.world.biomes.BCLBiome;
 
-import java.util.List;
-import java.util.Random;import net.minecraft.util.RandomSource;
+import java.util.*;
+
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.WorldgenRandom;
 
-import java.util.Set;
-
 public class BiomePicker {
-	private final Set<ResourceLocation> immutableIDs = Sets.newHashSet();
-	private final List<BCLBiome> biomes = Lists.newArrayList();
-	private WeighTree<BCLBiome> tree;
-	private int biomeCount = 0;
-	
+	public final Map<BCLBiome, Entry> all = new HashMap<>();
+	public class Entry {
+		public final BCLBiome bclBiome;
+		public final Holder<Biome> actual;
+		public final ResourceKey<Biome> key;
+
+		private final WeightedList<Entry> subbiomes = new WeightedList<>();
+		private final Entry edge;
+		private final Entry parent;
+
+		private Entry(BCLBiome bclBiome){
+			all.put(bclBiome, this);
+			this.bclBiome = bclBiome;
+
+			this.key = biomeRegistry.getResourceKey(biomeRegistry.get(bclBiome.getID())).orElseThrow();
+			this.actual = biomeRegistry.getOrCreateHolder(key);
+
+			bclBiome.forEachSubBiome((b, w)->{
+				subbiomes.add(create(b), w);
+			});
+
+			edge = bclBiome.getEdge()!=null?create(bclBiome.getEdge()):null;
+			parent = bclBiome.getParentBiome()!=null?create(bclBiome.getParentBiome()):null;
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if (this == o) return true;
+			if (o == null || getClass() != o.getClass()) return false;
+			Entry entry = (Entry) o;
+			return bclBiome.equals(entry.bclBiome);
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hash(bclBiome);
+		}
+
+		public Entry getSubBiome(WorldgenRandom random) {
+			return subbiomes.get(random);
+		}
+
+		public Entry getEdge(){
+			return edge;
+		}
+
+		public Entry getParentBiome(){
+			return parent;
+		}
+
+		public boolean isSame(Entry e){
+			return bclBiome.isSame(e.bclBiome);
+		}
+	}
+
+	private Entry create(BCLBiome bclBiome){
+		Entry e = all.get(bclBiome);
+		if (e!=null) return e;
+		return new Entry(bclBiome);
+	}
+
+	private final List<Entry> biomes = Lists.newArrayList();
+	private final Registry<Biome> biomeRegistry;
+	private WeighTree<Entry> tree;
+
+	public BiomePicker(Registry<Biome> biomeRegistry){
+		this.biomeRegistry = biomeRegistry;
+	}
+
 	public void addBiome(BCLBiome biome) {
-		if (immutableIDs.contains(biome.getID())) {
-			return;
-		}
-		immutableIDs.add(biome.getID());
-		biomes.add(biome);
-		biomeCount++;
+		biomes.add(create(biome));
 	}
 	
-	public void addBiomeMutable(BCLBiome biome) {
-		if (immutableIDs.contains(biome.getID())) {
-			return;
-		}
-		biomes.add(biome);
-	}
-	
-	public void clearMutables() {
-		for (int i = biomes.size() - 1; i >= biomeCount; i--) {
-			biomes.remove(i);
-		}
-	}
-	
-	public BCLBiome getBiome(WorldgenRandom random) {
+	public Entry getBiome(WorldgenRandom random) {
 		return biomes.isEmpty() ? null : tree.get(random);
 	}
-	
-	public List<BCLBiome> getBiomes() {
-		return biomes;
-	}
-	
-	public boolean containsImmutable(ResourceLocation id) {
-		return immutableIDs.contains(id);
-	}
-	
-	public void removeMutableBiome(ResourceLocation id) {
-		for (int i = biomeCount; i < biomes.size(); i++) {
-			BCLBiome biome = biomes.get(i);
-			if (biome.getID().equals(id)) {
-				biomes.remove(i);
-				break;
-			}
-		}
-	}
-	
+
 	public void rebuild() {
 		if (biomes.isEmpty()) {
 			return;
 		}
-		WeightedList<BCLBiome> list = new WeightedList<>();
+		WeightedList<Entry> list = new WeightedList<>();
 		biomes.forEach(biome -> {
-			list.add(biome, biome.getGenChance());
+			list.add(biome, biome.bclBiome.getGenChance());
 		});
 		tree = new WeighTree<>(list);
 	}
