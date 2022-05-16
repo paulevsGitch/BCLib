@@ -12,6 +12,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -20,16 +21,18 @@ import ru.bclib.api.biomes.BiomeAPI;
 import ru.bclib.util.BlocksHelper;
 import ru.bclib.util.MHelper;
 
+import java.util.function.BiConsumer;
+
 @Mixin(BoneMealItem.class)
 public class BoneMealItemMixin {
-	private static final MutableBlockPos bclib_BLOCK_POS = new MutableBlockPos();
+	@Unique
+	private static final MutableBlockPos BCLIB_BLOCK_POS = new MutableBlockPos();
 	
 	@Inject(method = "useOn", at = @At("HEAD"), cancellable = true)
 	private void bclib_onUse(UseOnContext context, CallbackInfoReturnable<InteractionResult> info) {
 		Level world = context.getLevel();
 		BlockPos blockPos = context.getClickedPos();
-		if (!world.isClientSide) {
-			BlockPos offseted = blockPos.relative(context.getClickedFace());
+		if (!world.isClientSide()) {
 			if (BonemealAPI.isTerrain(world.getBlockState(blockPos).getBlock())) {
 				boolean consume = false;
 				if (BonemealAPI.isSpreadableTerrain(world.getBlockState(blockPos).getBlock())) {
@@ -62,22 +65,23 @@ public class BoneMealItemMixin {
 		}
 	}
 	
-	private boolean bclib_growLandGrass(Level world, BlockPos pos) {
+	@Unique
+	private boolean bclib_growLandGrass(Level level, BlockPos pos) {
 		int y1 = pos.getY() + 3;
 		int y2 = pos.getY() - 3;
 		boolean result = false;
-		for (int i = 0; i < 64; i++) {
-			int x = (int) (pos.getX() + world.random.nextGaussian() * 2);
-			int z = (int) (pos.getZ() + world.random.nextGaussian() * 2);
-			bclib_BLOCK_POS.setX(x);
-			bclib_BLOCK_POS.setZ(z);
+		for (byte i = 0; i < 64; i++) {
+			int x = (int) (pos.getX() + level.random.nextGaussian() * 2);
+			int z = (int) (pos.getZ() + level.random.nextGaussian() * 2);
+			BCLIB_BLOCK_POS.setX(x);
+			BCLIB_BLOCK_POS.setZ(z);
 			for (int y = y1; y >= y2; y--) {
-				bclib_BLOCK_POS.setY(y);
-				BlockPos down = bclib_BLOCK_POS.below();
-				if (world.isEmptyBlock(bclib_BLOCK_POS) && !world.isEmptyBlock(down)) {
-					BlockState grass = bclib_getLandGrassState(world, down);
+				BCLIB_BLOCK_POS.setY(y);
+				BlockPos down = BCLIB_BLOCK_POS.below();
+				if (level.isEmptyBlock(BCLIB_BLOCK_POS) && !level.isEmptyBlock(down)) {
+					BiConsumer<Level, BlockPos> grass = bclib_getLandGrassState(level, down);
 					if (grass != null) {
-						BlocksHelper.setWithoutUpdate(world, bclib_BLOCK_POS, grass);
+						grass.accept(level, BCLIB_BLOCK_POS);
 						result = true;
 					}
 					break;
@@ -87,23 +91,24 @@ public class BoneMealItemMixin {
 		return result;
 	}
 	
-	private boolean bclib_growWaterGrass(Level world, BlockPos pos) {
+	@Unique
+	private boolean bclib_growWaterGrass(Level level, BlockPos pos) {
 		int y1 = pos.getY() + 3;
 		int y2 = pos.getY() - 3;
 		boolean result = false;
-		for (int i = 0; i < 64; i++) {
-			int x = (int) (pos.getX() + world.random.nextGaussian() * 2);
-			int z = (int) (pos.getZ() + world.random.nextGaussian() * 2);
-			bclib_BLOCK_POS.setX(x);
-			bclib_BLOCK_POS.setZ(z);
+		for (byte i = 0; i < 64; i++) {
+			int x = (int) (pos.getX() + level.random.nextGaussian() * 2);
+			int z = (int) (pos.getZ() + level.random.nextGaussian() * 2);
+			BCLIB_BLOCK_POS.setX(x);
+			BCLIB_BLOCK_POS.setZ(z);
 			for (int y = y1; y >= y2; y--) {
-				bclib_BLOCK_POS.setY(y);
-				BlockPos down = bclib_BLOCK_POS.below();
-				if (BlocksHelper.isFluid(world.getBlockState(bclib_BLOCK_POS)) && !BlocksHelper.isFluid(world.getBlockState(
+				BCLIB_BLOCK_POS.setY(y);
+				BlockPos down = BCLIB_BLOCK_POS.below();
+				if (BlocksHelper.isFluid(level.getBlockState(BCLIB_BLOCK_POS)) && !BlocksHelper.isFluid(level.getBlockState(
 					down))) {
-					BlockState grass = bclib_getWaterGrassState(world, down);
+					BiConsumer<Level, BlockPos> grass = bclib_getWaterGrassState(level, down);
 					if (grass != null) {
-						BlocksHelper.setWithoutUpdate(world, bclib_BLOCK_POS, grass);
+						grass.accept(level, BCLIB_BLOCK_POS);
 						result = true;
 					}
 					break;
@@ -113,26 +118,25 @@ public class BoneMealItemMixin {
 		return result;
 	}
 	
-	private BlockState bclib_getLandGrassState(Level world, BlockPos pos) {
-		BlockState state = world.getBlockState(pos);
-		Block block = state.getBlock();
-		block = BonemealAPI.getLandGrass(BiomeAPI.getBiomeID(world.getBiome(pos)), block, world.getRandom());
-		return block == null ? null : block.defaultBlockState();
+	@Unique
+	private BiConsumer<Level, BlockPos> bclib_getLandGrassState(Level level, BlockPos pos) {
+		BlockState state = level.getBlockState(pos);
+		return BonemealAPI.getLandGrass(BiomeAPI.getBiomeID(level.getBiome(pos)), state.getBlock(), level.getRandom());
 	}
 	
-	private BlockState bclib_getWaterGrassState(Level world, BlockPos pos) {
-		BlockState state = world.getBlockState(pos);
-		Block block = state.getBlock();
-		block = BonemealAPI.getWaterGrass(BiomeAPI.getBiomeID(world.getBiome(pos)), block, world.getRandom());
-		return block == null ? null : block.defaultBlockState();
+	@Unique
+	private BiConsumer<Level, BlockPos> bclib_getWaterGrassState(Level level, BlockPos pos) {
+		BlockState state = level.getBlockState(pos);
+		return BonemealAPI.getWaterGrass(BiomeAPI.getBiomeID(level.getBiome(pos)), state.getBlock(), level.getRandom());
 	}
 	
-	private BlockState bclib_getSpreadable(Level world, BlockPos pos) {
-		Vec3i[] offsets = MHelper.getOffsets(world.getRandom());
-		BlockState center = world.getBlockState(pos);
+	@Unique
+	private BlockState bclib_getSpreadable(Level level, BlockPos pos) {
+		Vec3i[] offsets = MHelper.getOffsets(level.getRandom());
+		BlockState center = level.getBlockState(pos);
 		for (Vec3i dir : offsets) {
 			BlockPos p = pos.offset(dir);
-			BlockState state = world.getBlockState(p);
+			BlockState state = level.getBlockState(p);
 			Block terrain = BonemealAPI.getSpreadable(state.getBlock());
 			if (center.is(terrain)) {
 				if (bclib_haveSameProperties(state, center)) {
@@ -146,6 +150,7 @@ public class BoneMealItemMixin {
 		return null;
 	}
 	
+	@Unique
 	private boolean bclib_haveSameProperties(BlockState state1, BlockState state2) {
 		Property<?>[] properties1 = state1.getProperties().toArray(new Property[0]);
 		Property<?>[] properties2 = state2.getProperties().toArray(new Property[0]);

@@ -22,6 +22,7 @@ import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import ru.bclib.interfaces.LootProvider;
 import ru.bclib.util.BlocksHelper;
 import ru.bclib.util.MHelper;
 
@@ -29,7 +30,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-public class BaseCropBlock extends BasePlantBlock {
+public class BaseCropBlock extends BasePlantBlock implements LootProvider {
 	public static final IntegerProperty AGE = IntegerProperty.create("age", 0, 3);
 	private static final VoxelShape SHAPE = Block.box(2, 0, 2, 14, 14, 14);
 	
@@ -69,7 +70,7 @@ public class BaseCropBlock extends BasePlantBlock {
 	}
 	
 	@Override
-	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
+	public List<ItemStack> getLoot(BlockState state, LootContext.Builder builder) {
 		if (state.getValue(AGE) < 3) {
 			return Collections.singletonList(new ItemStack(this));
 		}

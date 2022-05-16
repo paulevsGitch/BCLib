@@ -43,12 +43,13 @@ public class BaseGlassBlock extends BaseBlockNotFull implements AddMineablePicka
     }
 
     @Environment(EnvType.CLIENT)
+    @SuppressWarnings("deprecation")
     public boolean skipRendering(BlockState state, BlockState neighbor, Direction facing) {
         return neighbor.getBlock() == this ? true : super.skipRendering(state, neighbor, facing);
     }
 
     @Override
-    public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
+    public List<ItemStack> getLoot(BlockState state, LootContext.Builder builder) {
         ItemStack tool = builder.getParameter(LootContextParams.TOOL);
         if (tool != null && EnchantmentHelper.getItemEnchantmentLevel(Enchantments.SILK_TOUCH, tool) > 0) {
             return Collections.singletonList(new ItemStack(this));

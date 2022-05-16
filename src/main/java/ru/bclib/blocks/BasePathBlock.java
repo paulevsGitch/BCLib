@@ -24,13 +24,14 @@ import org.jetbrains.annotations.Nullable;
 import ru.bclib.client.models.BasePatterns;
 import ru.bclib.client.models.ModelsHelper;
 import ru.bclib.client.models.PatternsHelper;
+import ru.bclib.interfaces.LootProvider;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class BasePathBlock extends BaseBlockNotFull {
+public class BasePathBlock extends BaseBlockNotFull implements LootProvider {
 	private static final VoxelShape SHAPE = Block.box(0, 0, 0, 16, 15, 16);
 	
 	private Block baseBlock;
@@ -46,7 +47,7 @@ public class BasePathBlock extends BaseBlockNotFull {
 	}
 	
 	@Override
-	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
+	public List<ItemStack> getLoot(BlockState state, LootContext.Builder builder) {
 		ItemStack tool = builder.getParameter(LootContextParams.TOOL);
 		if (tool != null && EnchantmentHelper.getItemEnchantmentLevel(Enchantments.SILK_TOUCH, tool) > 0) {
 			return Collections.singletonList(new ItemStack(this));

@@ -27,6 +27,7 @@ import ru.bclib.client.models.ModelsHelper;
 import ru.bclib.client.models.PatternsHelper;
 import ru.bclib.client.render.BCLRenderLayer;
 import ru.bclib.interfaces.BlockModelProvider;
+import ru.bclib.interfaces.LootProvider;
 import ru.bclib.interfaces.RenderLayerProvider;
 import ru.bclib.interfaces.TagProvider;
 
@@ -35,7 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class BaseDoorBlock extends DoorBlock implements RenderLayerProvider, BlockModelProvider, TagProvider {
+public class BaseDoorBlock extends DoorBlock implements RenderLayerProvider, BlockModelProvider, TagProvider, LootProvider {
 	public BaseDoorBlock(Block source) {
 		this(FabricBlockSettings.copyOf(source).strength(3F, 3F).noOcclusion());
 	}
@@ -45,10 +46,8 @@ public class BaseDoorBlock extends DoorBlock implements RenderLayerProvider, Blo
 	}
 	
 	@Override
-	@SuppressWarnings("deprecation")
-	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
-		if (state.getValue(HALF) == DoubleBlockHalf.LOWER)
-			return Collections.singletonList(new ItemStack(this.asItem()));
+	public List<ItemStack> getLoot(BlockState state, LootContext.Builder builder) {
+		if (state.getValue(HALF) == DoubleBlockHalf.LOWER) return Collections.singletonList(new ItemStack(this.asItem()));
 		else return Collections.emptyList();
 	}
 	

@@ -19,6 +19,7 @@ import net.minecraft.world.level.material.MaterialColor;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import ru.bclib.interfaces.BlockModelProvider;
+import ru.bclib.interfaces.LootProvider;
 import ru.bclib.util.LootUtil;
 import ru.bclib.util.MHelper;
 
@@ -26,7 +27,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
 
-public class BaseOreBlock extends OreBlock implements BlockModelProvider {
+public class BaseOreBlock extends OreBlock implements BlockModelProvider, LootProvider {
 	private final Supplier<Item> dropItem;
 	private final int minCount;
 	private final int maxCount;
@@ -61,13 +62,12 @@ public class BaseOreBlock extends OreBlock implements BlockModelProvider {
 	}
 	
 	@Override
-	@SuppressWarnings("deprecation")
-	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
+	public List<ItemStack> getLoot(BlockState state, LootContext.Builder builder) {
 		return LootUtil
-				.getDrops(this, state, builder)
-				.orElseGet(
-						()->BaseOreBlock.getDroppedItems(this, dropItem.get(), maxCount, minCount, miningLevel, state, builder)
-				);
+			.getDrops(this, state, builder)
+			.orElseGet(
+				()->BaseOreBlock.getDroppedItems(this, dropItem.get(), maxCount, minCount, miningLevel, state, builder)
+			);
 	}
 	
 	public static List<ItemStack> getDroppedItems(ItemLike block, Item dropItem, int maxCount, int minCount, int miningLevel, BlockState state, LootContext.Builder builder) {

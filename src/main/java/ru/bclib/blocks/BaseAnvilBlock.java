@@ -28,6 +28,7 @@ import ru.bclib.client.models.ModelsHelper;
 import ru.bclib.client.models.PatternsHelper;
 import ru.bclib.interfaces.BlockModelProvider;
 import ru.bclib.interfaces.CustomItemProvider;
+import ru.bclib.interfaces.LootProvider;
 import ru.bclib.items.BaseAnvilItem;
 
 import java.util.Collections;
@@ -36,7 +37,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 
-public abstract class BaseAnvilBlock extends AnvilBlock implements BlockModelProvider, CustomItemProvider {
+public abstract class BaseAnvilBlock extends AnvilBlock implements BlockModelProvider, CustomItemProvider, LootProvider {
 	public static final IntegerProperty DESTRUCTION = BlockProperties.DESTRUCTION;
 	public IntegerProperty durability;
 	
@@ -96,8 +97,7 @@ public abstract class BaseAnvilBlock extends AnvilBlock implements BlockModelPro
 	}
 	
 	@Override
-	@SuppressWarnings("deprecation")
-	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
+	public List<ItemStack> getLoot(BlockState state, LootContext.Builder builder) {
 		int destruction = state.getValue(DESTRUCTION);
 		int durability = state.getValue(getDurabilityProp());
 		int value = destruction * getMaxDurability() + durability;

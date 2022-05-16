@@ -21,6 +21,7 @@ import ru.bclib.api.tag.NamedItemTags;
 import ru.bclib.api.tag.TagAPI.TagLocation;
 import ru.bclib.client.render.BCLRenderLayer;
 import ru.bclib.interfaces.BlockModelProvider;
+import ru.bclib.interfaces.LootProvider;
 import ru.bclib.interfaces.RenderLayerProvider;
 import ru.bclib.interfaces.TagProvider;
 import ru.bclib.interfaces.tools.AddMineableHoe;
@@ -32,7 +33,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class BaseLeavesBlock extends LeavesBlock implements BlockModelProvider, RenderLayerProvider, TagProvider, AddMineableShears, AddMineableHoe {
+public class BaseLeavesBlock extends LeavesBlock implements BlockModelProvider, RenderLayerProvider, TagProvider, AddMineableShears, AddMineableHoe, LootProvider {
 	protected final Block sapling;
 
 	private static FabricBlockSettings makeLeaves(MaterialColor color) {
@@ -71,8 +72,7 @@ public class BaseLeavesBlock extends LeavesBlock implements BlockModelProvider, 
 	}
 	
 	@Override
-	@SuppressWarnings("deprecation")
-	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
+	public List<ItemStack> getLoot(BlockState state, LootContext.Builder builder) {
 		return BaseLeavesBlock.getLeaveDrops(this, this.sapling, builder, 16, 16);
 	}
 	
