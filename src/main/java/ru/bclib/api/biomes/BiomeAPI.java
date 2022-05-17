@@ -195,10 +195,10 @@ public class BiomeAPI {
 		ID_MAP.put(bclbiome.getID(), bclbiome);
 		Dimension.DIMENSION_MAP.put(bclbiome.getID(), dim);
 
-		if (dim.is(Dimension.NETHER)) {
+		if (dim!=null && dim.is(Dimension.NETHER)) {
 			TagAPI.addBiomeTag(BiomeTags.IS_NETHER, bclbiome.getBiome());
 			TagAPI.addBiomeTag(CommonBiomeTags.IN_NETHER, bclbiome.getBiome());
-		} else if (dim.is(Dimension.END)) {
+		} else if (dim!=null && dim.is(Dimension.END)) {
 			TagAPI.addBiomeTag(BiomeTags.IS_END, bclbiome.getBiome());
 		}
 
