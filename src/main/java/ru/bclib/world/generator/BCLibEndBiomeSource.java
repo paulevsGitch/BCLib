@@ -126,8 +126,7 @@ public class BCLibEndBiomeSource extends BCLBiomeSource {
                                 }
 
                                 final boolean isEndBiome = biome.is(BiomeTags.IS_END)  ||
-                                        BiomeAPI.wasRegisteredAsEndVoidBiome(key) ||
-                                        BiomeAPI.wasRegisteredAsEndLandBiome(key);
+                                        BiomeAPI.wasRegisteredAsEndBiome(key);
                                 if (GeneratorOptions.addEndBiomesByTag() && isEndBiome) {
                                     return true;
                                 }
@@ -194,6 +193,8 @@ public class BCLibEndBiomeSource extends BCLBiomeSource {
 
     @Override
     public void setSeed(long seed) {
+        if (seed==currentSeed) return;
+
         super.setSeed(seed);
         initMap(seed);
     }

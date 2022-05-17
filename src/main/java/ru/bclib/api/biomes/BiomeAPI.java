@@ -81,7 +81,31 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class BiomeAPI {
-	enum Dimension {OVERWORLD, NETHER, END_LAND, END_VOID, UNDEFINED};
+	public static class Dimension {
+		public static final Dimension NONE = new Dimension();
+		public static final Dimension OVERWORLD = new Dimension();
+		public static final Dimension NETHER = new Dimension();
+		public static final Dimension END = new Dimension();
+		public static final Dimension END_LAND = new Dimension(END);
+		public static final Dimension END_VOID = new Dimension(END);
+
+		private static final Map<ResourceLocation, Dimension> DIMENSION_MAP = Maps.newHashMap();
+		public final Dimension parentOrNull;
+
+		public Dimension() {
+			this(null);
+		}
+
+		public Dimension(Dimension parentOrNull) {
+			this.parentOrNull = parentOrNull;
+		}
+
+		public boolean is(Dimension d){
+			if (d==this) return true;
+			if (parentOrNull!=null) return parentOrNull.is(d);
+			return false;
+		}
+	}
 	/**
 	 * Empty biome used as default value if requested biome doesn't exist or linked. Shouldn't be registered anywhere to prevent bugs.
 	 * Have {@code Biomes.THE_VOID} as the reference biome.
@@ -89,7 +113,6 @@ public class BiomeAPI {
 	public static final BCLBiome EMPTY_BIOME = new BCLBiome(Biomes.THE_VOID.location());
 	
 	private static final Map<ResourceLocation, BCLBiome> ID_MAP = Maps.newHashMap();
-	private static final Map<ResourceLocation, Dimension> DIMENSION_MAP = Maps.newHashMap();
 	private static final Map<Biome, BCLBiome> CLIENT = Maps.newHashMap();
 	public static Registry<Biome> biomeRegistry;
 	
@@ -170,13 +193,12 @@ public class BiomeAPI {
 			Registry.register(BuiltinRegistries.BIOME, loc, biome);
 		}
 		ID_MAP.put(bclbiome.getID(), bclbiome);
-		DIMENSION_MAP.put(bclbiome.getID(), dim);
+		Dimension.DIMENSION_MAP.put(bclbiome.getID(), dim);
 
-		if (dim==Dimension.NETHER) {
-
+		if (dim.is(Dimension.NETHER)) {
 			TagAPI.addBiomeTag(BiomeTags.IS_NETHER, bclbiome.getBiome());
 			TagAPI.addBiomeTag(CommonBiomeTags.IN_NETHER, bclbiome.getBiome());
-		} else if (dim==Dimension.END_LAND || dim==Dimension.END_VOID) {
+		} else if (dim.is(Dimension.END)) {
 			TagAPI.addBiomeTag(BiomeTags.IS_END, bclbiome.getBiome());
 		}
 
@@ -186,7 +208,7 @@ public class BiomeAPI {
 	}
 	
 	public static BCLBiome registerSubBiome(BCLBiome parent, BCLBiome subBiome) {
-		final Dimension dim = DIMENSION_MAP.getOrDefault(parent.getID(), Dimension.UNDEFINED);
+		final Dimension dim = Dimension.DIMENSION_MAP.getOrDefault(parent.getID(), Dimension.NONE);
 		registerBiome(subBiome, dim);
 		parent.addSubBiome(subBiome);
 
@@ -458,19 +480,24 @@ public class BiomeAPI {
 		return getFromRegistry(biomeID) == null;
 	}
 
+	public static boolean wasRegisteredAs(ResourceLocation biomeID, Dimension dim) {
+		if (!Dimension.DIMENSION_MAP.containsKey(biomeID)) return false;
+		return Dimension.DIMENSION_MAP.get(biomeID).is(dim);
+	}
 	public static boolean wasRegisteredAsNetherBiome(ResourceLocation biomeID) {
-		if (!DIMENSION_MAP.containsKey(biomeID)) return false;
-		return DIMENSION_MAP.get(biomeID)==Dimension.NETHER;
+		return wasRegisteredAs(biomeID, Dimension.NETHER);
+	}
+
+	public static boolean wasRegisteredAsEndBiome(ResourceLocation biomeID) {
+		return wasRegisteredAs(biomeID, Dimension.END);
 	}
 
 	public static boolean wasRegisteredAsEndLandBiome(ResourceLocation biomeID) {
-		if (!DIMENSION_MAP.containsKey(biomeID)) return false;
-		return DIMENSION_MAP.get(biomeID)==Dimension.END_LAND;
+		return wasRegisteredAs(biomeID, Dimension.END_LAND);
 	}
 
 	public static boolean wasRegisteredAsEndVoidBiome(ResourceLocation biomeID) {
-		if (!DIMENSION_MAP.containsKey(biomeID)) return false;
-		return DIMENSION_MAP.get(biomeID)==Dimension.END_VOID;
+		return wasRegisteredAs(biomeID, Dimension.END_VOID);
 	}
 	
 	/**
@@ -513,8 +540,8 @@ public class BiomeAPI {
 	public static void _runTagAdders(){
 		for (var mod:TAG_ADDERS.entrySet()) {
 			Stream<ResourceLocation> s = null;
-			if (mod.getKey()==Level.NETHER) s =  DIMENSION_MAP.entrySet().stream().filter(e ->e.getValue() == Dimension.NETHER).map(e -> e.getKey());
-			else if (mod.getKey()==Level.END) s =  DIMENSION_MAP.entrySet().stream().filter(e ->e.getValue() == Dimension.END_VOID || e.getValue()==Dimension.END_LAND).map(e -> e.getKey());
+			if (mod.getKey()==Level.NETHER) s =  Dimension.DIMENSION_MAP.entrySet().stream().filter(e ->e.getValue().is(Dimension.NETHER)).map(e -> e.getKey());
+			else if (mod.getKey()==Level.END) s =  Dimension.DIMENSION_MAP.entrySet().stream().filter(e ->e.getValue().is(Dimension.END)).map(e -> e.getKey());
 			if (s!=null) {
 				s.forEach(id -> {
 					BCLBiome b = BiomeAPI.getBiome(id);
@@ -565,26 +592,6 @@ public class BiomeAPI {
 
 		if (chunkGenerator instanceof NoiseGeneratorSettingsProvider gen)
 			noiseGeneratorSettings = gen.bclib_getNoiseGeneratorSettings();
-		/*final Registry<StructureSet> structureSetRegistry;
-		if (chunkGenerator instanceof ChunkGeneratorAccessor acc) {
-			structureSetRegistry = acc.bclib_getStructureSetsRegistry();
-		} else {
-			structureSetRegistry = null;
-		}
-
-
-		noiseGeneratorSettings = level
-				.getServer()
-				.getWorldData()
-				.worldGenSettings()
-				.dimensions()
-				.stream()
-				.map(dim->dim.generator())
-				.filter(gen-> structureSetRegistry!=null && (gen instanceof NoiseGeneratorSettingsProvider) && (gen instanceof ChunkGeneratorAccessor) && ((ChunkGeneratorAccessor)gen).bclib_getStructureSetsRegistry()==structureSetRegistry)
-				.map(gen->((NoiseGeneratorSettingsProvider)gen).bclib_getNoiseGeneratorSettings())
-				.findFirst()
-				.orElse(null);*/
-
 
 		// Datapacks (like Amplified Nether)will change the GeneratorSettings upon load, so we will
 		// only use the default Setting for Nether/End if we were unable to find a settings object

@@ -80,7 +80,7 @@ public class BiomePicker {
 	}
 
 	private final List<Entry> biomes = Lists.newArrayList();
-	private final Registry<Biome> biomeRegistry;
+	public final Registry<Biome> biomeRegistry;
 	private WeighTree<Entry> tree;
 
 	public BiomePicker(Registry<Biome> biomeRegistry){
