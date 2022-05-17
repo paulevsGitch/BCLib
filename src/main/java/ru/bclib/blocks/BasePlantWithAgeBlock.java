@@ -12,18 +12,26 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.material.Material;
 
-import java.util.Random;import net.minecraft.util.RandomSource;
+import java.util.Properties;
+import java.util.Random;
+import java.util.function.Function;
+
+import net.minecraft.util.RandomSource;
 
 public abstract class BasePlantWithAgeBlock extends BasePlantBlock {
 	public static final IntegerProperty AGE = BlockProperties.AGE;
 	
 	public BasePlantWithAgeBlock() {
+		this(p->p);
+	}
+
+	public BasePlantWithAgeBlock(Function<Properties, Properties> propMod) {
 		this(
-			FabricBlockSettings.of(Material.PLANT)
-				.sound(SoundType.GRASS)
-				.randomTicks()
-				.noCollission()
-		);
+				propMod.apply(FabricBlockSettings.of(Material.PLANT)
+								   .sound(SoundType.GRASS)
+								   .randomTicks()
+								   .noCollission())
+			);
 	}
 	
 	public BasePlantWithAgeBlock(Properties settings) {

@@ -34,7 +34,7 @@ public class DoubleBlockSurfaceNoiseCondition extends SurfaceNoiseCondition {
 		final int z = context.getBlockZ();
 		if (lastX==x && lastZ==z) return lastValue > threshold;
 
-		double value = NOISE.eval(x * 0.1, z * 0.1) + MHelper.randRange(-0.4, 0.4, MHelper.RANDOM);
+		double value = NOISE.eval(x * 0.1, z * 0.1) + MHelper.randRange(-0.4, 0.4, MHelper.RANDOM_SOURCE);
 
 		lastX=x;
 		lastZ=z;

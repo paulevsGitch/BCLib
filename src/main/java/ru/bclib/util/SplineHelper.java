@@ -55,7 +55,7 @@ public class SplineHelper {
 		return new Vector3f(x, y, z);
 	}
 	
-	public static void offsetParts(List<Vector3f> spline, Random random, float dx, float dy, float dz) {
+	public static void offsetParts(List<Vector3f> spline, RandomSource random, float dx, float dy, float dz) {
 		int count = spline.size();
 		for (int i = 1; i < count; i++) {
 			Vector3f pos = spline.get(i);

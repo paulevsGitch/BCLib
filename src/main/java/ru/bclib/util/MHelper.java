@@ -4,6 +4,7 @@ import com.mojang.math.Vector3f;
 import net.minecraft.core.Vec3i;
 
 import java.util.Random;import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.levelgen.LegacyRandomSource;
 
 public class MHelper {
 	private static final Vec3i[] RANDOM_OFFSETS = new Vec3i[3 * 3 * 3 - 1];
@@ -11,16 +12,17 @@ public class MHelper {
 	public static final float PHI = (float) (Math.PI * (3 - Math.sqrt(5)));
 	public static final float PI2 = (float) (Math.PI * 2);
 	public static final Random RANDOM = new Random();
+	public static final RandomSource RANDOM_SOURCE = new LegacyRandomSource(RANDOM.nextLong());
 	
-	public static int randRange(int min, int max, Random random) {
+	public static int randRange(int min, int max, RandomSource random) {
 		return min + random.nextInt(max - min + 1);
 	}
 	
-	public static double randRange(double min, double max, Random random) {
+	public static double randRange(double min, double max, RandomSource random) {
 		return min + random.nextDouble() * (max - min);
 	}
 	
-	public static float randRange(float min, float max, Random random) {
+	public static float randRange(float min, float max, RandomSource random) {
 		return min + random.nextFloat() * (max - min);
 	}
 	
@@ -195,7 +197,7 @@ public class MHelper {
 		return (float) Math.acos(dot / Math.sqrt(length1 * length2));
 	}
 	
-	public static Vector3f randomHorizontal(Random random) {
+	public static Vector3f randomHorizontal(RandomSource random) {
 		float angleY = randRange(0, PI2, random);
 		float vx = (float) Math.sin(angleY);
 		float vz = (float) Math.cos(angleY);

@@ -78,13 +78,13 @@ public class BaseCropBlock extends BasePlantBlock {
 		if (tool != null && tool.isCorrectToolForDrops(state)) {
 			int enchantment = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.BLOCK_FORTUNE, tool);
 			if (enchantment > 0) {
-				int countSeeds = MHelper.randRange(Mth.clamp(1 + enchantment, 1, 3), 3, MHelper.RANDOM);
-				int countDrops = MHelper.randRange(Mth.clamp(1 + enchantment, 1, 2), 2, MHelper.RANDOM);
+				int countSeeds = MHelper.randRange(Mth.clamp(1 + enchantment, 1, 3), 3, MHelper.RANDOM_SOURCE);
+				int countDrops = MHelper.randRange(Mth.clamp(1 + enchantment, 1, 2), 2, MHelper.RANDOM_SOURCE);
 				return Lists.newArrayList(new ItemStack(this, countSeeds), new ItemStack(drop, countDrops));
 			}
 		}
-		int countSeeds = MHelper.randRange(1, 3, MHelper.RANDOM);
-		int countDrops = MHelper.randRange(1, 2, MHelper.RANDOM);
+		int countSeeds = MHelper.randRange(1, 3, MHelper.RANDOM_SOURCE);
+		int countDrops = MHelper.randRange(1, 2, MHelper.RANDOM_SOURCE);
 		return Lists.newArrayList(new ItemStack(this, countSeeds), new ItemStack(drop, countDrops));
 	}
 	

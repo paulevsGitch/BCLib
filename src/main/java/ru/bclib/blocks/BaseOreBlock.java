@@ -89,9 +89,9 @@ public class BaseOreBlock extends DropExperienceBlock implements BlockModelProvi
 					if (min == max) {
 						return Collections.singletonList(new ItemStack(dropItem, max));
 					}
-					count = MHelper.randRange(min, max, MHelper.RANDOM);
+					count = MHelper.randRange(min, max, MHelper.RANDOM_SOURCE);
 				} else {
-					count = MHelper.randRange(minCount, maxCount, MHelper.RANDOM);
+					count = MHelper.randRange(minCount, maxCount, MHelper.RANDOM_SOURCE);
 				}
 				return Collections.singletonList(new ItemStack(dropItem, count));
 			}

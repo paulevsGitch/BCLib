@@ -39,37 +39,52 @@ import ru.bclib.items.tool.BaseShearsItem;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;import net.minecraft.util.RandomSource;
+import java.util.Random;
+import java.util.function.Function;
+
+import net.minecraft.util.RandomSource;
 
 public abstract class BasePlantBlock extends BaseBlockNotFull implements RenderLayerProvider, BonemealableBlock{
 	private static final VoxelShape SHAPE = Block.box(4, 0, 4, 12, 14, 12);
 	
 	public BasePlantBlock() {
-		this(false);
+		this(false, p->p);
 	}
-	
+
 	public BasePlantBlock(int light) {
-		this(false, light);
+		this(light, p->p);
 	}
 	
-	public BasePlantBlock(boolean replaceable) {
+	public BasePlantBlock(int light, Function<Properties, Properties> propMod) {
+		this(false, light, propMod);
+	}
+
+	public BasePlantBlock(boolean replaceabled) {
+		this(replaceabled, p->p);
+	}
+	public BasePlantBlock(boolean replaceable, Function<Properties, Properties> propMod) {
 		this(
-			FabricBlockSettings
+			propMod.apply(FabricBlockSettings
 				.of(replaceable ? Material.REPLACEABLE_PLANT : Material.PLANT)
 				.sound(SoundType.GRASS)
 				.noCollission()
 					.offsetType(BlockBehaviour.OffsetType.XZ)
+						 )
 		);
 	}
-	
-	public BasePlantBlock(boolean replaceable, int light) {
+
+	public BasePlantBlock(boolean replaceable, int light){
+		this(replaceable, light, p->p);
+	}
+	public BasePlantBlock(boolean replaceable, int light, Function<Properties, Properties> propMod) {
 		this(
-			FabricBlockSettings
+			propMod.apply(FabricBlockSettings
 				.of(replaceable ? Material.REPLACEABLE_PLANT : Material.PLANT)
 				.luminance(light)
 				.sound(SoundType.GRASS)
 				.noCollission()
 					.offsetType(BlockBehaviour.OffsetType.XZ)
+						 )
 		);
 	}
 	

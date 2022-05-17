@@ -35,29 +35,37 @@ import ru.bclib.interfaces.RenderLayerProvider;
 import ru.bclib.items.tool.BaseShearsItem;
 
 import java.util.List;
-import java.util.Random;import net.minecraft.util.RandomSource;
+import java.util.Random;
+import java.util.function.Function;
+
+import net.minecraft.util.RandomSource;
 
 public abstract class UnderwaterPlantBlock extends BaseBlockNotFull implements RenderLayerProvider, BonemealableBlock, LiquidBlockContainer {
 	private static final VoxelShape SHAPE = Block.box(4, 0, 4, 12, 14, 12);
-	
-	public UnderwaterPlantBlock() {
+
+	public UnderwaterPlantBlock(){this(p->p);}
+	public UnderwaterPlantBlock(Function<Properties, Properties> propMod) {
 		this(
-			FabricBlockSettings
+				propMod.apply(FabricBlockSettings
 				.of(Material.WATER_PLANT)
 				.sound(SoundType.WET_GRASS)
 				.noCollission()
-				.offsetType(BlockBehaviour.OffsetType.XZ)
+				.offsetType(BlockBehaviour.OffsetType.XZ))
 		);
 	}
-	
+
 	public UnderwaterPlantBlock(int light) {
+		this(light, p->p);
+	}
+	
+	public UnderwaterPlantBlock(int light, Function<Properties, Properties> propMod) {
 		this(
-			FabricBlockSettings
+				propMod.apply(FabricBlockSettings
 				.of(Material.WATER_PLANT)
 				.luminance(light)
 				.sound(SoundType.WET_GRASS)
 				.noCollission()
-				.offsetType(BlockBehaviour.OffsetType.XZ)
+				.offsetType(BlockBehaviour.OffsetType.XZ))
 		);
 	}
 	

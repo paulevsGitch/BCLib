@@ -130,6 +130,7 @@ public class BCLibNetherBiomeSource extends BCLBiomeSource {
 
     @Override
     public void setSeed(long seed) {
+        if (seed==currentSeed) return;
         super.setSeed(seed);
         biomePicker.rebuild();
         initMap(seed);

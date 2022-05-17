@@ -150,7 +150,7 @@ public class BlocksHelper {
 	 * @param random - {@link Random}.
 	 * @return {@link Direction}.
 	 */
-	public static Direction randomHorizontal(Random random) {
+	public static Direction randomHorizontal(RandomSource random) {
 		return HORIZONTAL[random.nextInt(4)];
 	}
 	
@@ -160,7 +160,7 @@ public class BlocksHelper {
 	 * @param random - {@link Random}.
 	 * @return {@link Direction}.
 	 */
-	public static Direction randomDirection(Random random) {
+	public static Direction randomDirection(RandomSource random) {
 		return DIRECTIONS[random.nextInt(6)];
 	}
 	

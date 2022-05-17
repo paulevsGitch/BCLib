@@ -34,7 +34,10 @@ import ru.bclib.items.tool.BaseShearsItem;
 import ru.bclib.util.BlocksHelper;
 
 import java.util.List;
-import java.util.Random;import net.minecraft.util.RandomSource;
+import java.util.Random;
+import java.util.function.Function;
+
+import net.minecraft.util.RandomSource;
 
 @SuppressWarnings("deprecation")
 public class BaseVineBlock extends BaseBlockNotFull implements RenderLayerProvider, BonemealableBlock {
@@ -48,15 +51,18 @@ public class BaseVineBlock extends BaseBlockNotFull implements RenderLayerProvid
 	public BaseVineBlock(int light) {
 		this(light, false);
 	}
-	
-	public BaseVineBlock(int light, boolean bottomOnly) {
+
+	public BaseVineBlock(int light, boolean bottomOnly){
+		this(light, bottomOnly, p->p);
+	}
+	public BaseVineBlock(int light, boolean bottomOnly, Function<Properties, Properties> propMod) {
 		this(
-			FabricBlockSettings
+				propMod.apply(FabricBlockSettings
 				.of(Material.PLANT)
 				.sound(SoundType.GRASS)
 				.lightLevel((state) -> bottomOnly ? state.getValue(SHAPE) == TripleShape.BOTTOM ? light : 0 : light)
 				.noCollission()
-					.offsetType(BlockBehaviour.OffsetType.XZ)
+					.offsetType(BlockBehaviour.OffsetType.XZ))
 		);
 	}
 	
