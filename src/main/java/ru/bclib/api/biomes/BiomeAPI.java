@@ -581,7 +581,7 @@ public class BiomeAPI {
 	}
 	
 	/**
-	 * Will apply biome modifications to world, internal usage only.
+	 * Will apply biome modiffications to world, internal usage only.
 	 * @param level
 	 */
 	public static void applyModifications(ServerLevel level) {

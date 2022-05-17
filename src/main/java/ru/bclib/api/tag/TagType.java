@@ -187,7 +187,7 @@ public class TagType<T> {
     public void apply(Map<ResourceLocation, Tag.Builder> tagsMap){
        if (Registry.BIOME_REGISTRY.equals(registryKey)) BiomeAPI._runTagAdders();
 
-       this.isFrozen = true;
+       //this.isFrozen = true;
        this.forEach((id, ids) -> TagAPI.apply(tagsMap.computeIfAbsent(id, key -> Tag.Builder.tag()), ids));
     }
 }

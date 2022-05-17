@@ -70,6 +70,8 @@ public class BCLibNetherBiomeSource extends BCLBiomeSource {
                 }
             }
         });
+
+        biomePicker.rebuild();
 	}
 
     public BCLibNetherBiomeSource(Registry<Biome> biomeRegistry, long seed) {
@@ -132,7 +134,6 @@ public class BCLibNetherBiomeSource extends BCLBiomeSource {
     public void setSeed(long seed) {
         if (seed==currentSeed) return;
         super.setSeed(seed);
-        biomePicker.rebuild();
         initMap(seed);
     }
 

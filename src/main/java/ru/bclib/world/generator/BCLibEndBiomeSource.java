@@ -87,16 +87,19 @@ public class BCLibEndBiomeSource extends BCLBiomeSource {
                 BCLBiome bclBiome = BiomeAPI.getBiome(key);
                 if (bclBiome != BiomeAPI.EMPTY_BIOME) {
                     if (bclBiome.getParentBiome() == null) {
-                        if (includeVoid.contains(key.toString())) {
+                        if (BiomeAPI.wasRegisteredAsEndVoidBiome(key) || includeVoid.contains(key.toString())) {
                             endVoidBiomePicker.addBiome(bclBiome);
                         } else {
                             endLandBiomePicker.addBiome(bclBiome);
                         }
-
                     }
                 }
             }
         });
+
+
+        endLandBiomePicker.rebuild();
+        endVoidBiomePicker.rebuild();
 
 
         this.centerBiome = biomeRegistry.getOrCreateHolder(Biomes.THE_END);
@@ -127,9 +130,7 @@ public class BCLibEndBiomeSource extends BCLBiomeSource {
 
                                 final boolean isEndBiome = biome.is(BiomeTags.IS_END)  ||
                                         BiomeAPI.wasRegisteredAsEndBiome(key);
-                                if (GeneratorOptions.addEndBiomesByTag() && isEndBiome) {
-                                    return true;
-                                }
+
 
                                 BCLBiome bclBiome = BiomeAPI.getBiome(key);
                                 if (bclBiome != BiomeAPI.EMPTY_BIOME) {

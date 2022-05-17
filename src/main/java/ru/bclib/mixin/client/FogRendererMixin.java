@@ -42,7 +42,7 @@ public class FogRendererMixin {
 				fogBlue *= 4;
 			}
 		}
-		
+
 		BackgroundInfo.fogColorRed = fogRed;
 		BackgroundInfo.fogColorGreen = fogGreen;
 		BackgroundInfo.fogColorBlue = fogBlue;
