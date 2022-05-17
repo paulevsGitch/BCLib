@@ -4,12 +4,15 @@ import net.minecraft.core.DefaultedRegistry;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.Tag;
 import net.minecraft.tags.TagKey;
 import net.minecraft.tags.TagManager;
 import net.minecraft.world.level.biome.Biome;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import ru.bclib.BCLib;
+import ru.bclib.api.biomes.BiomeAPI;
 
 import java.util.Map;
 import java.util.Set;
@@ -17,6 +20,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 public class TagType<T> {
+    boolean isFrozen = false;
     public static class RegistryBacked<T> extends Simple<T>{
         private final DefaultedRegistry<T> registry;
 
@@ -121,6 +125,7 @@ public class TagType<T> {
     }
 
     public void addUntyped(TagKey<T> tagID, ResourceLocation... elements) {
+        if (isFrozen) BCLib.LOGGER.warning("Adding Tag " + tagID + " after the API was frozen.");
         Set<ResourceLocation> set = getSetForTag(tagID);
         for (ResourceLocation id : elements) {
             if (id != null) {
@@ -141,6 +146,7 @@ public class TagType<T> {
      * @param elements array of Elements to add into tag.
      */
     protected void add(TagKey<T> tagID, T... elements) {
+        if (isFrozen) BCLib.LOGGER.warning("Adding Tag " + tagID + " after the API was frozen.");
         Set<ResourceLocation> set = getSetForTag(tagID);
         for (T element : elements) {
             ResourceLocation id = locationProvider.apply(element);
@@ -158,6 +164,7 @@ public class TagType<T> {
 
     @Deprecated(forRemoval = true)
     protected void add(ResourceLocation tagID, T... elements) {
+        if (isFrozen) BCLib.LOGGER.warning("Adding Tag " + tagID + " after the API was frozen.");
         Set<ResourceLocation> set = getSetForTag(tagID);
         for (T element : elements) {
             ResourceLocation id = locationProvider.apply(element);
@@ -176,5 +183,11 @@ public class TagType<T> {
 
     public void forEach(BiConsumer<ResourceLocation, Set<ResourceLocation>> consumer) {
         tags.forEach(consumer);
+    }
+    public void apply(Map<ResourceLocation, Tag.Builder> tagsMap){
+       if (Registry.BIOME_REGISTRY.equals(registryKey)) BiomeAPI._runTagAdders();
+
+       this.isFrozen = true;
+       this.forEach((id, ids) -> TagAPI.apply(tagsMap.computeIfAbsent(id, key -> Tag.Builder.tag()), ids));
     }
 }

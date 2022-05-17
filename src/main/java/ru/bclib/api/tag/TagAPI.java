@@ -139,6 +139,10 @@ public class TagAPI {
 	public static TagKey<Item> makeCommonItemTag(String name) {
 		return ITEMS.makeCommonTag(name);
 	}
+
+	public static TagKey<Biome> makeCommonBiomeTag(String name) {
+		return BIOMES.makeCommonTag(name);
+	}
 	
 	/**
 	 * Initializes basic tags. Should be called only in BCLib main class.
@@ -265,7 +269,9 @@ public class TagAPI {
 	public static void addItemTag(TagKey<Item> tagID, Item... items) {
 		ITEMS.add(tagID, items);
 	}
-	
+
+
+
 	/**
 	 * Automatically called in {@link net.minecraft.tags.TagLoader#loadAndBuild(ResourceManager)}.
 	 * <p>
@@ -277,9 +283,10 @@ public class TagAPI {
 	 * @return The {@code tagsMap} Parameter.
 	 */
 	public static <T> Map<ResourceLocation, Tag.Builder> apply(String directory, Map<ResourceLocation, Tag.Builder> tagsMap) {
+
 		TagType<?> type = TYPES.get(directory);
 		if (type!=null){
-			type.forEach((id, ids) -> apply(tagsMap.computeIfAbsent(id, key -> Tag.Builder.tag()), ids));
+			type.apply(tagsMap);
 		}
 
 //		final BiConsumer<ResourceLocation, Set<ResourceLocation>> consumer;

@@ -30,7 +30,6 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeGenerationSettings;
 import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.biome.Biomes;
-import net.minecraft.world.level.biome.Climate;
 import net.minecraft.world.level.biome.MobSpawnSettings.SpawnerData;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -50,6 +49,7 @@ import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.jetbrains.annotations.Nullable;
 import ru.bclib.BCLib;
+import ru.bclib.api.tag.CommonBiomeTags;
 import ru.bclib.api.tag.TagAPI;
 import ru.bclib.entity.BCLEntityWrapper;
 import ru.bclib.interfaces.BiomeSourceAccessor;
@@ -60,12 +60,10 @@ import ru.bclib.interfaces.SurfaceRuleProvider;
 import ru.bclib.mixin.common.BiomeGenerationSettingsAccessor;
 import ru.bclib.mixin.common.MobSpawnSettingsAccessor;
 import ru.bclib.util.CollectionsUtil;
-import ru.bclib.util.MHelper;
 import ru.bclib.world.biomes.BCLBiome;
 import ru.bclib.world.biomes.FabricBiomesData;
 import ru.bclib.world.biomes.VanillaBiomeSettings;
 import ru.bclib.world.features.BCLFeature;
-import ru.bclib.world.generator.BiomePicker;
 
 import java.util.HashSet;
 import java.util.List;
@@ -73,13 +71,14 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Random;import net.minecraft.util.RandomSource;
+
 import net.minecraft.world.level.levelgen.structure.Structure;
 
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class BiomeAPI {
 	enum Dimension {OVERWORLD, NETHER, END_LAND, END_VOID, UNDEFINED};
@@ -98,6 +97,7 @@ public class BiomeAPI {
 	private static final MutableInt FEATURE_ORDER_ID = new MutableInt(0);
 
 	private static final Map<ResourceKey, List<BiConsumer<ResourceLocation, Holder<Biome>>>> MODIFICATIONS = Maps.newHashMap();
+	private static final Map<ResourceKey, List<BiConsumer<ResourceLocation, Holder<Biome>>>> TAG_ADDERS = Maps.newHashMap();
 	private static final Map<ResourceLocation, SurfaceRules.RuleSource> SURFACE_RULES = Maps.newHashMap();
 	private static final Set<SurfaceRuleProvider> MODIFIED_SURFACE_PROVIDERS = new HashSet<>(8);
 
@@ -171,7 +171,17 @@ public class BiomeAPI {
 		}
 		ID_MAP.put(bclbiome.getID(), bclbiome);
 		DIMENSION_MAP.put(bclbiome.getID(), dim);
+
+		if (dim==Dimension.NETHER) {
+
+			TagAPI.addBiomeTag(BiomeTags.IS_NETHER, bclbiome.getBiome());
+			TagAPI.addBiomeTag(CommonBiomeTags.IN_NETHER, bclbiome.getBiome());
+		} else if (dim==Dimension.END_LAND || dim==Dimension.END_VOID) {
+			TagAPI.addBiomeTag(BiomeTags.IS_END, bclbiome.getBiome());
+		}
+
 		bclbiome.afterRegistration();
+
 		return bclbiome;
 	}
 	
@@ -180,11 +190,7 @@ public class BiomeAPI {
 		registerBiome(subBiome, dim);
 		parent.addSubBiome(subBiome);
 
-		if (dim==Dimension.NETHER) {
-			TagAPI.addBiomeTag(BiomeTags.IS_NETHER, subBiome.getBiome());
-		} else if (dim==Dimension.END_LAND || dim==Dimension.END_VOID) {
-			TagAPI.addBiomeTag(BiomeTags.IS_END, subBiome.getBiome());
-		}
+
 		return subBiome;
 	}
 	
@@ -204,7 +210,6 @@ public class BiomeAPI {
 
 		ResourceKey<Biome> key = BiomeAPI.getBiomeKeyOrThrow(bclBiome.getBiomeHolder());
 		bclBiome.forEachClimateParameter(p -> NetherBiomeData.addNetherBiome(key, p));
-		TagAPI.addBiomeTag(BiomeTags.IS_NETHER, bclBiome.getBiome());
 		return bclBiome;
 	}
 	
@@ -217,7 +222,6 @@ public class BiomeAPI {
 	public static BCLBiome registerNetherBiome(Biome biome) {
 		BCLBiome bclBiome = new BCLBiome(biome, null);
 		registerBiome(bclBiome, Dimension.NETHER);
-		TagAPI.addBiomeTag(BiomeTags.IS_NETHER, bclBiome.getBiome());
 		return bclBiome;
 	}
 	
@@ -501,6 +505,52 @@ public class BiomeAPI {
 	 */
 	public static void registerEndBiomeModification(BiConsumer<ResourceLocation, Holder<Biome>> modification) {
 		registerBiomeModification(Level.END, modification);
+	}
+
+	/**
+	 * For internal use only
+	 */
+	public static void _runTagAdders(){
+		for (var mod:TAG_ADDERS.entrySet()) {
+			Stream<ResourceLocation> s = null;
+			if (mod.getKey()==Level.NETHER) s =  DIMENSION_MAP.entrySet().stream().filter(e ->e.getValue() == Dimension.NETHER).map(e -> e.getKey());
+			else if (mod.getKey()==Level.END) s =  DIMENSION_MAP.entrySet().stream().filter(e ->e.getValue() == Dimension.END_VOID || e.getValue()==Dimension.END_LAND).map(e -> e.getKey());
+			if (s!=null) {
+				s.forEach(id -> {
+					BCLBiome b = BiomeAPI.getBiome(id);
+					Holder<Biome> biomeHolder = b.getBiomeHolder();
+					if (biomeHolder.isBound()) {
+						mod.getValue().forEach(c -> c.accept(id, biomeHolder));
+					}
+				});
+			}
+		}
+	}
+
+	/**
+	 * Registers new biome modification for specified dimension. Will work both for mod and datapack biomes.
+	 * @param dimensionID {@link ResourceLocation} dimension ID, example: Level.OVERWORLD or "minecraft:overworld".
+	 * @param modification {@link BiConsumer} with {@link ResourceKey} biome ID and {@link Biome} parameters.
+	 */
+	public static void onFinishingBiomeTags(ResourceKey dimensionID, BiConsumer<ResourceLocation, Holder<Biome>> modification) {
+		List<BiConsumer<ResourceLocation, Holder<Biome>>> modifications = TAG_ADDERS.computeIfAbsent(dimensionID, k -> Lists.newArrayList());
+		modifications.add(modification);
+	}
+
+	/**
+	 * Registers new biome modification for the Nether. Will work both for mod and datapack biomes.
+	 * @param modification {@link BiConsumer} with {@link ResourceLocation} biome ID and {@link Biome} parameters.
+	 */
+	public static void onFinishingNetherBiomeTags(BiConsumer<ResourceLocation, Holder<Biome>> modification) {
+		onFinishingBiomeTags(Level.NETHER, modification);
+	}
+
+	/**
+	 * Registers new biome modification for the End. Will work both for mod and datapack biomes.
+	 * @param modification {@link BiConsumer} with {@link ResourceLocation} biome ID and {@link Biome} parameters.
+	 */
+	public static void onFinishingEndBiomeTags(BiConsumer<ResourceLocation, Holder<Biome>> modification) {
+		onFinishingBiomeTags(Level.END, modification);
 	}
 	
 	/**
