@@ -796,28 +796,6 @@ public class BiomeAPI {
         accessor.bclib_setFlowerFeatures(flowerFeatures);
     }
 
-    /**
-     * Adds new carver into existing biome.
-     *
-     * @param biome  {@link Biome} to add carver in.
-     * @param carver {@link ConfiguredWorldCarver} to add.
-     * @param stage  {@link Carving} stage.
-     */
-    public static void addBiomeCarver(Biome biome, Holder<? extends ConfiguredWorldCarver<?>> carver, Carving stage) {
-        BiomeGenerationSettingsAccessor accessor = (BiomeGenerationSettingsAccessor) biome.getGenerationSettings();
-        Map<Carving, HolderSet<ConfiguredWorldCarver<?>>> carverMap = CollectionsUtil.getMutable(accessor.bclib_getCarvers());
-        HolderSet<ConfiguredWorldCarver<?>> carvers = carverMap.get(stage);
-
-        List<Holder<ConfiguredWorldCarver<?>>> carverList;
-        if (carvers == null) {
-            carverList = Lists.newArrayList();
-        } else {
-            carverList = carvers.stream().toList();
-        }
-        carverList.add((Holder<ConfiguredWorldCarver<?>>) carver);
-        carverMap.put(stage, HolderSet.direct(carverList));
-        accessor.bclib_setCarvers(carverMap);
-    }
 
     /**
      * Adds surface rule to specified biome.
@@ -830,35 +808,6 @@ public class BiomeAPI {
         //NOISE_GENERATOR_SETTINGS.forEach(BiomeAPI::changeSurfaceRulesForGenerator);
     }
 
-    /**
-     * Get surface rule for the biome using its {@link ResourceLocation} ID as a key.
-     *
-     * @param biomeID {@link ResourceLocation} biome ID.
-     * @return {@link SurfaceRules.RuleSource}.
-     */
-    @Nullable
-    public static SurfaceRules.RuleSource getSurfaceRule(ResourceLocation biomeID) {
-        return SURFACE_RULES.get(biomeID);
-    }
-
-    /**
-     * Adds mob spawning to specified biome.
-     *
-     * @param biome         {@link Biome} to add mob spawning.
-     * @param entityType    {@link BCLEntityWrapper} mob type.
-     * @param weight        spawn weight.
-     * @param minGroupCount minimum mobs in group.
-     * @param maxGroupCount maximum mobs in group.
-     */
-    public static <M extends Mob> void addBiomeMobSpawn(Holder<Biome> biome,
-                                                        BCLEntityWrapper<M> entityType,
-                                                        int weight,
-                                                        int minGroupCount,
-                                                        int maxGroupCount) {
-        if (entityType.canSpawn()) {
-            addBiomeMobSpawn(biome, entityType.type(), weight, minGroupCount, maxGroupCount);
-        }
-    }
 
     /**
      * Adds mob spawning to specified biome.
@@ -886,22 +835,6 @@ public class BiomeAPI {
         accessor.bcl_setSpawners(spawners);
     }
 
-    /**
-     * Get biome surface block. Can be used to get terrain material for features or other things.
-     *
-     * @param pos   {@link BlockPos} position to get block.
-     * @param biome {@link Holder<Biome>} to get block from.
-     * @param level {@link ServerLevel} current server level.
-     * @return {@link BlockState} with the biome surface or AIR if it fails.
-     */
-    public static BlockState getBiomeSurfaceBlock(BlockPos pos, Holder<Biome> biome, ServerLevel level) {
-        ChunkGenerator generator = level.getChunkSource().getGenerator();
-        if (generator instanceof NoiseBasedChunkGenerator) {
-            SurfaceProvider provider = (SurfaceProvider) generator;
-            return provider.bclib_getSurface(pos, biome, level);
-        }
-        return Blocks.AIR.defaultBlockState();
-    }
 
     public static Optional<BlockState> findTopMaterial(WorldGenLevel world, BlockPos pos) {
         return findTopMaterial(getBiome(world.getBiome(pos)));
@@ -922,18 +855,9 @@ public class BiomeAPI {
         return Optional.empty();
     }
 
-    public static Optional<BlockState> findUnderMaterial(WorldGenLevel world, BlockPos pos) {
-        return findUnderMaterial(getBiome(world.getBiome(pos)));
-    }
-
     public static Optional<BlockState> findUnderMaterial(Holder<Biome> biome) {
         return findUnderMaterial(getBiome(biome.value()));
     }
-
-    public static Optional<BlockState> findUnderMaterial(Biome biome) {
-        return findUnderMaterial(getBiome(biome));
-    }
-
     public static Optional<BlockState> findUnderMaterial(BCLBiome biome) {
         if (biome instanceof SurfaceMaterialProvider smp) {
             return Optional.of(smp.getUnderMaterial());
@@ -1016,24 +940,6 @@ public class BiomeAPI {
         });
     }
 
-    /**
-     * Getter for correct feature list from all biome feature list of lists.
-     *
-     * @param step  feature {@link Decoration} step.
-     * @param lists biome accessor lists.
-     * @return mutable {@link ConfiguredFeature} list.
-     */
-    private static List<Supplier<PlacedFeature>> getList(Decoration step, List<List<Supplier<PlacedFeature>>> lists) {
-        int index = step.ordinal();
-        if (lists.size() <= index) {
-            for (int i = lists.size(); i <= index; i++) {
-                lists.add(Lists.newArrayList());
-            }
-        }
-        List<Supplier<PlacedFeature>> list = CollectionsUtil.getMutable(lists.get(index));
-        lists.set(index, list);
-        return list;
-    }
 
     private static List<Holder<PlacedFeature>> getFeaturesListCopy(List<HolderSet<PlacedFeature>> features,
                                                                    Decoration step) {
