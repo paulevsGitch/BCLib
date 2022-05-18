@@ -227,16 +227,16 @@ public class BCLibEndBiomeSource extends BCLBiomeSource {
             }
 
             if (height < -10F) {
-                return mapVoid.getBiome(posX, biomeY << 2, posZ).actual;
+                return mapVoid.getBiome(posX, biomeY << 2, posZ).biome;
             } else {
-                return mapLand.getBiome(posX, biomeY << 2, posZ).actual;
+                return mapLand.getBiome(posX, biomeY << 2, posZ).biome;
             }
         } else {
             pos.setLocation(biomeX, biomeZ);
             if (endLandFunction.apply(pos)) {
-                return dist <= farEndBiomes ? centerBiome : mapLand.getBiome(posX, biomeY << 2, posZ).actual;
+                return dist <= farEndBiomes ? centerBiome : mapLand.getBiome(posX, biomeY << 2, posZ).biome;
             } else {
-                return dist <= farEndBiomes ? barrens : mapVoid.getBiome(posX, biomeY << 2, posZ).actual;
+                return dist <= farEndBiomes ? barrens : mapVoid.getBiome(posX, biomeY << 2, posZ).biome;
             }
         }
     }

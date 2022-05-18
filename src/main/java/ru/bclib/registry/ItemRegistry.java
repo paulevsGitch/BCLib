@@ -20,7 +20,8 @@ import net.minecraft.world.item.ShovelItem;
 import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.item.SwordItem;
 import net.minecraft.world.level.block.DispenserBlock;
-import ru.bclib.api.tag.NamedCommonItemTags;
+
+import ru.bclib.api.tag.CommonItemTags;
 import ru.bclib.api.tag.NamedToolTags;
 import ru.bclib.api.tag.TagAPI;
 import ru.bclib.config.PathConfig;
@@ -86,7 +87,7 @@ public class ItemRegistry extends BaseRegistry<Item> {
 			TagAPI.addItemTag(NamedToolTags.FABRIC_HOES, item);
 		}
 		else if (item instanceof BaseShearsItem) {
-			TagAPI.addItemTags(item, NamedToolTags.FABRIC_SHEARS, NamedCommonItemTags.SHEARS);
+			TagAPI.addItemTags(item, NamedToolTags.FABRIC_SHEARS, CommonItemTags.SHEARS);
 			DispenserBlock.registerBehavior(item.asItem(), new ShearsDispenseItemBehavior());
 		}
 		

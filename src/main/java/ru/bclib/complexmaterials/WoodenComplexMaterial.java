@@ -4,18 +4,15 @@ import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.registry.FlammableBlockRegistry;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.MaterialColor;
 import ru.bclib.BCLib;
-import ru.bclib.api.tag.NamedBlockTags;
-import ru.bclib.api.tag.NamedCommonBlockTags;
-import ru.bclib.api.tag.NamedCommonItemTags;
-import ru.bclib.api.tag.NamedItemTags;
-import ru.bclib.api.tag.TagAPI;
-import ru.bclib.api.tag.TagAPI.TagLocation;
+import ru.bclib.api.tag.*;
+
 import ru.bclib.blocks.BaseBarkBlock;
 import ru.bclib.blocks.BaseBarrelBlock;
 import ru.bclib.blocks.BaseBlock;
@@ -100,8 +97,8 @@ public class WoodenComplexMaterial extends ComplexMaterial {
 	}
 
 	final protected void initBase(FabricBlockSettings blockSettings, FabricItemSettings itemSettings) {
-		TagLocation<Block> tagBlockLog = TagLocation.of(getBlockTag(TAG_LOGS));
-		TagLocation<Item> tagItemLog = TagLocation.of(getItemTag(TAG_LOGS));
+		TagKey<Block> tagBlockLog = getBlockTag(TAG_LOGS);
+		TagKey<Item> tagItemLog = getItemTag(TAG_LOGS);
 
 		addBlockEntry(
 				new BlockEntry(BLOCK_STRIPPED_LOG, (complexMaterial, settings) -> new BaseRotatedPillarBlock(settings))
@@ -169,21 +166,21 @@ public class WoodenComplexMaterial extends ComplexMaterial {
 
 	final protected void initStorage(FabricBlockSettings blockSettings, FabricItemSettings itemSettings) {
 		addBlockEntry(new BlockEntry(BLOCK_CHEST, (complexMaterial, settings) -> new BaseChestBlock(getBlock(BLOCK_PLANKS)))
-			.setBlockTags(NamedCommonBlockTags.CHEST, NamedCommonBlockTags.WOODEN_CHEST)
-			.setItemTags(NamedCommonItemTags.CHEST, NamedCommonItemTags.WOODEN_CHEST));
+			.setBlockTags(CommonBlockTags.CHEST, CommonBlockTags.WOODEN_CHEST)
+			.setItemTags(CommonItemTags.CHEST, CommonItemTags.WOODEN_CHEST));
 
 		addBlockEntry(new BlockEntry(BLOCK_BARREL, (complexMaterial, settings) -> new BaseBarrelBlock(getBlock(BLOCK_PLANKS)))
-			.setBlockTags(NamedCommonBlockTags.BARREL, NamedCommonBlockTags.WOODEN_BARREL)
-			.setItemTags(NamedCommonItemTags.BARREL, NamedCommonItemTags.WOODEN_BARREL));
+			.setBlockTags(CommonBlockTags.BARREL, CommonBlockTags.WOODEN_BARREL)
+			.setItemTags(CommonItemTags.BARREL, CommonItemTags.WOODEN_BARREL));
 	}
 
 	final protected void initDecorations(FabricBlockSettings blockSettings, FabricItemSettings itemSettings) {
 		addBlockEntry(new BlockEntry(BLOCK_CRAFTING_TABLE, (complexMaterial, settings) -> new BaseCraftingTableBlock(getBlock(BLOCK_PLANKS)))
-			.setBlockTags(NamedCommonBlockTags.WORKBENCHES)
-			.setItemTags(NamedCommonItemTags.WORKBENCHES));
+			.setBlockTags(CommonBlockTags.WORKBENCHES)
+			.setItemTags(CommonItemTags.WORKBENCHES));
 
 		addBlockEntry(new BlockEntry(BLOCK_BOOKSHELF, (complexMaterial, settings) -> new BaseBookshelfBlock(getBlock(BLOCK_PLANKS)))
-			.setBlockTags(NamedCommonBlockTags.BOOKSHELVES));
+			.setBlockTags(CommonBlockTags.BOOKSHELVES));
 
 		addBlockEntry(new BlockEntry(BLOCK_COMPOSTER, (complexMaterial, settings) -> new BaseComposterBlock(getBlock(BLOCK_PLANKS))));
 	}

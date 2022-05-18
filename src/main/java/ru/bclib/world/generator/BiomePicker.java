@@ -1,39 +1,37 @@
 package ru.bclib.world.generator;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+
 import ru.bclib.util.WeighTree;
 import ru.bclib.util.WeightedList;
 import ru.bclib.world.biomes.BCLBiome;
 
 import java.util.*;
 
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.WorldgenRandom;
 
 public class BiomePicker {
-	public final Map<BCLBiome, Entry> all = new HashMap<>();
-	public class Entry {
+	public final Map<BCLBiome, ActualBiome> all = new HashMap<>();
+	public class ActualBiome {
 		public final BCLBiome bclBiome;
-		public final Holder<Biome> actual;
+		public final Holder<Biome> biome;
 		public final ResourceKey<Biome> key;
 
-		private final WeightedList<Entry> subbiomes = new WeightedList<>();
-		private final Entry edge;
-		private final Entry parent;
+		private final WeightedList<ActualBiome> subbiomes = new WeightedList<>();
+		private final ActualBiome edge;
+		private final ActualBiome parent;
 
-		private Entry(BCLBiome bclBiome){
+		private ActualBiome(BCLBiome bclBiome){
 			all.put(bclBiome, this);
 			this.bclBiome = bclBiome;
 
 			this.key = biomeRegistry.getResourceKey(biomeRegistry.get(bclBiome.getID())).orElseThrow();
-			this.actual = biomeRegistry.getOrCreateHolder(key);
+			this.biome = biomeRegistry.getOrCreateHolder(key);
 
 			bclBiome.forEachSubBiome((b, w)->{
 				subbiomes.add(create(b), w);
@@ -47,7 +45,7 @@ public class BiomePicker {
 		public boolean equals(Object o) {
 			if (this == o) return true;
 			if (o == null || getClass() != o.getClass()) return false;
-			Entry entry = (Entry) o;
+			ActualBiome entry = (ActualBiome) o;
 			return bclBiome.equals(entry.bclBiome);
 		}
 
@@ -56,32 +54,32 @@ public class BiomePicker {
 			return Objects.hash(bclBiome);
 		}
 
-		public Entry getSubBiome(WorldgenRandom random) {
+		public ActualBiome getSubBiome(WorldgenRandom random) {
 			return subbiomes.get(random);
 		}
 
-		public Entry getEdge(){
+		public ActualBiome getEdge(){
 			return edge;
 		}
 
-		public Entry getParentBiome(){
+		public ActualBiome getParentBiome(){
 			return parent;
 		}
 
-		public boolean isSame(Entry e){
+		public boolean isSame(ActualBiome e){
 			return bclBiome.isSame(e.bclBiome);
 		}
 	}
 
-	private Entry create(BCLBiome bclBiome){
-		Entry e = all.get(bclBiome);
+	private ActualBiome create(BCLBiome bclBiome){
+		ActualBiome e = all.get(bclBiome);
 		if (e!=null) return e;
-		return new Entry(bclBiome);
+		return new ActualBiome(bclBiome);
 	}
 
-	private final List<Entry> biomes = Lists.newArrayList();
+	private final List<ActualBiome> biomes = Lists.newArrayList();
 	public final Registry<Biome> biomeRegistry;
-	private WeighTree<Entry> tree;
+	private WeighTree<ActualBiome> tree;
 
 	public BiomePicker(Registry<Biome> biomeRegistry){
 		this.biomeRegistry = biomeRegistry;
@@ -91,7 +89,7 @@ public class BiomePicker {
 		biomes.add(create(biome));
 	}
 	
-	public Entry getBiome(WorldgenRandom random) {
+	public ActualBiome getBiome(WorldgenRandom random) {
 		return biomes.isEmpty() ? null : tree.get(random);
 	}
 
@@ -99,7 +97,7 @@ public class BiomePicker {
 		if (biomes.isEmpty()) {
 			return;
 		}
-		WeightedList<Entry> list = new WeightedList<>();
+		WeightedList<ActualBiome> list = new WeightedList<>();
 		biomes.forEach(biome -> {
 			list.add(biome, biome.bclBiome.getGenChance());
 		});

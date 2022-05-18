@@ -8,6 +8,7 @@ import net.minecraft.client.resources.model.BlockModelRotation;
 import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -21,7 +22,7 @@ import net.minecraft.world.level.storage.loot.LootContext;
 import org.jetbrains.annotations.Nullable;
 import ru.bclib.api.tag.NamedBlockTags;
 import ru.bclib.api.tag.NamedItemTags;
-import ru.bclib.api.tag.TagAPI.TagLocation;
+
 import ru.bclib.client.models.BasePatterns;
 import ru.bclib.client.models.ModelsHelper;
 import ru.bclib.client.models.PatternsHelper;
@@ -151,7 +152,7 @@ public class BaseDoorBlock extends DoorBlock implements RenderLayerProvider, Blo
 	}
 	
 	@Override
-	public void addTags(List<TagLocation<Block>> blockTags, List<TagLocation<Item>> itemTags) {
+	public void addTags(List<TagKey<Block>> blockTags, List<TagKey<Item>> itemTags) {
 		blockTags.add(NamedBlockTags.DOORS);
 		itemTags.add(NamedItemTags.DOORS);
 	}

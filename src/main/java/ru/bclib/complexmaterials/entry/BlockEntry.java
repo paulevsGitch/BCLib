@@ -2,10 +2,11 @@ package ru.bclib.complexmaterials.entry;
 
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import ru.bclib.api.tag.TagAPI;
-import ru.bclib.api.tag.TagAPI.TagLocation;
+
 import ru.bclib.complexmaterials.ComplexMaterial;
 import ru.bclib.registry.BlockRegistry;
 
@@ -15,8 +16,8 @@ public class BlockEntry extends ComplexMaterialEntry {
 	final BiFunction<ComplexMaterial, FabricBlockSettings, Block> initFunction;
 	final boolean hasItem;
 	
-	TagLocation<Block>[] blockTags;
-	TagLocation<Item>[] itemTags;
+	TagKey<Block>[] blockTags;
+	TagKey<Item>[] itemTags;
 	
 	public BlockEntry(String suffix, BiFunction<ComplexMaterial, FabricBlockSettings, Block> initFunction) {
 		this(suffix, true, initFunction);
@@ -28,12 +29,12 @@ public class BlockEntry extends ComplexMaterialEntry {
 		this.hasItem = hasItem;
 	}
 	
-	public BlockEntry setBlockTags(TagLocation<Block>... blockTags) {
+	public BlockEntry setBlockTags(TagKey<Block>... blockTags) {
 		this.blockTags = blockTags;
 		return this;
 	}
 	
-	public BlockEntry setItemTags(TagLocation<Item>... itemTags) {
+	public BlockEntry setItemTags(TagKey<Item>... itemTags) {
 		this.itemTags = itemTags;
 		return this;
 	}

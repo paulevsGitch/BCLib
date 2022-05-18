@@ -45,25 +45,6 @@ public class TagAPI {
 		return (TagType.UnTyped<T>)TYPES.computeIfAbsent(directory, (dir)->new TagType.UnTyped<>(registry, dir));
 	}
 
-
-
-	
-	/**
-	 * Get or create {@link TagKey}.
-	 *
-	 * @param registry - {@link Registry<T>} tag collection;
-	 * @param id				- {@link ResourceLocation} tag id.
-	 * @return {@link TagKey}.
-	 */
-	@Deprecated(forRemoval = true)
-	public static <T> TagKey<T> makeTag(Registry<T> registry, TagLocation<T> id) {
-		return registry
-				.getTagNames()
-				.filter(tagKey -> tagKey.location().equals(id))
-				.findAny()
-				.orElse(TagKey.create(registry.key(), id));
-	}
-
 	/**
 	 * Get or create {@link Block} {@link TagKey} with mod namespace.
 	 *
@@ -157,24 +138,13 @@ public class TagAPI {
 
 	/**
 	 * Adds multiple Tags to one Biome.
-	 * @param tagIDs array of {@link TagLocation<Biome>} tag IDs.
+	 * @param tagIDs array of {@link TagKey<Biome>} tag IDs.
 	 * @param biome The {@link Biome} to add tag.
 	 */
 	@SafeVarargs
 	@Deprecated(forRemoval = true)
-	public static void addBiomeTags(Biome biome, TagLocation<Biome>... tagIDs) {
+	public static void addBiomeTags(Biome biome, TagKey<Biome>... tagIDs) {
 		BIOMES.add(biome, tagIDs);
-	}
-
-	/**
-	 * Adds one Tag to multiple Biomes.
-	 * @param tagID {@link TagLocation<Biome>} tag ID.
-	 * @param biomes array of {@link Biome} to add into tag.
-	 */
-
-	@Deprecated(forRemoval = true)
-	public static void addBiomeTag(TagLocation<Biome> tagID, Biome... biomes) {
-		BIOMES.add(tagID, biomes);
 	}
 
 	/**
@@ -189,24 +159,15 @@ public class TagAPI {
 
 	/**
 	 * Adds multiple Tags to one Block.
-	 * @param tagIDs array of {@link TagLocation<Block>} tag IDs.
+	 * @param tagIDs array of {@link TagKey<Block>} tag IDs.
 	 * @param block The {@link Block} to add tag.
 	 */
 	@SafeVarargs
 	@Deprecated(forRemoval = true)
-	public static void addBlockTags(Block block, TagLocation<Block>... tagIDs) {
+	public static void addBlockTags(Block block, TagKey<Block>... tagIDs) {
 		BLOCKS.add(block, tagIDs);
 	}
-	
-	/**
-	 * Adds one Tag to multiple Blocks.
-	 * @param tagID {@link TagLocation<Block>} tag ID.
-	 * @param blocks array of {@link Block} to add into tag.
-	 */
-	@Deprecated(forRemoval = true)
-	public static void addBlockTag(TagLocation<Block> tagID, Block... blocks) {
-		BLOCKS.add(tagID, blocks);
-	}
+
 
 	/**
 	 * Adds one Tag to multiple Blocks.
@@ -219,35 +180,13 @@ public class TagAPI {
 	
 	/**
 	 * Adds multiple Tags to one Item.
-	 * @param tagIDs array of {@link TagLocation<Item>} tag IDs.
+	 * @param tagIDs array of {@link TagKey<Item>} tag IDs.
 	 * @param item The {@link Item} to add tag.
 	 */
 	@Deprecated(forRemoval = true)
 	@SafeVarargs
-	public static void addItemTags(ItemLike item, TagLocation<Item>... tagIDs) {
+	public static void addItemTags(ItemLike item, TagKey<Item>... tagIDs) {
 		ITEMS.add(item.asItem(), tagIDs);
-	}
-	
-	/**
-	 * Adds one Tag to multiple Items.
-	 * @param tagID {@link TagLocation<Item>} tag ID.
-	 * @param items array of {@link ItemLike} to add into tag.
-	 */
-	@Deprecated(forRemoval = true)
-	public static void addItemTag(TagLocation<Item> tagID, Item... items) {
-		ITEMS.add(tagID, items);
-	}
-
-	/**
-	 * Adds one Tag to multiple Items.
-	 * @param tagID {@link TagLocation<Item>} tag ID.
-	 * @param items array of {@link ItemLike} to add into tag.
-	 */
-	@Deprecated(forRemoval = true)
-	public static void addItemTag(TagLocation<Item> tagID, ItemLike... items) {
-		for(ItemLike i : items) {
-			ITEMS.add(i.asItem(), tagID);
-		}
 	}
 
 	/**
@@ -317,40 +256,9 @@ public class TagAPI {
 	}
 
 
-	/**
-	 * Extends (without changing) {@link ResourceLocation}. This Type was introduced to allow type-safe definition af
-	 * Tags using their ResourceLocation.
-	 * @param <T> The Type of the underlying {@link Tag}
-	 */
-	public static class TagLocation<T> extends ResourceLocation {
-		public TagLocation(String string) {
-			super(string);
-		}
-
-		public TagLocation(String string, String string2) {
-			super(string, string2);
-		}
-
-		public TagLocation(ResourceLocation location) {
-			super(location.getNamespace(), location.getPath());
-		}
-
-		public static<R> TagLocation<R> of(TagKey<R> tag){
-			return new TagLocation<R>(tag.location());
-		}
-	}
-
 	public static boolean isToolWithMineableTag(ItemStack stack, TagKey<Block> tag){
-		return isToolWithUntypedMineableTag(stack, tag.location());
-	}
-
-	public static boolean isToolWithMineableTag(ItemStack stack, TagLocation<Block> tag){
-		return isToolWithUntypedMineableTag(stack, tag);
-	}
-
-	private static boolean isToolWithUntypedMineableTag(ItemStack stack, ResourceLocation tag){
 		if (stack.getItem() instanceof DiggerItemAccessor dig){
-			return dig.bclib_getBlockTag().location().equals(tag);
+			return dig.bclib_getBlockTag().equals(tag);
 		}
 		return false;
 	}

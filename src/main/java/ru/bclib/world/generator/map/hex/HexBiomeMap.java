@@ -7,7 +7,6 @@ import ru.bclib.interfaces.BiomeMap;
 import ru.bclib.interfaces.TriConsumer;
 import ru.bclib.noise.OpenSimplexNoise;
 import ru.bclib.util.MHelper;
-import ru.bclib.world.biomes.BCLBiome;
 import ru.bclib.world.generator.BiomePicker;
 
 import java.util.Map;
@@ -50,9 +49,9 @@ public class HexBiomeMap implements BiomeMap {
 	}
 	
 	@Override
-	public BiomePicker.Entry getBiome(double x, double y, double z) {
-		BiomePicker.Entry biome = getRawBiome(x, z);
-		BiomePicker.Entry edge = biome.getEdge();
+	public BiomePicker.ActualBiome getBiome(double x, double y, double z) {
+		BiomePicker.ActualBiome biome = getRawBiome(x, z);
+		BiomePicker.ActualBiome edge = biome.getEdge();
 		int size = biome.bclBiome.getEdgeSize();
 		
 		if (edge == null && biome.getParentBiome() != null) {
@@ -93,7 +92,7 @@ public class HexBiomeMap implements BiomeMap {
 		this.processor = processor;
 	}
 	
-	private BiomePicker.Entry getRawBiome(double x, double z) {
+	private BiomePicker.ActualBiome getRawBiome(double x, double z) {
 		double px = x / scale * RAD_INNER;
 		double pz = z / scale;
 		double dx = rotateX(px, pz);
@@ -132,7 +131,7 @@ public class HexBiomeMap implements BiomeMap {
 		return getChunkBiome(cellX, cellZ);
 	}
 	
-	private BiomePicker.Entry getChunkBiome(int x, int z) {
+	private BiomePicker.ActualBiome getChunkBiome(int x, int z) {
 		int cx = HexBiomeChunk.scaleCoordinate(x);
 		int cz = HexBiomeChunk.scaleCoordinate(z);
 		

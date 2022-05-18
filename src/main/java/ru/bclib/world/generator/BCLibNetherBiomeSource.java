@@ -5,16 +5,11 @@ import net.minecraft.core.Registry;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BiomeTags;
-import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.level.biome.*;
 
 import net.fabricmc.fabric.impl.biome.NetherBiomeData;
 
-import com.mojang.datafixers.kinds.Applicative;
-import com.mojang.datafixers.util.Either;
-import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import org.apache.commons.lang3.function.TriFunction;
 import ru.bclib.BCLib;
@@ -28,7 +23,6 @@ import ru.bclib.world.generator.map.hex.HexBiomeMap;
 import ru.bclib.world.generator.map.square.SquareBiomeMap;
 
 import java.util.List;
-import java.util.function.Function;
 
 public class BCLibNetherBiomeSource extends BCLBiomeSource {
     private static boolean forceLegacyGenerator = false;
@@ -149,8 +143,8 @@ public class BCLibNetherBiomeSource extends BCLBiomeSource {
         if ((biomeX & 63) == 0 && (biomeZ & 63) == 0) {
             biomeMap.clearCache();
         }
-        BiomePicker.Entry bb = biomeMap.getBiome(biomeX << 2, biomeY << 2, biomeZ << 2);
-        return bb.actual;
+        BiomePicker.ActualBiome bb = biomeMap.getBiome(biomeX << 2, biomeY << 2, biomeZ << 2);
+        return bb.biome;
     }
 
     @Override

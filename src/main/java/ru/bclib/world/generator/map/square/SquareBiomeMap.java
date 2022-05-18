@@ -9,7 +9,6 @@ import ru.bclib.interfaces.BiomeMap;
 import ru.bclib.interfaces.TriConsumer;
 import ru.bclib.noise.OpenSimplexNoise;
 import ru.bclib.util.MHelper;
-import ru.bclib.world.biomes.BCLBiome;
 import ru.bclib.world.generator.BiomePicker;
 
 import java.util.Map;
@@ -45,11 +44,11 @@ public class SquareBiomeMap implements BiomeMap {
 	}
 	
 	@Override
-	public BiomePicker.Entry getBiome(double x, double y, double z) {
-		BiomePicker.Entry biome = getRawBiome(x, z);
+	public BiomePicker.ActualBiome getBiome(double x, double y, double z) {
+		BiomePicker.ActualBiome biome = getRawBiome(x, z);
 		
 		if (biome.getEdge() != null || (biome.getParentBiome() != null && biome.getParentBiome().getEdge() != null)) {
-			BiomePicker.Entry search = biome;
+			BiomePicker.ActualBiome search = biome;
 			if (biome.getParentBiome() != null) {
 				search = biome.getParentBiome();
 			}
@@ -96,7 +95,7 @@ public class SquareBiomeMap implements BiomeMap {
 		return chunk;
 	}
 	
-	private BiomePicker.Entry getRawBiome(double bx, double bz) {
+	private BiomePicker.ActualBiome getRawBiome(double bx, double bz) {
 		double x = bx * size / sizeXZ;
 		double z = bz * size / sizeXZ;
 		

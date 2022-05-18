@@ -21,5 +21,7 @@ public class CommonBlockTags {
 	public static final TagKey<Block> WOODEN_CHEST = TagAPI.makeCommonBlockTag("wooden_chests");
 	public static final TagKey<Block> WORKBENCHES = TagAPI.makeCommonBlockTag("workbench");
 
+	public static final TagKey<Block> DRAGON_IMMUNE = TagAPI.makeCommonBlockTag("dragon_immune");
+
 	public static final TagKey<Block> MINABLE_WITH_HAMMER = TagAPI.makeCommonBlockTag("mineable/hammer");
 }

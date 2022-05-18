@@ -6,13 +6,14 @@ import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.Registry;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import ru.bclib.BCLib;
 import ru.bclib.api.biomes.BiomeAPI;
 import ru.bclib.api.tag.NamedMineableTags;
 import ru.bclib.api.tag.TagAPI;
-import ru.bclib.api.tag.TagAPI.TagLocation;
+
 import ru.bclib.blocks.BaseBarrelBlock;
 import ru.bclib.blocks.BaseChestBlock;
 import ru.bclib.blocks.BaseFurnaceBlock;
@@ -39,8 +40,8 @@ import java.util.function.Consumer;
 
 public class PostInitAPI {
 	private static List<Consumer<Boolean>> postInitFunctions = Lists.newArrayList();
-	private static List<TagLocation<Block>> blockTags = Lists.newArrayList();
-	private static List<TagLocation<Item>> itemTags = Lists.newArrayList();
+	private static List<TagKey<Block>> blockTags = Lists.newArrayList();
+	private static List<TagKey<Item>> itemTags = Lists.newArrayList();
 	
 	/**
 	 * Register a new function which will be called after all mods are initiated. Will be called on both client and server.

@@ -1,13 +1,14 @@
 package ru.bclib.api.tag;
 
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
-import ru.bclib.api.tag.TagAPI.TagLocation;
+
 
 public class NamedToolTags {
-	public static final TagLocation<Item> FABRIC_AXES = new TagLocation<>("fabric", "axes");
-	public static final TagLocation<Item> FABRIC_HOES = new TagLocation<>("fabric", "hoes");
-	public static final TagLocation<Item> FABRIC_PICKAXES = new TagLocation<>("fabric", "pickaxes");
-	public static final TagLocation<Item> FABRIC_SHEARS = new TagLocation<>("fabric", "shears");
-	public static final TagLocation<Item> FABRIC_SHOVELS = new TagLocation<>("fabric", "shovels");
-	public static final TagLocation<Item> FABRIC_SWORDS = new TagLocation<>("fabric", "swords");
+	public static final TagKey<Item> FABRIC_AXES = TagAPI.makeItemTag("fabric", "axes");
+	public static final TagKey<Item> FABRIC_HOES = TagAPI.makeItemTag("fabric", "hoes");
+	public static final TagKey<Item> FABRIC_PICKAXES = TagAPI.makeItemTag("fabric", "pickaxes");
+	public static final TagKey<Item> FABRIC_SHEARS = TagAPI.makeItemTag("fabric", "shears");
+	public static final TagKey<Item> FABRIC_SHOVELS = TagAPI.makeItemTag("fabric", "shovels");
+	public static final TagKey<Item> FABRIC_SWORDS = TagAPI.makeItemTag("fabric", "swords");
 }

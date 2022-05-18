@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
@@ -18,7 +19,7 @@ import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import ru.bclib.api.tag.NamedBlockTags;
 import ru.bclib.api.tag.NamedItemTags;
-import ru.bclib.api.tag.TagAPI.TagLocation;
+
 import ru.bclib.client.render.BCLRenderLayer;
 import ru.bclib.interfaces.BlockModelProvider;
 import ru.bclib.interfaces.RenderLayerProvider;
@@ -100,7 +101,7 @@ public class BaseLeavesBlock extends LeavesBlock implements BlockModelProvider, 
 	}
 	
 	@Override
-	public void addTags(List<TagLocation<Block>> blockTags, List<TagLocation<Item>> itemTags) {
+	public void addTags(List<TagKey<Block>> blockTags, List<TagKey<Item>> itemTags) {
 		blockTags.add(NamedBlockTags.LEAVES);
 		itemTags.add(NamedItemTags.LEAVES);
 	}

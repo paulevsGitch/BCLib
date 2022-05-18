@@ -1,6 +1,8 @@
 package ru.bclib.blocks;
 
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
+
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
@@ -9,7 +11,7 @@ import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
 import ru.bclib.api.tag.NamedBlockTags;
 import ru.bclib.api.tag.NamedItemTags;
-import ru.bclib.api.tag.TagAPI.TagLocation;
+
 import ru.bclib.client.render.BCLRenderLayer;
 import ru.bclib.interfaces.RenderLayerProvider;
 import ru.bclib.interfaces.TagProvider;
@@ -58,7 +60,7 @@ public class SimpleLeavesBlock extends BaseBlockNotFull implements RenderLayerPr
 	}
 	
 	@Override
-	public void addTags(List<TagLocation<Block>> blockTags, List<TagLocation<Item>> itemTags) {
+	public void addTags(List<TagKey<Block>> blockTags, List<TagKey<Item>> itemTags) {
 		blockTags.add(NamedBlockTags.LEAVES);
 		itemTags.add(NamedItemTags.LEAVES);
 	}

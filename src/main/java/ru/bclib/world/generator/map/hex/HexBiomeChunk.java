@@ -1,11 +1,10 @@
 package ru.bclib.world.generator.map.hex;
 
 import ru.bclib.interfaces.BiomeChunk;
-import ru.bclib.world.biomes.BCLBiome;
 import ru.bclib.world.generator.BiomePicker;
 
 import java.util.Arrays;
-import java.util.Random;import net.minecraft.util.RandomSource;
+
 import net.minecraft.world.level.levelgen.WorldgenRandom;
 
 public class HexBiomeChunk implements BiomeChunk {
@@ -21,12 +20,12 @@ public class HexBiomeChunk implements BiomeChunk {
 	private static final byte SIDE_PRE_OFFSET = (byte) Math.round(Math.log(SIDE_PRE) / Math.log(2));
 	private static final short[][] NEIGHBOURS;
 	
-	private final BiomePicker.Entry[] biomes = new BiomePicker.Entry[SIZE];
+	private final BiomePicker.ActualBiome[] biomes = new BiomePicker.ActualBiome[SIZE];
 	
 	public HexBiomeChunk(WorldgenRandom random, BiomePicker picker) {
-		BiomePicker.Entry[][] buffers = new BiomePicker.Entry[2][SIZE];
+		BiomePicker.ActualBiome[][] buffers = new BiomePicker.ActualBiome[2][SIZE];
 		
-		for (BiomePicker.Entry[] buffer: buffers) {
+		for (BiomePicker.ActualBiome[] buffer: buffers) {
 			Arrays.fill(buffer, null);
 		}
 		
@@ -41,9 +40,9 @@ public class HexBiomeChunk implements BiomeChunk {
 		boolean hasEmptyCells = true;
 		byte bufferIndex = 0;
 		while (hasEmptyCells) {
-			BiomePicker.Entry[] inBuffer = buffers[bufferIndex];
+			BiomePicker.ActualBiome[] inBuffer = buffers[bufferIndex];
 			bufferIndex = (byte) ((bufferIndex + 1) & 1);
-			BiomePicker.Entry[] outBuffer = buffers[bufferIndex];
+			BiomePicker.ActualBiome[] outBuffer = buffers[bufferIndex];
 			hasEmptyCells = false;
 			
 			for (short index = SIDE; index < MAX_SIDE; index++) {
@@ -65,7 +64,7 @@ public class HexBiomeChunk implements BiomeChunk {
 			}
 		}
 
-		BiomePicker.Entry[] outBuffer = buffers[bufferIndex];
+		BiomePicker.ActualBiome[] outBuffer = buffers[bufferIndex];
 		byte preN = (byte) (SIDE_MASK - 2);
 		for (byte index = 0; index < SIDE; index++) {
 			outBuffer[getIndex(index, (byte) 0)] = outBuffer[getIndex(index, (byte) 2)];
@@ -86,7 +85,7 @@ public class HexBiomeChunk implements BiomeChunk {
 		System.arraycopy(outBuffer, 0, this.biomes, 0, SIZE);
 	}
 	
-	private void circle(BiomePicker.Entry[] buffer, short center, BiomePicker.Entry biome, BiomePicker.Entry mask) {
+	private void circle(BiomePicker.ActualBiome[] buffer, short center, BiomePicker.ActualBiome biome, BiomePicker.ActualBiome mask) {
 		if (buffer[center] == mask) {
 			buffer[center] = biome;
 		}
@@ -108,12 +107,12 @@ public class HexBiomeChunk implements BiomeChunk {
 	}
 	
 	@Override
-	public BiomePicker.Entry getBiome(int x, int z) {
+	public BiomePicker.ActualBiome getBiome(int x, int z) {
 		return biomes[getIndex(wrap(x), wrap(z))];
 	}
 	
 	@Override
-	public void setBiome(int x, int z, BiomePicker.Entry biome) {
+	public void setBiome(int x, int z, BiomePicker.ActualBiome biome) {
 		biomes[getIndex(wrap(x), wrap(z))] = biome;
 	}
 	

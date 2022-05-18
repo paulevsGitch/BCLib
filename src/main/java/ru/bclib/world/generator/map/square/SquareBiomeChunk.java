@@ -1,10 +1,8 @@
 package ru.bclib.world.generator.map.square;
 
 import ru.bclib.interfaces.BiomeChunk;
-import ru.bclib.world.biomes.BCLBiome;
 import ru.bclib.world.generator.BiomePicker;
 
-import java.util.Random;import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.levelgen.WorldgenRandom;
 
 public class SquareBiomeChunk implements BiomeChunk {
@@ -18,11 +16,11 @@ public class SquareBiomeChunk implements BiomeChunk {
 	private static final int SM_CAPACITY = SM_WIDTH * SM_WIDTH;
 	private static final int CAPACITY = WIDTH * WIDTH;
 	
-	private final BiomePicker.Entry[] biomes;
+	private final BiomePicker.ActualBiome[] biomes;
 	
 	public SquareBiomeChunk(WorldgenRandom random, BiomePicker picker) {
-		BiomePicker.Entry[] PreBio = new BiomePicker.Entry[SM_CAPACITY];
-		biomes = new BiomePicker.Entry[CAPACITY];
+		BiomePicker.ActualBiome[] PreBio = new BiomePicker.ActualBiome[SM_CAPACITY];
+		biomes = new BiomePicker.ActualBiome[CAPACITY];
 		
 		for (int x = 0; x < SM_WIDTH; x++) {
 			int offset = x << SM_BIT_OFFSET;
@@ -40,12 +38,12 @@ public class SquareBiomeChunk implements BiomeChunk {
 	}
 	
 	@Override
-	public BiomePicker.Entry getBiome(int x, int z) {
+	public BiomePicker.ActualBiome getBiome(int x, int z) {
 		return biomes[getIndex(x & MASK_WIDTH, z & MASK_WIDTH)];
 	}
 	
 	@Override
-	public void setBiome(int x, int z, BiomePicker.Entry biome) {
+	public void setBiome(int x, int z, BiomePicker.ActualBiome biome) {
 		biomes[getIndex(x & MASK_WIDTH, z & MASK_WIDTH)] = biome;
 	}
 	

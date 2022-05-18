@@ -1,14 +1,16 @@
 package ru.bclib.api.tag;
 
+import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
-import ru.bclib.api.tag.TagAPI.TagLocation;
+
 
 public class NamedMineableTags {
-	public static final TagLocation<Block> AXE = new TagLocation<>("mineable/axe");
-	public static final TagLocation<Block> HOE = new TagLocation<>("mineable/hoe");
-	public static final TagLocation<Block> PICKAXE = new TagLocation<>("mineable/pickaxe");
-	public static final TagLocation<Block> SHEARS = new TagLocation<>("fabric", "mineable/shears");
-	public static final TagLocation<Block> SHOVEL = new TagLocation<>("mineable/shovel");
-	public static final TagLocation<Block> SWORD = new TagLocation<>("fabric", "mineable/sword");
-	public static final TagLocation<Block> HAMMER = new TagLocation<>("c", "mineable/hammer");
+	public static final TagKey<Block> AXE = BlockTags.MINEABLE_WITH_AXE;
+	public static final TagKey<Block> HOE = BlockTags.MINEABLE_WITH_HOE;
+	public static final TagKey<Block> PICKAXE = BlockTags.MINEABLE_WITH_PICKAXE;
+	public static final TagKey<Block> SHEARS = TagAPI.makeBlockTag("fabric", "mineable/shears");
+	public static final TagKey<Block> SHOVEL = BlockTags.MINEABLE_WITH_SHOVEL;
+	public static final TagKey<Block> SWORD = TagAPI.makeBlockTag("fabric", "mineable/sword");
+	public static final TagKey<Block> HAMMER = TagAPI.makeCommonBlockTag( "mineable/hammer");
 }

@@ -6,10 +6,9 @@ import ru.bclib.interfaces.BiomeChunk;
 import ru.bclib.interfaces.BiomeMap;
 import ru.bclib.interfaces.TriConsumer;
 import ru.bclib.noise.OpenSimplexNoise;
-import ru.bclib.world.biomes.BCLBiome;
 import ru.bclib.world.generator.BiomePicker;
 
-import java.util.Random;import net.minecraft.util.RandomSource;
+import java.util.Random;
 
 public class MapStack implements BiomeMap {
 	private final OpenSimplexNoise noise;
@@ -52,7 +51,7 @@ public class MapStack implements BiomeMap {
 	}
 	
 	@Override
-	public BiomePicker.Entry getBiome(double x, double y, double z) {
+	public BiomePicker.ActualBiome getBiome(double x, double y, double z) {
 		int mapIndex;
 		
 		if (y < minValue) {
@@ -70,7 +69,7 @@ public class MapStack implements BiomeMap {
 	}
 	
 	private void onChunkCreation(int cx, int cz, int side) {
-		BiomePicker.Entry[][] biomeMap = new BiomePicker.Entry[side][side];
+		BiomePicker.ActualBiome[][] biomeMap = new BiomePicker.ActualBiome[side][side];
 		BiomeChunk[] chunks = new BiomeChunk[maps.length];
 		
 		boolean isNoEmpty = false;
@@ -79,7 +78,7 @@ public class MapStack implements BiomeMap {
 			for (int x = 0; x < side; x++) {
 				for (int z = 0; z < side; z++) {
 					if (biomeMap[x][z] == null) {
-						BiomePicker.Entry biome = chunks[i].getBiome(x, z);
+						BiomePicker.ActualBiome biome = chunks[i].getBiome(x, z);
 						if (biome.bclBiome.isVertical()) {
 							biomeMap[x][z] = biome;
 							isNoEmpty = true;
