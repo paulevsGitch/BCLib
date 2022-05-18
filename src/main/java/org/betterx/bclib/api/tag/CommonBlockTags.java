@@ -24,4 +24,6 @@ public class CommonBlockTags {
     public static final TagKey<Block> DRAGON_IMMUNE = TagAPI.makeCommonBlockTag("dragon_immune");
 
     public static final TagKey<Block> MINABLE_WITH_HAMMER = TagAPI.makeCommonBlockTag("mineable/hammer");
+
+    public static final TagKey<Block> IS_OBSIDIAN = TagAPI.makeCommonBlockTag("is_obsidian");
 }

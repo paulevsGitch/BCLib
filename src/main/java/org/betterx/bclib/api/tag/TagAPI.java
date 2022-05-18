@@ -148,7 +148,6 @@ public class TagAPI {
      * @param biome  The {@link Biome} to add tag.
      */
     @SafeVarargs
-    @Deprecated(forRemoval = true)
     public static void addBiomeTags(Biome biome, TagKey<Biome>... tagIDs) {
         BIOMES.add(biome, tagIDs);
     }
@@ -171,7 +170,6 @@ public class TagAPI {
      * @param block  The {@link Block} to add tag.
      */
     @SafeVarargs
-    @Deprecated(forRemoval = true)
     public static void addBlockTags(Block block, TagKey<Block>... tagIDs) {
         BLOCKS.add(block, tagIDs);
     }
@@ -193,7 +191,6 @@ public class TagAPI {
      * @param tagIDs array of {@link TagKey<Item>} tag IDs.
      * @param item   The {@link Item} to add tag.
      */
-    @Deprecated(forRemoval = true)
     @SafeVarargs
     public static void addItemTags(ItemLike item, TagKey<Item>... tagIDs) {
         ITEMS.add(item.asItem(), tagIDs);
