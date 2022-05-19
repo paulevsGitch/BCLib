@@ -127,7 +127,6 @@ public abstract class BasePlantBlock extends BaseBlockNotFull implements RenderL
     @Override
     public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
         ItemStack tool = builder.getParameter(LootContextParams.TOOL);
-        //TODO: 1.18.2 Test if shearing still works
         if (tool != null && BaseShearsItem.isShear(tool) || EnchantmentHelper.getItemEnchantmentLevel(
                 Enchantments.SILK_TOUCH,
                 tool

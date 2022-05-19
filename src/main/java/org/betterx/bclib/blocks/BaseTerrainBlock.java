@@ -77,9 +77,7 @@ public class BaseTerrainBlock extends BaseBlock {
                                  Player player,
                                  InteractionHand hand,
                                  BlockHitResult hit) {
-        //TODO: 1.18.2 check
         if (pathBlock != null && TagAPI.isToolWithMineableTag(player.getMainHandItem(), NamedMineableTags.SHOVEL)) {
-            //if (pathBlock != null && FabricTagProvider.SHOVELS.contains(player.getMainHandItem().getItem())) {
             world.playSound(player, pos, SoundEvents.SHOVEL_FLATTEN, SoundSource.BLOCKS, 1.0F, 1.0F);
             if (!world.isClientSide) {
                 world.setBlockAndUpdate(pos, pathBlock.defaultBlockState());

@@ -34,6 +34,7 @@ import org.betterx.bclib.util.ItemUtil;
 import org.betterx.bclib.util.RecipeHelper;
 
 import java.util.Objects;
+import org.jetbrains.annotations.NotNull;
 
 public class AnvilRecipe implements Recipe<Container>, UnknownReceipBookCategory {
     public final static String GROUP = "smithing";
@@ -102,41 +103,60 @@ public class AnvilRecipe implements Recipe<Container>, UnknownReceipBookCategory
     }
 
     @Override
-    public boolean matches(Container craftingInventory, Level world) {
+    public boolean matches(@NotNull Container craftingInventory, @NotNull Level world) {
         return this.matches(craftingInventory);
     }
 
     @Override
-    public ItemStack assemble(Container craftingInventory) {
+    public ItemStack assemble(@NotNull Container craftingInventory) {
         return this.output.copy();
+    }
+
+    public ItemStack getHammer(Container c) {
+        ItemStack h = c.getItem(1);
+        if (!h.isEmpty() && h.is(CommonItemTags.HAMMERS)) return h;
+        h = c.getItem(0);
+        if (!h.isEmpty() && h.is(CommonItemTags.HAMMERS)) return h;
+        return null;
+    }
+
+    public ItemStack getIngredient(Container c) {
+        ItemStack i = c.getItem(0);
+        if (i.is(CommonItemTags.HAMMERS)) i = c.getItem(1);
+        return i;
     }
 
     public ItemStack craft(Container craftingInventory, Player player) {
         if (!player.isCreative()) {
             if (!checkHammerDurability(craftingInventory, player)) return ItemStack.EMPTY;
-            ItemStack hammer = craftingInventory.getItem(1);
-            hammer.hurtAndBreak(this.damage, player, entity -> entity.broadcastBreakEvent((InteractionHand) null));
+            ItemStack hammer = getHammer(craftingInventory);
+            if (hammer != null) {
+                hammer.hurtAndBreak(this.damage, player, entity -> entity.broadcastBreakEvent((InteractionHand) null));
+                return ItemStack.EMPTY;
+            }
         }
         return this.assemble(craftingInventory);
     }
 
     public boolean checkHammerDurability(Container craftingInventory, Player player) {
         if (player.isCreative()) return true;
-        ItemStack hammer = craftingInventory.getItem(1);
-        int damage = hammer.getDamageValue() + this.damage;
-        return damage < hammer.getMaxDamage();
+        ItemStack hammer = getHammer(craftingInventory);
+        if (hammer != null) {
+            int damage = hammer.getDamageValue() + this.damage;
+            return damage < hammer.getMaxDamage();
+        }
+        return true;
     }
 
     public boolean matches(Container craftingInventory) {
-        ItemStack hammer = craftingInventory.getItem(1);
-        //TODO: 1.18.2 Test if hammer still works
-        if (hammer.isEmpty() || !hammer.is(CommonItemTags.HAMMERS)) {
+        ItemStack hammer = getHammer(craftingInventory);
+        if (hammer == null) {
             return false;
         }
-        ItemStack material = craftingInventory.getItem(0);
+        ItemStack material = getIngredient(craftingInventory);
         int materialCount = material.getCount();
         int level = ((TieredItem) hammer.getItem()).getTier().getLevel();
-        return this.input.test(craftingInventory.getItem(0)) && materialCount >= this.inputCount && level >= this.toolLevel;
+        return this.input.test(getIngredient(craftingInventory)) && materialCount >= this.inputCount && level >= this.toolLevel;
     }
 
     public int getDamage() {

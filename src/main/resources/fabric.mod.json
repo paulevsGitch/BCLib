@@ -1,18 +1,18 @@
 {
   "schemaVersion": 1,
   "id": "bclib",
-  "version": "2.0.0",
+  "version": "${version}",
   "name": "BCLib",
   "description": "A library for BetterX team mods",
   "authors": [
-    "paulevs",
     "Quiqueck",
+    "paulevs",
     "Bulldog83"
   ],
   "contact": {
     "homepage": "https://www.curseforge.com/minecraft/mc-mods/bclib",
-    "issues": "https://github.com/paulevsGitch/bclib/issues",
-    "sources": "https://github.com/paulevsGitch/bclib"
+    "issues": "https://github.com/quiqueck/bclib/issues",
+    "sources": "https://github.com/quiqueck/bclib"
   },
   "license": "MIT",
   "icon": "assets/bclib/icon.png",

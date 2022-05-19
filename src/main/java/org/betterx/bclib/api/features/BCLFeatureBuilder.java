@@ -128,13 +128,10 @@ public class BCLFeatureBuilder<FC extends FeatureConfiguration, F extends Featur
         return modifier(BiomeFilter.biome());
     }
 
-    // Are these two things required in 1.18.1?
-    // TODO - add information
     public BCLFeatureBuilder squarePlacement() {
         return modifier(InSquarePlacement.spread());
     }
 
-    // TODO - add information
     public BCLFeatureBuilder heightmap() {
         return modifier(PlacementUtils.HEIGHTMAP);
     }
