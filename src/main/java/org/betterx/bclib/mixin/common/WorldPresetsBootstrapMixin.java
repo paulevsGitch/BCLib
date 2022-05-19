@@ -74,12 +74,12 @@ public abstract class WorldPresetsBootstrapMixin {
                         endSource,
                         this.endNoiseSettings)
         );
-        WorldPreset preset = new WorldPreset(Map.of(LevelStem.OVERWORLD,
-                                                    overworldStem,
-                                                    LevelStem.NETHER,
-                                                    bclNether,
-                                                    LevelStem.END,
-                                                    bclEnd));
+        WorldPreset preset = new org.betterx.bclib.presets.WorldPresets.SortableWorldPreset(Map.of(LevelStem.OVERWORLD,
+                                                                                                   overworldStem,
+                                                                                                   LevelStem.NETHER,
+                                                                                                   bclNether,
+                                                                                                   LevelStem.END,
+                                                                                                   bclEnd), 0);
 
         BuiltinRegistries.register(this.presets, org.betterx.bclib.presets.WorldPresets.BCL_WORLD, preset);
 

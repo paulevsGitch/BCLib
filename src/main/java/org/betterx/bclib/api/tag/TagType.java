@@ -4,6 +4,7 @@ import net.minecraft.core.DefaultedRegistry;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagEntry;
 import net.minecraft.tags.TagKey;
 import net.minecraft.tags.TagLoader;
 import net.minecraft.tags.TagManager;
@@ -196,6 +197,12 @@ public class TagType<T> {
         if (Registry.BIOME_REGISTRY.equals(registryKey)) BiomeAPI._runTagAdders();
 
         //this.isFrozen = true;
-        this.forEach((id, ids) -> TagAPI.apply(tagsMap.computeIfAbsent(id, key -> Lists.newArrayList()), ids));
+        this.forEach((id, ids) -> apply(tagsMap.computeIfAbsent(id, key -> Lists.newArrayList()), ids));
+    }
+
+    private static List<TagLoader.EntryWithSource> apply(List<TagLoader.EntryWithSource> builder,
+                                                         Set<ResourceLocation> ids) {
+        ids.forEach(value -> builder.add(new TagLoader.EntryWithSource(TagEntry.element(value), BCLib.MOD_ID)));
+        return builder;
     }
 }

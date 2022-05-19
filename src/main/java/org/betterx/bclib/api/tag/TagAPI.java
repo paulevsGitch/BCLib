@@ -5,7 +5,6 @@ import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.tags.TagEntry;
 import net.minecraft.tags.TagKey;
 import net.minecraft.tags.TagLoader;
 import net.minecraft.world.item.Item;
@@ -17,13 +16,11 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 
 import com.google.common.collect.Maps;
-import org.betterx.bclib.BCLib;
 import org.betterx.bclib.api.biomes.BiomeAPI;
 import org.betterx.bclib.mixin.common.DiggerItemAccessor;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Function;
 
 public class TagAPI {
@@ -257,19 +254,6 @@ public class TagAPI {
 //			TAGS_BIOME.forEach(consumer);
 //		}
         return tagsMap;
-    }
-
-    /**
-     * Adds all {@code ids} to the {@code builder}.
-     *
-     * @param builder
-     * @param ids
-     * @return The Builder passed as {@code builder}.
-     */
-    public static List<TagLoader.EntryWithSource> apply(List<TagLoader.EntryWithSource> builder,
-                                                        Set<ResourceLocation> ids) {
-        ids.forEach(value -> builder.add(new TagLoader.EntryWithSource(TagEntry.element(value), BCLib.MOD_ID)));
-        return builder;
     }
 
 

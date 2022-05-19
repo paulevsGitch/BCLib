@@ -6,6 +6,7 @@ import net.minecraft.data.BuiltinRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.WorldPresetTags;
+import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.presets.WorldPreset;
 
 import org.betterx.bclib.BCLib;
@@ -13,9 +14,19 @@ import org.betterx.bclib.api.tag.TagAPI;
 import org.betterx.bclib.api.tag.TagType;
 import org.betterx.bclib.gui.modmenu.MainScreen;
 
+import java.util.Map;
 import java.util.Optional;
 
 public class WorldPresets {
+    public static class SortableWorldPreset extends WorldPreset {
+        public final int sortOrder;
+
+        public SortableWorldPreset(Map<ResourceKey<LevelStem>, LevelStem> map, int sortOrder) {
+            super(map);
+            this.sortOrder = sortOrder;
+        }
+    }
+
     public static TagType.Simple<WorldPreset> WORLD_PRESETS =
             TagAPI.registerType(BuiltinRegistries.WORLD_PRESET, "tags/worldgen/world_preset");
 
