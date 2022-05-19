@@ -11,6 +11,7 @@ import org.betterx.bclib.api.dataexchange.DataExchangeAPI;
 import org.betterx.bclib.api.dataexchange.handler.autosync.*;
 import org.betterx.bclib.api.tag.TagAPI;
 import org.betterx.bclib.config.Configs;
+import org.betterx.bclib.presets.WorldPresets;
 import org.betterx.bclib.recipes.AnvilRecipe;
 import org.betterx.bclib.recipes.CraftingRecipes;
 import org.betterx.bclib.registry.BaseBlockEntities;
@@ -37,6 +38,7 @@ public class BCLib implements ModInitializer {
         CraftingRecipes.init();
         WorldDataAPI.registerModCache(MOD_ID);
         DataExchangeAPI.registerMod(MOD_ID);
+        WorldPresets.register();
         AnvilRecipe.register();
 
         DataExchangeAPI.registerDescriptors(List.of(

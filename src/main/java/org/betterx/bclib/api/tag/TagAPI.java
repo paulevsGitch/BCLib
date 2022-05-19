@@ -35,9 +35,13 @@ public class TagAPI {
                                                               "tags/worldgen/biome",
                                                               b -> BiomeAPI.getBiomeID(b));
 
-    private static <T> TagType.RegistryBacked<T> registerType(DefaultedRegistry<T> registry) {
+    public static <T> TagType.RegistryBacked<T> registerType(DefaultedRegistry<T> registry) {
         TagType<T> type = new TagType.RegistryBacked<>(registry);
         return (TagType.RegistryBacked<T>) TYPES.computeIfAbsent(type.directory, (dir) -> type);
+    }
+
+    public static <T> TagType.Simple<T> registerType(Registry<T> registry, String directory) {
+        return registerType(registry.key(), directory, (o) -> registry.getKey(o));
     }
 
     public static <T> TagType.Simple<T> registerType(ResourceKey<? extends Registry<T>> registry,

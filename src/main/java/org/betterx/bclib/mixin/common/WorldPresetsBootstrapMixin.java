@@ -3,7 +3,6 @@ package org.betterx.bclib.mixin.common;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.data.BuiltinRegistries;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.dimension.LevelStem;
@@ -14,7 +13,6 @@ import net.minecraft.world.level.levelgen.presets.WorldPresets;
 import net.minecraft.world.level.levelgen.structure.StructureSet;
 import net.minecraft.world.level.levelgen.synth.NormalNoise;
 
-import org.betterx.bclib.BCLib;
 import org.betterx.bclib.world.generator.BCLibEndBiomeSource;
 import org.betterx.bclib.world.generator.BCLibNetherBiomeSource;
 import org.spongepowered.asm.mixin.Final;
@@ -27,7 +25,6 @@ import java.util.Map;
 
 @Mixin(WorldPresets.Bootstrap.class)
 public abstract class WorldPresetsBootstrapMixin {
-    private static final ResourceKey<WorldPreset> BCL_NORMAL = bcl_register("normal");
     @Shadow
     @Final
     private Registry<WorldPreset> presets;
@@ -54,9 +51,6 @@ public abstract class WorldPresetsBootstrapMixin {
     private Holder<NoiseGeneratorSettings> endNoiseSettings;
 
     //see WorldPresets.register
-    private static ResourceKey<WorldPreset> bcl_register(String string) {
-        return ResourceKey.create(Registry.WORLD_PRESET_REGISTRY, BCLib.makeID(string));
-    }
 
     @ModifyArg(method = "run", at = @At(value = "INVOKE", ordinal = 0, target = "Lnet/minecraft/world/level/levelgen/presets/WorldPresets$Bootstrap;registerCustomOverworldPreset(Lnet/minecraft/resources/ResourceKey;Lnet/minecraft/world/level/dimension/LevelStem;)Lnet/minecraft/core/Holder;"))
     private LevelStem bcl_getOverworldStem(LevelStem overworldStem) {
@@ -86,7 +80,8 @@ public abstract class WorldPresetsBootstrapMixin {
                                                     bclNether,
                                                     LevelStem.END,
                                                     bclEnd));
-        BuiltinRegistries.register(this.presets, BCL_NORMAL, preset);
+
+        BuiltinRegistries.register(this.presets, org.betterx.bclib.presets.WorldPresets.BCL_WORLD, preset);
 
         return overworldStem;
     }
