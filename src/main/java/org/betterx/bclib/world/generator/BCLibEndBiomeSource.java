@@ -102,8 +102,8 @@ public class BCLibEndBiomeSource extends BCLBiomeSource {
         endVoidBiomePicker.rebuild();
 
 
-        this.centerBiome = biomeRegistry.getOrCreateHolder(Biomes.THE_END);
-        this.barrens = biomeRegistry.getOrCreateHolder(Biomes.END_BARRENS);
+        this.centerBiome = biomeRegistry.getOrCreateHolderOrThrow(Biomes.THE_END);
+        this.barrens = biomeRegistry.getOrCreateHolderOrThrow(Biomes.END_BARRENS);
 
         this.endLandFunction = GeneratorOptions.getEndLandFunction();
         this.pos = new Point();
@@ -119,7 +119,8 @@ public class BCLibEndBiomeSource extends BCLBiomeSource {
 
         return biomeRegistry.stream()
                             .filter(biome -> biomeRegistry.getResourceKey(biome).isPresent())
-                            .map(biome -> biomeRegistry.getOrCreateHolder(biomeRegistry.getResourceKey(biome).get()))
+                            .map(biome -> biomeRegistry.getOrCreateHolderOrThrow(biomeRegistry.getResourceKey(biome)
+                                                                                              .get()))
                             .filter(biome -> {
                                 ResourceLocation key = biome.unwrapKey().orElseThrow().location();
 

@@ -2,18 +2,16 @@ package org.betterx.bclib.mixin.common;
 
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.Services;
 import net.minecraft.server.WorldStem;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.progress.ChunkProgressListener;
 import net.minecraft.server.level.progress.ChunkProgressListenerFactory;
 import net.minecraft.server.packs.repository.PackRepository;
-import net.minecraft.server.players.GameProfileCache;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.LevelStorageSource.LevelStorageAccess;
 import net.minecraft.world.level.storage.WorldData;
 
-import com.mojang.authlib.GameProfileRepository;
-import com.mojang.authlib.minecraft.MinecraftSessionService;
 import com.mojang.datafixers.DataFixer;
 import org.betterx.bclib.api.dataexchange.DataExchangeAPI;
 import org.betterx.bclib.recipes.BCLRecipeManager;
@@ -50,9 +48,7 @@ public class MinecraftServerMixin {
                                     WorldStem worldStem,
                                     Proxy proxy,
                                     DataFixer dataFixer,
-                                    MinecraftSessionService minecraftSessionService,
-                                    GameProfileRepository gameProfileRepository,
-                                    GameProfileCache gameProfileCache,
+                                    Services services,
                                     ChunkProgressListenerFactory chunkProgressListenerFactory,
                                     CallbackInfo ci) {
         DataExchangeAPI.prepareServerside();

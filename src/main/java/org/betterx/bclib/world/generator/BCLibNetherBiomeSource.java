@@ -105,7 +105,8 @@ public class BCLibNetherBiomeSource extends BCLBiomeSource {
 
         return biomeRegistry.stream()
                             .filter(biome -> biomeRegistry.getResourceKey(biome).isPresent())
-                            .map(biome -> biomeRegistry.getOrCreateHolder(biomeRegistry.getResourceKey(biome).get()))
+                            .map(biome -> biomeRegistry.getOrCreateHolderOrThrow(biomeRegistry.getResourceKey(biome)
+                                                                                              .get()))
                             .filter(biome -> {
                                 ResourceLocation location = biome.unwrapKey().orElseThrow().location();
                                 final String strLocation = location.toString();

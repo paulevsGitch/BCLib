@@ -1,51 +1,51 @@
 {
-	"schemaVersion": 1,
-	"id": "bclib",
-	"version": "${version}",
-	"name": "BCLib",
-	"description": "A library for BetterX team mods",
-	"authors": [
-		"paulevs",
-		"Quiqueck",
-		"Bulldog83"
-	],
-	"contact": {
-		"homepage": "https://www.curseforge.com/minecraft/mc-mods/bclib",
-		"issues": "https://github.com/paulevsGitch/bclib/issues",
-		"sources": "https://github.com/paulevsGitch/bclib"
-	},
-	"license": "MIT",
-	"icon": "assets/bclib/icon.png",
-	"environment": "*",
-	"entrypoints": {
-		"main": [
-			"ru.bclib.BCLib"
-		],
-		"client": [
-			"ru.bclib.client.BCLibClient"
-		],
-		"server": [
-			"ru.bclib.server.BCLibServer"
-		],
-		"modmenu": [
-			"ru.bclib.integration.modmenu.ModMenuEntryPoint"
-		]
-	},
-	"accessWidener" : "bclib.accesswidener",
-	"mixins": [
-		"bclib.mixins.common.json",
-		"bclib.mixins.client.json"
-	],
-	"depends": {
-		"fabricloader": ">=0.14.3",
-		"fabric": ">=0.52.0",
-		"minecraft": "1.19-alpha.22.18.a"
-	},
-	"custom":{
-		"modmenu":{
-			"links":{
-				"title.link.bclib.discord":"https://discord.gg/kYuATbYbKW"
-			}
-		}
-	}
+  "schemaVersion": 1,
+  "id": "bclib",
+  "version": "2.0.0",
+  "name": "BCLib",
+  "description": "A library for BetterX team mods",
+  "authors": [
+    "paulevs",
+    "Quiqueck",
+    "Bulldog83"
+  ],
+  "contact": {
+    "homepage": "https://www.curseforge.com/minecraft/mc-mods/bclib",
+    "issues": "https://github.com/paulevsGitch/bclib/issues",
+    "sources": "https://github.com/paulevsGitch/bclib"
+  },
+  "license": "MIT",
+  "icon": "assets/bclib/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "org.betterx.bclib.BCLib"
+    ],
+    "client": [
+      "org.betterx.bclib.client.BCLibClient"
+    ],
+    "server": [
+      "org.betterx.bclib.server.BCLibServer"
+    ],
+    "modmenu": [
+      "org.betterx.bclib.integration.modmenu.ModMenuEntryPoint"
+    ]
+  },
+  "accessWidener": "bclib.accesswidener",
+  "mixins": [
+    "bclib.mixins.common.json",
+    "bclib.mixins.client.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.14.5",
+    "fabric": ">=0.52.4",
+    "minecraft": "1.19-beta.1"
+  },
+  "custom": {
+    "modmenu": {
+      "links": {
+        "title.link.bclib.discord": "https://discord.gg/kYuATbYbKW"
+      }
+    }
+  }
 }

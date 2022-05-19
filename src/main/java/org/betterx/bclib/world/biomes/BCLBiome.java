@@ -189,7 +189,7 @@ public class BCLBiome extends BCLBiomeSettings {
 
 
     public Holder<Biome> getBiomeHolder() {
-        return BuiltinRegistries.BIOME.getOrCreateHolder(BiomeAPI.getBiomeKey(biome));
+        return BuiltinRegistries.BIOME.getOrCreateHolderOrThrow(BiomeAPI.getBiomeKey(biome));
     }
 
     /**

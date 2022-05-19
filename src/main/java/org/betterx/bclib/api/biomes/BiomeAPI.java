@@ -22,18 +22,14 @@ import net.minecraft.world.level.biome.BiomeGenerationSettings;
 import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.biome.MobSpawnSettings.SpawnerData;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.chunk.PalettedContainer;
-import net.minecraft.world.level.levelgen.GenerationStep.Carving;
 import net.minecraft.world.level.levelgen.GenerationStep.Decoration;
-import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
 import net.minecraft.world.level.levelgen.SurfaceRules;
 import net.minecraft.world.level.levelgen.SurfaceRules.RuleSource;
-import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
@@ -53,8 +49,10 @@ import org.apache.commons.lang3.mutable.MutableInt;
 import org.betterx.bclib.BCLib;
 import org.betterx.bclib.api.tag.CommonBiomeTags;
 import org.betterx.bclib.api.tag.TagAPI;
-import org.betterx.bclib.entity.BCLEntityWrapper;
-import org.betterx.bclib.interfaces.*;
+import org.betterx.bclib.interfaces.BiomeSourceAccessor;
+import org.betterx.bclib.interfaces.NoiseGeneratorSettingsProvider;
+import org.betterx.bclib.interfaces.SurfaceMaterialProvider;
+import org.betterx.bclib.interfaces.SurfaceRuleProvider;
 import org.betterx.bclib.mixin.client.MinecraftMixin;
 import org.betterx.bclib.mixin.common.BiomeGenerationSettingsAccessor;
 import org.betterx.bclib.mixin.common.MobSpawnSettingsAccessor;
@@ -483,7 +481,7 @@ public class BiomeAPI {
 
         FabricBiomesData.END_VOID_BIOMES.forEach((key, weight) -> {
             if (!hasBiome(key.location())) {
-                registerEndVoidBiome(BuiltinRegistries.BIOME.getOrCreateHolder(key), weight);
+                registerEndVoidBiome(BuiltinRegistries.BIOME.getOrCreateHolderOrThrow(key), weight);
             }
         });
     }
@@ -495,7 +493,7 @@ public class BiomeAPI {
 
     @Nullable
     public static Holder<Biome> getFromRegistry(ResourceKey<Biome> key) {
-        return BuiltinRegistries.BIOME.getOrCreateHolder(key);
+        return BuiltinRegistries.BIOME.getOrCreateHolderOrThrow(key);
     }
 
     public static boolean isDatapackBiome(ResourceLocation biomeID) {
@@ -858,6 +856,7 @@ public class BiomeAPI {
     public static Optional<BlockState> findUnderMaterial(Holder<Biome> biome) {
         return findUnderMaterial(getBiome(biome.value()));
     }
+
     public static Optional<BlockState> findUnderMaterial(BCLBiome biome) {
         if (biome instanceof SurfaceMaterialProvider smp) {
             return Optional.of(smp.getUnderMaterial());

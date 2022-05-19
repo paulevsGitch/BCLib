@@ -4,16 +4,18 @@ import net.minecraft.core.DefaultedRegistry;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.Tag;
 import net.minecraft.tags.TagKey;
+import net.minecraft.tags.TagLoader;
 import net.minecraft.tags.TagManager;
 import net.minecraft.world.level.biome.Biome;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.betterx.bclib.BCLib;
 import org.betterx.bclib.api.biomes.BiomeAPI;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
@@ -190,10 +192,10 @@ public class TagType<T> {
         tags.forEach(consumer);
     }
 
-    public void apply(Map<ResourceLocation, Tag.Builder> tagsMap) {
+    public void apply(Map<ResourceLocation, List<TagLoader.EntryWithSource>> tagsMap) {
         if (Registry.BIOME_REGISTRY.equals(registryKey)) BiomeAPI._runTagAdders();
 
         //this.isFrozen = true;
-        this.forEach((id, ids) -> TagAPI.apply(tagsMap.computeIfAbsent(id, key -> Tag.Builder.tag()), ids));
+        this.forEach((id, ids) -> TagAPI.apply(tagsMap.computeIfAbsent(id, key -> Lists.newArrayList()), ids));
     }
 }

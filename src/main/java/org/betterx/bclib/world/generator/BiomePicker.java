@@ -33,7 +33,7 @@ public class BiomePicker {
             this.bclBiome = bclBiome;
 
             this.key = biomeRegistry.getResourceKey(biomeRegistry.get(bclBiome.getID())).orElseThrow();
-            this.biome = biomeRegistry.getOrCreateHolder(key);
+            this.biome = biomeRegistry.getOrCreateHolderOrThrow(key);
 
             bclBiome.forEachSubBiome((b, w) -> {
                 subbiomes.add(create(b), w);

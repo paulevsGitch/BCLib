@@ -5,8 +5,9 @@ import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.tags.Tag;
+import net.minecraft.tags.TagEntry;
 import net.minecraft.tags.TagKey;
+import net.minecraft.tags.TagLoader;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -16,9 +17,11 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 
 import com.google.common.collect.Maps;
+import org.betterx.bclib.BCLib;
 import org.betterx.bclib.api.biomes.BiomeAPI;
 import org.betterx.bclib.mixin.common.DiggerItemAccessor;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
@@ -229,8 +232,8 @@ public class TagAPI {
      * @param tagsMap   The map that will hold the registered Tags
      * @return The {@code tagsMap} Parameter.
      */
-    public static <T> Map<ResourceLocation, Tag.Builder> apply(String directory,
-                                                               Map<ResourceLocation, Tag.Builder> tagsMap) {
+    public static <T> Map<ResourceLocation, List<TagLoader.EntryWithSource>> apply(String directory,
+                                                                                   Map<ResourceLocation, List<TagLoader.EntryWithSource>> tagsMap) {
 
         TagType<?> type = TYPES.get(directory);
         if (type != null) {
@@ -259,8 +262,9 @@ public class TagAPI {
      * @param ids
      * @return The Builder passed as {@code builder}.
      */
-    public static Tag.Builder apply(Tag.Builder builder, Set<ResourceLocation> ids) {
-        ids.forEach(value -> builder.addElement(value, "BCLib Code"));
+    public static List<TagLoader.EntryWithSource> apply(List<TagLoader.EntryWithSource> builder,
+                                                        Set<ResourceLocation> ids) {
+        ids.forEach(value -> builder.add(new TagLoader.EntryWithSource(TagEntry.element(value), BCLib.MOD_ID)));
         return builder;
     }
 
