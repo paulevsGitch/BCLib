@@ -2,7 +2,6 @@ accessWidener   v1  named
 
 # Classes
 accessible	class	net/minecraft/server/MinecraftServer$ReloadableResources
-accessible	class	net/minecraft/client/Minecraft$ExperimentalDialogType
 accessible	class	net/minecraft/world/level/levelgen/SurfaceRules$Context
 accessible	class	net/minecraft/world/level/levelgen/SurfaceRules$Condition
 accessible	class	net/minecraft/world/level/levelgen/SurfaceRules$SurfaceRule

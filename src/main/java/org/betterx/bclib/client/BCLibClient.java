@@ -11,6 +11,7 @@ import org.betterx.bclib.api.ModIntegrationAPI;
 import org.betterx.bclib.api.PostInitAPI;
 import org.betterx.bclib.api.dataexchange.DataExchangeAPI;
 import org.betterx.bclib.client.models.CustomModelBakery;
+import org.betterx.bclib.client.presets.WorldPresetsUI;
 import org.betterx.bclib.registry.BaseBlockEntityRenders;
 
 import org.jetbrains.annotations.Nullable;
@@ -27,6 +28,8 @@ public class BCLibClient implements ClientModInitializer, ModelResourceProvider,
         modelBakery = new CustomModelBakery();
         ModelLoadingRegistry.INSTANCE.registerResourceProvider(rm -> this);
         ModelLoadingRegistry.INSTANCE.registerVariantProvider(rm -> this);
+
+        WorldPresetsUI.setupClientside();
     }
 
     @Override

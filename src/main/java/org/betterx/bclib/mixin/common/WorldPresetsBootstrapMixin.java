@@ -6,15 +6,12 @@ import net.minecraft.data.BuiltinRegistries;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.dimension.LevelStem;
-import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
 import net.minecraft.world.level.levelgen.presets.WorldPreset;
 import net.minecraft.world.level.levelgen.presets.WorldPresets;
 import net.minecraft.world.level.levelgen.structure.StructureSet;
 import net.minecraft.world.level.levelgen.synth.NormalNoise;
 
-import org.betterx.bclib.world.generator.BCLibEndBiomeSource;
-import org.betterx.bclib.world.generator.BCLibNetherBiomeSource;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -54,35 +51,27 @@ public abstract class WorldPresetsBootstrapMixin {
 
     @ModifyArg(method = "run", at = @At(value = "INVOKE", ordinal = 0, target = "Lnet/minecraft/world/level/levelgen/presets/WorldPresets$Bootstrap;registerCustomOverworldPreset(Lnet/minecraft/resources/ResourceKey;Lnet/minecraft/world/level/dimension/LevelStem;)Lnet/minecraft/core/Holder;"))
     private LevelStem bcl_getOverworldStem(LevelStem overworldStem) {
-        BCLibNetherBiomeSource netherSource = new BCLibNetherBiomeSource(this.biomes);
-        BCLibEndBiomeSource endSource = new BCLibEndBiomeSource(this.biomes);
-
-        LevelStem bclNether = new LevelStem(
-                this.netherDimensionType,
-                new NoiseBasedChunkGenerator(
-                        this.structureSets,
-                        this.noises,
-                        netherSource,
-                        this.netherNoiseSettings)
+        WorldPreset preset = new org.betterx.bclib.presets.WorldPresets.SortableWorldPreset(
+                Map.of(LevelStem.OVERWORLD,
+                        overworldStem,
+                        LevelStem.NETHER,
+                        org.betterx.bclib.presets.WorldPresets.getBCLNetherLevelStem(this.biomes,
+                                this.netherDimensionType,
+                                this.structureSets,
+                                this.noises,
+                                this.netherNoiseSettings),
+                        LevelStem.END,
+                        org.betterx.bclib.presets.WorldPresets.getBCLEndLevelStem(this.biomes,
+                                this.endDimensionType,
+                                this.structureSets,
+                                this.noises,
+                                this.endNoiseSettings)
+                ), 0
         );
-
-        LevelStem bclEnd = new LevelStem(
-                this.endDimensionType,
-                new NoiseBasedChunkGenerator(
-                        this.structureSets,
-                        this.noises,
-                        endSource,
-                        this.endNoiseSettings)
-        );
-        WorldPreset preset = new org.betterx.bclib.presets.WorldPresets.SortableWorldPreset(Map.of(LevelStem.OVERWORLD,
-                                                                                                   overworldStem,
-                                                                                                   LevelStem.NETHER,
-                                                                                                   bclNether,
-                                                                                                   LevelStem.END,
-                                                                                                   bclEnd), 0);
 
         BuiltinRegistries.register(this.presets, org.betterx.bclib.presets.WorldPresets.BCL_WORLD, preset);
 
         return overworldStem;
     }
+
 }

@@ -38,7 +38,7 @@ public class BCLib implements ModInitializer {
         CraftingRecipes.init();
         WorldDataAPI.registerModCache(MOD_ID);
         DataExchangeAPI.registerMod(MOD_ID);
-        WorldPresets.register();
+        WorldPresets.registerPresets();
         AnvilRecipe.register();
 
         DataExchangeAPI.registerDescriptors(List.of(
@@ -47,7 +47,7 @@ public class BCLib implements ModInitializer {
                 RequestFiles.DESCRIPTOR,
                 SendFiles.DESCRIPTOR,
                 Chunker.DESCRIPTOR
-                                                   ));
+        ));
 
         BCLibPatch.register();
         Configs.save();
