@@ -3,12 +3,20 @@ package org.betterx.bclib.mixin.common;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.worldselection.WorldOpenFlows;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.nbt.Tag;
+import net.minecraft.resources.RegistryOps;
 import net.minecraft.server.ReloadableServerResources;
+import net.minecraft.server.WorldLoader;
+import net.minecraft.server.WorldStem;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.world.level.DataPackConfig;
 import net.minecraft.world.level.LevelSettings;
 import net.minecraft.world.level.levelgen.WorldGenSettings;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.WorldData;
 
+import com.mojang.datafixers.util.Pair;
 import org.betterx.bclib.api.LifeCycleAPI;
 import org.betterx.bclib.api.biomes.BiomeAPI;
 import org.betterx.bclib.api.dataexchange.DataExchangeAPI;
@@ -20,6 +28,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(WorldOpenFlows.class)
 public abstract class WorldOpenFlowsMixin {
@@ -76,5 +85,25 @@ public abstract class WorldOpenFlowsMixin {
 
         DataFixerAPI.createWorldData(levelStorageAccess, worldData.worldGenSettings());
         LifeCycleAPI._runBeforeLevelLoad();
+    }
+
+    @Inject(method = "loadWorldStem(Lnet/minecraft/server/WorldLoader$PackConfig;Lnet/minecraft/server/WorldLoader$WorldDataSupplier;)Lnet/minecraft/server/WorldStem;", at = @At("RETURN"))
+    public void bcl_loadWorldStem(WorldLoader.PackConfig packConfig,
+                                  WorldLoader.WorldDataSupplier<WorldData> worldDataSupplier,
+                                  CallbackInfoReturnable<WorldStem> cir) {
+        WorldStem result = cir.getReturnValue();
+    }
+
+    @Inject(method = "method_41887", at = @At("RETURN"))
+    private static void bcl_loadWorldStem(LevelStorageSource.LevelStorageAccess levelStorageAccess,
+                                          ResourceManager resourceManager,
+                                          DataPackConfig dataPackConfig,
+                                          CallbackInfoReturnable<Pair> cir) {
+        RegistryAccess.Writable writable = RegistryAccess.builtinCopy();
+        RegistryOps<Tag> dynamicOps = RegistryOps.create(NbtOps.INSTANCE, writable);
+        WorldData worldData = levelStorageAccess.getDataTag(dynamicOps,
+                dataPackConfig,
+                writable.allElementsLifecycle());
+        Pair<WorldData, RegistryAccess> p = cir.getReturnValue();
     }
 }

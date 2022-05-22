@@ -176,6 +176,6 @@ public class BCLibNetherBiomeSource extends BCLBiomeSource {
 
     @Override
     public String toString() {
-        return "BCLib - Nether BiomeSource (" + Integer.toHexString(hashCode()) + ", version=" + biomeSourceVersion + ", seed=" + currentSeed + ")";
+        return "BCLib - Nether BiomeSource (" + Integer.toHexString(hashCode()) + ", version=" + biomeSourceVersion + ", seed=" + currentSeed + ", biomes=" + possibleBiomes().size() + ")";
     }
 }

@@ -22,14 +22,14 @@ public class MultiPackResourceManagerMixin {
 
     @Inject(method = "getResource", at = @At("HEAD"), cancellable = true)
     private void bclib_hasResource(ResourceLocation resourceLocation, CallbackInfoReturnable<Optional<Resource>> info) {
-//        if (resourceLocation.getNamespace().equals("minecraft")) {
-//            for (String key : BCLIB_MISSING_RESOURCES) {
-//                if (resourceLocation.getPath().equals(key)) {
+        if (resourceLocation.getNamespace().equals("minecraft")) {
+            for (String key : BCLIB_MISSING_RESOURCES) {
+                if (resourceLocation.getPath().equals(key)) {
 //                    info.setReturnValue(Optional.empty());
 //                    info.cancel();
-//                    return;
-//                }
-//            }
-//        }
+                    return;
+                }
+            }
+        }
     }
 }

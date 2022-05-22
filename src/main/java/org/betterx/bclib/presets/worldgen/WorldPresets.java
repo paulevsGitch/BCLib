@@ -132,6 +132,29 @@ public class WorldPresets {
         return createDefaultWorldFromPreset(registryAccess, RandomSource.create().nextLong());
     }
 
+    public static WorldGenSettings fixSettingsInCurrentWorld(ResourceKey<LevelStem> dimensionKey,
+                                                             ResourceKey<DimensionType> dimensionTypeKey,
+                                                             WorldGenSettings settings) {
+        var oldNether = settings.dimensions().getHolder(dimensionKey);
+        //TODO: Make sure our BiomeSource reuses the BiomeList from the Datapack Source
+        
+        int loaderVersion = BCLChunkGenerator.getBiomeVersionForGenerator(oldNether
+                .map(h -> h.value().generator())
+                .orElse(null));
+
+        int targetVersion = BCLChunkGenerator.getBiomeVersionForCurrentWorld(dimensionKey);
+        if (loaderVersion != targetVersion) {
+            BCLib.LOGGER.info("Enforcing Correct Generator for " + dimensionKey.location().toString() + ".");
+            RegistryAccess access = RegistryAccess.builtinCopy();
+            return WorldPresets.replaceGenerator(dimensionKey,
+                    dimensionTypeKey,
+                    targetVersion,
+                    access,
+                    settings);
+        }
+        return settings;
+    }
+
     public static WorldGenSettings replaceGenerator(
             ResourceKey<LevelStem> dimensionKey,
             ResourceKey<DimensionType> dimensionTypeKey,

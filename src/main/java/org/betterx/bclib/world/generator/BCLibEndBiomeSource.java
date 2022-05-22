@@ -256,6 +256,6 @@ public class BCLibEndBiomeSource extends BCLBiomeSource {
 
     @Override
     public String toString() {
-        return "BCLib - The End BiomeSource (" + Integer.toHexString(hashCode()) + ", version=" + biomeSourceVersion + ", seed=" + currentSeed + ")";
+        return "BCLib - The End BiomeSource (" + Integer.toHexString(hashCode()) + ", version=" + biomeSourceVersion + ", seed=" + currentSeed + ", biomes=" + possibleBiomes().size() + ")";
     }
 }
