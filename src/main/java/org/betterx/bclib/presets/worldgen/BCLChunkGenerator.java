@@ -26,11 +26,6 @@ import org.betterx.bclib.world.generator.BCLBiomeSource;
 import java.util.Optional;
 
 public class BCLChunkGenerator extends NoiseBasedChunkGenerator {
-    public static int BIOME_SOURCE_VERSION_NONE = -1;
-    public static int BIOME_SOURCE_VERSION_VANILLA = 0;
-    public static int BIOME_SOURCE_VERSION_SQUARE = 17;
-    public static int BIOME_SOURCE_VERSION_HEX = 18;
-    public static int DEFAULT_BIOME_SOURCE_VERSION = BIOME_SOURCE_VERSION_HEX;
 
     private static String TAG_GENERATOR = "generator";
     private static final String TAG_VERSION = "version";
@@ -81,13 +76,8 @@ public class BCLChunkGenerator extends NoiseBasedChunkGenerator {
     }
 
     public static int getBiomeVersionForGenerator(ChunkGenerator generator) {
-        if (generator == null) return BIOME_SOURCE_VERSION_NONE;
-
-        if (generator.getBiomeSource() instanceof BCLBiomeSource bcl) {
-            return bcl.biomeSourceVersion;
-        } else {
-            return BIOME_SOURCE_VERSION_VANILLA;
-        }
+        if (generator == null) return BCLBiomeSource.getVersionBiomeSource(null);
+        return BCLBiomeSource.getVersionBiomeSource(generator.getBiomeSource());
     }
 
     public static Optional<Holder<LevelStem>> referenceStemForVersion(
@@ -99,13 +89,13 @@ public class BCLChunkGenerator extends NoiseBasedChunkGenerator {
             boolean generateBonusChest
     ) {
         final WorldGenSettings referenceSettings;
-        if (biomeSourceVersion == BIOME_SOURCE_VERSION_VANILLA) {
+        if (biomeSourceVersion == BCLBiomeSource.BIOME_SOURCE_VERSION_VANILLA) {
             referenceSettings = net.minecraft.world.level.levelgen.presets.WorldPresets.createNormalWorldFromPreset(
                     registryAccess,
                     seed,
                     generateStructures,
                     generateBonusChest);
-        } else if (biomeSourceVersion == BIOME_SOURCE_VERSION_SQUARE) {
+        } else if (biomeSourceVersion == BCLBiomeSource.BIOME_SOURCE_VERSION_SQUARE) {
             referenceSettings = WorldPresets.createWorldFromPreset(
                     WorldPresets.BCL_WORLD_17,
                     registryAccess,
@@ -124,7 +114,7 @@ public class BCLChunkGenerator extends NoiseBasedChunkGenerator {
 
     public static int getBiomeVersionForCurrentWorld(ResourceKey<LevelStem> key) {
         final CompoundTag settingsNbt = getSettingsNbt();
-        if (!settingsNbt.contains(key.location().toString())) return DEFAULT_BIOME_SOURCE_VERSION;
+        if (!settingsNbt.contains(key.location().toString())) return BCLBiomeSource.DEFAULT_BIOME_SOURCE_VERSION;
         return settingsNbt.getInt(key.location().toString());
     }
 
@@ -155,7 +145,7 @@ public class BCLChunkGenerator extends NoiseBasedChunkGenerator {
 
         if (settingsNbt.size() == 0) {
             BCLib.LOGGER.info("Found World without generator Settings. Setting up data...");
-            int biomeSourceVersion = DEFAULT_BIOME_SOURCE_VERSION;
+            int biomeSourceVersion = BCLBiomeSource.DEFAULT_BIOME_SOURCE_VERSION;
 
             final CompoundTag bclRoot = WorldDataAPI.getRootTag(BCLib.MOD_ID);
 
@@ -167,15 +157,15 @@ public class BCLChunkGenerator extends NoiseBasedChunkGenerator {
 
             if (isPre18) {
                 BCLib.LOGGER.info("World was create pre 1.18!");
-                biomeSourceVersion = BIOME_SOURCE_VERSION_SQUARE;
+                biomeSourceVersion = BCLBiomeSource.BIOME_SOURCE_VERSION_SQUARE;
             }
 
             if (WorldDataAPI.hasMod("betternether")) {
                 BCLib.LOGGER.info("Found Data from BetterNether, using for migration.");
                 final CompoundTag bnRoot = WorldDataAPI.getRootTag("betternether");
                 biomeSourceVersion = "1.17".equals(bnRoot.getString(TAG_BN_GEN_VERSION))
-                        ? BIOME_SOURCE_VERSION_SQUARE
-                        : BIOME_SOURCE_VERSION_HEX;
+                        ? BCLBiomeSource.BIOME_SOURCE_VERSION_SQUARE
+                        : BCLBiomeSource.BIOME_SOURCE_VERSION_HEX;
             }
 
             BCLib.LOGGER.info("Set world to BiomeSource Version " + biomeSourceVersion);

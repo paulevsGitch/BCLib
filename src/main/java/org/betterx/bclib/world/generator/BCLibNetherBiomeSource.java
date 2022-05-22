@@ -19,7 +19,6 @@ import org.betterx.bclib.api.biomes.BiomeAPI;
 import org.betterx.bclib.config.ConfigKeeper.StringArrayEntry;
 import org.betterx.bclib.config.Configs;
 import org.betterx.bclib.interfaces.BiomeMap;
-import org.betterx.bclib.presets.worldgen.BCLChunkGenerator;
 import org.betterx.bclib.world.biomes.BCLBiome;
 import org.betterx.bclib.world.generator.map.MapStack;
 import org.betterx.bclib.world.generator.map.hex.HexBiomeMap;
@@ -156,7 +155,7 @@ public class BCLibNetherBiomeSource extends BCLBiomeSource {
 
     @Override
     protected void onInitMap(long seed) {
-        TriFunction<Long, Integer, BiomePicker, BiomeMap> mapConstructor = (biomeSourceVersion != BCLChunkGenerator.BIOME_SOURCE_VERSION_HEX)
+        TriFunction<Long, Integer, BiomePicker, BiomeMap> mapConstructor = (biomeSourceVersion != BCLBiomeSource.BIOME_SOURCE_VERSION_HEX)
                 ? SquareBiomeMap::new
                 : HexBiomeMap::new;
         if (worldHeight > 128 && GeneratorOptions.useVerticalBiomes()) {

@@ -2,15 +2,12 @@ package org.betterx.bclib.gui.screens;
 
 import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
 import net.minecraft.client.gui.screens.worldselection.WorldCreationContext;
-import net.minecraft.core.Registry;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.level.chunk.ChunkGenerator;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.dimension.BuiltinDimensionTypes;
+import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.dimension.LevelStem;
-import net.minecraft.world.level.levelgen.FlatLevelSource;
-import net.minecraft.world.level.levelgen.WorldGenSettings;
-import net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorSettings;
-import net.minecraft.world.level.levelgen.structure.StructureSet;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -19,6 +16,8 @@ import org.betterx.bclib.BCLib;
 import org.betterx.bclib.gui.gridlayout.GridCheckboxCell;
 import org.betterx.bclib.gui.gridlayout.GridLayout;
 import org.betterx.bclib.presets.worldgen.BCLChunkGenerator;
+import org.betterx.bclib.presets.worldgen.WorldPresets;
+import org.betterx.bclib.world.generator.BCLBiomeSource;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -72,14 +71,16 @@ public class WorldSetupScreen extends BCLibScreen {
         row = colNether.addRow();
         row.addSpacer(32);
         netherLegacy = row.addCheckbox(Component.translatable("title.screen.bclib.worldgen.legacy_square"),
-                endVersion == BCLChunkGenerator.BIOME_SOURCE_VERSION_SQUARE,
-                font,
+                endVersion == BCLBiomeSource.BIOME_SOURCE_VERSION_SQUARE,
+                1.0,
+                GridLayout.GridValueType.PERCENTAGE,
                 (state) -> {
                 });
         bclibNether = mainSettingsRow.addCheckbox(Component.translatable(
                         "title.screen.bclib.worldgen.custom_biome_source"),
-                netherVersion != BCLChunkGenerator.BIOME_SOURCE_VERSION_VANILLA,
-                font,
+                netherVersion != BCLBiomeSource.BIOME_SOURCE_VERSION_VANILLA,
+                1.0,
+                GridLayout.GridValueType.PERCENTAGE,
                 (state) -> {
                     netherLegacy.setEnabled(state);
                 });
@@ -95,15 +96,17 @@ public class WorldSetupScreen extends BCLibScreen {
         row.addSpacer(32);
 
         endLegacy = row.addCheckbox(Component.translatable("title.screen.bclib.worldgen.legacy_square"),
-                endVersion == BCLChunkGenerator.BIOME_SOURCE_VERSION_SQUARE,
-                font,
+                endVersion == BCLBiomeSource.BIOME_SOURCE_VERSION_SQUARE,
+                1.0,
+                GridLayout.GridValueType.PERCENTAGE,
                 (state) -> {
                 });
 
         bclibEnd = mainSettingsRow.addCheckbox(Component.translatable(
                         "title.screen.bclib.worldgen.custom_biome_source"),
-                endVersion != BCLChunkGenerator.BIOME_SOURCE_VERSION_VANILLA,
-                font,
+                endVersion != BCLBiomeSource.BIOME_SOURCE_VERSION_VANILLA,
+                1.0,
+                GridLayout.GridValueType.PERCENTAGE,
                 (state) -> {
                     endLegacy.setEnabled(state);
                 });
@@ -119,31 +122,43 @@ public class WorldSetupScreen extends BCLibScreen {
     }
 
     private void updateSettings() {
-        int endVersion = BCLChunkGenerator.DEFAULT_BIOME_SOURCE_VERSION;
+        int endVersion = BCLBiomeSource.DEFAULT_BIOME_SOURCE_VERSION;
         if (bclibEnd.isChecked()) {
-            if (endLegacy.isChecked()) endVersion = BCLChunkGenerator.BIOME_SOURCE_VERSION_SQUARE;
-            else endVersion = BCLChunkGenerator.BIOME_SOURCE_VERSION_HEX;
+            if (endLegacy.isChecked()) endVersion = BCLBiomeSource.BIOME_SOURCE_VERSION_SQUARE;
+            else endVersion = BCLBiomeSource.BIOME_SOURCE_VERSION_HEX;
         } else {
-            endVersion = BCLChunkGenerator.BIOME_SOURCE_VERSION_VANILLA;
+            endVersion = BCLBiomeSource.BIOME_SOURCE_VERSION_VANILLA;
         }
 
-        int netherVersion = BCLChunkGenerator.DEFAULT_BIOME_SOURCE_VERSION;
+        int netherVersion = BCLBiomeSource.DEFAULT_BIOME_SOURCE_VERSION;
         if (bclibNether.isChecked()) {
-            if (netherLegacy.isChecked()) netherVersion = BCLChunkGenerator.BIOME_SOURCE_VERSION_SQUARE;
-            else netherVersion = BCLChunkGenerator.BIOME_SOURCE_VERSION_HEX;
+            if (netherLegacy.isChecked()) netherVersion = BCLBiomeSource.BIOME_SOURCE_VERSION_SQUARE;
+            else netherVersion = BCLBiomeSource.BIOME_SOURCE_VERSION_HEX;
         } else {
-            netherVersion = BCLChunkGenerator.BIOME_SOURCE_VERSION_VANILLA;
+            netherVersion = BCLBiomeSource.BIOME_SOURCE_VERSION_VANILLA;
         }
 
         BCLib.LOGGER.info("Custom World Versions: end=" + endVersion + ", nether=" + netherVersion);
+        updateConfiguration(LevelStem.END, BuiltinDimensionTypes.END, endVersion);
+        updateConfiguration(LevelStem.NETHER, BuiltinDimensionTypes.NETHER, netherVersion);
     }
 
-    private WorldCreationContext.Updater worldConfiguration(FlatLevelGeneratorSettings flatLevelGeneratorSettings) {
 
-        return (frozen, worldGenSettings) -> {
-            Registry<StructureSet> registry = frozen.registryOrThrow(Registry.STRUCTURE_SET_REGISTRY);
-            ChunkGenerator chunkGenerator = new FlatLevelSource(registry, flatLevelGeneratorSettings);
-            return WorldGenSettings.replaceOverworldGenerator(frozen, worldGenSettings, chunkGenerator);
-        };
+    private void updateConfiguration(
+            ResourceKey<LevelStem> dimensionKey,
+            ResourceKey<DimensionType> dimensionTypeKey,
+            int biomeSourceVersion
+    ) {
+        createWorldScreen.worldGenSettingsComponent.updateSettings(
+                (registryAccess, worldGenSettings) -> WorldPresets.replaceGenerator(
+                        dimensionKey,
+                        dimensionTypeKey,
+                        biomeSourceVersion,
+                        registryAccess,
+                        worldGenSettings
+                )
+        );
     }
+
+
 }

@@ -6,12 +6,16 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeSource;
 
 import org.betterx.bclib.api.biomes.BiomeAPI;
-import org.betterx.bclib.presets.worldgen.BCLChunkGenerator;
 
 import java.util.List;
 import java.util.Optional;
 
 public abstract class BCLBiomeSource extends BiomeSource {
+    public static int BIOME_SOURCE_VERSION_NONE = -1;
+    public static int BIOME_SOURCE_VERSION_VANILLA = 0;
+    public static int BIOME_SOURCE_VERSION_SQUARE = 17;
+    public static int BIOME_SOURCE_VERSION_HEX = 18;
+    public static int DEFAULT_BIOME_SOURCE_VERSION = BIOME_SOURCE_VERSION_HEX;
     protected final Registry<Biome> biomeRegistry;
     protected long currentSeed;
 
@@ -29,7 +33,7 @@ public abstract class BCLBiomeSource extends BiomeSource {
         super(preInit(biomeRegistry, list));
 
         this.biomeRegistry = biomeRegistry;
-        this.biomeSourceVersion = biomeSourceVersion.orElse(BCLChunkGenerator.DEFAULT_BIOME_SOURCE_VERSION);
+        this.biomeSourceVersion = biomeSourceVersion.orElse(DEFAULT_BIOME_SOURCE_VERSION);
         this.currentSeed = seed;
 
         System.out.println(this + " with Registry: " + biomeRegistry.getClass().getName() + "@" + Integer.toHexString(
@@ -52,4 +56,14 @@ public abstract class BCLBiomeSource extends BiomeSource {
     }
 
     protected abstract void onInitMap(long newSeed);
+
+    public static int getVersionBiomeSource(BiomeSource biomeSource) {
+        if (biomeSource == null) return BCLBiomeSource.BIOME_SOURCE_VERSION_NONE;
+
+        if (biomeSource instanceof BCLBiomeSource bcl) {
+            return bcl.biomeSourceVersion;
+        } else {
+            return BCLBiomeSource.BIOME_SOURCE_VERSION_VANILLA;
+        }
+    }
 }

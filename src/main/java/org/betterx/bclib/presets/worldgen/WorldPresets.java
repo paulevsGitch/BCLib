@@ -1,6 +1,7 @@
 package org.betterx.bclib.presets.worldgen;
 
 import net.minecraft.core.Holder;
+import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.data.BuiltinRegistries;
@@ -9,6 +10,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.WorldPresetTags;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
@@ -18,6 +20,7 @@ import net.minecraft.world.level.levelgen.structure.StructureSet;
 import net.minecraft.world.level.levelgen.synth.NormalNoise;
 
 import com.mojang.datafixers.util.Pair;
+import com.mojang.serialization.Lifecycle;
 import org.betterx.bclib.BCLib;
 import org.betterx.bclib.api.tag.TagAPI;
 import org.betterx.bclib.api.tag.TagType;
@@ -127,6 +130,63 @@ public class WorldPresets {
 
     public static WorldGenSettings createDefaultWorldFromPreset(RegistryAccess registryAccess) {
         return createDefaultWorldFromPreset(registryAccess, RandomSource.create().nextLong());
+    }
+
+    public static WorldGenSettings replaceGenerator(
+            ResourceKey<LevelStem> dimensionKey,
+            ResourceKey<DimensionType> dimensionTypeKey,
+            int biomeSourceVersion,
+            RegistryAccess registryAccess,
+            WorldGenSettings worldGenSettings
+    ) {
+        Optional<Holder<LevelStem>> oLevelStem = BCLChunkGenerator.referenceStemForVersion(
+                dimensionKey,
+                biomeSourceVersion,
+                registryAccess,
+                worldGenSettings.seed(),
+                worldGenSettings.generateStructures(),
+                worldGenSettings.generateStructures()
+        );
+
+        Registry<DimensionType> registry = registryAccess.registryOrThrow(Registry.DIMENSION_TYPE_REGISTRY);
+        Registry<LevelStem> registry2 = withDimension(dimensionKey, dimensionTypeKey, registry,
+                worldGenSettings.dimensions(),
+                oLevelStem.map(l -> l.value().generator()).orElseThrow());
+        return new WorldGenSettings(worldGenSettings.seed(),
+                worldGenSettings.generateStructures(),
+                worldGenSettings.generateBonusChest(),
+                registry2);
+    }
+
+    public static Registry<LevelStem> withDimension(ResourceKey<LevelStem> dimensionKey,
+                                                    ResourceKey<DimensionType> dimensionTypeKey,
+                                                    Registry<DimensionType> registry,
+                                                    Registry<LevelStem> registry2,
+                                                    ChunkGenerator chunkGenerator) {
+        LevelStem levelStem = registry2.get(dimensionKey);
+        Holder<DimensionType> holder = levelStem == null
+                ? registry.getOrCreateHolderOrThrow(dimensionTypeKey)
+                : levelStem.typeHolder();
+        return withDimension(dimensionKey, registry2, holder, chunkGenerator);
+    }
+
+    public static Registry<LevelStem> withDimension(ResourceKey<LevelStem> dimensionKey, Registry<LevelStem> registry,
+                                                    Holder<DimensionType> holder,
+                                                    ChunkGenerator chunkGenerator) {
+        MappedRegistry<LevelStem> writableRegistry = new MappedRegistry<LevelStem>(Registry.LEVEL_STEM_REGISTRY,
+                Lifecycle.experimental(),
+                null);
+        writableRegistry.register(dimensionKey,
+                new LevelStem(holder, chunkGenerator),
+                Lifecycle.stable());
+        for (Map.Entry<ResourceKey<LevelStem>, LevelStem> entry : registry.entrySet()) {
+            ResourceKey<LevelStem> resourceKey = entry.getKey();
+            if (resourceKey == dimensionKey) continue;
+            writableRegistry.register(resourceKey,
+                    entry.getValue(),
+                    registry.lifecycle(entry.getValue()));
+        }
+        return writableRegistry;
     }
 
     /**

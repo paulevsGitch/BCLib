@@ -90,11 +90,11 @@ public class GridRow extends GridContainer {
                               OnPress onPress) {
         GridCell cell = new GridCell(width, height, widthType, (transform) -> {
             Button customButton = new Button(transform.left,
-                                             transform.top,
-                                             transform.width,
-                                             transform.height,
-                                             text,
-                                             onPress);
+                    transform.top,
+                    transform.width,
+                    transform.height,
+                    text,
+                    onPress);
             customButton.setAlpha(alpha);
             return customButton;
         }, null);
@@ -104,6 +104,11 @@ public class GridRow extends GridContainer {
 
     public GridCheckboxCell addCheckbox(Component text, boolean checked, Font font, Consumer<Boolean> onChange) {
         final int width = font.width(text.getVisualOrderText()) + 24 + 2 * 12;
+        return addCheckbox(text, checked, width, widthType, onChange);
+    }
+
+    public GridCheckboxCell addCheckbox(Component text, boolean checked, double width,
+                                        GridLayout.GridValueType widthType, Consumer<Boolean> onChange) {
 
         GridCheckboxCell cell = new GridCheckboxCell(text, checked, 1.0f, width, widthType, 20, onChange);
         this.cells.add(cell);
@@ -157,16 +162,16 @@ public class GridRow extends GridContainer {
 
     public GridCell addImage(ResourceLocation location, float alpha, int width, int height) {
         return addImage(location,
-                        alpha,
-                        width,
-                        GridLayout.GridValueType.CONSTANT,
-                        height,
-                        0,
-                        0,
-                        width,
-                        height,
-                        width,
-                        height);
+                alpha,
+                width,
+                GridLayout.GridValueType.CONSTANT,
+                height,
+                0,
+                0,
+                width,
+                height,
+                width,
+                height);
     }
 
     public GridCell addImage(ResourceLocation location,
@@ -186,16 +191,16 @@ public class GridRow extends GridContainer {
                              int resourceWidth,
                              int resourceHeight) {
         return addImage(location,
-                        alpha,
-                        width,
-                        widthType,
-                        height,
-                        0,
-                        0,
-                        resourceWidth,
-                        resourceWidth,
-                        resourceWidth,
-                        resourceHeight);
+                alpha,
+                width,
+                widthType,
+                height,
+                0,
+                0,
+                resourceWidth,
+                resourceWidth,
+                resourceWidth,
+                resourceHeight);
     }
 
     public GridCell addImage(ResourceLocation location,
@@ -209,16 +214,16 @@ public class GridRow extends GridContainer {
                              int resourceWidth,
                              int resourceHeight) {
         return addImage(location,
-                        1.0f,
-                        width,
-                        widthType,
-                        height,
-                        uvLeft,
-                        uvTop,
-                        uvWidth,
-                        uvHeight,
-                        resourceWidth,
-                        resourceHeight);
+                1.0f,
+                width,
+                widthType,
+                height,
+                uvLeft,
+                uvTop,
+                uvWidth,
+                uvHeight,
+                resourceWidth,
+                resourceHeight);
     }
 
     public GridCell addImage(ResourceLocation location,
@@ -233,16 +238,16 @@ public class GridRow extends GridContainer {
                              int resourceWidth,
                              int resourceHeight) {
         GridCell cell = new GridImageCell(location,
-                                          width,
-                                          widthType,
-                                          height,
-                                          alpha,
-                                          uvLeft,
-                                          uvTop,
-                                          uvWidth,
-                                          uvHeight,
-                                          resourceWidth,
-                                          resourceHeight);
+                width,
+                widthType,
+                height,
+                alpha,
+                uvLeft,
+                uvTop,
+                uvWidth,
+                uvHeight,
+                resourceWidth,
+                resourceHeight);
         this.cells.add(cell);
         return cell;
     }
@@ -303,11 +308,11 @@ public class GridRow extends GridContainer {
     public GridStringCell addString(Component text, int color, GridScreen parent) {
         final int width = parent.getWidth(text);
         return this.addString(text,
-                              width,
-                              GridLayout.GridValueType.CONSTANT,
-                              color,
-                              GridLayout.Alignment.CENTER,
-                              parent);
+                width,
+                GridLayout.GridValueType.CONSTANT,
+                color,
+                GridLayout.Alignment.CENTER,
+                parent);
     }
 
     public GridStringCell addString(Component text, GridLayout.Alignment contentAlignment, GridScreen parent) {
@@ -336,12 +341,12 @@ public class GridRow extends GridContainer {
                                     GridLayout.Alignment contentAlignment,
                                     GridScreen parent) {
         GridStringCell cell = new GridStringCell(width,
-                                                 widthType,
-                                                 parent.getFont().lineHeight,
-                                                 contentAlignment,
-                                                 parent,
-                                                 text,
-                                                 color);
+                widthType,
+                parent.getFont().lineHeight,
+                contentAlignment,
+                parent,
+                text,
+                color);
         this.cells.add(cell);
         return cell;
     }

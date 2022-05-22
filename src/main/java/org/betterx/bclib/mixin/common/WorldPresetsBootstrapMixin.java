@@ -12,7 +12,7 @@ import net.minecraft.world.level.levelgen.presets.WorldPresets;
 import net.minecraft.world.level.levelgen.structure.StructureSet;
 import net.minecraft.world.level.levelgen.synth.NormalNoise;
 
-import org.betterx.bclib.presets.worldgen.BCLChunkGenerator;
+import org.betterx.bclib.world.generator.BCLBiomeSource;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -82,14 +82,14 @@ public abstract class WorldPresetsBootstrapMixin {
                                 this.structureSets,
                                 this.noises,
                                 this.netherNoiseSettings,
-                                Optional.of(BCLChunkGenerator.BIOME_SOURCE_VERSION_SQUARE)),
+                                Optional.of(BCLBiomeSource.BIOME_SOURCE_VERSION_SQUARE)),
                         LevelStem.END,
                         org.betterx.bclib.presets.worldgen.WorldPresets.getBCLEndLevelStem(this.biomes,
                                 this.endDimensionType,
                                 this.structureSets,
                                 this.noises,
                                 this.endNoiseSettings,
-                                Optional.of(BCLChunkGenerator.BIOME_SOURCE_VERSION_SQUARE))
+                                Optional.of(BCLBiomeSource.BIOME_SOURCE_VERSION_SQUARE))
                 ), 0
         );
 

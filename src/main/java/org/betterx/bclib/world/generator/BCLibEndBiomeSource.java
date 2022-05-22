@@ -22,7 +22,6 @@ import org.betterx.bclib.config.ConfigKeeper.StringArrayEntry;
 import org.betterx.bclib.config.Configs;
 import org.betterx.bclib.interfaces.BiomeMap;
 import org.betterx.bclib.noise.OpenSimplexNoise;
-import org.betterx.bclib.presets.worldgen.BCLChunkGenerator;
 import org.betterx.bclib.world.biomes.BCLBiome;
 import org.betterx.bclib.world.generator.map.hex.HexBiomeMap;
 import org.betterx.bclib.world.generator.map.square.SquareBiomeMap;
@@ -187,7 +186,7 @@ public class BCLibEndBiomeSource extends BCLBiomeSource {
 
     @Override
     protected void onInitMap(long seed) {
-        if ((biomeSourceVersion != BCLChunkGenerator.BIOME_SOURCE_VERSION_HEX)) {
+        if ((biomeSourceVersion != BCLBiomeSource.BIOME_SOURCE_VERSION_HEX)) {
             this.mapLand = new SquareBiomeMap(seed,
                     GeneratorOptions.getBiomeSizeEndLand(),
                     endLandBiomePicker);
