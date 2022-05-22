@@ -22,7 +22,7 @@ public class WorldPresetsUI {
 
     public static void setupClientside() {
         registerCustomizeUI(WorldPresets.BCL_WORLD, (createWorldScreen, worldCreationContext) -> {
-            return new WorldSetupScreen(createWorldScreen);
+            return new WorldSetupScreen(createWorldScreen, worldCreationContext);
         });
     }
 }
