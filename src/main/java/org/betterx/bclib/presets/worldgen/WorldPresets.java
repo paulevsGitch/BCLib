@@ -134,6 +134,15 @@ public class WorldPresets {
         return createDefaultWorldFromPreset(registryAccess, RandomSource.create().nextLong());
     }
 
+    /**
+     * Datapacks can change the world's generator. This Method will ensure, that the Generators contain
+     * the correct BiomeSources for this world
+     *
+     * @param dimensionKey
+     * @param dimensionTypeKey
+     * @param settings
+     * @return
+     */
     public static WorldGenSettings fixSettingsInCurrentWorld(ResourceKey<LevelStem> dimensionKey,
                                                              ResourceKey<DimensionType> dimensionTypeKey,
                                                              WorldGenSettings settings) {
