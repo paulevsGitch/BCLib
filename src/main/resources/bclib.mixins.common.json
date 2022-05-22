@@ -12,6 +12,7 @@
     "BlockStateBaseMixin",
     "BoneMealItemMixin",
     "ChunkGeneratorMixin",
+    "ChunkGeneratorsMixin",
     "ComposterBlockAccessor",
     "CraftingMenuMixin",
     "DedicatedServerPropertiesMixin",

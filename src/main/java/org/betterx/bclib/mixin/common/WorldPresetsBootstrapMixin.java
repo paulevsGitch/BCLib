@@ -51,17 +51,17 @@ public abstract class WorldPresetsBootstrapMixin {
 
     @ModifyArg(method = "run", at = @At(value = "INVOKE", ordinal = 0, target = "Lnet/minecraft/world/level/levelgen/presets/WorldPresets$Bootstrap;registerCustomOverworldPreset(Lnet/minecraft/resources/ResourceKey;Lnet/minecraft/world/level/dimension/LevelStem;)Lnet/minecraft/core/Holder;"))
     private LevelStem bcl_getOverworldStem(LevelStem overworldStem) {
-        WorldPreset preset = new org.betterx.bclib.presets.WorldPresets.SortableWorldPreset(
+        WorldPreset preset = new org.betterx.bclib.presets.worldgen.WorldPresets.SortableWorldPreset(
                 Map.of(LevelStem.OVERWORLD,
                         overworldStem,
                         LevelStem.NETHER,
-                        org.betterx.bclib.presets.WorldPresets.getBCLNetherLevelStem(this.biomes,
+                        org.betterx.bclib.presets.worldgen.WorldPresets.getBCLNetherLevelStem(this.biomes,
                                 this.netherDimensionType,
                                 this.structureSets,
                                 this.noises,
                                 this.netherNoiseSettings),
                         LevelStem.END,
-                        org.betterx.bclib.presets.WorldPresets.getBCLEndLevelStem(this.biomes,
+                        org.betterx.bclib.presets.worldgen.WorldPresets.getBCLEndLevelStem(this.biomes,
                                 this.endDimensionType,
                                 this.structureSets,
                                 this.noises,
@@ -69,7 +69,7 @@ public abstract class WorldPresetsBootstrapMixin {
                 ), 0
         );
 
-        BuiltinRegistries.register(this.presets, org.betterx.bclib.presets.WorldPresets.BCL_WORLD, preset);
+        BuiltinRegistries.register(this.presets, org.betterx.bclib.presets.worldgen.WorldPresets.BCL_WORLD, preset);
 
         return overworldStem;
     }

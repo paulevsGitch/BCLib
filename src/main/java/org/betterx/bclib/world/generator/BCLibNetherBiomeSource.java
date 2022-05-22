@@ -33,18 +33,18 @@ public class BCLibNetherBiomeSource extends BCLBiomeSource {
     public static final Codec<BCLibNetherBiomeSource> CODEC = RecordCodecBuilder
             .create(instance -> instance
                     .group(RegistryOps
-                                   .retrieveRegistry(Registry.BIOME_REGISTRY)
-                                   .forGetter(source -> source.biomeRegistry),
-                           Codec
-                                   .LONG
-                                   .fieldOf("seed")
-                                   .stable()
-                                   .forGetter(source -> {
-                                       return source.currentSeed;
-                                   })
-                          )
+                                    .retrieveRegistry(Registry.BIOME_REGISTRY)
+                                    .forGetter(source -> source.biomeRegistry),
+                            Codec
+                                    .LONG
+                                    .fieldOf("seed")
+                                    .stable()
+                                    .forGetter(source -> {
+                                        return source.currentSeed;
+                                    })
+                    )
                     .apply(instance, instance.stable(BCLibNetherBiomeSource::new))
-                   );
+            );
     private BiomeMap biomeMap;
     private final BiomePicker biomePicker;
 
@@ -172,8 +172,8 @@ public class BCLibNetherBiomeSource extends BCLBiomeSource {
             );
         } else {
             this.biomeMap = mapConstructor.apply(seed,
-                                                 GeneratorOptions.getBiomeSizeNether(),
-                                                 biomePicker);
+                    GeneratorOptions.getBiomeSizeNether(),
+                    biomePicker);
         }
     }
 

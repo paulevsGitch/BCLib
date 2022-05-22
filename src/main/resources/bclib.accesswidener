@@ -9,4 +9,4 @@ accessible	class	net/minecraft/world/level/levelgen/SurfaceRules$LazyXZCondition
 accessible	class	net/minecraft/world/level/levelgen/SurfaceRules$LazyCondition
 accessible	class	net/minecraft/world/level/levelgen/SurfaceRules$SequenceRuleSource
 accessible  class   net/minecraft/world/level/levelgen/presets/WorldPresets$Bootstrap
-
+extendable  class   net/minecraft/world/level/levelgen/NoiseBasedChunkGenerator

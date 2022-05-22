@@ -13,7 +13,7 @@ import net.minecraft.world.level.levelgen.presets.WorldPreset;
 
 import com.mojang.datafixers.util.Pair;
 import org.betterx.bclib.api.biomes.BiomeAPI;
-import org.betterx.bclib.presets.WorldPresets;
+import org.betterx.bclib.presets.worldgen.WorldPresets;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;

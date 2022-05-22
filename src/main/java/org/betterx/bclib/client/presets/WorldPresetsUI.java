@@ -8,7 +8,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
 import org.betterx.bclib.gui.worldgen.WorldSetupScreen;
-import org.betterx.bclib.presets.WorldPresets;
+import org.betterx.bclib.presets.worldgen.WorldPresets;
 
 import java.util.Optional;
 

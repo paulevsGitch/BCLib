@@ -12,6 +12,8 @@ import java.util.Map;
 
 @Mixin(PresetEditor.class)
 interface PresetEditorMixin {
+    //Make Sure the PresetEditor.EDITORS Field is a mutable List. Allows us to add new Custom WorldPreset UIs in
+    //WorldPresetsUI
     @Redirect(method = "<clinit>", at = @At(value = "INVOKE", target = "Ljava/util/Map;of(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/util/Map;"))
     private static <K, V> Map<K, V> bcl_foo(K k1, V v1, K k2, V v2) {
         Map<K, V> a = Maps.newHashMap();

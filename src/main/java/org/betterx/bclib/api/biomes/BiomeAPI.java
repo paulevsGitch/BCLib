@@ -124,11 +124,11 @@ public class BiomeAPI {
 
     public static final BCLBiome THE_END = registerEndLandBiome(getFromRegistry(Biomes.THE_END));
     public static final BCLBiome END_MIDLANDS = registerSubBiome(THE_END,
-                                                                 getFromRegistry(Biomes.END_MIDLANDS).value(),
-                                                                 0.5F);
+            getFromRegistry(Biomes.END_MIDLANDS).value(),
+            0.5F);
     public static final BCLBiome END_HIGHLANDS = registerSubBiome(THE_END,
-                                                                  getFromRegistry(Biomes.END_HIGHLANDS).value(),
-                                                                  0.5F);
+            getFromRegistry(Biomes.END_HIGHLANDS).value(),
+            0.5F);
 
     public static final BCLBiome END_BARRENS = registerEndVoidBiome(getFromRegistry(new ResourceLocation("end_barrens")));
     public static final BCLBiome SMALL_END_ISLANDS = registerEndVoidBiome(getFromRegistry(new ResourceLocation(
@@ -289,7 +289,7 @@ public class BiomeAPI {
      */
     public static BCLBiome registerEndLandBiome(Holder<Biome> biome, float genChance) {
         BCLBiome bclBiome = new BCLBiome(biome.value(),
-                                         VanillaBiomeSettings.createVanilla().setGenChance(genChance).build());
+                VanillaBiomeSettings.createVanilla().setGenChance(genChance).build());
 
         registerBiome(bclBiome, Dimension.END_LAND);
         return bclBiome;
@@ -335,7 +335,7 @@ public class BiomeAPI {
      */
     public static BCLBiome registerEndVoidBiome(Holder<Biome> biome, float genChance) {
         BCLBiome bclBiome = new BCLBiome(biome.value(),
-                                         VanillaBiomeSettings.createVanilla().setGenChance(genChance).build());
+                VanillaBiomeSettings.createVanilla().setGenChance(genChance).build());
 
         registerBiome(bclBiome, Dimension.END_VOID);
         return bclBiome;
@@ -530,7 +530,7 @@ public class BiomeAPI {
     public static void registerBiomeModification(ResourceKey dimensionID,
                                                  BiConsumer<ResourceLocation, Holder<Biome>> modification) {
         List<BiConsumer<ResourceLocation, Holder<Biome>>> modifications = MODIFICATIONS.computeIfAbsent(dimensionID,
-                                                                                                        k -> Lists.newArrayList());
+                k -> Lists.newArrayList());
         modifications.add(modification);
     }
 
@@ -596,7 +596,7 @@ public class BiomeAPI {
     public static void onFinishingBiomeTags(ResourceKey dimensionID,
                                             BiConsumer<ResourceLocation, Holder<Biome>> modification) {
         List<BiConsumer<ResourceLocation, Holder<Biome>>> modifications = TAG_ADDERS.computeIfAbsent(dimensionID,
-                                                                                                     k -> Lists.newArrayList());
+                k -> Lists.newArrayList());
         modifications.add(modification);
     }
 

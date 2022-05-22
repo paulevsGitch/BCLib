@@ -1,4 +1,4 @@
-package org.betterx.bclib.presets;
+package org.betterx.bclib.presets.worldgen;
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
@@ -11,7 +11,6 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.dimension.LevelStem;
-import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
 import net.minecraft.world.level.levelgen.WorldGenSettings;
 import net.minecraft.world.level.levelgen.presets.WorldPreset;
@@ -39,7 +38,7 @@ public class WorldPresets {
         BCLibNetherBiomeSource netherSource = new BCLibNetherBiomeSource(biomes);
         LevelStem bclNether = new LevelStem(
                 dimension,
-                new NoiseBasedChunkGenerator(
+                new BCLChunkGenerator(
                         structureSets,
                         noiseParameters,
                         netherSource,
@@ -57,7 +56,7 @@ public class WorldPresets {
         BCLibEndBiomeSource netherSource = new BCLibEndBiomeSource(biomes);
         LevelStem bclEnd = new LevelStem(
                 dimension,
-                new NoiseBasedChunkGenerator(
+                new BCLChunkGenerator(
                         structureSets,
                         noiseParameters,
                         netherSource,
