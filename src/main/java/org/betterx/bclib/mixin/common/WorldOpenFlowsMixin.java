@@ -61,7 +61,7 @@ public abstract class WorldOpenFlowsMixin {
         DataExchangeAPI.prepareServerside();
         BiomeAPI.prepareNewLevel();
 
-        DataFixerAPI.initializeWorldData(this.levelSource, levelID, true);
+        DataFixerAPI.createWorldData(this.levelSource, levelID, worldGenSettings);
         LifeCycleAPI._runBeforeLevelLoad();
     }
 
@@ -74,7 +74,7 @@ public abstract class WorldOpenFlowsMixin {
         DataExchangeAPI.prepareServerside();
         BiomeAPI.prepareNewLevel();
 
-        DataFixerAPI.initializeWorldData(levelStorageAccess, true);
+        DataFixerAPI.createWorldData(levelStorageAccess, worldData.worldGenSettings());
         LifeCycleAPI._runBeforeLevelLoad();
     }
 }

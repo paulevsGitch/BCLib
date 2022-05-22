@@ -3,12 +3,12 @@ package org.betterx.bclib.api.datafixer;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.toasts.SystemToast;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.worldselection.EditWorldScreen;
 import net.minecraft.nbt.*;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.chunk.storage.RegionFile;
+import net.minecraft.world.level.levelgen.WorldGenSettings;
 import net.minecraft.world.level.storage.LevelResource;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.LevelStorageSource.LevelStorageAccess;
@@ -24,6 +24,7 @@ import org.betterx.bclib.gui.screens.ConfirmFixScreen;
 import org.betterx.bclib.gui.screens.LevelFixErrorScreen;
 import org.betterx.bclib.gui.screens.LevelFixErrorScreen.Listener;
 import org.betterx.bclib.gui.screens.ProgressScreen;
+import org.betterx.bclib.presets.worldgen.BCLChunkGenerator;
 import org.betterx.bclib.util.Logger;
 
 import java.io.*;
@@ -160,6 +161,13 @@ public class DataFixerAPI {
         });
     }
 
+    public static void createWorldData(LevelStorageSource levelSource, String levelID, WorldGenSettings settings) {
+        wrapCall(levelSource, levelID, (levelStorageAccess) -> {
+            createWorldData(levelStorageAccess, settings);
+            return true;
+        });
+    }
+
     /**
      * Initializes the DataStorage for this world. If the world is new, the patch registry is initialized to the
      * current versions of the plugins.
@@ -169,6 +177,12 @@ public class DataFixerAPI {
      */
     public static void initializeWorldData(LevelStorageAccess access, boolean newWorld) {
         initializeWorldData(access.getLevelPath(LevelResource.ROOT).toFile(), newWorld);
+    }
+
+    public static void createWorldData(LevelStorageAccess access, WorldGenSettings settings) {
+        initializeWorldData(access, true);
+        BCLChunkGenerator.initializeWorldData(settings);
+        WorldDataAPI.saveFile(BCLib.MOD_ID);
     }
 
     /**
@@ -190,8 +204,8 @@ public class DataFixerAPI {
     @Environment(EnvType.CLIENT)
     private static AtomicProgressListener showProgressScreen() {
         ProgressScreen ps = new ProgressScreen(Minecraft.getInstance().screen,
-                                               Component.translatable("title.bclib.datafixer.progress"),
-                                               Component.translatable("message.bclib.datafixer.progress"));
+                Component.translatable("title.bclib.datafixer.progress"),
+                Component.translatable("message.bclib.datafixer.progress"));
         Minecraft.getInstance().setScreen(ps);
         return ps;
     }
@@ -298,8 +312,8 @@ public class DataFixerAPI {
     private static void showLevelFixErrorScreen(State state, Listener onContinue) {
         Minecraft.getInstance()
                  .setScreen(new LevelFixErrorScreen(Minecraft.getInstance().screen,
-                                                    state.getErrorMessages(),
-                                                    onContinue));
+                         state.getErrorMessages(),
+                         onContinue));
     }
 
     private static MigrationProfile loadProfileIfNeeded(File levelBaseDir) {
@@ -511,8 +525,8 @@ public class DataFixerAPI {
 
                             try {
                                 changed[0] |= data.patchBlockState(palette,
-                                                                   ((CompoundTag) tag).getList("BlockStates",
-                                                                                               Tag.TAG_LONG));
+                                        ((CompoundTag) tag).getList("BlockStates",
+                                                Tag.TAG_LONG));
                             } catch (PatchDidiFailException e) {
                                 BCLib.LOGGER.error("Failed fixing BlockState in " + pos);
                                 state.addError("Failed fixing BlockState in " + pos + " (" + e.getMessage() + ")");

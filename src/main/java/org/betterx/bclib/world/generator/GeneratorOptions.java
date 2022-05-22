@@ -15,7 +15,6 @@ public class GeneratorOptions {
     private static Function<Point, Boolean> endLandFunction;
     private static boolean customNetherBiomeSource = true;
     private static boolean customEndBiomeSource = true;
-    private static boolean useOldBiomeGenerator = false;
     private static boolean verticalBiomes = true;
     private static long farEndBiomesSqr = 1000000;
     private static boolean fixEndBiomeSource = true;
@@ -24,13 +23,12 @@ public class GeneratorOptions {
     public static void init() {
         biomeSizeNether = Configs.GENERATOR_CONFIG.getInt("nether.biomeMap", "biomeSize", 256);
         biomeVSizeNether = Configs.GENERATOR_CONFIG.getInt("nether.biomeMap",
-                                                           "biomeVerticalSize(onlyInTallNether)",
-                                                           86);
+                "biomeVerticalSize(onlyInTallNether)",
+                86);
         biomeSizeEndLand = Configs.GENERATOR_CONFIG.getInt("end.biomeMap", "biomeSizeLand", 256);
         biomeSizeEndVoid = Configs.GENERATOR_CONFIG.getInt("end.biomeMap", "biomeSizeVoid", 256);
         customNetherBiomeSource = Configs.GENERATOR_CONFIG.getBoolean("options", "customNetherBiomeSource", true);
         customEndBiomeSource = Configs.GENERATOR_CONFIG.getBoolean("options", "customEndBiomeSource", true);
-        useOldBiomeGenerator = Configs.GENERATOR_CONFIG.useOldGenerator();
         verticalBiomes = Configs.GENERATOR_CONFIG.getBoolean("options", "verticalBiomesInTallNether", true);
         fixEndBiomeSource = Configs.GENERATOR_CONFIG.getBoolean("options.biomeSource", "fixEndBiomeSource", true);
         fixNetherBiomeSource = Configs.GENERATOR_CONFIG.getBoolean("options.biomeSource", "fixNetherBiomeSource", true);
@@ -90,9 +88,6 @@ public class GeneratorOptions {
         return customEndBiomeSource;
     }
 
-    public static boolean useOldBiomeGenerator() {
-        return useOldBiomeGenerator;
-    }
 
     public static boolean useVerticalBiomes() {
         return verticalBiomes;

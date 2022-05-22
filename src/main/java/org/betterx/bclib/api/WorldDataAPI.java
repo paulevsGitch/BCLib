@@ -30,6 +30,9 @@ import java.util.function.Consumer;
 public class WorldDataAPI {
     private static final Map<String, CompoundTag> TAGS = Maps.newHashMap();
     private static final List<String> MODS = Lists.newArrayList();
+
+    private static final String TAG_CREATED = "create_version";
+    private static final String TAG_MODIFIED = "modify_version";
     private static File dataDir;
 
     public static void load(File dataDir) {
@@ -84,9 +87,14 @@ public class WorldDataAPI {
         CompoundTag root = TAGS.get(modID);
         if (root == null) {
             root = new CompoundTag();
+            root.putString(TAG_CREATED, ModUtil.getModVersion(modID));
             TAGS.put(modID, root);
         }
         return root;
+    }
+
+    public static boolean hasMod(String modID) {
+        return MODS.contains(modID);
     }
 
     /**
@@ -120,7 +128,9 @@ public class WorldDataAPI {
             if (!dataDir.exists()) {
                 dataDir.mkdirs();
             }
-            NbtIo.writeCompressed(getRootTag(modID), new File(dataDir, modID + ".nbt"));
+            CompoundTag tag = getRootTag(modID);
+            tag.putString(TAG_MODIFIED, ModUtil.getModVersion(modID));
+            NbtIo.writeCompressed(tag, new File(dataDir, modID + ".nbt"));
         } catch (IOException e) {
             BCLib.LOGGER.error("World data saving failed", e);
         }

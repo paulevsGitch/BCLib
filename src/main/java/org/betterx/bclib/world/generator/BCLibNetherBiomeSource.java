@@ -19,15 +19,16 @@ import org.betterx.bclib.api.biomes.BiomeAPI;
 import org.betterx.bclib.config.ConfigKeeper.StringArrayEntry;
 import org.betterx.bclib.config.Configs;
 import org.betterx.bclib.interfaces.BiomeMap;
+import org.betterx.bclib.presets.worldgen.BCLChunkGenerator;
 import org.betterx.bclib.world.biomes.BCLBiome;
 import org.betterx.bclib.world.generator.map.MapStack;
 import org.betterx.bclib.world.generator.map.hex.HexBiomeMap;
 import org.betterx.bclib.world.generator.map.square.SquareBiomeMap;
 
 import java.util.List;
+import java.util.Optional;
 
 public class BCLibNetherBiomeSource extends BCLBiomeSource {
-    private static boolean forceLegacyGenerator = false;
     private static int lastWorldHeight;
     private static int worldHeight;
     public static final Codec<BCLibNetherBiomeSource> CODEC = RecordCodecBuilder
@@ -41,15 +42,32 @@ public class BCLibNetherBiomeSource extends BCLBiomeSource {
                                     .stable()
                                     .forGetter(source -> {
                                         return source.currentSeed;
-                                    })
+                                    }),
+                            Codec
+                                    .INT
+                                    .optionalFieldOf("version")
+                                    .stable()
+                                    .forGetter(source -> Optional.of(source.biomeSourceVersion))
                     )
                     .apply(instance, instance.stable(BCLibNetherBiomeSource::new))
             );
     private BiomeMap biomeMap;
     private final BiomePicker biomePicker;
 
-    public BCLibNetherBiomeSource(Registry<Biome> biomeRegistry) {
-        super(biomeRegistry, getBiomes(biomeRegistry));
+    public BCLibNetherBiomeSource(Registry<Biome> biomeRegistry, Optional<Integer> version) {
+        this(biomeRegistry, 0, version, false);
+    }
+
+    public BCLibNetherBiomeSource(Registry<Biome> biomeRegistry, long seed, Optional<Integer> version) {
+        this(biomeRegistry, seed, version, true);
+    }
+
+    private BCLibNetherBiomeSource(Registry<Biome> biomeRegistry,
+                                   long seed,
+                                   Optional<Integer> version,
+                                   boolean initMaps) {
+        super(biomeRegistry, getBiomes(biomeRegistry), seed, version);
+
         biomePicker = new BiomePicker(biomeRegistry);
 
         this.possibleBiomes().forEach(biome -> {
@@ -69,23 +87,9 @@ public class BCLibNetherBiomeSource extends BCLBiomeSource {
         });
 
         biomePicker.rebuild();
-    }
-
-    public BCLibNetherBiomeSource(Registry<Biome> biomeRegistry, long seed) {
-        this(biomeRegistry);
-        setSeed(seed);
-    }
-
-    /**
-     * When true, the older square generator is used for the nether.
-     * <p>
-     * This override is used (for example) by BetterNether to force the legacy generation for worlds
-     * that were created before 1.18
-     *
-     * @param val wether or not you want to force the old generatore.
-     */
-    public static void setForceLegacyGeneration(boolean val) {
-        forceLegacyGenerator = val;
+        if (initMaps) {
+            initMap(seed);
+        }
     }
 
     /**
@@ -128,12 +132,6 @@ public class BCLibNetherBiomeSource extends BCLBiomeSource {
         Registry.register(Registry.BIOME_SOURCE, BCLib.makeID("nether_biome_source"), CODEC);
     }
 
-    @Override
-    public void setSeed(long seed) {
-        if (seed == currentSeed) return;
-        super.setSeed(seed);
-        initMap(seed);
-    }
 
     @Override
     public Holder<Biome> getNoiseBiome(int biomeX, int biomeY, int biomeZ, Climate.Sampler var4) {
@@ -156,9 +154,9 @@ public class BCLibNetherBiomeSource extends BCLBiomeSource {
         return CODEC;
     }
 
-    private void initMap(long seed) {
-        boolean useLegacy = GeneratorOptions.useOldBiomeGenerator() || forceLegacyGenerator;
-        TriFunction<Long, Integer, BiomePicker, BiomeMap> mapConstructor = useLegacy
+    @Override
+    protected void onInitMap(long seed) {
+        TriFunction<Long, Integer, BiomePicker, BiomeMap> mapConstructor = (biomeSourceVersion != BCLChunkGenerator.BIOME_SOURCE_VERSION_HEX)
                 ? SquareBiomeMap::new
                 : HexBiomeMap::new;
         if (worldHeight > 128 && GeneratorOptions.useVerticalBiomes()) {
@@ -179,6 +177,6 @@ public class BCLibNetherBiomeSource extends BCLBiomeSource {
 
     @Override
     public String toString() {
-        return "BCLib - Nether BiomeSource (" + Integer.toHexString(hashCode()) + ")";
+        return "BCLib - Nether BiomeSource (" + Integer.toHexString(hashCode()) + ", version=" + biomeSourceVersion + ", seed=" + currentSeed + ")";
     }
 }

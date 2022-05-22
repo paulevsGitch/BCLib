@@ -21,6 +21,7 @@ import com.mojang.datafixers.util.Pair;
 import org.betterx.bclib.BCLib;
 import org.betterx.bclib.api.tag.TagAPI;
 import org.betterx.bclib.api.tag.TagType;
+import org.betterx.bclib.world.generator.BCLBiomeSource;
 import org.betterx.bclib.world.generator.BCLibEndBiomeSource;
 import org.betterx.bclib.world.generator.BCLibNetherBiomeSource;
 
@@ -34,8 +35,9 @@ public class WorldPresets {
                                                   Holder<DimensionType> dimension,
                                                   Registry<StructureSet> structureSets,
                                                   Registry<NormalNoise.NoiseParameters> noiseParameters,
-                                                  Holder<NoiseGeneratorSettings> generatorSettings) {
-        BCLibNetherBiomeSource netherSource = new BCLibNetherBiomeSource(biomes);
+                                                  Holder<NoiseGeneratorSettings> generatorSettings,
+                                                  Optional<Integer> version) {
+        BCLibNetherBiomeSource netherSource = new BCLibNetherBiomeSource(biomes, version);
         LevelStem bclNether = new LevelStem(
                 dimension,
                 new BCLChunkGenerator(
@@ -52,8 +54,9 @@ public class WorldPresets {
                                                Holder<DimensionType> dimension,
                                                Registry<StructureSet> structureSets,
                                                Registry<NormalNoise.NoiseParameters> noiseParameters,
-                                               Holder<NoiseGeneratorSettings> generatorSettings) {
-        BCLibEndBiomeSource netherSource = new BCLibEndBiomeSource(biomes);
+                                               Holder<NoiseGeneratorSettings> generatorSettings,
+                                               Optional<Integer> version) {
+        BCLibEndBiomeSource netherSource = new BCLibEndBiomeSource(biomes, version);
         LevelStem bclEnd = new LevelStem(
                 dimension,
                 new BCLChunkGenerator(
@@ -78,18 +81,39 @@ public class WorldPresets {
             TagAPI.registerType(BuiltinRegistries.WORLD_PRESET, "tags/worldgen/world_preset");
 
     public static final ResourceKey<WorldPreset> BCL_WORLD = register(BCLib.makeID("normal"));
+    public static final ResourceKey<WorldPreset> BCL_WORLD_17 = register(BCLib.makeID("legacy_17"), false);
 
     public static Optional<ResourceKey<WorldPreset>> DEFAULT = Optional.of(BCL_WORLD);
+
+    public static WorldGenSettings createWorldFromPreset(ResourceKey<WorldPreset> preset,
+                                                         RegistryAccess registryAccess,
+                                                         long seed,
+                                                         boolean generateStructures,
+                                                         boolean generateBonusChest) {
+        WorldGenSettings settings = registryAccess
+                .registryOrThrow(Registry.WORLD_PRESET_REGISTRY)
+                .getHolderOrThrow(preset)
+                .value()
+                .createWorldGenSettings(seed, generateStructures, generateBonusChest);
+
+        for (LevelStem stem : settings.dimensions()) {
+            if (stem.generator().getBiomeSource() instanceof BCLBiomeSource bcl) {
+                bcl.setSeed(seed);
+            }
+        }
+
+        return settings;
+    }
 
     public static WorldGenSettings createDefaultWorldFromPreset(RegistryAccess registryAccess,
                                                                 long seed,
                                                                 boolean generateStructures,
                                                                 boolean generateBonusChest) {
-        return registryAccess
-                .registryOrThrow(Registry.WORLD_PRESET_REGISTRY)
-                .getHolderOrThrow(DEFAULT.orElseThrow())
-                .value()
-                .createWorldGenSettings(seed, generateStructures, generateBonusChest);
+        return createWorldFromPreset(DEFAULT.orElseThrow(),
+                registryAccess,
+                seed,
+                generateStructures,
+                generateBonusChest);
     }
 
     public static Pair<WorldGenSettings, RegistryAccess.Frozen> defaultWorldDataSupplier(RegistryAccess.Frozen frozen) {
@@ -115,8 +139,14 @@ public class WorldPresets {
      * @return The key you may use to reference your new Preset
      */
     public static ResourceKey<WorldPreset> register(ResourceLocation loc) {
+        return register(loc, true);
+    }
+
+    private static ResourceKey<WorldPreset> register(ResourceLocation loc, boolean addToNormal) {
         ResourceKey<WorldPreset> key = ResourceKey.create(Registry.WORLD_PRESET_REGISTRY, loc);
-        WORLD_PRESETS.addUntyped(WorldPresetTags.NORMAL, key.location());
+        if (addToNormal) {
+            WORLD_PRESETS.addUntyped(WorldPresetTags.NORMAL, key.location());
+        }
 
         return key;
     }
