@@ -40,6 +40,11 @@ public abstract class NoiseBasedChunkGeneratorMixin implements SurfaceProvider, 
     }
 
     @Override
+    public Holder<NoiseGeneratorSettings> bclib_getNoiseGeneratorSettingHolders() {
+        return settings;
+    }
+
+    @Override
     public Registry<NormalNoise.NoiseParameters> bclib_getNoises() {
         return noises;
     }

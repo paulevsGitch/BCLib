@@ -24,6 +24,8 @@ import com.mojang.serialization.Lifecycle;
 import org.betterx.bclib.BCLib;
 import org.betterx.bclib.api.tag.TagAPI;
 import org.betterx.bclib.api.tag.TagType;
+import org.betterx.bclib.interfaces.ChunkGeneratorAccessor;
+import org.betterx.bclib.interfaces.NoiseGeneratorSettingsProvider;
 import org.betterx.bclib.world.generator.BCLBiomeSource;
 import org.betterx.bclib.world.generator.BCLibEndBiomeSource;
 import org.betterx.bclib.world.generator.BCLibNetherBiomeSource;
@@ -136,8 +138,6 @@ public class WorldPresets {
                                                              ResourceKey<DimensionType> dimensionTypeKey,
                                                              WorldGenSettings settings) {
         var oldNether = settings.dimensions().getHolder(dimensionKey);
-        //TODO: Make sure our BiomeSource reuses the BiomeList from the Datapack Source
-        
         int loaderVersion = BCLChunkGenerator.getBiomeVersionForGenerator(oldNether
                 .map(h -> h.value().generator())
                 .orElse(null));
@@ -145,12 +145,38 @@ public class WorldPresets {
         int targetVersion = BCLChunkGenerator.getBiomeVersionForCurrentWorld(dimensionKey);
         if (loaderVersion != targetVersion) {
             BCLib.LOGGER.info("Enforcing Correct Generator for " + dimensionKey.location().toString() + ".");
+            var chunkGenerator = oldNether.map(h -> h.value().generator()).orElse(null);
             RegistryAccess access = RegistryAccess.builtinCopy();
-            return WorldPresets.replaceGenerator(dimensionKey,
-                    dimensionTypeKey,
+            Optional<Holder<LevelStem>> refLevelStem = BCLChunkGenerator.referenceStemForVersion(
+                    dimensionKey,
                     targetVersion,
                     access,
-                    settings);
+                    settings.seed(),
+                    settings.generateStructures(),
+                    settings.generateStructures()
+            );
+
+            ChunkGenerator referenceGenerator = refLevelStem.map(h -> h.value().generator()).orElse(null);
+            if (referenceGenerator == null) {
+                BCLib.LOGGER.error("Failed to create Generator for " + dimensionKey.location().toString());
+                return settings;
+            }
+
+            if (chunkGenerator instanceof ChunkGeneratorAccessor generator) {
+                if (chunkGenerator instanceof NoiseGeneratorSettingsProvider noiseProvider) {
+                    //TODO: Make sure our BiomeSource reuses the BiomeList from the Datapack Source
+                    referenceGenerator = new BCLChunkGenerator(generator.bclib_getStructureSetsRegistry(),
+                            noiseProvider.bclib_getNoises(),
+                            referenceGenerator.getBiomeSource(),
+                            noiseProvider.bclib_getNoiseGeneratorSettingHolders());
+                }
+            }
+
+            return WorldPresets.replaceGenerator(dimensionKey,
+                    dimensionTypeKey,
+                    access,
+                    settings,
+                    referenceGenerator);
         }
         return settings;
     }
@@ -170,11 +196,24 @@ public class WorldPresets {
                 worldGenSettings.generateStructures(),
                 worldGenSettings.generateStructures()
         );
+        return replaceGenerator(dimensionKey,
+                dimensionTypeKey,
+                registryAccess,
+                worldGenSettings,
+                oLevelStem.map(l -> l.value().generator()).orElseThrow());
+    }
 
+    public static WorldGenSettings replaceGenerator(
+            ResourceKey<LevelStem> dimensionKey,
+            ResourceKey<DimensionType> dimensionTypeKey,
+            RegistryAccess registryAccess,
+            WorldGenSettings worldGenSettings,
+            ChunkGenerator generator
+    ) {
         Registry<DimensionType> registry = registryAccess.registryOrThrow(Registry.DIMENSION_TYPE_REGISTRY);
         Registry<LevelStem> registry2 = withDimension(dimensionKey, dimensionTypeKey, registry,
                 worldGenSettings.dimensions(),
-                oLevelStem.map(l -> l.value().generator()).orElseThrow());
+                generator);
         return new WorldGenSettings(worldGenSettings.seed(),
                 worldGenSettings.generateStructures(),
                 worldGenSettings.generateBonusChest(),
