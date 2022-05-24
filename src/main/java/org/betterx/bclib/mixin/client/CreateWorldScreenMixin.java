@@ -13,7 +13,8 @@ import net.minecraft.world.level.levelgen.presets.WorldPreset;
 
 import com.mojang.datafixers.util.Pair;
 import org.betterx.bclib.api.biomes.BiomeAPI;
-import org.betterx.bclib.presets.worldgen.WorldPresets;
+import org.betterx.bclib.presets.worldgen.BCLWorldPresets;
+import org.betterx.bclib.presets.worldgen.WorldGenUtilities;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -35,15 +36,15 @@ public class CreateWorldScreenMixin {
     //Change the WorldPreset that is selected by default on the Create World Screen
     @ModifyArg(method = "openFresh", index = 1, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/worldselection/WorldGenSettingsComponent;<init>(Lnet/minecraft/client/gui/screens/worldselection/WorldCreationContext;Ljava/util/Optional;Ljava/util/OptionalLong;)V"))
     private static Optional<ResourceKey<WorldPreset>> bcl_NewDefault(Optional<ResourceKey<WorldPreset>> preset) {
-        return WorldPresets.DEFAULT;
+        return BCLWorldPresets.DEFAULT;
     }
 
-    //Make sure the WorldGenSettings match the default WorldPreset
+    //Make sure the WorldGenSettings used to populate the create screen match the default WorldPreset
     @ModifyArg(method = "openFresh", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/WorldLoader;load(Lnet/minecraft/server/WorldLoader$InitConfig;Lnet/minecraft/server/WorldLoader$WorldDataSupplier;Lnet/minecraft/server/WorldLoader$ResultFactory;Ljava/util/concurrent/Executor;Ljava/util/concurrent/Executor;)Ljava/util/concurrent/CompletableFuture;"))
     private static WorldLoader.WorldDataSupplier<WorldGenSettings> bcl_NewDefaultSettings(WorldLoader.WorldDataSupplier<WorldGenSettings> worldDataSupplier) {
         return (resourceManager, dataPackConfig) -> {
             Pair<WorldGenSettings, RegistryAccess.Frozen> res = worldDataSupplier.get(resourceManager, dataPackConfig);
-            return WorldPresets.defaultWorldDataSupplier(res.getSecond());
+            return WorldGenUtilities.defaultWorldDataSupplier(res.getSecond());
         };
     }
 }

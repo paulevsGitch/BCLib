@@ -11,7 +11,7 @@ import org.betterx.bclib.api.dataexchange.DataExchangeAPI;
 import org.betterx.bclib.api.dataexchange.handler.autosync.*;
 import org.betterx.bclib.api.tag.TagAPI;
 import org.betterx.bclib.config.Configs;
-import org.betterx.bclib.presets.worldgen.WorldPresets;
+import org.betterx.bclib.presets.worldgen.BCLWorldPresets;
 import org.betterx.bclib.recipes.AnvilRecipe;
 import org.betterx.bclib.recipes.CraftingRecipes;
 import org.betterx.bclib.registry.BaseBlockEntities;
@@ -25,6 +25,7 @@ import java.util.List;
 
 public class BCLib implements ModInitializer {
     public static final String MOD_ID = "bclib";
+    public static final String TOGETHER_WORLDS = "worlds_together";
     public static final Logger LOGGER = new Logger(MOD_ID);
 
     @Override
@@ -37,9 +38,9 @@ public class BCLib implements ModInitializer {
         TagAPI.init();
         CraftingRecipes.init();
         WorldDataAPI.registerModCache(MOD_ID);
-        WorldDataAPI.registerModCache(MOD_ID);
+        WorldDataAPI.registerModCache(TOGETHER_WORLDS);
         DataExchangeAPI.registerMod(MOD_ID);
-        WorldPresets.registerPresets();
+        BCLWorldPresets.registerPresets();
         AnvilRecipe.register();
 
         DataExchangeAPI.registerDescriptors(List.of(

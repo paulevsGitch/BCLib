@@ -16,7 +16,7 @@ import org.betterx.bclib.api.datafixer.DataFixerAPI;
 import org.betterx.bclib.api.datafixer.ForcedLevelPatch;
 import org.betterx.bclib.api.datafixer.MigrationProfile;
 import org.betterx.bclib.config.Configs;
-import org.betterx.bclib.presets.worldgen.BCLChunkGenerator;
+import org.betterx.bclib.presets.worldgen.WorldGenUtilities;
 import org.betterx.bclib.util.MHelper;
 import org.betterx.bclib.world.generator.GeneratorOptions;
 
@@ -45,7 +45,7 @@ final class BiomeSourcePatch extends ForcedLevelPatch {
     @Override
     protected Boolean runLevelDatPatch(CompoundTag root, MigrationProfile profile) {
         //make sure we have a working generators file before attempting to patch
-        BCLChunkGenerator.migrateGeneratorSettings();
+        WorldGenUtilities.migrateGeneratorSettings();
 
         final CompoundTag worldGenSettings = root.getCompound("Data").getCompound("WorldGenSettings");
         final CompoundTag dimensions = worldGenSettings.getCompound("dimensions");
@@ -109,16 +109,16 @@ final class BiomeSourcePatch extends ForcedLevelPatch {
         Optional<WorldGenSettings> oWorldGen = WorldGenSettings.CODEC
                 .parse(new Dynamic<>(registryOps, worldGenSettings))
                 .result();
-        
+
         Optional<LevelStem> oLevelStem = LevelStem.CODEC
                 .parse(new Dynamic<>(registryOps, dimensionTag))
                 .resultOrPartial(BCLib.LOGGER::error);
 
         Optional<ChunkGenerator> netherGenerator = oLevelStem.map(l -> l.generator());
-        int biomeSourceVersion = BCLChunkGenerator.getBiomeVersionForGenerator(netherGenerator.orElse(null));
-        int targetVersion = BCLChunkGenerator.getBiomeVersionForCurrentWorld(dimensionKey);
+        int biomeSourceVersion = WorldGenUtilities.getBiomeVersionForGenerator(netherGenerator.orElse(null));
+        int targetVersion = WorldGenUtilities.getBiomeVersionForCurrentWorld(dimensionKey);
         if (biomeSourceVersion != targetVersion) {
-            Optional<Holder<LevelStem>> refLevelStem = BCLChunkGenerator.referenceStemForVersion(
+            Optional<Holder<LevelStem>> refLevelStem = WorldGenUtilities.referenceStemForVersion(
                     dimensionKey,
                     targetVersion,
                     registryAccess,

@@ -27,8 +27,10 @@ import org.betterx.bclib.world.generator.map.hex.HexBiomeMap;
 import org.betterx.bclib.world.generator.map.square.SquareBiomeMap;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 
 public class BCLibEndBiomeSource extends BCLBiomeSource {
@@ -72,7 +74,15 @@ public class BCLibEndBiomeSource extends BCLBiomeSource {
     }
 
     private BCLibEndBiomeSource(Registry<Biome> biomeRegistry, long seed, Optional<Integer> version, boolean initMaps) {
-        super(biomeRegistry, getBiomes(biomeRegistry), seed, version);
+        this(biomeRegistry, getBiomes(biomeRegistry), seed, version, initMaps);
+    }
+
+    private BCLibEndBiomeSource(Registry<Biome> biomeRegistry,
+                                List<Holder<Biome>> list,
+                                long seed,
+                                Optional<Integer> version,
+                                boolean initMaps) {
+        super(biomeRegistry, list, seed, version);
 
         endLandBiomePicker = new BiomePicker(biomeRegistry);
         endVoidBiomePicker = new BiomePicker(biomeRegistry);
@@ -122,39 +132,47 @@ public class BCLibEndBiomeSource extends BCLBiomeSource {
         }
     }
 
-    private static List<Holder<Biome>> getBiomes(Registry<Biome> biomeRegistry) {
-        List<String> includeLand = Configs.BIOMES_CONFIG.getEntry("force_include",
+    protected BCLBiomeSource cloneForDatapack(Set<Holder<Biome>> datapackBiomes) {
+        datapackBiomes.addAll(getBclBiomes(this.biomeRegistry));
+        return new BCLibEndBiomeSource(this.biomeRegistry,
+                datapackBiomes.stream().toList(),
+                this.currentSeed,
+                Optional.of(biomeSourceVersion),
+                true);
+    }
+
+    private static List<Holder<Biome>> getBclBiomes(Registry<Biome> biomeRegistry) {
+        List<String> include = Configs.BIOMES_CONFIG.getEntry("force_include",
                 "end_land_biomes",
                 StringArrayEntry.class).getValue();
-        List<String> includeVoid = Configs.BIOMES_CONFIG.getEntry("force_include",
+        include.addAll(Configs.BIOMES_CONFIG.getEntry("force_include",
                 "end_void_biomes",
+                StringArrayEntry.class).getValue());
+
+        return getBiomes(biomeRegistry, new ArrayList<>(0), include, BCLibEndBiomeSource::isValidBCLEndBiome);
+    }
+
+    private static List<Holder<Biome>> getBiomes(Registry<Biome> biomeRegistry) {
+        List<String> include = Configs.BIOMES_CONFIG.getEntry("force_include",
+                "end_land_biomes",
                 StringArrayEntry.class).getValue();
+        include.addAll(Configs.BIOMES_CONFIG.getEntry("force_include",
+                "end_void_biomes",
+                StringArrayEntry.class).getValue());
 
-        return biomeRegistry.stream()
-                            .filter(biome -> biomeRegistry.getResourceKey(biome).isPresent())
-                            .map(biome -> biomeRegistry.getOrCreateHolderOrThrow(biomeRegistry.getResourceKey(biome)
-                                                                                              .get()))
-                            .filter(biome -> {
-                                ResourceLocation key = biome.unwrapKey().orElseThrow().location();
-
-
-                                if (includeLand.contains(key.toString()) || includeVoid.contains(key.toString())) {
-                                    return true;
-                                }
-
-                                final boolean isEndBiome = biome.is(BiomeTags.IS_END) ||
-                                        BiomeAPI.wasRegisteredAsEndBiome(key);
+        return getBiomes(biomeRegistry, new ArrayList<>(0), include, BCLibEndBiomeSource::isValidEndBiome);
+    }
 
 
-                                BCLBiome bclBiome = BiomeAPI.getBiome(key);
-                                if (bclBiome != BiomeAPI.EMPTY_BIOME) {
-                                    if (bclBiome.getParentBiome() != null) {
-                                        bclBiome = bclBiome.getParentBiome();
-                                    }
-                                    key = bclBiome.getID();
-                                }
-                                return isEndBiome;
-                            }).toList();
+    private static boolean isValidEndBiome(Holder<Biome> biome, ResourceLocation location) {
+        return biome.is(BiomeTags.IS_END) ||
+                BiomeAPI.wasRegisteredAsEndBiome(location);
+    }
+
+    private static boolean isValidBCLEndBiome(Holder<Biome> biome, ResourceLocation location) {
+        return biome.is(BiomeTags.IS_END) ||
+                BiomeAPI.wasRegisteredAs(location, BiomeAPI.Dimension.BCL_END_LAND) ||
+                BiomeAPI.wasRegisteredAs(location, BiomeAPI.Dimension.BCL_END_VOID);
     }
 
     public static float getLegacyHeightValue(SimplexNoise simplexNoise, int i, int j) {

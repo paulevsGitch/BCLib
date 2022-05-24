@@ -18,6 +18,53 @@ import java.util.Objects;
 
 public class BiomePicker {
     public final Map<BCLBiome, ActualBiome> all = new HashMap<>();
+    public final Registry<Biome> biomeRegistry;
+    private final List<ActualBiome> biomes = Lists.newArrayList();
+    private final List<String> allowedBiomes;
+    private WeighTree<ActualBiome> tree;
+
+    public BiomePicker(Registry<Biome> biomeRegistry) {
+        this(biomeRegistry, null);
+    }
+
+    public BiomePicker(Registry<Biome> biomeRegistry, List<Holder<Biome>> allowedBiomes) {
+        this.biomeRegistry = biomeRegistry;
+        this.allowedBiomes = allowedBiomes != null ? allowedBiomes
+                .stream()
+                .map(h -> h.unwrapKey())
+                .filter(o -> o.isPresent())
+                .map(o -> o.get().location().toString()).toList() : null;
+    }
+
+    private boolean isAllowed(BCLBiome b) {
+        if (allowedBiomes == null) return true;
+        return allowedBiomes.contains(b.getID().toString());
+    }
+
+    private ActualBiome create(BCLBiome bclBiome) {
+        ActualBiome e = all.get(bclBiome);
+        if (e != null) return e;
+        return new ActualBiome(bclBiome);
+    }
+
+    public void addBiome(BCLBiome biome) {
+        biomes.add(create(biome));
+    }
+
+    public ActualBiome getBiome(WorldgenRandom random) {
+        return biomes.isEmpty() ? null : tree.get(random);
+    }
+
+    public void rebuild() {
+        if (biomes.isEmpty()) {
+            return;
+        }
+        WeightedList<ActualBiome> list = new WeightedList<>();
+        biomes.forEach(biome -> {
+            list.add(biome, biome.bclBiome.getGenChance());
+        });
+        tree = new WeighTree<>(list);
+    }
 
     public class ActualBiome {
         public final BCLBiome bclBiome;
@@ -36,10 +83,16 @@ public class BiomePicker {
             this.biome = biomeRegistry.getOrCreateHolderOrThrow(key);
 
             bclBiome.forEachSubBiome((b, w) -> {
-                subbiomes.add(create(b), w);
+                if (isAllowed(b))
+                    subbiomes.add(create(b), w);
             });
 
-            edge = bclBiome.getEdge() != null ? create(bclBiome.getEdge()) : null;
+            if (bclBiome.getEdge() != null && isAllowed(bclBiome.getEdge())) {
+                edge = create(bclBiome.getEdge());
+            } else {
+                edge = null;
+            }
+
             parent = bclBiome.getParentBiome() != null ? create(bclBiome.getParentBiome()) : null;
         }
 
@@ -71,38 +124,5 @@ public class BiomePicker {
         public boolean isSame(ActualBiome e) {
             return bclBiome.isSame(e.bclBiome);
         }
-    }
-
-    private ActualBiome create(BCLBiome bclBiome) {
-        ActualBiome e = all.get(bclBiome);
-        if (e != null) return e;
-        return new ActualBiome(bclBiome);
-    }
-
-    private final List<ActualBiome> biomes = Lists.newArrayList();
-    public final Registry<Biome> biomeRegistry;
-    private WeighTree<ActualBiome> tree;
-
-    public BiomePicker(Registry<Biome> biomeRegistry) {
-        this.biomeRegistry = biomeRegistry;
-    }
-
-    public void addBiome(BCLBiome biome) {
-        biomes.add(create(biome));
-    }
-
-    public ActualBiome getBiome(WorldgenRandom random) {
-        return biomes.isEmpty() ? null : tree.get(random);
-    }
-
-    public void rebuild() {
-        if (biomes.isEmpty()) {
-            return;
-        }
-        WeightedList<ActualBiome> list = new WeightedList<>();
-        biomes.forEach(biome -> {
-            list.add(biome, biome.bclBiome.getGenChance());
-        });
-        tree = new WeighTree<>(list);
     }
 }

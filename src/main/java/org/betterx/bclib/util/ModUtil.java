@@ -56,7 +56,7 @@ public class ModUtil {
 
     private static ModMetadata readJSON(InputStream is, String sourceFile) throws IOException {
         try (com.google.gson.stream.JsonReader reader = new JsonReader(new InputStreamReader(is,
-                                                                                             StandardCharsets.UTF_8))) {
+                StandardCharsets.UTF_8))) {
             JsonObject data = new JsonParser().parse(reader)
                                               .getAsJsonObject();
             Version ver;
@@ -261,6 +261,8 @@ public class ModUtil {
      * @return The version of the locally installed Mod
      */
     public static String getModVersion(String modID) {
+        if (modID == BCLib.TOGETHER_WORLDS) modID = BCLib.MOD_ID;
+
         Optional<ModContainer> optional = FabricLoader.getInstance()
                                                       .getModContainer(modID);
         if (optional.isPresent()) {

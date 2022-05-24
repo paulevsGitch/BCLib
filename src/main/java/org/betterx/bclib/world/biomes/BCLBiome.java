@@ -232,8 +232,8 @@ public class BCLBiome extends BCLBiomeSettings {
     public void afterRegistration() {
         if (!this.structureTags.isEmpty()) {
             structureTags.forEach(tagKey ->
-                                          TagAPI.addBiomeTag(tagKey, biome)
-                                 );
+                    TagAPI.addBiomeTag(tagKey, biome)
+            );
         }
 
         if (this.surfaceInit != null) {
@@ -358,4 +358,13 @@ public class BCLBiome extends BCLBiomeSettings {
     }
 
     private final boolean didLoadConfig = false;
+
+    public boolean isEdgeBiome() {
+        if (getParentBiome() == null) return false;
+        return getParentBiome().edge == this;
+    }
+
+    public boolean allowFabricRegistration() {
+        return !isEdgeBiome();
+    }
 }

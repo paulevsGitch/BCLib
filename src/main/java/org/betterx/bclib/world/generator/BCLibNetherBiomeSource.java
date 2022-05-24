@@ -26,6 +26,7 @@ import org.betterx.bclib.world.generator.map.square.SquareBiomeMap;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public class BCLibNetherBiomeSource extends BCLBiomeSource {
     private static int lastWorldHeight;
@@ -65,7 +66,15 @@ public class BCLibNetherBiomeSource extends BCLBiomeSource {
                                    long seed,
                                    Optional<Integer> version,
                                    boolean initMaps) {
-        super(biomeRegistry, getBiomes(biomeRegistry), seed, version);
+        this(biomeRegistry, getBiomes(biomeRegistry), seed, version, initMaps);
+    }
+
+    private BCLibNetherBiomeSource(Registry<Biome> biomeRegistry,
+                                   List<Holder<Biome>> list,
+                                   long seed,
+                                   Optional<Integer> version,
+                                   boolean initMaps) {
+        super(biomeRegistry, list, seed, version);
 
         biomePicker = new BiomePicker(biomeRegistry);
 
@@ -77,6 +86,7 @@ public class BCLibNetherBiomeSource extends BCLBiomeSource {
                 biomePicker.addBiome(bclBiome);
             } else {
                 BCLBiome bclBiome = BiomeAPI.getBiome(key);
+
                 if (bclBiome != BiomeAPI.EMPTY_BIOME) {
                     if (bclBiome.getParentBiome() == null) {
                         biomePicker.addBiome(bclBiome);
@@ -91,6 +101,15 @@ public class BCLibNetherBiomeSource extends BCLBiomeSource {
         }
     }
 
+    protected BCLBiomeSource cloneForDatapack(Set<Holder<Biome>> datapackBiomes) {
+        datapackBiomes.addAll(getBclBiomes(this.biomeRegistry));
+        return new BCLibNetherBiomeSource(this.biomeRegistry,
+                datapackBiomes.stream().toList(),
+                this.currentSeed,
+                Optional.of(biomeSourceVersion),
+                true);
+    }
+
     /**
      * Set world height, used when Nether is larger than vanilla 128 blocks tall.
      *
@@ -100,27 +119,34 @@ public class BCLibNetherBiomeSource extends BCLBiomeSource {
         BCLibNetherBiomeSource.worldHeight = worldHeight;
     }
 
+    private static List<Holder<Biome>> getBclBiomes(Registry<Biome> biomeRegistry) {
+        List<String> include = Configs.BIOMES_CONFIG.getEntry("force_include", "nether_biomes", StringArrayEntry.class)
+                                                    .getValue();
+        List<String> exclude = Configs.BIOMES_CONFIG.getEntry("force_exclude", "nether_biomes", StringArrayEntry.class)
+                                                    .getValue();
+
+        return getBiomes(biomeRegistry, exclude, include, BCLibNetherBiomeSource::isValidBCLNetherBiome);
+    }
+
+
     private static List<Holder<Biome>> getBiomes(Registry<Biome> biomeRegistry) {
         List<String> include = Configs.BIOMES_CONFIG.getEntry("force_include", "nether_biomes", StringArrayEntry.class)
                                                     .getValue();
         List<String> exclude = Configs.BIOMES_CONFIG.getEntry("force_exclude", "nether_biomes", StringArrayEntry.class)
                                                     .getValue();
 
-        return biomeRegistry.stream()
-                            .filter(biome -> biomeRegistry.getResourceKey(biome).isPresent())
-                            .map(biome -> biomeRegistry.getOrCreateHolderOrThrow(biomeRegistry.getResourceKey(biome)
-                                                                                              .get()))
-                            .filter(biome -> {
-                                ResourceLocation location = biome.unwrapKey().orElseThrow().location();
-                                final String strLocation = location.toString();
-                                if (exclude.contains(strLocation)) return false;
-                                if (include.contains(strLocation)) return true;
+        return getBiomes(biomeRegistry, exclude, include, BCLibNetherBiomeSource::isValidNetherBiome);
+    }
 
-                                return
-                                        NetherBiomeData.canGenerateInNether(biome.unwrapKey().get()) ||
-                                                biome.is(BiomeTags.IS_NETHER) ||
-                                                BiomeAPI.wasRegisteredAsNetherBiome(location);
-                            }).toList();
+
+    private static boolean isValidNetherBiome(Holder<Biome> biome, ResourceLocation location) {
+        return NetherBiomeData.canGenerateInNether(biome.unwrapKey().get()) ||
+                biome.is(BiomeTags.IS_NETHER) ||
+                BiomeAPI.wasRegisteredAsNetherBiome(location);
+    }
+
+    private static boolean isValidBCLNetherBiome(Holder<Biome> biome, ResourceLocation location) {
+        return BiomeAPI.wasRegisteredAs(location, BiomeAPI.Dimension.BCL_NETHER);
     }
 
     public static <T> void debug(Object el, Registry<T> reg) {

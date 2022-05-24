@@ -8,7 +8,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
 import org.betterx.bclib.gui.screens.WorldSetupScreen;
-import org.betterx.bclib.presets.worldgen.WorldPresets;
+import org.betterx.bclib.presets.worldgen.BCLWorldPresets;
 
 import java.util.Optional;
 
@@ -21,7 +21,7 @@ public class WorldPresetsUI {
     }
 
     public static void setupClientside() {
-        registerCustomizeUI(WorldPresets.BCL_WORLD, (createWorldScreen, worldCreationContext) -> {
+        registerCustomizeUI(BCLWorldPresets.BCL_WORLD, (createWorldScreen, worldCreationContext) -> {
             return new WorldSetupScreen(createWorldScreen, worldCreationContext);
         });
     }
