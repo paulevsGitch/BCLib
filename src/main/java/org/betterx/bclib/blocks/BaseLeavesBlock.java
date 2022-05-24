@@ -91,7 +91,7 @@ public class BaseLeavesBlock extends LeavesBlock implements BlockModelProvider, 
             if (BaseShearsItem.isShear(tool) || EnchantmentHelper.getItemEnchantmentLevel(
                     Enchantments.SILK_TOUCH,
                     tool
-                                                                                         ) > 0) {
+            ) > 0) {
                 return Collections.singletonList(new ItemStack(leaveBlock));
             }
             int fortune = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.BLOCK_FORTUNE, tool);

@@ -9,6 +9,7 @@ import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.dimension.BuiltinDimensionTypes;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.dimension.LevelStem;
+import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
 import net.minecraft.world.level.levelgen.WorldGenSettings;
 
 import com.mojang.serialization.Codec;
@@ -104,6 +105,25 @@ public class BCLWorldPresetSettings extends WorldPresetSettings {
         return biomeSource;
     }
 
+    public Holder<NoiseGeneratorSettings> fixNoiseSettings(Holder<NoiseGeneratorSettings> settings,
+                                                           BiomeSource biomeSource) {
+        NoiseGeneratorSettings old = settings.value();
+        NoiseGeneratorSettings noise = new NoiseGeneratorSettings(old.noiseSettings(),
+                old.defaultBlock(),
+                old.defaultFluid(),
+                old.noiseRouter(),
+                old.surfaceRule(),
+                old.spawnTarget(),
+                old.seaLevel(),
+                old.disableMobGeneration(),
+                old.aquifersEnabled(),
+                old.oreVeinsEnabled(),
+                old.useLegacyRandomSource());
+
+
+        return Holder.direct(noise);
+    }
+
 
     /**
      * Datapacks can change the world's generator. This Method will ensure, that the Generators contain
@@ -144,11 +164,12 @@ public class BCLWorldPresetSettings extends WorldPresetSettings {
             if (chunkGenerator instanceof ChunkGeneratorAccessor generator) {
                 if (chunkGenerator instanceof NoiseGeneratorSettingsProvider noiseProvider) {
                     final Set<Holder<Biome>> biomes = chunkGenerator.getBiomeSource().possibleBiomes();
-
+                    final BiomeSource bs = fixBiomeSource(referenceGenerator.getBiomeSource(), biomes);
                     referenceGenerator = new BCLChunkGenerator(generator.bclib_getStructureSetsRegistry(),
                             noiseProvider.bclib_getNoises(),
-                            fixBiomeSource(referenceGenerator.getBiomeSource(), biomes),
-                            noiseProvider.bclib_getNoiseGeneratorSettingHolders());
+                            bs,
+                            fixNoiseSettings(noiseProvider.bclib_getNoiseGeneratorSettingHolders(), bs)
+                    );
                 }
             }
 
