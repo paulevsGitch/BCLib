@@ -1,4 +1,4 @@
-package org.betterx.bclib.presets.worldgen;
+package org.betterx.bclib.api.worldgen;
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;

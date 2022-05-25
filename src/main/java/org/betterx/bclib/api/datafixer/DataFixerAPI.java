@@ -24,7 +24,7 @@ import org.betterx.bclib.gui.screens.ConfirmFixScreen;
 import org.betterx.bclib.gui.screens.LevelFixErrorScreen;
 import org.betterx.bclib.gui.screens.LevelFixErrorScreen.Listener;
 import org.betterx.bclib.gui.screens.ProgressScreen;
-import org.betterx.bclib.presets.worldgen.WorldGenUtilities;
+import org.betterx.bclib.api.worldgen.WorldGenUtil;
 import org.betterx.bclib.util.Logger;
 
 import java.io.*;
@@ -181,7 +181,7 @@ public class DataFixerAPI {
 
     public static void createWorldData(LevelStorageAccess access, WorldGenSettings settings) {
         initializeWorldData(access, true);
-        WorldGenUtilities.initializeWorldData(settings);
+        WorldGenUtil.initializeWorldData(settings);
         WorldDataAPI.saveFile(BCLib.MOD_ID);
     }
 

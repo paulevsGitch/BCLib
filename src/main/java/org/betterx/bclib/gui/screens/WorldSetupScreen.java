@@ -15,7 +15,7 @@ import net.fabricmc.api.Environment;
 import org.betterx.bclib.BCLib;
 import org.betterx.bclib.gui.gridlayout.GridCheckboxCell;
 import org.betterx.bclib.gui.gridlayout.GridLayout;
-import org.betterx.bclib.presets.worldgen.WorldGenUtilities;
+import org.betterx.bclib.api.worldgen.WorldGenUtil;
 import org.betterx.bclib.world.generator.BCLBiomeSource;
 
 import org.jetbrains.annotations.Nullable;
@@ -39,14 +39,14 @@ public class WorldSetupScreen extends BCLibScreen {
 
     @Override
     protected void initLayout() {
-        final int netherVersion = WorldGenUtilities.getBiomeVersionForGenerator(context
+        final int netherVersion = WorldGenUtil.getBiomeVersionForGenerator(context
                 .worldGenSettings()
                 .dimensions()
                 .getOrCreateHolderOrThrow(
                         LevelStem.NETHER)
                 .value()
                 .generator());
-        final int endVersion = WorldGenUtilities.getBiomeVersionForGenerator(context
+        final int endVersion = WorldGenUtil.getBiomeVersionForGenerator(context
                 .worldGenSettings()
                 .dimensions()
                 .getOrCreateHolderOrThrow(
@@ -149,7 +149,7 @@ public class WorldSetupScreen extends BCLibScreen {
             int biomeSourceVersion
     ) {
         createWorldScreen.worldGenSettingsComponent.updateSettings(
-                (registryAccess, worldGenSettings) -> WorldGenUtilities.replaceGenerator(
+                (registryAccess, worldGenSettings) -> WorldGenUtil.replaceGenerator(
                         dimensionKey,
                         dimensionTypeKey,
                         biomeSourceVersion,

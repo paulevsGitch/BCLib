@@ -1,4 +1,4 @@
-package org.betterx.bclib.presets.worldgen;
+package org.betterx.bclib.api.worldgen;
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.MappedRegistry;
@@ -16,6 +16,8 @@ import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
+import net.minecraft.world.level.levelgen.SurfaceRules;
+import net.minecraft.world.level.levelgen.SurfaceRules.RuleSource;
 import net.minecraft.world.level.levelgen.WorldGenSettings;
 import net.minecraft.world.level.levelgen.presets.WorldPreset;
 import net.minecraft.world.level.levelgen.structure.StructureSet;
@@ -27,16 +29,22 @@ import com.mojang.serialization.Lifecycle;
 import org.betterx.bclib.BCLib;
 import org.betterx.bclib.api.WorldDataAPI;
 import org.betterx.bclib.mixin.common.RegistryOpsAccessor;
+import org.betterx.bclib.presets.worldgen.BCLWorldPresetSettings;
+import org.betterx.bclib.presets.worldgen.BCLWorldPresets;
+import org.betterx.bclib.presets.worldgen.WorldPresetSettings;
 import org.betterx.bclib.util.ModUtil;
 import org.betterx.bclib.world.generator.BCLBiomeSource;
 import org.betterx.bclib.world.generator.BCLibEndBiomeSource;
 import org.betterx.bclib.world.generator.BCLibNetherBiomeSource;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
 import org.jetbrains.annotations.NotNull;
 
-public class WorldGenUtilities {
+public class WorldGenUtil {
     private static final String TAG_VERSION = "version";
     private static final String TAG_BN_GEN_VERSION = "generator_version";
     private static String TAG_GENERATOR = "generator";
@@ -378,5 +386,18 @@ public class WorldGenUtilities {
             super(dimension, structureSets, noiseParameters, generatorSettings);
             this.biomes = biomes;
         }
+    }
+    
+    public static RuleSource addRulesForBiomeSource(RuleSource org, BiomeSource biomeSource) {
+        List<RuleSource> additionalRules = SurfaceRuleUtil.getRuleSources(biomeSource);
+        if (org instanceof SurfaceRules.SequenceRuleSource sequenceRule) {
+            List<RuleSource> existingSequence = sequenceRule.sequence();
+            additionalRules = additionalRules.stream().filter(r -> existingSequence.indexOf(r) < 0).collect(Collectors.toList());
+            additionalRules.addAll(sequenceRule.sequence());
+        } else {
+            additionalRules.add(org);
+        }
+        
+        return SurfaceRules.sequence(additionalRules.toArray(new RuleSource[additionalRules.size()]));
     }
 }

@@ -15,6 +15,8 @@ import net.minecraft.world.level.levelgen.WorldGenSettings;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import org.betterx.bclib.BCLib;
+import org.betterx.bclib.api.worldgen.BCLChunkGenerator;
+import org.betterx.bclib.api.worldgen.WorldGenUtil;
 import org.betterx.bclib.interfaces.ChunkGeneratorAccessor;
 import org.betterx.bclib.interfaces.NoiseGeneratorSettingsProvider;
 import org.betterx.bclib.world.generator.BCLBiomeSource;
@@ -60,14 +62,14 @@ public class BCLWorldPresetSettings extends WorldPresetSettings {
     }
 
     public BCLWorldPreset buildPreset(LevelStem overworldStem,
-                                      WorldGenUtilities.Context netherContext,
-                                      WorldGenUtilities.Context endContext) {
+                                      WorldGenUtil.Context netherContext,
+                                      WorldGenUtil.Context endContext) {
         return new BCLWorldPreset(buildDimensionMap(overworldStem, netherContext, endContext), 1000, this);
     }
 
     public Map<ResourceKey<LevelStem>, LevelStem> buildDimensionMap(LevelStem overworldStem,
-                                                                    WorldGenUtilities.Context netherContext,
-                                                                    WorldGenUtilities.Context endContext) {
+                                                                    WorldGenUtil.Context netherContext,
+                                                                    WorldGenUtil.Context endContext) {
         return Map.of(LevelStem.OVERWORLD,
                 overworldStem,
                 LevelStem.NETHER,
@@ -84,18 +86,18 @@ public class BCLWorldPresetSettings extends WorldPresetSettings {
         return BCLBiomeSource.BIOME_SOURCE_VERSION_VANILLA;
     }
 
-    public LevelStem createStem(WorldGenUtilities.Context ctx, ResourceKey<LevelStem> key) {
+    public LevelStem createStem(WorldGenUtil.Context ctx, ResourceKey<LevelStem> key) {
         if (key == LevelStem.NETHER) return createNetherStem(ctx);
         if (key == LevelStem.END) return createEndStem(ctx);
         return null;
     }
 
-    public LevelStem createNetherStem(WorldGenUtilities.Context ctx) {
-        return WorldGenUtilities.getBCLNetherLevelStem(ctx, Optional.of(netherVersion));
+    public LevelStem createNetherStem(WorldGenUtil.Context ctx) {
+        return WorldGenUtil.getBCLNetherLevelStem(ctx, Optional.of(netherVersion));
     }
 
-    public LevelStem createEndStem(WorldGenUtilities.Context ctx) {
-        return WorldGenUtilities.getBCLEndLevelStem(ctx, Optional.of(endVersion));
+    public LevelStem createEndStem(WorldGenUtil.Context ctx) {
+        return WorldGenUtil.getBCLEndLevelStem(ctx, Optional.of(endVersion));
     }
 
     public BiomeSource fixBiomeSource(BiomeSource biomeSource, Set<Holder<Biome>> datapackBiomes) {
@@ -112,7 +114,7 @@ public class BCLWorldPresetSettings extends WorldPresetSettings {
                 old.defaultBlock(),
                 old.defaultFluid(),
                 old.noiseRouter(),
-                old.surfaceRule(),
+                WorldGenUtil.addRulesForBiomeSource(old.surfaceRule(), biomeSource),
                 old.spawnTarget(),
                 old.seaLevel(),
                 old.disableMobGeneration(),
@@ -138,7 +140,7 @@ public class BCLWorldPresetSettings extends WorldPresetSettings {
                                                       ResourceKey<DimensionType> dimensionTypeKey,
                                                       WorldGenSettings settings) {
         var oldNether = settings.dimensions().getHolder(dimensionKey);
-        int loaderVersion = WorldGenUtilities.getBiomeVersionForGenerator(oldNether
+        int loaderVersion = WorldGenUtil.getBiomeVersionForGenerator(oldNether
                 .map(h -> h.value().generator())
                 .orElse(null));
 
@@ -146,7 +148,7 @@ public class BCLWorldPresetSettings extends WorldPresetSettings {
         if (loaderVersion != targetVersion) {
             BCLib.LOGGER.info("Enforcing Correct Generator for " + dimensionKey.location().toString() + ".");
             var chunkGenerator = oldNether.map(h -> h.value().generator()).orElse(null);
-            Optional<Holder<LevelStem>> refLevelStem = WorldGenUtilities.referenceStemForVersion(
+            Optional<Holder<LevelStem>> refLevelStem = WorldGenUtil.referenceStemForVersion(
                     dimensionKey,
                     targetVersion,
                     access,
@@ -173,7 +175,7 @@ public class BCLWorldPresetSettings extends WorldPresetSettings {
                 }
             }
 
-            return WorldGenUtilities.replaceGenerator(dimensionKey,
+            return WorldGenUtil.replaceGenerator(dimensionKey,
                     dimensionTypeKey,
                     access,
                     settings,

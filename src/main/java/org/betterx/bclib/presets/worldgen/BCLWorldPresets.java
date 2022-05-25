@@ -12,6 +12,7 @@ import com.google.common.collect.Maps;
 import org.betterx.bclib.BCLib;
 import org.betterx.bclib.api.tag.TagAPI;
 import org.betterx.bclib.api.tag.TagType;
+import org.betterx.bclib.api.worldgen.WorldGenUtil;
 import org.betterx.bclib.world.generator.BCLBiomeSource;
 
 import java.util.Map;
@@ -82,8 +83,8 @@ public class BCLWorldPresets {
 
     public static void bootstrapPresets(Registry<WorldPreset> presets,
                                         LevelStem overworldStem,
-                                        WorldGenUtilities.Context netherContext,
-                                        WorldGenUtilities.Context endContext) {
+                                        WorldGenUtil.Context netherContext,
+                                        WorldGenUtil.Context endContext) {
 
         for (Map.Entry<ResourceKey<WorldPreset>, PresetBuilder> e : BUILDERS.entrySet()) {
             BCLWorldPreset preset = e.getValue().create(overworldStem, netherContext, endContext);
@@ -100,7 +101,7 @@ public class BCLWorldPresets {
     @FunctionalInterface
     public interface PresetBuilder {
         BCLWorldPreset create(LevelStem overworldStem,
-                              WorldGenUtilities.Context netherContext,
-                              WorldGenUtilities.Context endContext);
+                              WorldGenUtil.Context netherContext,
+                              WorldGenUtil.Context endContext);
     }
 }

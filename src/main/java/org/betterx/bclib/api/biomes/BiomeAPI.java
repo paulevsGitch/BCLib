@@ -128,7 +128,6 @@ public class BiomeAPI {
 
     private static final Map<ResourceKey, List<BiConsumer<ResourceLocation, Holder<Biome>>>> MODIFICATIONS = Maps.newHashMap();
     private static final Map<ResourceKey, List<BiConsumer<ResourceLocation, Holder<Biome>>>> TAG_ADDERS = Maps.newHashMap();
-    private static final Map<ResourceLocation, SurfaceRules.RuleSource> SURFACE_RULES = Maps.newHashMap();
     private static final Set<SurfaceRuleProvider> MODIFIED_SURFACE_PROVIDERS = new HashSet<>(8);
 
     public static final BCLBiome NETHER_WASTES_BIOME = registerNetherBiome(getFromRegistry(Biomes.NETHER_WASTES).value());
@@ -728,45 +727,7 @@ public class BiomeAPI {
         }
         accessor.bclib_setFeatures(featureList);
     }
-
-    private static List<SurfaceRules.RuleSource> getRuleSourcesForBiomes(Set<Holder<Biome>> biomes) {
-        Set<ResourceLocation> biomeIDs = biomes
-                .stream()
-                .map(biome -> getBiomeID(biome))
-                .collect(Collectors.toSet());
-        return getRuleSourcesFromIDs(biomeIDs);
-    }
-
-    /**
-     * Creates a list of SurfaceRules for all Biomes that are managed by the passed {@link BiomeSource}.
-     * If we have Surface rules for any of the Biomes from the given set of {@link BiomeSource}, they
-     * will be added to the result
-     * <p>
-     * Note: This Method is used in the {@link NoiseGeneratorSettingsMixin} which in turn
-     * is called from {@link #applyModifications(ServerLevel)}.
-     *
-     * @param sources The Set of {@link BiomeSource} we want to consider
-     * @return A list of {@link RuleSource}-Objects that are needed to create those Biomes
-     */
-    public static List<SurfaceRules.RuleSource> getRuleSources(Set<BiomeSource> sources) {
-        final Set<Holder<Biome>> biomes = new HashSet<>();
-        for (BiomeSource s : sources) {
-            biomes.addAll(s.possibleBiomes());
-        }
-
-        return getRuleSourcesForBiomes(biomes);
-    }
-
-    private static List<SurfaceRules.RuleSource> getRuleSourcesFromIDs(Set<ResourceLocation> biomeIDs) {
-        List<SurfaceRules.RuleSource> rules = Lists.newArrayList();
-        SURFACE_RULES.forEach((biomeID, rule) -> {
-            if (biomeIDs.contains(biomeID)) {
-                rules.add(rule);
-            }
-        });
-        return rules;
-    }
-
+    
     /**
      * Adds new features to existing biome.
      *
@@ -827,20 +788,8 @@ public class BiomeAPI {
         accessor.bclib_setFeatureSet(featureSet);
         accessor.bclib_setFlowerFeatures(flowerFeatures);
     }
-
-
-    /**
-     * Adds surface rule to specified biome.
-     *
-     * @param biomeID biome {@link ResourceLocation}.
-     * @param source  {@link SurfaceRules.RuleSource}.
-     */
-    public static void addSurfaceRule(ResourceLocation biomeID, SurfaceRules.RuleSource source) {
-        SURFACE_RULES.put(biomeID, source);
-        //NOISE_GENERATOR_SETTINGS.forEach(BiomeAPI::changeSurfaceRulesForGenerator);
-    }
-
-
+    
+    
     /**
      * Adds mob spawning to specified biome.
      *

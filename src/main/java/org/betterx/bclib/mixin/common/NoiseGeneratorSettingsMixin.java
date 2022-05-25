@@ -5,7 +5,7 @@ import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
 import net.minecraft.world.level.levelgen.SurfaceRules;
 import net.minecraft.world.level.levelgen.SurfaceRules.RuleSource;
 
-import org.betterx.bclib.api.biomes.BiomeAPI;
+import org.betterx.bclib.api.worldgen.SurfaceRuleUtil;
 import org.betterx.bclib.interfaces.SurfaceRuleProvider;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -28,7 +28,7 @@ public class NoiseGeneratorSettingsMixin implements SurfaceRuleProvider {
     private final Set<BiomeSource> bclib_biomeSources = new HashSet<>();
 
     private void bclib_updateCustomRules() {
-        bclib_setCustomRules(BiomeAPI.getRuleSources(bclib_biomeSources));
+        bclib_setCustomRules(SurfaceRuleUtil.getRuleSources(bclib_biomeSources));
     }
 
     @Override

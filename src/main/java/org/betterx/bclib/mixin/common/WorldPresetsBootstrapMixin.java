@@ -12,7 +12,7 @@ import net.minecraft.world.level.levelgen.structure.StructureSet;
 import net.minecraft.world.level.levelgen.synth.NormalNoise;
 
 import org.betterx.bclib.presets.worldgen.BCLWorldPresets;
-import org.betterx.bclib.presets.worldgen.WorldGenUtilities;
+import org.betterx.bclib.api.worldgen.WorldGenUtil;
 import org.betterx.bclib.presets.worldgen.WorldPresetSettings;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -52,12 +52,12 @@ public abstract class WorldPresetsBootstrapMixin {
     @ModifyArg(method = "run", at = @At(value = "INVOKE", ordinal = 0, target = "Lnet/minecraft/world/level/levelgen/presets/WorldPresets$Bootstrap;registerCustomOverworldPreset(Lnet/minecraft/resources/ResourceKey;Lnet/minecraft/world/level/dimension/LevelStem;)Lnet/minecraft/core/Holder;"))
     private LevelStem bcl_getOverworldStem(LevelStem overworldStem) {
         WorldPresetSettings.bootstrap();
-        WorldGenUtilities.Context netherContext = new WorldGenUtilities.Context(this.biomes,
+        WorldGenUtil.Context netherContext = new WorldGenUtil.Context(this.biomes,
                 this.netherDimensionType,
                 this.structureSets,
                 this.noises,
                 this.netherNoiseSettings);
-        WorldGenUtilities.Context endContext = new WorldGenUtilities.Context(this.biomes,
+        WorldGenUtil.Context endContext = new WorldGenUtil.Context(this.biomes,
                 this.endDimensionType,
                 this.structureSets,
                 this.noises,

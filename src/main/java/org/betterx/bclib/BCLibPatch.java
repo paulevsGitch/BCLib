@@ -16,7 +16,7 @@ import org.betterx.bclib.api.datafixer.DataFixerAPI;
 import org.betterx.bclib.api.datafixer.ForcedLevelPatch;
 import org.betterx.bclib.api.datafixer.MigrationProfile;
 import org.betterx.bclib.config.Configs;
-import org.betterx.bclib.presets.worldgen.WorldGenUtilities;
+import org.betterx.bclib.api.worldgen.WorldGenUtil;
 import org.betterx.bclib.util.MHelper;
 import org.betterx.bclib.world.generator.GeneratorOptions;
 
@@ -45,7 +45,7 @@ final class BiomeSourcePatch extends ForcedLevelPatch {
     @Override
     protected Boolean runLevelDatPatch(CompoundTag root, MigrationProfile profile) {
         //make sure we have a working generators file before attempting to patch
-        WorldGenUtilities.migrateGeneratorSettings();
+        WorldGenUtil.migrateGeneratorSettings();
 
         final CompoundTag worldGenSettings = root.getCompound("Data").getCompound("WorldGenSettings");
         final CompoundTag dimensions = worldGenSettings.getCompound("dimensions");
@@ -115,10 +115,10 @@ final class BiomeSourcePatch extends ForcedLevelPatch {
                 .resultOrPartial(BCLib.LOGGER::error);
 
         Optional<ChunkGenerator> netherGenerator = oLevelStem.map(l -> l.generator());
-        int biomeSourceVersion = WorldGenUtilities.getBiomeVersionForGenerator(netherGenerator.orElse(null));
-        int targetVersion = WorldGenUtilities.getBiomeVersionForCurrentWorld(dimensionKey);
+        int biomeSourceVersion = WorldGenUtil.getBiomeVersionForGenerator(netherGenerator.orElse(null));
+        int targetVersion = WorldGenUtil.getBiomeVersionForCurrentWorld(dimensionKey);
         if (biomeSourceVersion != targetVersion) {
-            Optional<Holder<LevelStem>> refLevelStem = WorldGenUtilities.referenceStemForVersion(
+            Optional<Holder<LevelStem>> refLevelStem = WorldGenUtil.referenceStemForVersion(
                     dimensionKey,
                     targetVersion,
                     registryAccess,

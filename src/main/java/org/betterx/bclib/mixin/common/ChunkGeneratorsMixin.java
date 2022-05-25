@@ -6,7 +6,7 @@ import net.minecraft.world.level.chunk.ChunkGenerators;
 
 import com.mojang.serialization.Codec;
 import org.betterx.bclib.BCLib;
-import org.betterx.bclib.presets.worldgen.BCLChunkGenerator;
+import org.betterx.bclib.api.worldgen.BCLChunkGenerator;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
