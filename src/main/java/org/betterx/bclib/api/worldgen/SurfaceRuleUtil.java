@@ -8,7 +8,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeSource;
-import net.minecraft.world.level.levelgen.SurfaceRules;
 import net.minecraft.world.level.levelgen.SurfaceRules.RuleSource;
 import org.betterx.bclib.api.biomes.BiomeAPI;
 import org.betterx.bclib.mixin.common.NoiseGeneratorSettingsMixin;
@@ -36,7 +35,7 @@ public class SurfaceRuleUtil {
 	 * will be added to the result
 	 * <p>
 	 * Note: This Method is used in the {@link NoiseGeneratorSettingsMixin} which in turn
-	 * is called from {@link #applyModifications(ServerLevel)}.
+	 * is called from {@link BiomeAPI#applyModifications(ServerLevel)}.
 	 *
 	 * @param sources The Set of {@link BiomeSource} we want to consider
 	 * @return A list of {@link RuleSource}-Objects that are needed to create those Biomes
