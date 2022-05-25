@@ -16,6 +16,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import org.betterx.bclib.BCLib;
 import org.betterx.bclib.api.worldgen.BCLChunkGenerator;
+import org.betterx.bclib.api.worldgen.SurfaceRuleUtil;
 import org.betterx.bclib.api.worldgen.WorldGenUtil;
 import org.betterx.bclib.interfaces.ChunkGeneratorAccessor;
 import org.betterx.bclib.interfaces.NoiseGeneratorSettingsProvider;
@@ -114,7 +115,7 @@ public class BCLWorldPresetSettings extends WorldPresetSettings {
                 old.defaultBlock(),
                 old.defaultFluid(),
                 old.noiseRouter(),
-                WorldGenUtil.addRulesForBiomeSource(old.surfaceRule(), biomeSource),
+                SurfaceRuleUtil.addRulesForBiomeSource(old.surfaceRule(), biomeSource),
                 old.spawnTarget(),
                 old.seaLevel(),
                 old.disableMobGeneration(),

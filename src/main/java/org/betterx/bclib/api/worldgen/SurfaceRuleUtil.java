@@ -8,6 +8,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeSource;
+import net.minecraft.world.level.levelgen.SurfaceRules;
 import net.minecraft.world.level.levelgen.SurfaceRules.RuleSource;
 import org.betterx.bclib.api.biomes.BiomeAPI;
 import org.betterx.bclib.mixin.common.NoiseGeneratorSettingsMixin;
@@ -72,5 +73,18 @@ public class SurfaceRuleUtil {
 	public static void addSurfaceRule(ResourceLocation biomeID, RuleSource source) {
 		SURFACE_RULES.put(biomeID, source);
 		//NOISE_GENERATOR_SETTINGS.forEach(BiomeAPI::changeSurfaceRulesForGenerator);
+	}
+	
+	public static RuleSource addRulesForBiomeSource(RuleSource org, BiomeSource biomeSource) {
+		List<RuleSource> additionalRules = getRuleSources(biomeSource);
+		if (org instanceof SurfaceRules.SequenceRuleSource sequenceRule) {
+			List<RuleSource> existingSequence = sequenceRule.sequence();
+			additionalRules = additionalRules.stream().filter(r -> existingSequence.indexOf(r) < 0).collect(Collectors.toList());
+			additionalRules.addAll(sequenceRule.sequence());
+		} else {
+			additionalRules.add(org);
+		}
+		
+		return SurfaceRules.sequence(additionalRules.toArray(new RuleSource[additionalRules.size()]));
 	}
 }

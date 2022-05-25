@@ -16,8 +16,6 @@ import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
-import net.minecraft.world.level.levelgen.SurfaceRules;
-import net.minecraft.world.level.levelgen.SurfaceRules.RuleSource;
 import net.minecraft.world.level.levelgen.WorldGenSettings;
 import net.minecraft.world.level.levelgen.presets.WorldPreset;
 import net.minecraft.world.level.levelgen.structure.StructureSet;
@@ -37,10 +35,8 @@ import org.betterx.bclib.world.generator.BCLBiomeSource;
 import org.betterx.bclib.world.generator.BCLibEndBiomeSource;
 import org.betterx.bclib.world.generator.BCLibNetherBiomeSource;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -388,16 +384,4 @@ public class WorldGenUtil {
         }
     }
     
-    public static RuleSource addRulesForBiomeSource(RuleSource org, BiomeSource biomeSource) {
-        List<RuleSource> additionalRules = SurfaceRuleUtil.getRuleSources(biomeSource);
-        if (org instanceof SurfaceRules.SequenceRuleSource sequenceRule) {
-            List<RuleSource> existingSequence = sequenceRule.sequence();
-            additionalRules = additionalRules.stream().filter(r -> existingSequence.indexOf(r) < 0).collect(Collectors.toList());
-            additionalRules.addAll(sequenceRule.sequence());
-        } else {
-            additionalRules.add(org);
-        }
-        
-        return SurfaceRules.sequence(additionalRules.toArray(new RuleSource[additionalRules.size()]));
-    }
 }
