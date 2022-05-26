@@ -17,8 +17,8 @@ import com.google.common.collect.Sets;
 import org.betterx.bclib.BCLib;
 import org.betterx.bclib.api.biomes.BCLBiomeBuilder;
 import org.betterx.bclib.api.biomes.BiomeAPI;
-import org.betterx.bclib.api.tag.TagAPI;
 import org.betterx.bclib.api.surface.SurfaceRuleUtil;
+import org.betterx.bclib.api.tag.TagAPI;
 import org.betterx.bclib.util.WeightedList;
 
 import java.util.List;
