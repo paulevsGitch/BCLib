@@ -57,8 +57,8 @@ public class ModUtil {
     private static ModMetadata readJSON(InputStream is, String sourceFile) throws IOException {
         try (com.google.gson.stream.JsonReader reader = new JsonReader(new InputStreamReader(is,
                 StandardCharsets.UTF_8))) {
-            JsonObject data = new JsonParser().parse(reader)
-                                              .getAsJsonObject();
+            JsonObject data = JsonParser.parseReader(reader)
+                                        .getAsJsonObject();
             Version ver;
             try {
                 ver = new SemanticVersionImpl(data.get("version")

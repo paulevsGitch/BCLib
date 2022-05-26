@@ -8,9 +8,12 @@ import net.minecraft.server.level.progress.ChunkProgressListener;
 import net.minecraft.world.level.CustomSpawner;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.levelgen.WorldGenSettings;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.ServerLevelData;
 
+import org.betterx.bclib.api.biomes.BiomeAPI;
+import org.betterx.bclib.api.dataexchange.DataExchangeAPI;
 import org.betterx.bclib.api.datafixer.DataFixerAPI;
 
 import java.util.ArrayList;
@@ -24,6 +27,25 @@ public class LifeCycleAPI {
     private final static List<LevelLoadBiomesCall> onLoadLevelBiomes = new ArrayList<>(2);
     private final static List<LevelLoadCall> onLoadLevel = new ArrayList<>(2);
     private final static List<BeforeLevelLoadCall> beforeLoadLevel = new ArrayList<>(2);
+
+    public static void startingWorld(LevelStorageSource.LevelStorageAccess levelStorageAccess,
+                                     WorldGenSettings settings) {
+        DataExchangeAPI.prepareServerside();
+        BiomeAPI.prepareNewLevel();
+
+        DataFixerAPI.createWorldData(levelStorageAccess, settings);
+        _runBeforeLevelLoad();
+    }
+
+    public static void startingWorld(String levelID,
+                                     WorldGenSettings worldGenSettings,
+                                     LevelStorageSource levelSource) {
+        DataExchangeAPI.prepareServerside();
+        BiomeAPI.prepareNewLevel();
+
+        DataFixerAPI.createWorldData(levelSource, levelID, worldGenSettings);
+        _runBeforeLevelLoad();
+    }
 
     /**
      * A callback function that is used for each new ServerLevel instance
@@ -121,18 +143,18 @@ public class LifeCycleAPI {
                                      List<CustomSpawner> list,
                                      boolean bl2) {
         onLoadLevel.forEach(c -> c.onLoad(
-                                    world,
-                                    minecraftServer,
-                                    executor,
-                                    levelStorageAccess,
-                                    serverLevelData,
-                                    resourceKey,
-                                    chunkProgressListener,
-                                    bl,
-                                    l,
-                                    list,
-                                    bl2)
-                           );
+                world,
+                minecraftServer,
+                executor,
+                levelStorageAccess,
+                serverLevelData,
+                resourceKey,
+                chunkProgressListener,
+                bl,
+                l,
+                list,
+                bl2)
+        );
 
         final long seed = world.getSeed();
         final Registry<Biome> biomeRegistry = world.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY);

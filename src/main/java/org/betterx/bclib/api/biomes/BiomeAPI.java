@@ -26,10 +26,10 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.chunk.PalettedContainer;
+import net.minecraft.world.level.dimension.BuiltinDimensionTypes;
+import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.levelgen.GenerationStep.Decoration;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
-import net.minecraft.world.level.levelgen.SurfaceRules;
-import net.minecraft.world.level.levelgen.SurfaceRules.RuleSource;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
@@ -56,7 +56,6 @@ import org.betterx.bclib.interfaces.SurfaceRuleProvider;
 import org.betterx.bclib.mixin.client.MinecraftMixin;
 import org.betterx.bclib.mixin.common.BiomeGenerationSettingsAccessor;
 import org.betterx.bclib.mixin.common.MobSpawnSettingsAccessor;
-import org.betterx.bclib.mixin.common.NoiseGeneratorSettingsMixin;
 import org.betterx.bclib.util.CollectionsUtil;
 import org.betterx.bclib.world.biomes.BCLBiome;
 import org.betterx.bclib.world.biomes.FabricBiomesData;
@@ -126,7 +125,7 @@ public class BiomeAPI {
     private static final Map<Holder<PlacedFeature>, Integer> FEATURE_ORDER = Maps.newHashMap();
     private static final MutableInt FEATURE_ORDER_ID = new MutableInt(0);
 
-    private static final Map<ResourceKey, List<BiConsumer<ResourceLocation, Holder<Biome>>>> MODIFICATIONS = Maps.newHashMap();
+    private static final Map<ResourceKey<DimensionType>, List<BiConsumer<ResourceLocation, Holder<Biome>>>> MODIFICATIONS = Maps.newHashMap();
     private static final Map<ResourceKey, List<BiConsumer<ResourceLocation, Holder<Biome>>>> TAG_ADDERS = Maps.newHashMap();
     private static final Set<SurfaceRuleProvider> MODIFIED_SURFACE_PROVIDERS = new HashSet<>(8);
 
@@ -560,7 +559,7 @@ public class BiomeAPI {
      * @param dimensionID  {@link ResourceLocation} dimension ID, example: Level.OVERWORLD or "minecraft:overworld".
      * @param modification {@link BiConsumer} with {@link ResourceKey} biome ID and {@link Biome} parameters.
      */
-    public static void registerBiomeModification(ResourceKey dimensionID,
+    public static void registerBiomeModification(ResourceKey<DimensionType> dimensionID,
                                                  BiConsumer<ResourceLocation, Holder<Biome>> modification) {
         List<BiConsumer<ResourceLocation, Holder<Biome>>> modifications = MODIFICATIONS.computeIfAbsent(dimensionID,
                 k -> Lists.newArrayList());
@@ -573,7 +572,7 @@ public class BiomeAPI {
      * @param modification {@link BiConsumer} with {@link ResourceLocation} biome ID and {@link Biome} parameters.
      */
     public static void registerOverworldBiomeModification(BiConsumer<ResourceLocation, Holder<Biome>> modification) {
-        registerBiomeModification(Level.OVERWORLD, modification);
+        registerBiomeModification(BuiltinDimensionTypes.OVERWORLD, modification);
     }
 
     /**
@@ -582,7 +581,7 @@ public class BiomeAPI {
      * @param modification {@link BiConsumer} with {@link ResourceLocation} biome ID and {@link Biome} parameters.
      */
     public static void registerNetherBiomeModification(BiConsumer<ResourceLocation, Holder<Biome>> modification) {
-        registerBiomeModification(Level.NETHER, modification);
+        registerBiomeModification(BuiltinDimensionTypes.NETHER, modification);
     }
 
     /**
@@ -591,7 +590,7 @@ public class BiomeAPI {
      * @param modification {@link BiConsumer} with {@link ResourceLocation} biome ID and {@link Biome} parameters.
      */
     public static void registerEndBiomeModification(BiConsumer<ResourceLocation, Holder<Biome>> modification) {
-        registerBiomeModification(Level.END, modification);
+        registerBiomeModification(BuiltinDimensionTypes.END, modification);
     }
 
     /**
@@ -656,7 +655,11 @@ public class BiomeAPI {
      *
      * @param level
      */
-    public static void applyModifications(ServerLevel level) {
+    @Deprecated(forRemoval = true)
+    public static void applyModificationsDeprecated(ServerLevel level) {
+        //TODO: Now Disabled, because we fix the settings when everything gets loaded
+        if (level != null) return;
+
         NoiseGeneratorSettings noiseGeneratorSettings = null;
         final ChunkGenerator chunkGenerator = level.getChunkSource().getGenerator();
         final BiomeSource source = chunkGenerator.getBiomeSource();
@@ -675,7 +678,10 @@ public class BiomeAPI {
             }
         }
 
-        List<BiConsumer<ResourceLocation, Holder<Biome>>> modifications = MODIFICATIONS.get(level.dimension());
+        List<BiConsumer<ResourceLocation, Holder<Biome>>> modifications = MODIFICATIONS.get(level
+                .dimensionTypeRegistration()
+                .unwrapKey()
+                .orElseThrow());
         for (Holder<Biome> biomeHolder : biomes) {
             if (biomeHolder.isBound()) {
                 applyModificationsAndUpdateFeatures(modifications, biomeHolder);
@@ -697,6 +703,18 @@ public class BiomeAPI {
 
         ((BiomeSourceAccessor) source).bclRebuildFeatures();
     }
+
+    public static void applyModifications(BiomeSource source, ResourceKey<DimensionType> dimension) {
+        BCLib.LOGGER.info("Apply Modifications for " + dimension.location() + " BiomeSource " + source);
+        final Set<Holder<Biome>> biomes = source.possibleBiomes();
+        List<BiConsumer<ResourceLocation, Holder<Biome>>> modifications = MODIFICATIONS.get(dimension);
+        for (Holder<Biome> biomeHolder : biomes) {
+            if (biomeHolder.isBound()) {
+                applyModificationsAndUpdateFeatures(modifications, biomeHolder);
+            }
+        }
+    }
+
 
     private static void applyModificationsAndUpdateFeatures(List<BiConsumer<ResourceLocation, Holder<Biome>>> modifications,
                                                             Holder<Biome> biome) {
@@ -727,7 +745,7 @@ public class BiomeAPI {
         }
         accessor.bclib_setFeatures(featureList);
     }
-    
+
     /**
      * Adds new features to existing biome.
      *
@@ -788,8 +806,8 @@ public class BiomeAPI {
         accessor.bclib_setFeatureSet(featureSet);
         accessor.bclib_setFlowerFeatures(flowerFeatures);
     }
-    
-    
+
+
     /**
      * Adds mob spawning to specified biome.
      *

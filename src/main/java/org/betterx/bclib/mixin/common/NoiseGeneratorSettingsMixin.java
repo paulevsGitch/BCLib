@@ -68,12 +68,23 @@ public class NoiseGeneratorSettingsMixin implements SurfaceRuleProvider {
         bclib_setSurfaceRule(SurfaceRules.sequence(rules.toArray(new RuleSource[rules.size()])));
     }
 
+    public void bclib_overwrite(SurfaceRules.RuleSource surfaceRule) {
+        if (surfaceRule == this.surfaceRule) return;
+        if (this.bcl_containsOverride) {
+            System.out.println("Adding another override");
+        }
+        this.bcl_containsOverride = true;
+        this.surfaceRule = surfaceRule;
+    }
+
     void bclib_setSurfaceRule(SurfaceRules.RuleSource surfaceRule) {
         if (bclib_originalSurfaceRule == null) {
             bclib_originalSurfaceRule = this.surfaceRule;
         }
         this.surfaceRule = surfaceRule;
     }
+
+    private boolean bcl_containsOverride = false;
 
     RuleSource bclib_getOriginalSurfaceRule() {
         if (bclib_originalSurfaceRule == null) {

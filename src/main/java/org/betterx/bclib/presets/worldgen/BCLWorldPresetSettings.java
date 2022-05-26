@@ -15,6 +15,7 @@ import net.minecraft.world.level.levelgen.WorldGenSettings;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import org.betterx.bclib.BCLib;
+import org.betterx.bclib.api.biomes.BiomeAPI;
 import org.betterx.bclib.api.worldgen.BCLChunkGenerator;
 import org.betterx.bclib.api.worldgen.SurfaceRuleUtil;
 import org.betterx.bclib.api.worldgen.WorldGenUtil;
@@ -140,15 +141,16 @@ public class BCLWorldPresetSettings extends WorldPresetSettings {
     public WorldGenSettings fixSettingsInCurrentWorld(RegistryAccess access, ResourceKey<LevelStem> dimensionKey,
                                                       ResourceKey<DimensionType> dimensionTypeKey,
                                                       WorldGenSettings settings) {
-        var oldNether = settings.dimensions().getHolder(dimensionKey);
-        int loaderVersion = WorldGenUtil.getBiomeVersionForGenerator(oldNether
+        Optional<Holder<LevelStem>> loadedStem = settings.dimensions().getHolder(dimensionKey);
+        final ChunkGenerator loadedChunkGenerator = loadedStem.map(h -> h.value().generator()).orElse(null);
+        final int loaderVersion = WorldGenUtil.getBiomeVersionForGenerator(loadedStem
                 .map(h -> h.value().generator())
                 .orElse(null));
 
-        int targetVersion = getVersion(dimensionKey);
+        final int targetVersion = getVersion(dimensionKey);
         if (loaderVersion != targetVersion) {
             BCLib.LOGGER.info("Enforcing Correct Generator for " + dimensionKey.location().toString() + ".");
-            var chunkGenerator = oldNether.map(h -> h.value().generator()).orElse(null);
+
             Optional<Holder<LevelStem>> refLevelStem = WorldGenUtil.referenceStemForVersion(
                     dimensionKey,
                     targetVersion,
@@ -164,10 +166,11 @@ public class BCLWorldPresetSettings extends WorldPresetSettings {
                 return settings;
             }
 
-            if (chunkGenerator instanceof ChunkGeneratorAccessor generator) {
-                if (chunkGenerator instanceof NoiseGeneratorSettingsProvider noiseProvider) {
-                    final Set<Holder<Biome>> biomes = chunkGenerator.getBiomeSource().possibleBiomes();
+            if (loadedChunkGenerator instanceof ChunkGeneratorAccessor generator) {
+                if (loadedChunkGenerator instanceof NoiseGeneratorSettingsProvider noiseProvider) {
+                    final Set<Holder<Biome>> biomes = loadedChunkGenerator.getBiomeSource().possibleBiomes();
                     final BiomeSource bs = fixBiomeSource(referenceGenerator.getBiomeSource(), biomes);
+                    BiomeAPI.applyModifications(bs, dimensionTypeKey);
                     referenceGenerator = new BCLChunkGenerator(generator.bclib_getStructureSetsRegistry(),
                             noiseProvider.bclib_getNoises(),
                             bs,
@@ -181,6 +184,8 @@ public class BCLWorldPresetSettings extends WorldPresetSettings {
                     access,
                     settings,
                     referenceGenerator);
+        } else {
+            BCLChunkGenerator.injectNoiseSettings(dimensionTypeKey, loadedChunkGenerator);
         }
         return settings;
     }

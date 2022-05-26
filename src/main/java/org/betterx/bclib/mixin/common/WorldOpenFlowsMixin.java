@@ -58,11 +58,7 @@ public abstract class WorldOpenFlowsMixin {
                                      RegistryAccess registryAccess,
                                      WorldGenSettings worldGenSettings,
                                      CallbackInfo ci) {
-        DataExchangeAPI.prepareServerside();
-        BiomeAPI.prepareNewLevel();
-
-        DataFixerAPI.createWorldData(this.levelSource, levelID, worldGenSettings);
-        LifeCycleAPI._runBeforeLevelLoad();
+        LifeCycleAPI.startingWorld(levelID, worldGenSettings, this.levelSource);
     }
 
     @Inject(method = "createLevelFromExistingSettings", at = @At("HEAD"))
@@ -71,10 +67,6 @@ public abstract class WorldOpenFlowsMixin {
                                                     RegistryAccess.Frozen frozen,
                                                     WorldData worldData,
                                                     CallbackInfo ci) {
-        DataExchangeAPI.prepareServerside();
-        BiomeAPI.prepareNewLevel();
-
-        DataFixerAPI.createWorldData(levelStorageAccess, worldData.worldGenSettings());
-        LifeCycleAPI._runBeforeLevelLoad();
+        //LifeCycleAPI.startWorld(levelStorageAccess, worldData.worldGenSettings());
     }
 }

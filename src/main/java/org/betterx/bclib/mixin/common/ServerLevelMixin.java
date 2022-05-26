@@ -57,18 +57,18 @@ public abstract class ServerLevelMixin extends Level {
                                          CallbackInfo ci) {
         ServerLevel level = ServerLevel.class.cast(this);
         LifeCycleAPI._runLevelLoad(level,
-                                   server,
-                                   executor,
-                                   levelStorageAccess,
-                                   serverLevelData,
-                                   resourceKey,
-                                   chunkProgressListener,
-                                   bl,
-                                   l,
-                                   list,
-                                   bl2);
+                server,
+                executor,
+                levelStorageAccess,
+                serverLevelData,
+                resourceKey,
+                chunkProgressListener,
+                bl,
+                l,
+                list,
+                bl2);
 
-        BiomeAPI.applyModifications(ServerLevel.class.cast(this));
+        BiomeAPI.applyModificationsDeprecated(ServerLevel.class.cast(this));
 
         if (level.dimension() == Level.NETHER) {
             BCLibNetherBiomeSource.setWorldHeight(level.getChunkSource().getGenerator().getGenDepth());

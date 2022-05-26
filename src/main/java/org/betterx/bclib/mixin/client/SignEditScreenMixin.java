@@ -40,7 +40,7 @@ public abstract class SignEditScreenMixin extends Screen {
         super(component);
     }
 
-    @Inject(method = "render(Lcom/mojang/blaze3d/vertex/PoseStack;IIF)V", locals = LocalCapture.CAPTURE_FAILSOFT, at = @At(
+    @Inject(method = "render(Lcom/mojang/blaze3d/vertex/PoseStack;IIF)V", locals = LocalCapture.CAPTURE_FAILSOFT, at = @At(ordinal = 1,
             value = "INVOKE",
             target = "Lcom/mojang/blaze3d/vertex/PoseStack;pushPose()V",
             shift = Shift.BEFORE

@@ -10,21 +10,30 @@ import net.minecraft.server.WorldLoader;
 import net.minecraft.world.level.DataPackConfig;
 import net.minecraft.world.level.levelgen.WorldGenSettings;
 import net.minecraft.world.level.levelgen.presets.WorldPreset;
+import net.minecraft.world.level.storage.LevelStorageSource;
 
 import com.mojang.datafixers.util.Pair;
+import org.betterx.bclib.api.LifeCycleAPI;
 import org.betterx.bclib.api.biomes.BiomeAPI;
-import org.betterx.bclib.presets.worldgen.BCLWorldPresets;
 import org.betterx.bclib.api.worldgen.WorldGenUtil;
+import org.betterx.bclib.presets.worldgen.BCLWorldPresets;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Optional;
 
 @Mixin(CreateWorldScreen.class)
 public class CreateWorldScreenMixin {
+    @Shadow
+    @Final
+    public WorldGenSettingsComponent worldGenSettingsComponent;
+
     @Inject(method = "<init>", at = @At("TAIL"))
     private void bcl_init(Screen screen,
                           DataPackConfig dataPackConfig,
@@ -47,4 +56,14 @@ public class CreateWorldScreenMixin {
             return WorldGenUtil.defaultWorldDataSupplier(res.getSecond());
         };
     }
+
+    @Inject(method = "createNewWorldDirectory", at = @At("RETURN"))
+    void bcl_createNewWorld(CallbackInfoReturnable<Optional<LevelStorageSource.LevelStorageAccess>> cir) {
+        Optional<LevelStorageSource.LevelStorageAccess> levelStorageAccess = cir.getReturnValue();
+        if (levelStorageAccess.isPresent()) {
+            LifeCycleAPI.startingWorld(levelStorageAccess.get(),
+                    worldGenSettingsComponent.settings().worldGenSettings());
+        }
+    }
+
 }
