@@ -32,6 +32,7 @@ public class PrimaryLevelDataMixin {
     private static final ThreadLocal<Optional<RegistryOps<Tag>>> bcl_lastRegistryAccess = ThreadLocal.withInitial(
             () -> Optional.empty());
 
+    //This is the way a created (new) world is initializing the PrimaryLevelData
     @ModifyArg(method = "<init>(Lnet/minecraft/world/level/LevelSettings;Lnet/minecraft/world/level/levelgen/WorldGenSettings;Lcom/mojang/serialization/Lifecycle;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/storage/PrimaryLevelData;<init>(Lcom/mojang/datafixers/DataFixer;ILnet/minecraft/nbt/CompoundTag;ZIIIFJJIIIZIZZZLnet/minecraft/world/level/border/WorldBorder$Settings;IILjava/util/UUID;Ljava/util/Set;Lnet/minecraft/world/level/timers/TimerQueue;Lnet/minecraft/nbt/CompoundTag;Lnet/minecraft/nbt/CompoundTag;Lnet/minecraft/world/level/LevelSettings;Lnet/minecraft/world/level/levelgen/WorldGenSettings;Lcom/mojang/serialization/Lifecycle;)V"))
     private static WorldGenSettings bcl_fixOtherSettings(WorldGenSettings worldGenSettings) {
         BCLChunkGenerator.injectNoiseSettings(worldGenSettings);
@@ -53,6 +54,8 @@ public class PrimaryLevelDataMixin {
         }
     }
 
+
+    //This is the way an loaded (existing) world is initializing the PrimaryLevelData
     @ModifyArg(method = "parse", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/storage/PrimaryLevelData;<init>(Lcom/mojang/datafixers/DataFixer;ILnet/minecraft/nbt/CompoundTag;ZIIIFJJIIIZIZZZLnet/minecraft/world/level/border/WorldBorder$Settings;IILjava/util/UUID;Ljava/util/Set;Lnet/minecraft/world/level/timers/TimerQueue;Lnet/minecraft/nbt/CompoundTag;Lnet/minecraft/nbt/CompoundTag;Lnet/minecraft/world/level/LevelSettings;Lnet/minecraft/world/level/levelgen/WorldGenSettings;Lcom/mojang/serialization/Lifecycle;)V"))
     private static WorldGenSettings bcl_fixSettings(WorldGenSettings settings) {
         Optional<RegistryOps<Tag>> registryOps = bcl_lastRegistryAccess.get();

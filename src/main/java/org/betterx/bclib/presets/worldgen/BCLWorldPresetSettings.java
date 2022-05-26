@@ -170,7 +170,7 @@ public class BCLWorldPresetSettings extends WorldPresetSettings {
                 if (loadedChunkGenerator instanceof NoiseGeneratorSettingsProvider noiseProvider) {
                     final Set<Holder<Biome>> biomes = loadedChunkGenerator.getBiomeSource().possibleBiomes();
                     final BiomeSource bs = fixBiomeSource(referenceGenerator.getBiomeSource(), biomes);
-                    BiomeAPI.applyModifications(bs, dimensionTypeKey);
+                    BiomeAPI.applyModifications(bs, dimensionKey);
                     referenceGenerator = new BCLChunkGenerator(generator.bclib_getStructureSetsRegistry(),
                             noiseProvider.bclib_getNoises(),
                             bs,
@@ -185,7 +185,7 @@ public class BCLWorldPresetSettings extends WorldPresetSettings {
                     settings,
                     referenceGenerator);
         } else {
-            BCLChunkGenerator.injectNoiseSettings(dimensionTypeKey, loadedChunkGenerator);
+            BCLChunkGenerator.injectNoiseSettings(dimensionKey, loadedChunkGenerator);
         }
         return settings;
     }
@@ -193,6 +193,8 @@ public class BCLWorldPresetSettings extends WorldPresetSettings {
     public WorldGenSettings repairSettingsOnLoad(RegistryAccess registryAccess, WorldGenSettings settings) {
         settings = fixSettingsInCurrentWorld(registryAccess, LevelStem.NETHER, BuiltinDimensionTypes.NETHER, settings);
         settings = fixSettingsInCurrentWorld(registryAccess, LevelStem.END, BuiltinDimensionTypes.END, settings);
+        BCLChunkGenerator.injectNoiseSettings(settings, BCLChunkGenerator.NON_MANAGED_DIMENSIONS);
         return settings;
     }
+
 }

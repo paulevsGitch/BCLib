@@ -26,8 +26,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.chunk.PalettedContainer;
-import net.minecraft.world.level.dimension.BuiltinDimensionTypes;
-import net.minecraft.world.level.dimension.DimensionType;
+import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.GenerationStep.Decoration;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
@@ -53,7 +52,6 @@ import org.betterx.bclib.interfaces.BiomeSourceAccessor;
 import org.betterx.bclib.interfaces.NoiseGeneratorSettingsProvider;
 import org.betterx.bclib.interfaces.SurfaceMaterialProvider;
 import org.betterx.bclib.interfaces.SurfaceRuleProvider;
-import org.betterx.bclib.mixin.client.MinecraftMixin;
 import org.betterx.bclib.mixin.common.BiomeGenerationSettingsAccessor;
 import org.betterx.bclib.mixin.common.MobSpawnSettingsAccessor;
 import org.betterx.bclib.util.CollectionsUtil;
@@ -125,9 +123,8 @@ public class BiomeAPI {
     private static final Map<Holder<PlacedFeature>, Integer> FEATURE_ORDER = Maps.newHashMap();
     private static final MutableInt FEATURE_ORDER_ID = new MutableInt(0);
 
-    private static final Map<ResourceKey<DimensionType>, List<BiConsumer<ResourceLocation, Holder<Biome>>>> MODIFICATIONS = Maps.newHashMap();
+    private static final Map<ResourceKey<LevelStem>, List<BiConsumer<ResourceLocation, Holder<Biome>>>> MODIFICATIONS = Maps.newHashMap();
     private static final Map<ResourceKey, List<BiConsumer<ResourceLocation, Holder<Biome>>>> TAG_ADDERS = Maps.newHashMap();
-    private static final Set<SurfaceRuleProvider> MODIFIED_SURFACE_PROVIDERS = new HashSet<>(8);
 
     public static final BCLBiome NETHER_WASTES_BIOME = registerNetherBiome(getFromRegistry(Biomes.NETHER_WASTES).value());
     public static final BCLBiome CRIMSON_FOREST_BIOME = registerNetherBiome(getFromRegistry(Biomes.CRIMSON_FOREST).value());
@@ -183,12 +180,10 @@ public class BiomeAPI {
     /**
      * For internal use only.
      * <p>
-     * This method gets called before a world is loaded/created to flush cashes we build. The Method is
-     * called from  {@link MinecraftMixin}
+     * This method gets called before a world is loaded/created to flush cashes we build.
      */
     public static void prepareNewLevel() {
-        MODIFIED_SURFACE_PROVIDERS.forEach(p -> p.bclib_clearBiomeSources());
-        MODIFIED_SURFACE_PROVIDERS.clear();
+
     }
 
     /**
@@ -559,7 +554,7 @@ public class BiomeAPI {
      * @param dimensionID  {@link ResourceLocation} dimension ID, example: Level.OVERWORLD or "minecraft:overworld".
      * @param modification {@link BiConsumer} with {@link ResourceKey} biome ID and {@link Biome} parameters.
      */
-    public static void registerBiomeModification(ResourceKey<DimensionType> dimensionID,
+    public static void registerBiomeModification(ResourceKey<LevelStem> dimensionID,
                                                  BiConsumer<ResourceLocation, Holder<Biome>> modification) {
         List<BiConsumer<ResourceLocation, Holder<Biome>>> modifications = MODIFICATIONS.computeIfAbsent(dimensionID,
                 k -> Lists.newArrayList());
@@ -572,7 +567,7 @@ public class BiomeAPI {
      * @param modification {@link BiConsumer} with {@link ResourceLocation} biome ID and {@link Biome} parameters.
      */
     public static void registerOverworldBiomeModification(BiConsumer<ResourceLocation, Holder<Biome>> modification) {
-        registerBiomeModification(BuiltinDimensionTypes.OVERWORLD, modification);
+        registerBiomeModification(LevelStem.OVERWORLD, modification);
     }
 
     /**
@@ -581,7 +576,7 @@ public class BiomeAPI {
      * @param modification {@link BiConsumer} with {@link ResourceLocation} biome ID and {@link Biome} parameters.
      */
     public static void registerNetherBiomeModification(BiConsumer<ResourceLocation, Holder<Biome>> modification) {
-        registerBiomeModification(BuiltinDimensionTypes.NETHER, modification);
+        registerBiomeModification(LevelStem.NETHER, modification);
     }
 
     /**
@@ -590,7 +585,7 @@ public class BiomeAPI {
      * @param modification {@link BiConsumer} with {@link ResourceLocation} biome ID and {@link Biome} parameters.
      */
     public static void registerEndBiomeModification(BiConsumer<ResourceLocation, Holder<Biome>> modification) {
-        registerBiomeModification(BuiltinDimensionTypes.END, modification);
+        registerBiomeModification(LevelStem.END, modification);
     }
 
     /**
@@ -695,7 +690,7 @@ public class BiomeAPI {
             // Provided by all the BiomeSources that use the same generator.
             // This happens for example when using the MiningDimensions, which reuses the generator for the
             // Nethering Dimension
-            MODIFIED_SURFACE_PROVIDERS.add(provider);
+            //MODIFIED_SURFACE_PROVIDERS.add(provider);
             provider.bclib_addBiomeSource(source);
         } else {
             BCLib.LOGGER.warning("No generator for " + source);
@@ -704,7 +699,7 @@ public class BiomeAPI {
         ((BiomeSourceAccessor) source).bclRebuildFeatures();
     }
 
-    public static void applyModifications(BiomeSource source, ResourceKey<DimensionType> dimension) {
+    public static void applyModifications(BiomeSource source, ResourceKey<LevelStem> dimension) {
         BCLib.LOGGER.info("Apply Modifications for " + dimension.location() + " BiomeSource " + source);
         final Set<Holder<Biome>> biomes = source.possibleBiomes();
         List<BiConsumer<ResourceLocation, Holder<Biome>>> modifications = MODIFICATIONS.get(dimension);

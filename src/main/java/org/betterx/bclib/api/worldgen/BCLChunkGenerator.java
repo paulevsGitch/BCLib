@@ -6,8 +6,6 @@ import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.chunk.ChunkGenerator;
-import net.minecraft.world.level.dimension.BuiltinDimensionTypes;
-import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
@@ -22,7 +20,9 @@ import org.betterx.bclib.api.biomes.BiomeAPI;
 import org.betterx.bclib.interfaces.NoiseGeneratorSettingsProvider;
 import org.betterx.bclib.interfaces.SurfaceRuleProvider;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 public class BCLChunkGenerator extends NoiseBasedChunkGenerator {
 
@@ -59,23 +59,14 @@ public class BCLChunkGenerator extends NoiseBasedChunkGenerator {
     }
 
     public static void injectNoiseSettings(WorldGenSettings settings) {
-        injectNoiseSettings(LevelStem.NETHER, BuiltinDimensionTypes.NETHER, settings);
-        injectNoiseSettings(LevelStem.END, BuiltinDimensionTypes.END, settings);
+        BCLChunkGenerator.injectNoiseSettings(settings, BCLChunkGenerator.ALL_DIMENSIONS);
     }
 
     public static void injectNoiseSettings(ResourceKey<LevelStem> dimensionKey,
-                                           ResourceKey<DimensionType> dimensionTypeKey,
-                                           WorldGenSettings settings) {
-        Optional<Holder<LevelStem>> loadedStem = settings.dimensions().getHolder(dimensionKey);
-        final ChunkGenerator loadedChunkGenerator = loadedStem.map(h -> h.value().generator()).orElse(null);
-        injectNoiseSettings(dimensionTypeKey, loadedChunkGenerator);
-    }
-
-    public static void injectNoiseSettings(ResourceKey<DimensionType> dimensionTypeKey,
                                            ChunkGenerator loadedChunkGenerator) {
-        BCLib.LOGGER.debug("Correcting Noise Settings for " + dimensionTypeKey.location().toString());
+        BCLib.LOGGER.debug("Correcting Noise Settings for " + dimensionKey.location().toString());
         final BiomeSource loadedBiomeSource = loadedChunkGenerator.getBiomeSource();
-        BiomeAPI.applyModifications(loadedBiomeSource, dimensionTypeKey);
+        BiomeAPI.applyModifications(loadedBiomeSource, dimensionKey);
 
         if (loadedChunkGenerator instanceof NoiseBasedChunkGenerator nbc) {
             if (((Object) nbc.generatorSettings().value()) instanceof SurfaceRuleProvider srp) {
@@ -83,6 +74,26 @@ public class BCLChunkGenerator extends NoiseBasedChunkGenerator {
                         .generatorSettings()
                         .value()
                         .surfaceRule(), loadedBiomeSource));
+            }
+        }
+    }
+
+    public static final Predicate<ResourceKey<LevelStem>> NON_MANAGED_DIMENSIONS = dim -> dim != LevelStem.NETHER && dim != LevelStem.END;
+    public static final Predicate<ResourceKey<LevelStem>> ALL_DIMENSIONS = dim -> true;
+
+    public static void injectNoiseSettings(WorldGenSettings settings, Predicate<ResourceKey<LevelStem>> filter) {
+        List<ResourceKey<LevelStem>> otherDimensions = settings
+                .dimensions()
+                .entrySet()
+                .stream()
+                .map(e -> e.getKey())
+                .filter(filter)
+                .toList();
+
+        for (ResourceKey<LevelStem> key : otherDimensions) {
+            Optional<Holder<LevelStem>> stem = settings.dimensions().getHolder(key);
+            if (stem.isPresent()) {
+                injectNoiseSettings(key, stem.get().value().generator());
             }
         }
     }
