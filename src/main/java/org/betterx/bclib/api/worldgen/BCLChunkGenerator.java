@@ -65,7 +65,7 @@ public class BCLChunkGenerator extends NoiseBasedChunkGenerator {
 
     public static void injectNoiseSettings(ResourceKey<LevelStem> dimensionKey,
                                            ChunkGenerator loadedChunkGenerator) {
-        BCLib.LOGGER.debug("Correcting Noise Settings for " + dimensionKey.location().toString());
+        BCLib.LOGGER.debug("Checking Noise Settings for " + dimensionKey.location().toString());
         final BiomeSource loadedBiomeSource = loadedChunkGenerator.getBiomeSource();
         BiomeAPI.applyModifications(loadedBiomeSource, dimensionKey);
 

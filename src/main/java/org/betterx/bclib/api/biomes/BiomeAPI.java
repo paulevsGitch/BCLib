@@ -18,7 +18,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.biome.BiomeGenerationSettings;
 import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.biome.MobSpawnSettings.SpawnerData;
@@ -32,7 +31,6 @@ import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
-import net.minecraft.world.level.levelgen.structure.Structure;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -43,7 +41,6 @@ import com.google.common.base.Suppliers;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.betterx.bclib.BCLib;
 import org.betterx.bclib.api.tag.CommonBiomeTags;
@@ -60,8 +57,11 @@ import org.betterx.bclib.world.biomes.FabricBiomesData;
 import org.betterx.bclib.world.biomes.VanillaBiomeSettings;
 import org.betterx.bclib.world.features.BCLFeature;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -729,16 +729,16 @@ public class BiomeAPI {
      * @param biome The {@link Biome} to sort the features for
      */
     public static void sortBiomeFeatures(Holder<Biome> biome) {
-        BiomeGenerationSettings settings = biome.value().getGenerationSettings();
-        BiomeGenerationSettingsAccessor accessor = (BiomeGenerationSettingsAccessor) settings;
-        List<HolderSet<PlacedFeature>> featureList = CollectionsUtil.getMutable(accessor.bclib_getFeatures());
-        final int size = featureList.size();
-        for (int i = 0; i < size; i++) {
-            List<Holder<PlacedFeature>> features = getFeaturesListCopy(featureList, i);
-            sortFeatures(features);
-            featureList.set(i, HolderSet.direct(features));
-        }
-        accessor.bclib_setFeatures(featureList);
+//        BiomeGenerationSettings settings = biome.value().getGenerationSettings();
+//        BiomeGenerationSettingsAccessor accessor = (BiomeGenerationSettingsAccessor) settings;
+//        List<HolderSet<PlacedFeature>> featureList = CollectionsUtil.getMutable(accessor.bclib_getFeatures());
+//        final int size = featureList.size();
+//        for (int i = 0; i < size; i++) {
+//            List<Holder<PlacedFeature>> features = getFeaturesListCopy(featureList, i);
+//            sortFeatures(features);
+//            featureList.set(i, HolderSet.direct(features));
+//        }
+//        accessor.bclib_setFeatures(featureList);
     }
 
     /**
@@ -885,54 +885,26 @@ public class BiomeAPI {
         setBiome(chunk, pos, biome);
     }
 
-    static class StructureID {
-        public final ResourceLocation biomeID;
-        public final Holder<Structure> structure;
-
-        StructureID(ResourceLocation biomeID, Holder<Structure> structure) {
-            this.biomeID = biomeID;
-            this.structure = structure;
-        }
-
-        @Override
-        public String toString() {
-            return "StructureID{" + "id=" + biomeID + ", structure=" + structure + '}';
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            StructureID that = (StructureID) o;
-            return biomeID.equals(that.biomeID) && structure.equals(that.structure);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(biomeID, structure);
-        }
-    }
-
     private static void sortFeatures(List<Holder<PlacedFeature>> features) {
-        initFeatureOrder();
-
-        Set<Holder<PlacedFeature>> featuresWithoutDuplicates = Sets.newHashSet();
-        features.forEach(holder -> featuresWithoutDuplicates.add(holder));
-
-        if (featuresWithoutDuplicates.size() != features.size()) {
-            features.clear();
-            featuresWithoutDuplicates.forEach(feature -> features.add(feature));
-        }
-
-        features.forEach(feature -> {
-            FEATURE_ORDER.computeIfAbsent(feature, f -> FEATURE_ORDER_ID.getAndIncrement());
-        });
-
-        features.sort((f1, f2) -> {
-            int v1 = FEATURE_ORDER.getOrDefault(f1, 70000);
-            int v2 = FEATURE_ORDER.getOrDefault(f2, 70000);
-            return Integer.compare(v1, v2);
-        });
+//        initFeatureOrder();
+//
+//        Set<Holder<PlacedFeature>> featuresWithoutDuplicates = Sets.newHashSet();
+//        features.forEach(holder -> featuresWithoutDuplicates.add(holder));
+//
+//        if (featuresWithoutDuplicates.size() != features.size()) {
+//            features.clear();
+//            featuresWithoutDuplicates.forEach(feature -> features.add(feature));
+//        }
+//
+//        features.forEach(feature -> {
+//            FEATURE_ORDER.computeIfAbsent(feature, f -> FEATURE_ORDER_ID.getAndIncrement());
+//        });
+//
+//        features.sort((f1, f2) -> {
+//            int v1 = FEATURE_ORDER.getOrDefault(f1, 70000);
+//            int v2 = FEATURE_ORDER.getOrDefault(f2, 70000);
+//            return Integer.compare(v1, v2);
+//        });
     }
 
 
