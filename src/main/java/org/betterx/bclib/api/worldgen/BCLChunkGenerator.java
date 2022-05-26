@@ -17,6 +17,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import org.betterx.bclib.BCLib;
 import org.betterx.bclib.api.biomes.BiomeAPI;
+import org.betterx.bclib.api.surface.SurfaceRuleUtil;
 import org.betterx.bclib.interfaces.NoiseGeneratorSettingsProvider;
 import org.betterx.bclib.interfaces.SurfaceRuleProvider;
 

@@ -1,4 +1,4 @@
-package org.betterx.bclib.api.worldgen;
+package org.betterx.bclib.api.surface;
 
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
