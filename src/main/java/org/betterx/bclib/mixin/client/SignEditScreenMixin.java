@@ -40,16 +40,16 @@ public abstract class SignEditScreenMixin extends Screen {
         super(component);
     }
 
-    @Inject(method = "render(Lcom/mojang/blaze3d/vertex/PoseStack;IIF)V", at = @At(
+    @Inject(method = "render(Lcom/mojang/blaze3d/vertex/PoseStack;IIF)V", locals = LocalCapture.CAPTURE_FAILSOFT, at = @At(
             value = "INVOKE",
             target = "Lcom/mojang/blaze3d/vertex/PoseStack;pushPose()V",
             shift = Shift.BEFORE
-    ), locals = LocalCapture.CAPTURE_FAILSOFT)
+    ))
     private void bclib_checkOffset(PoseStack poseStack,
                                    int i,
                                    int j,
                                    float f,
-                                   CallbackInfo info,
+                                   CallbackInfo ci,
                                    float g,
                                    BlockState blockState,
                                    boolean bl,
