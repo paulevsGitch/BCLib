@@ -1,9 +1,14 @@
 package org.betterx.bclib;
 
+import net.minecraft.core.Registry;
+import net.minecraft.data.BuiltinRegistries;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.biome.*;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.impl.biome.NetherBiomeData;
 import net.fabricmc.loader.api.FabricLoader;
 
 import org.betterx.bclib.api.WorldDataAPI;
@@ -49,10 +54,29 @@ public class BCLib implements ModInitializer {
                 RequestFiles.DESCRIPTOR,
                 SendFiles.DESCRIPTOR,
                 Chunker.DESCRIPTOR
-        ));
+                                                   ));
 
         BCLibPatch.register();
         Configs.save();
+        if (isDevEnvironment()) {
+            Biome.BiomeBuilder builder = new Biome.BiomeBuilder()
+                    .precipitation(Biome.Precipitation.NONE)
+                    .temperature(1.0f)
+                    .downfall(1.0f)
+                    .mobSpawnSettings(new MobSpawnSettings.Builder().build())
+                    .specialEffects(new BiomeSpecialEffects.Builder().fogColor(0xff00ff)
+                                                                     .waterColor(0xff00ff)
+                                                                     .waterFogColor(0xff00ff)
+                                                                     .skyColor(0xff00ff)
+                                                                     .build())
+                    .generationSettings(new BiomeGenerationSettings.Builder().build());
+
+            Biome biome = builder.build();
+            ResourceLocation loc = makeID("testbiome");
+            biome = Registry.register(BuiltinRegistries.BIOME, loc, biome);
+            ResourceKey<Biome> key = BuiltinRegistries.BIOME.getResourceKey(biome).orElseThrow();
+            NetherBiomeData.addNetherBiome(key, Climate.parameters(-1, 1, 0, 0, 0, 0, 0));
+        }
     }
 
     public static boolean isDevEnvironment() {
