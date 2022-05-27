@@ -70,9 +70,4 @@ public class MinecraftServerMixin {
         accessor.bclib_setRecipesByName(BCLRecipeManager.getMapByName(accessor.bclib_getRecipesByName()));
         accessor.bclib_setRecipes(BCLRecipeManager.getMap(accessor.bclib_getRecipes()));
     }
-
-    @Inject(method = "createLevels", at = @At(value = "HEAD"))
-    private void bcl_createLevel(ChunkProgressListener chunkProgressListener, CallbackInfo ci) {
-        System.out.println(this.worldData);
-    }
 }

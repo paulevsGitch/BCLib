@@ -1,6 +1,5 @@
-package org.betterx.bclib.world.biomes;
+package org.betterx.bclib.api.biomes;
 
-import net.minecraft.core.Holder;
 import net.minecraft.data.BuiltinRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -15,16 +14,11 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.betterx.bclib.BCLib;
-import org.betterx.bclib.api.biomes.BCLBiomeBuilder;
-import org.betterx.bclib.api.biomes.BiomeAPI;
 import org.betterx.bclib.api.surface.SurfaceRuleUtil;
 import org.betterx.bclib.api.tag.TagAPI;
 import org.betterx.bclib.util.WeightedList;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import org.jetbrains.annotations.Nullable;
@@ -38,7 +32,7 @@ public class BCLBiome extends BCLBiomeSettings {
 
     private final List<Climate.ParameterPoint> parameterPoints = Lists.newArrayList();
 
-    private Consumer<Holder<Biome>> surfaceInit;
+    private Consumer<ResourceKey<Biome>> surfaceInit;
     private BCLBiome biomeParent;
 
     /**
@@ -46,7 +40,7 @@ public class BCLBiome extends BCLBiomeSettings {
      *
      * @param biomeKey {@link ResourceKey} for the {@link Biome}.
      */
-    public BCLBiome(ResourceKey<Biome> biomeKey) {
+    protected BCLBiome(ResourceKey<Biome> biomeKey) {
         this(biomeKey.location());
     }
 
@@ -55,7 +49,7 @@ public class BCLBiome extends BCLBiomeSettings {
      *
      * @param biomeID {@link ResourceLocation} biome ID.
      */
-    public BCLBiome(ResourceLocation biomeID) {
+    protected BCLBiome(ResourceLocation biomeID) {
         this(biomeID, BuiltinRegistries.BIOME.get(biomeID), null);
     }
 
@@ -64,7 +58,7 @@ public class BCLBiome extends BCLBiomeSettings {
      *
      * @param biome {@link Biome} to wrap.
      */
-    public BCLBiome(Biome biome) {
+    protected BCLBiome(Biome biome) {
         this(biome, null);
     }
 
@@ -74,7 +68,7 @@ public class BCLBiome extends BCLBiomeSettings {
      * @param biome    {@link Biome} to wrap.
      * @param settings The Settings for this Biome or {@code null} if you want to apply default settings
      */
-    public BCLBiome(Biome biome, VanillaBiomeSettings settings) {
+    protected BCLBiome(Biome biome, VanillaBiomeSettings settings) {
         this(BiomeAPI.getBiomeID(biome), biome, settings);
     }
 
@@ -89,7 +83,7 @@ public class BCLBiome extends BCLBiomeSettings {
      * @param biome    {@link Biome} to wrap.
      * @param defaults The Settings for this Biome or null if you want to apply the defaults
      */
-    public BCLBiome(ResourceLocation biomeID, Biome biome, BCLBiomeSettings defaults) {
+    protected BCLBiome(ResourceLocation biomeID, Biome biome, BCLBiomeSettings defaults) {
         this.subbiomes.add(this, 1.0F);
         this.biomeID = biomeID;
         this.biome = biome;
@@ -202,43 +196,15 @@ public class BCLBiome extends BCLBiomeSettings {
         return biome;
     }
 
-//	/**
-//	 * Recursively update biomes to correct world biome registry instances, for internal usage only.
-//	 * @param biomeRegistry {@link Registry} for {@link Biome}.
-//	 */
-//	public void updateActualBiomes(Registry<Biome> biomeRegistry) {
-//		subbiomes.forEach((sub) -> {
-//			if (sub != this) {
-//				sub.updateActualBiomes(biomeRegistry);
-//			}
-//		});
-//		if (edge != null && edge != this) {
-//			edge.updateActualBiomes(biomeRegistry);
-//		}
-//
-//		final ResourceKey<Biome> key = biomeRegistry.getResourceKey(biomeRegistry.get(biomeID)).orElseThrow();
-//		Holder<Biome> aBiome = biomeRegistry.getOrCreateHolder(key);
-//		if (aBiome != actualBiome && actualBiome != null) {
-//			System.out.println("Changed actual Biome");
-//		}
-//		this.actualBiome = aBiome;
-//		if (actualBiome == null) {
-//			BCLib.LOGGER.error("Unable to find actual Biome for " + biomeID);
-//		}
-//	}
-
     /**
      * For internal use from BiomeAPI only
      */
-    public void afterRegistration() {
-        if (!this.structureTags.isEmpty()) {
-            structureTags.forEach(tagKey ->
-                    TagAPI.addBiomeTag(tagKey, biome)
-            );
-        }
+    void afterRegistration() {
+        ResourceKey<Biome> key = BuiltinRegistries.BIOME.getResourceKey(getBiome()).orElseThrow();
+        this.structureTags.forEach(tagKey -> TagAPI.addBiomeTag(tagKey, biome));
 
         if (this.surfaceInit != null) {
-            surfaceInit.accept(getBiomeHolder());
+            surfaceInit.accept(key);
         }
     }
 
@@ -315,15 +281,15 @@ public class BCLBiome extends BCLBiomeSettings {
      * Adds structures to this biome. For internal use only.
      * Used inside {@link BCLBiomeBuilder}.
      */
-    public void attachStructures(List<TagKey<Biome>> structures) {
-        this.structureTags.addAll(structures);
+    void attachStructures(List<TagKey<Biome>> structures) {
+        structureTags.addAll(structures);
     }
 
     /**
      * Adds structures to this biome. For internal use only.
      * Used inside {@link BCLBiomeBuilder}.
      */
-    public void addClimateParameters(List<Climate.ParameterPoint> params) {
+    void addClimateParameters(List<Climate.ParameterPoint> params) {
         this.parameterPoints.addAll(params);
     }
 
@@ -336,9 +302,8 @@ public class BCLBiome extends BCLBiomeSettings {
      *
      * @param surface {@link SurfaceRules.RuleSource} rule.
      */
-    public void setSurface(RuleSource surface) {
-        this.surfaceInit = (b) -> {
-            final ResourceKey key = BiomeAPI.getBiomeKey(b);
+    void setSurface(RuleSource surface) {
+        this.surfaceInit = (key) -> {
             if (key == null) {
                 BCLib.LOGGER.warning("BCL Biome " + biomeID + " does not have registry key!");
             } else {
@@ -365,7 +330,7 @@ public class BCLBiome extends BCLBiomeSettings {
         return getParentBiome().edge == this;
     }
 
-    public boolean allowFabricRegistration() {
+    boolean allowFabricRegistration() {
         return !isEdgeBiome();
     }
 }

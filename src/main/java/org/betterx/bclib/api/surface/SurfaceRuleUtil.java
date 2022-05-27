@@ -73,7 +73,6 @@ public class SurfaceRuleUtil {
      */
     public static void addSurfaceRule(ResourceLocation biomeID, RuleSource source) {
         SURFACE_RULES.put(biomeID, source);
-        //NOISE_GENERATOR_SETTINGS.forEach(BiomeAPI::changeSurfaceRulesForGenerator);
     }
 
     public static RuleSource addRulesForBiomeSource(RuleSource org, BiomeSource biomeSource) {
