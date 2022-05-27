@@ -35,6 +35,11 @@ public class LifeCycleAPI {
     private final static List<LevelLoadCall> onLoadLevel = new ArrayList<>(2);
     private final static List<BeforeLevelLoadCall> beforeLoadLevel = new ArrayList<>(2);
 
+
+    private static void worldCreationStarted(RegistryAccess access) {
+        BiomeAPI.initRegistry(access);
+    }
+
     public static void newWorldSetup(LevelStorageSource.LevelStorageAccess levelStorageAccess,
                                      WorldGenSettings settings) {
         DataExchangeAPI.prepareServerside();
@@ -61,22 +66,13 @@ public class LifeCycleAPI {
         _runBeforeLevelLoad();
     }
 
-    public static WorldGenSettings worldLoadStarted(WorldGenSettings settings,
-                                                    Optional<RegistryOps<Tag>> registryOps) {
+    public static WorldGenSettings worldLoadStarted(WorldGenSettings settings, Optional<RegistryOps<Tag>> registryOps) {
         if (registryOps.orElse(null) instanceof RegistryOpsAccessor acc) {
-            BiomeAPI.initRegistry(acc.bcl_getRegistryAccess()
-                                     .registry(Registry.BIOME_REGISTRY)
-                                     .orElse(null));
+            BiomeAPI.initRegistry(acc.bcl_getRegistryAccess());
         }
         settings = WorldGenUtil.fixSettingsInCurrentWorld(registryOps, settings);
 
         return settings;
-    }
-
-    private static void worldCreationStarted(RegistryAccess access) {
-        BiomeAPI.initRegistry(access
-                                      .registry(Registry.BIOME_REGISTRY)
-                                      .orElse(null));
     }
 
     public static void worldCreationStarted(RegistryOps<Tag> regOps) {
@@ -90,42 +86,8 @@ public class LifeCycleAPI {
         worldCreationStarted(worldGenSettingsComponent.registryHolder());
 
         if (levelStorageAccess.isPresent()) {
-            newWorldSetup(levelStorageAccess.get(),
-                          worldGenSettingsComponent.settings().worldGenSettings());
+            newWorldSetup(levelStorageAccess.get(), worldGenSettingsComponent.settings().worldGenSettings());
         }
-    }
-
-
-    /**
-     * A callback function that is used for each new ServerLevel instance
-     */
-    public interface BeforeLevelLoadCall {
-        void beforeLoad();
-    }
-
-    /**
-     * A callback function that is used for each new ServerLevel instance
-     */
-    public interface LevelLoadBiomesCall {
-        void onLoad(ServerLevel world, long seed, Registry<Biome> registry);
-    }
-
-    /**
-     * A callback function that is used for each new ServerLevel instance
-     */
-    public interface LevelLoadCall {
-        void onLoad(
-                ServerLevel world,
-                MinecraftServer minecraftServer,
-                Executor executor,
-                LevelStorageSource.LevelStorageAccess levelStorageAccess,
-                ServerLevelData serverLevelData,
-                ResourceKey<Level> resourceKey,
-                ChunkProgressListener chunkProgressListener,
-                boolean bl,
-                long l,
-                List<CustomSpawner> list,
-                boolean bl2);
     }
 
     /**
@@ -191,22 +153,51 @@ public class LifeCycleAPI {
                                      long l,
                                      List<CustomSpawner> list,
                                      boolean bl2) {
-        onLoadLevel.forEach(c -> c.onLoad(
-                                    world,
-                                    minecraftServer,
-                                    executor,
-                                    levelStorageAccess,
-                                    serverLevelData,
-                                    resourceKey,
-                                    chunkProgressListener,
-                                    bl,
-                                    l,
-                                    list,
-                                    bl2)
-                           );
+        onLoadLevel.forEach(c -> c.onLoad(world,
+                                          minecraftServer,
+                                          executor,
+                                          levelStorageAccess,
+                                          serverLevelData,
+                                          resourceKey,
+                                          chunkProgressListener,
+                                          bl,
+                                          l,
+                                          list,
+                                          bl2));
 
         final long seed = world.getSeed();
         final Registry<Biome> biomeRegistry = world.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY);
         onLoadLevelBiomes.forEach(c -> c.onLoad(world, seed, biomeRegistry));
+    }
+
+    /**
+     * A callback function that is used for each new ServerLevel instance
+     */
+    public interface BeforeLevelLoadCall {
+        void beforeLoad();
+    }
+
+    /**
+     * A callback function that is used for each new ServerLevel instance
+     */
+    public interface LevelLoadBiomesCall {
+        void onLoad(ServerLevel world, long seed, Registry<Biome> registry);
+    }
+
+    /**
+     * A callback function that is used for each new ServerLevel instance
+     */
+    public interface LevelLoadCall {
+        void onLoad(ServerLevel world,
+                    MinecraftServer minecraftServer,
+                    Executor executor,
+                    LevelStorageSource.LevelStorageAccess levelStorageAccess,
+                    ServerLevelData serverLevelData,
+                    ResourceKey<Level> resourceKey,
+                    ChunkProgressListener chunkProgressListener,
+                    boolean bl,
+                    long l,
+                    List<CustomSpawner> list,
+                    boolean bl2);
     }
 }

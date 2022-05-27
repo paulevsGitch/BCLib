@@ -1,10 +1,7 @@
 package org.betterx.bclib.api.biomes;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Holder;
-import net.minecraft.core.HolderSet;
-import net.minecraft.core.Registry;
+import net.minecraft.core.*;
 import net.minecraft.data.BuiltinRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -115,7 +112,8 @@ public class BiomeAPI {
 
     private static final Map<ResourceLocation, BCLBiome> ID_MAP = Maps.newHashMap();
     private static final Map<Biome, BCLBiome> CLIENT = Maps.newHashMap();
-    public static Registry<Biome> biomeRegistry;
+    private static Registry<Biome> biomeRegistry;
+    private static RegistryAccess registryAccess;
 
     private static final Map<Holder<PlacedFeature>, Integer> FEATURE_ORDER = Maps.newHashMap();
     private static final MutableInt FEATURE_ORDER_ID = new MutableInt(0);
@@ -165,12 +163,17 @@ public class BiomeAPI {
     /**
      * Initialize registry for current server.
      *
-     * @param biomeRegistry - {@link Registry} for {@link Biome}.
+     * @param access - The new, active {@link RegistryAccess} for the current session.
      */
-    public static void initRegistry(Registry<Biome> biomeRegistry) {
-        if (biomeRegistry != BiomeAPI.biomeRegistry) {
-            BiomeAPI.biomeRegistry = biomeRegistry; //12819
-            CLIENT.clear();
+    public static void initRegistry(RegistryAccess access) {
+        if (access != registryAccess) {
+            BiomeAPI.registryAccess = access;
+            Registry<Biome> biomeRegistry = access.registry(Registry.BIOME_REGISTRY).orElse(null);
+
+            if (biomeRegistry != BiomeAPI.biomeRegistry) {
+                BiomeAPI.biomeRegistry = biomeRegistry;
+                CLIENT.clear();
+            }
         }
     }
 

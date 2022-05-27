@@ -3,7 +3,6 @@ package org.betterx.bclib.mixin.client;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
 import net.minecraft.client.gui.screens.worldselection.WorldGenSettingsComponent;
-import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.WorldLoader;
@@ -39,7 +38,7 @@ public class CreateWorldScreenMixin {
                           DataPackConfig dataPackConfig,
                           WorldGenSettingsComponent worldGenSettingsComponent,
                           CallbackInfo ci) {
-        BiomeAPI.initRegistry(worldGenSettingsComponent.registryHolder().registryOrThrow(Registry.BIOME_REGISTRY));
+        BiomeAPI.initRegistry(worldGenSettingsComponent.registryHolder());
     }
 
     //Change the WorldPreset that is selected by default on the Create World Screen
