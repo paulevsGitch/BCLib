@@ -14,6 +14,8 @@ import net.minecraft.world.level.levelgen.LegacyRandomSource;
 import net.minecraft.world.level.levelgen.WorldgenRandom;
 import net.minecraft.world.level.levelgen.synth.SimplexNoise;
 
+import net.fabricmc.fabric.impl.biome.TheEndBiomeData;
+
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import org.betterx.bclib.BCLib;
@@ -21,6 +23,7 @@ import org.betterx.bclib.api.biomes.BiomeAPI;
 import org.betterx.bclib.config.ConfigKeeper.StringArrayEntry;
 import org.betterx.bclib.config.Configs;
 import org.betterx.bclib.interfaces.BiomeMap;
+import org.betterx.bclib.interfaces.TheEndBiomeDataAccessor;
 import org.betterx.bclib.noise.OpenSimplexNoise;
 import org.betterx.bclib.world.biomes.BCLBiome;
 import org.betterx.bclib.world.generator.map.hex.HexBiomeMap;
@@ -51,9 +54,9 @@ public class BCLibEndBiomeSource extends BCLBiomeSource {
                                                                               .stable()
                                                                               .forGetter(source -> Optional.of(source.biomeSourceVersion)))
                                                               .apply(instance,
-                                                                      instance.stable(BCLibEndBiomeSource::new)
-                                                              )
-    );
+                                                                     instance.stable(BCLibEndBiomeSource::new)
+                                                                    )
+                                       );
     private final Holder<Biome> centerBiome;
     private final Holder<Biome> barrens;
     private final Point pos;
@@ -88,8 +91,8 @@ public class BCLibEndBiomeSource extends BCLBiomeSource {
         endVoidBiomePicker = new BiomePicker(biomeRegistry);
 
         List<String> includeVoid = Configs.BIOMES_CONFIG.getEntry("force_include",
-                "end_void_biomes",
-                StringArrayEntry.class).getValue();
+                                                                  "end_void_biomes",
+                                                                  StringArrayEntry.class).getValue();
         this.possibleBiomes().forEach(biome -> {
             ResourceLocation key = biome.unwrapKey().orElseThrow().location();
             String group = key.getNamespace() + "." + key.getPath();
@@ -135,32 +138,56 @@ public class BCLibEndBiomeSource extends BCLBiomeSource {
     protected BCLBiomeSource cloneForDatapack(Set<Holder<Biome>> datapackBiomes) {
         datapackBiomes.addAll(getBclBiomes(this.biomeRegistry));
         return new BCLibEndBiomeSource(this.biomeRegistry,
-                datapackBiomes.stream().toList(),
-                this.currentSeed,
-                Optional.of(biomeSourceVersion),
-                true);
+                                       datapackBiomes.stream().toList(),
+                                       this.currentSeed,
+                                       Optional.of(biomeSourceVersion),
+                                       true);
     }
 
     private static List<Holder<Biome>> getBclBiomes(Registry<Biome> biomeRegistry) {
         List<String> include = Configs.BIOMES_CONFIG.getEntry("force_include",
-                "end_land_biomes",
-                StringArrayEntry.class).getValue();
+                                                              "end_land_biomes",
+                                                              StringArrayEntry.class).getValue();
         include.addAll(Configs.BIOMES_CONFIG.getEntry("force_include",
-                "end_void_biomes",
-                StringArrayEntry.class).getValue());
+                                                      "end_void_biomes",
+                                                      StringArrayEntry.class).getValue());
+        if (TheEndBiomeData.createOverrides(biomeRegistry) instanceof TheEndBiomeDataAccessor acc) {
+            return getBiomes(biomeRegistry,
+                             new ArrayList<>(0),
+                             include,
+                             (biome, location) ->
+                                     BCLibEndBiomeSource.isValidNonVanillaEndBiome(biome, location) ||
+                                             acc.bcl_isNonVanillaAndCanGenerateInEnd(biome.unwrapKey().orElseThrow())
 
-        return getBiomes(biomeRegistry, new ArrayList<>(0), include, BCLibEndBiomeSource::isValidBCLEndBiome);
+                            );
+        } else {
+            return getBiomes(biomeRegistry,
+                             new ArrayList<>(0),
+                             include,
+                             BCLibEndBiomeSource::isValidNonVanillaEndBiome);
+        }
     }
 
     private static List<Holder<Biome>> getBiomes(Registry<Biome> biomeRegistry) {
         List<String> include = Configs.BIOMES_CONFIG.getEntry("force_include",
-                "end_land_biomes",
-                StringArrayEntry.class).getValue();
+                                                              "end_land_biomes",
+                                                              StringArrayEntry.class).getValue();
         include.addAll(Configs.BIOMES_CONFIG.getEntry("force_include",
-                "end_void_biomes",
-                StringArrayEntry.class).getValue());
+                                                      "end_void_biomes",
+                                                      StringArrayEntry.class).getValue());
 
-        return getBiomes(biomeRegistry, new ArrayList<>(0), include, BCLibEndBiomeSource::isValidEndBiome);
+        if (TheEndBiomeData.createOverrides(biomeRegistry) instanceof TheEndBiomeDataAccessor acc) {
+            return getBiomes(biomeRegistry,
+                             new ArrayList<>(0),
+                             include,
+                             (biome, location) ->
+                                     BCLibEndBiomeSource.isValidEndBiome(biome, location) || acc.bcl_canGenerateInEnd(
+                                             biome.unwrapKey().orElseThrow())
+
+                            );
+        } else {
+            return getBiomes(biomeRegistry, new ArrayList<>(0), include, BCLibEndBiomeSource::isValidEndBiome);
+        }
     }
 
 
@@ -169,10 +196,10 @@ public class BCLibEndBiomeSource extends BCLBiomeSource {
                 BiomeAPI.wasRegisteredAsEndBiome(location);
     }
 
-    private static boolean isValidBCLEndBiome(Holder<Biome> biome, ResourceLocation location) {
+    private static boolean isValidNonVanillaEndBiome(Holder<Biome> biome, ResourceLocation location) {
         return biome.is(BiomeTags.IS_END) ||
-                BiomeAPI.wasRegisteredAs(location, BiomeAPI.Dimension.BCL_END_LAND) ||
-                BiomeAPI.wasRegisteredAs(location, BiomeAPI.Dimension.BCL_END_VOID);
+                BiomeAPI.wasRegisteredAs(location, BiomeAPI.BiomeType.BCL_END_LAND) ||
+                BiomeAPI.wasRegisteredAs(location, BiomeAPI.BiomeType.BCL_END_VOID);
     }
 
     public static float getLegacyHeightValue(SimplexNoise simplexNoise, int i, int j) {
@@ -206,18 +233,18 @@ public class BCLibEndBiomeSource extends BCLBiomeSource {
     protected void onInitMap(long seed) {
         if ((biomeSourceVersion != BCLBiomeSource.BIOME_SOURCE_VERSION_HEX)) {
             this.mapLand = new SquareBiomeMap(seed,
-                    GeneratorOptions.getBiomeSizeEndLand(),
-                    endLandBiomePicker);
+                                              GeneratorOptions.getBiomeSizeEndLand(),
+                                              endLandBiomePicker);
             this.mapVoid = new SquareBiomeMap(seed,
-                    GeneratorOptions.getBiomeSizeEndVoid(),
-                    endVoidBiomePicker);
+                                              GeneratorOptions.getBiomeSizeEndVoid(),
+                                              endVoidBiomePicker);
         } else {
             this.mapLand = new HexBiomeMap(seed,
-                    GeneratorOptions.getBiomeSizeEndLand(),
-                    endLandBiomePicker);
+                                           GeneratorOptions.getBiomeSizeEndLand(),
+                                           endLandBiomePicker);
             this.mapVoid = new HexBiomeMap(seed,
-                    GeneratorOptions.getBiomeSizeEndVoid(),
-                    endVoidBiomePicker);
+                                           GeneratorOptions.getBiomeSizeEndVoid(),
+                                           endVoidBiomePicker);
         }
 
         WorldgenRandom chunkRandom = new WorldgenRandom(new LegacyRandomSource(seed));
@@ -246,7 +273,7 @@ public class BCLibEndBiomeSource extends BCLBiomeSource {
                     noise,
                     (biomeX >> 1) + 1,
                     (biomeZ >> 1) + 1
-            ) + (float) SMALL_NOISE.eval(biomeX, biomeZ) * 5;
+                                               ) + (float) SMALL_NOISE.eval(biomeX, biomeZ) * 5;
 
             if (height > -20F && height < -5F) {
                 return barrens;

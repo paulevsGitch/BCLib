@@ -23,7 +23,6 @@
     "MainMixin",
     "MinecraftServerMixin",
     "MobSpawnSettingsAccessor",
-    "NetherBiomeDataMixin",
     "NoiseBasedChunkGeneratorMixin",
     "NoiseGeneratorSettingsMixin",
     "PistonBaseBlockMixin",

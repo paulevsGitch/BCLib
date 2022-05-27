@@ -1,45 +1,44 @@
 package org.betterx.bclib.mixin.common;
 
+import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.biome.Biomes;
 
 import net.fabricmc.fabric.impl.biome.TheEndBiomeData;
+import net.fabricmc.fabric.impl.biome.WeightedPicker;
 
-import org.betterx.bclib.world.biomes.FabricBiomesData;
+import org.betterx.bclib.interfaces.TheEndBiomeDataAccessor;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.Shadow;
 
-@Mixin(value = TheEndBiomeData.class, remap = false)
-public class TheEndBiomeDataMixin {
-    @Inject(method = "addEndBiomeReplacement", at = @At(value = "HEAD"))
-    private static void bclib_addEndBiomeReplacement(ResourceKey<Biome> replaced,
-                                                     ResourceKey<Biome> variant,
-                                                     double weight,
-                                                     CallbackInfo info) {
-        if (replaced == Biomes.END_BARRENS || replaced == Biomes.SMALL_END_ISLANDS) {
-            FabricBiomesData.END_VOID_BIOMES.put(variant, (float) weight);
-        } else {
-            FabricBiomesData.END_LAND_BIOMES.put(variant, (float) weight);
-        }
+import javax.annotation.Nullable;
+import java.util.Map;
+
+@Mixin(value = TheEndBiomeData.Overrides.class, remap = false)
+public class TheEndBiomeDataMixin implements TheEndBiomeDataAccessor {
+    @Shadow
+    @Final
+    @Nullable
+    private Map<Holder<Biome>, WeightedPicker<Holder<Biome>>> endBiomesMap;
+    @Shadow
+    @Final
+    @Nullable
+    private Map<Holder<Biome>, WeightedPicker<Holder<Biome>>> endMidlandsMap;
+    @Shadow
+    @Final
+    @Nullable
+    private Map<Holder<Biome>, WeightedPicker<Holder<Biome>>> endBarrensMap;
+
+    public boolean bcl_canGenerateAsEndBiome(ResourceKey<Biome> key) {
+        return endBiomesMap.containsKey(key);
     }
 
-    @Inject(method = "addEndMidlandsReplacement", at = @At(value = "HEAD"))
-    private static void bclib_addEndMidlandsReplacement(ResourceKey<Biome> highlands,
-                                                        ResourceKey<Biome> midlands,
-                                                        double weight,
-                                                        CallbackInfo info) {
-        FabricBiomesData.END_LAND_BIOMES.put(midlands, (float) weight);
+    public boolean bcl_canGenerateAsEndMidlandBiome(ResourceKey<Biome> key) {
+        return endMidlandsMap.containsKey(key);
     }
 
-    @Inject(method = "addEndBarrensReplacement", at = @At(value = "HEAD"))
-    private static void bclib_addEndBarrensReplacement(ResourceKey<Biome> highlands,
-                                                       ResourceKey<Biome> barrens,
-                                                       double weight,
-                                                       CallbackInfo info) {
-        FabricBiomesData.END_LAND_BIOMES.put(barrens, (float) weight);
-        FabricBiomesData.END_VOID_BIOMES.put(barrens, (float) weight);
+    public boolean bcl_canGenerateAsEndBarrensBiome(ResourceKey<Biome> key) {
+        return endBarrensMap.containsKey(key);
     }
 }

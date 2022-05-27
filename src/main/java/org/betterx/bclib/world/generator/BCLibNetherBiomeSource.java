@@ -34,23 +34,23 @@ public class BCLibNetherBiomeSource extends BCLBiomeSource {
     public static final Codec<BCLibNetherBiomeSource> CODEC = RecordCodecBuilder
             .create(instance -> instance
                     .group(RegistryOps
-                                    .retrieveRegistry(Registry.BIOME_REGISTRY)
-                                    .forGetter(source -> source.biomeRegistry),
-                            Codec
-                                    .LONG
-                                    .fieldOf("seed")
-                                    .stable()
-                                    .forGetter(source -> {
-                                        return source.currentSeed;
-                                    }),
-                            Codec
-                                    .INT
-                                    .optionalFieldOf("version")
-                                    .stable()
-                                    .forGetter(source -> Optional.of(source.biomeSourceVersion))
-                    )
+                                   .retrieveRegistry(Registry.BIOME_REGISTRY)
+                                   .forGetter(source -> source.biomeRegistry),
+                           Codec
+                                   .LONG
+                                   .fieldOf("seed")
+                                   .stable()
+                                   .forGetter(source -> {
+                                       return source.currentSeed;
+                                   }),
+                           Codec
+                                   .INT
+                                   .optionalFieldOf("version")
+                                   .stable()
+                                   .forGetter(source -> Optional.of(source.biomeSourceVersion))
+                          )
                     .apply(instance, instance.stable(BCLibNetherBiomeSource::new))
-            );
+                   );
     private BiomeMap biomeMap;
     private final BiomePicker biomePicker;
 
@@ -104,10 +104,10 @@ public class BCLibNetherBiomeSource extends BCLBiomeSource {
     protected BCLBiomeSource cloneForDatapack(Set<Holder<Biome>> datapackBiomes) {
         datapackBiomes.addAll(getBclBiomes(this.biomeRegistry));
         return new BCLibNetherBiomeSource(this.biomeRegistry,
-                datapackBiomes.stream().toList(),
-                this.currentSeed,
-                Optional.of(biomeSourceVersion),
-                true);
+                                          datapackBiomes.stream().toList(),
+                                          this.currentSeed,
+                                          Optional.of(biomeSourceVersion),
+                                          true);
     }
 
     /**
@@ -125,7 +125,7 @@ public class BCLibNetherBiomeSource extends BCLBiomeSource {
         List<String> exclude = Configs.BIOMES_CONFIG.getEntry("force_exclude", "nether_biomes", StringArrayEntry.class)
                                                     .getValue();
 
-        return getBiomes(biomeRegistry, exclude, include, BCLibNetherBiomeSource::isValidBCLNetherBiome);
+        return getBiomes(biomeRegistry, exclude, include, BCLibNetherBiomeSource::isValidNonVanillaNetherBiome);
     }
 
 
@@ -145,8 +145,11 @@ public class BCLibNetherBiomeSource extends BCLBiomeSource {
                 BiomeAPI.wasRegisteredAsNetherBiome(location);
     }
 
-    private static boolean isValidBCLNetherBiome(Holder<Biome> biome, ResourceLocation location) {
-        return BiomeAPI.wasRegisteredAs(location, BiomeAPI.Dimension.BCL_NETHER);
+    private static boolean isValidNonVanillaNetherBiome(Holder<Biome> biome, ResourceLocation location) {
+        return (
+                !"minecraft".equals(location.getNamespace()) &&
+                        NetherBiomeData.canGenerateInNether(biome.unwrapKey().get())) ||
+                BiomeAPI.wasRegisteredAs(location, BiomeAPI.BiomeType.BCL_NETHER);
     }
 
     public static <T> void debug(Object el, Registry<T> reg) {
@@ -195,8 +198,8 @@ public class BCLibNetherBiomeSource extends BCLBiomeSource {
             );
         } else {
             this.biomeMap = mapConstructor.apply(seed,
-                    GeneratorOptions.getBiomeSizeNether(),
-                    biomePicker);
+                                                 GeneratorOptions.getBiomeSizeNether(),
+                                                 biomePicker);
         }
     }
 
