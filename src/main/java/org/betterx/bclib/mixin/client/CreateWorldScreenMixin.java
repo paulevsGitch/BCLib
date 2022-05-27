@@ -57,13 +57,9 @@ public class CreateWorldScreenMixin {
         };
     }
 
+    //this is called when a new world is first created
     @Inject(method = "createNewWorldDirectory", at = @At("RETURN"))
     void bcl_createNewWorld(CallbackInfoReturnable<Optional<LevelStorageSource.LevelStorageAccess>> cir) {
-        Optional<LevelStorageSource.LevelStorageAccess> levelStorageAccess = cir.getReturnValue();
-        if (levelStorageAccess.isPresent()) {
-            LifeCycleAPI.startingWorld(levelStorageAccess.get(),
-                    worldGenSettingsComponent.settings().worldGenSettings());
-        }
+        LifeCycleAPI.worldCreationStarted(cir.getReturnValue(), this.worldGenSettingsComponent);
     }
-
 }

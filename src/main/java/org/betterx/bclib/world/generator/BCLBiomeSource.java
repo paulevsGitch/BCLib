@@ -42,7 +42,7 @@ public abstract class BCLBiomeSource extends BiomeSource {
         System.out.println(this + " with Registry: " + biomeRegistry.getClass().getName() + "@" + Integer.toHexString(
                 biomeRegistry.hashCode()));
 
-        BiomeAPI.initRegistry(biomeRegistry);
+        //BiomeAPI.initRegistry(biomeRegistry);
     }
 
     final public void setSeed(long seed) {

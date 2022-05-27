@@ -11,8 +11,8 @@ import net.minecraft.world.level.storage.PrimaryLevelData;
 import com.mojang.datafixers.DataFixer;
 import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.Lifecycle;
+import org.betterx.bclib.api.LifeCycleAPI;
 import org.betterx.bclib.api.worldgen.BCLChunkGenerator;
-import org.betterx.bclib.api.worldgen.WorldGenUtil;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -59,9 +59,9 @@ public class PrimaryLevelDataMixin {
     @ModifyArg(method = "parse", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/storage/PrimaryLevelData;<init>(Lcom/mojang/datafixers/DataFixer;ILnet/minecraft/nbt/CompoundTag;ZIIIFJJIIIZIZZZLnet/minecraft/world/level/border/WorldBorder$Settings;IILjava/util/UUID;Ljava/util/Set;Lnet/minecraft/world/level/timers/TimerQueue;Lnet/minecraft/nbt/CompoundTag;Lnet/minecraft/nbt/CompoundTag;Lnet/minecraft/world/level/LevelSettings;Lnet/minecraft/world/level/levelgen/WorldGenSettings;Lcom/mojang/serialization/Lifecycle;)V"))
     private static WorldGenSettings bcl_fixSettings(WorldGenSettings settings) {
         Optional<RegistryOps<Tag>> registryOps = bcl_lastRegistryAccess.get();
-        settings = WorldGenUtil.fixSettingsInCurrentWorld(registryOps, settings);
-
+        settings = LifeCycleAPI.worldLoadStarted(settings, registryOps);
         bcl_lastRegistryAccess.set(Optional.empty());
         return settings;
     }
+
 }

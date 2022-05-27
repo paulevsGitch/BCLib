@@ -1,72 +1,32 @@
 package org.betterx.bclib.mixin.common;
 
+import net.minecraft.nbt.Tag;
+import net.minecraft.resources.RegistryOps;
 import net.minecraft.server.Main;
-import net.minecraft.server.dedicated.DedicatedServerSettings;
 import net.minecraft.world.level.storage.LevelStorageSource;
 
-import joptsimple.ArgumentAcceptingOptionSpec;
-import joptsimple.OptionParser;
-import joptsimple.OptionSet;
+import com.mojang.serialization.DynamicOps;
 import org.betterx.bclib.api.LifeCycleAPI;
-import org.betterx.bclib.api.biomes.BiomeAPI;
-import org.betterx.bclib.api.datafixer.DataFixerAPI;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import java.io.File;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Optional;
 
 @Mixin(Main.class)
 abstract public class MainMixin {
     @ModifyVariable(method = "main", ordinal = 0, at = @At(value = "INVOKE", shift = At.Shift.AFTER, target = "Lnet/minecraft/world/level/storage/LevelStorageSource$LevelStorageAccess;getSummary()Lnet/minecraft/world/level/storage/LevelSummary;"))
     private static LevelStorageSource.LevelStorageAccess bc_createAccess(LevelStorageSource.LevelStorageAccess levelStorageAccess) {
-        BiomeAPI.prepareNewLevel();
-        DataFixerAPI.fixData(levelStorageAccess, false, (didFix) -> {/* not called when showUI==false */});
-
-        LifeCycleAPI._runBeforeLevelLoad();
+        LifeCycleAPI.newWorldSetup(levelStorageAccess);
         return levelStorageAccess;
     }
 
 
-    //@Inject(method = "main", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/storage/LevelStorageSource;createDefault(Ljava/nio/file/Path;)Lnet/minecraft/world/level/storage/LevelStorageSource;"))
-    private static void bclib_callServerFix(String[] args, CallbackInfo ci) {
-        OptionParser parser = new OptionParser();
-        ArgumentAcceptingOptionSpec<String> optionUniverse = parser.accepts("universe")
-                                                                   .withRequiredArg()
-                                                                   .defaultsTo(".", new String[0]);
-        ArgumentAcceptingOptionSpec<String> optionWorld = parser.accepts("world").withRequiredArg();
-
-        //this is only for compat reasons, we do not need to read thise options in our mixin, but it seems to cause
-        //errors if they are not defined
-        parser.accepts("nogui");
-        parser.accepts("initSettings", "Initializes 'server.properties' and 'eula.txt', then quits");
-        parser.accepts("demo");
-        parser.accepts("bonusChest");
-        parser.accepts("forceUpgrade");
-        parser.accepts("eraseCache");
-        parser.accepts("safeMode", "Loads level with vanilla datapack only");
-        parser.accepts("help").forHelp();
-        parser.accepts("singleplayer").withRequiredArg();
-        parser.accepts("port").withRequiredArg().ofType(Integer.class).defaultsTo(-1, new Integer[0]);
-        parser.accepts("serverId").withRequiredArg();
-        parser.accepts("jfrProfile");
-        parser.nonOptions();
-
-        OptionSet options = parser.parse(args);
-
-        Path settingPath = Paths.get("server.properties");
-        DedicatedServerSettings settings = new DedicatedServerSettings(settingPath);
-
-        File file = new File(options.valueOf(optionUniverse));
-        String levelID = Optional.ofNullable(options.valueOf(optionWorld)).orElse(settings.getProperties().levelName);
-
-        LevelStorageSource levelStorageSource = LevelStorageSource.createDefault(file.toPath());
-        DataFixerAPI.fixData(levelStorageSource, levelID, false, (didFix) -> {/* not called when showUI==false */});
-
-        LifeCycleAPI._runBeforeLevelLoad();
+    @ModifyArg(method = "method_43613", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/storage/LevelStorageSource$LevelStorageAccess;getDataTag(Lcom/mojang/serialization/DynamicOps;Lnet/minecraft/world/level/DataPackConfig;Lcom/mojang/serialization/Lifecycle;)Lnet/minecraft/world/level/storage/WorldData;"))
+    private static DynamicOps<Tag> bcl_onCreate(DynamicOps<Tag> dynamicOps) {
+        if (dynamicOps instanceof RegistryOps<Tag> regOps) {
+            LifeCycleAPI.worldCreationStarted(regOps);
+        }
+        return dynamicOps;
     }
+
 }

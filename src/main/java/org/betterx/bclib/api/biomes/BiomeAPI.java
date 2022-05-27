@@ -169,8 +169,7 @@ public class BiomeAPI {
      */
     public static void initRegistry(Registry<Biome> biomeRegistry) {
         if (biomeRegistry != BiomeAPI.biomeRegistry) {
-            System.out.println("Switching Registry to " + biomeRegistry);//17015, 19009, 19058, 19009
-            BiomeAPI.biomeRegistry = biomeRegistry;
+            BiomeAPI.biomeRegistry = biomeRegistry; //12819
             CLIENT.clear();
         }
     }

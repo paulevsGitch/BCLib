@@ -58,7 +58,7 @@ public abstract class WorldOpenFlowsMixin {
                                      RegistryAccess registryAccess,
                                      WorldGenSettings worldGenSettings,
                                      CallbackInfo ci) {
-        LifeCycleAPI.startingWorld(levelID, worldGenSettings, this.levelSource);
+        LifeCycleAPI.newWorldSetup(levelID, worldGenSettings, this.levelSource);
     }
 
     @Inject(method = "createLevelFromExistingSettings", at = @At("HEAD"))
