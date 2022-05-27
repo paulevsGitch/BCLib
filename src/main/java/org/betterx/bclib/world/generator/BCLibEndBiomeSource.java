@@ -19,13 +19,13 @@ import net.fabricmc.fabric.impl.biome.TheEndBiomeData;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import org.betterx.bclib.BCLib;
+import org.betterx.bclib.api.biomes.BCLBiome;
 import org.betterx.bclib.api.biomes.BiomeAPI;
 import org.betterx.bclib.config.ConfigKeeper.StringArrayEntry;
 import org.betterx.bclib.config.Configs;
 import org.betterx.bclib.interfaces.BiomeMap;
 import org.betterx.bclib.interfaces.TheEndBiomeDataAccessor;
 import org.betterx.bclib.noise.OpenSimplexNoise;
-import org.betterx.bclib.world.biomes.BCLBiome;
 import org.betterx.bclib.world.generator.map.hex.HexBiomeMap;
 import org.betterx.bclib.world.generator.map.square.SquareBiomeMap;
 

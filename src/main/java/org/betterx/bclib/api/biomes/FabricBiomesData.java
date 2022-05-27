@@ -1,4 +1,4 @@
-package org.betterx.bclib.world.biomes;
+package org.betterx.bclib.api.biomes;
 
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.biome.Biome;

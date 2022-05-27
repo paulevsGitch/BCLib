@@ -7,9 +7,9 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.WorldgenRandom;
 
 import com.google.common.collect.Lists;
+import org.betterx.bclib.api.biomes.BCLBiome;
 import org.betterx.bclib.util.WeighTree;
 import org.betterx.bclib.util.WeightedList;
-import org.betterx.bclib.world.biomes.BCLBiome;
 
 import java.util.HashMap;
 import java.util.List;

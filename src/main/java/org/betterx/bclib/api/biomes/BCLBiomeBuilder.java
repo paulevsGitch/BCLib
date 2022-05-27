@@ -35,8 +35,6 @@ import org.betterx.bclib.util.CollectionsUtil;
 import org.betterx.bclib.util.ColorUtil;
 import org.betterx.bclib.util.Pair;
 import org.betterx.bclib.util.TriFunction;
-import org.betterx.bclib.world.biomes.BCLBiome;
-import org.betterx.bclib.world.biomes.BCLBiomeSettings;
 import org.betterx.bclib.world.features.BCLFeature;
 import org.betterx.bclib.world.structures.BCLStructure;
 
@@ -56,7 +54,8 @@ public class BCLBiomeBuilder {
                                                                                                   -0.012);
 
     private final List<TagKey<Biome>> structureTags = new ArrayList<>(8);
-    private final List<Pair<GenerationStep.Carving, Holder<? extends ConfiguredWorldCarver<?>>>> carvers = new ArrayList<>(1);
+    private final List<Pair<GenerationStep.Carving, Holder<? extends ConfiguredWorldCarver<?>>>> carvers = new ArrayList<>(
+            1);
     private BiomeGenerationSettings.Builder generationSettings;
     private BiomeSpecialEffects.Builder effectsBuilder;
     private MobSpawnSettings.Builder spawnSettings;

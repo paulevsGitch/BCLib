@@ -52,9 +52,6 @@ import org.betterx.bclib.interfaces.SurfaceRuleProvider;
 import org.betterx.bclib.mixin.common.BiomeGenerationSettingsAccessor;
 import org.betterx.bclib.mixin.common.MobSpawnSettingsAccessor;
 import org.betterx.bclib.util.CollectionsUtil;
-import org.betterx.bclib.world.biomes.BCLBiome;
-import org.betterx.bclib.world.biomes.FabricBiomesData;
-import org.betterx.bclib.world.biomes.VanillaBiomeSettings;
 import org.betterx.bclib.world.features.BCLFeature;
 
 import java.util.List;
@@ -249,7 +246,7 @@ public class BiomeAPI {
     public static BCLBiome registerNetherBiome(BCLBiome bclBiome) {
         registerBiome(bclBiome, BiomeType.BCL_NETHER);
 
-        ResourceKey<Biome> key = BiomeAPI.getBiomeKeyOrThrow(bclBiome.getBiomeHolder());
+        ResourceKey<Biome> key = BiomeAPI.getBiomeKey(bclBiome.getBiome());
         if (bclBiome.allowFabricRegistration()) {
             bclBiome.forEachClimateParameter(p -> NetherBiomeData.addNetherBiome(key, p));
         }
@@ -329,7 +326,7 @@ public class BiomeAPI {
         registerBiome(biome, BiomeType.END_VOID);
 
         float weight = biome.getGenChance();
-        ResourceKey<Biome> key = BiomeAPI.getBiomeKeyOrThrow(biome.getBiomeHolder());
+        ResourceKey<Biome> key = BiomeAPI.getBiomeKey(biome.getBiome());
         if (biome.allowFabricRegistration()) {
             TheEndBiomeData.addEndBiomeReplacement(Biomes.SMALL_END_ISLANDS, key, weight);
         }
@@ -407,9 +404,13 @@ public class BiomeAPI {
      */
     @Nullable
     public static ResourceKey getBiomeKey(Biome biome) {
+        if (biomeRegistry != null) {
+            Optional<ResourceKey<Biome>> key = biomeRegistry.getResourceKey(biome);
+            if (key.isPresent()) return key.get();
+        }
         return BuiltinRegistries.BIOME
                 .getResourceKey(biome)
-                .orElseGet(() -> biomeRegistry != null ? biomeRegistry.getResourceKey(biome).orElse(null) : null);
+                .orElseGet(null);
     }
 
     /**
@@ -446,6 +447,26 @@ public class BiomeAPI {
 
     public static ResourceKey getBiomeKeyOrThrow(Holder<Biome> biome) {
         return biome.unwrapKey().orElseThrow();
+    }
+
+    public static Holder<Biome> getBiomeHolder(BCLBiome biome) {
+        return getBiomeHolder(biome.getBiome());
+    }
+
+    public static Holder<Biome> getBiomeHolder(Biome biome) {
+        if (biomeRegistry != null) {
+            Optional<ResourceKey<Biome>> key = biomeRegistry.getResourceKey(biome);
+            if (key.isPresent()) return biomeRegistry.getOrCreateHolderOrThrow(key.get());
+        }
+
+        return BuiltinRegistries.BIOME.getOrCreateHolderOrThrow(BiomeAPI.getBiomeKey(biome));
+    }
+
+    public static Holder<Biome> getBiomeHolder(ResourceLocation biome) {
+        if (biomeRegistry != null) {
+            return getBiomeHolder(biomeRegistry.get(biome));
+        }
+        return getBiomeHolder(BuiltinRegistries.BIOME.get(biome));
     }
 
     /**
@@ -607,8 +628,7 @@ public class BiomeAPI {
                                                                             .map(e -> e.getKey());
             if (s != null) {
                 s.forEach(id -> {
-                    BCLBiome b = BiomeAPI.getBiome(id);
-                    Holder<Biome> biomeHolder = b.getBiomeHolder();
+                    Holder<Biome> biomeHolder = BiomeAPI.getBiomeHolder(id);
                     if (biomeHolder.isBound()) {
                         mod.getValue().forEach(c -> c.accept(id, biomeHolder));
                     }

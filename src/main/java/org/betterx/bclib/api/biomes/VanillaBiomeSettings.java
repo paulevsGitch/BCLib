@@ -1,4 +1,4 @@
-package org.betterx.bclib.world.biomes;
+package org.betterx.bclib.api.biomes;
 
 
 public class VanillaBiomeSettings extends BCLBiomeSettings {

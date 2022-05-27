@@ -18,7 +18,10 @@ import org.betterx.bclib.api.surface.SurfaceRuleUtil;
 import org.betterx.bclib.api.tag.TagAPI;
 import org.betterx.bclib.util.WeightedList;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import org.jetbrains.annotations.Nullable;
@@ -182,10 +185,6 @@ public class BCLBiome extends BCLBiomeSettings {
         return biomeID;
     }
 
-
-    public Holder<Biome> getBiomeHolder() {
-        return BuiltinRegistries.BIOME.getOrCreateHolderOrThrow(BiomeAPI.getBiomeKey(biome));
-    }
 
     /**
      * Getter for biome from buil-in registry. For datapack biomes will be same as actual biome.
