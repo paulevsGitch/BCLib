@@ -28,6 +28,7 @@ import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import org.betterx.bclib.api.surface.SurfaceRuleBuilder;
 import org.betterx.bclib.entity.BCLEntityWrapper;
 import org.betterx.bclib.mixin.common.BiomeGenerationSettingsAccessor;
@@ -41,6 +42,7 @@ import org.betterx.bclib.world.structures.BCLStructure;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
@@ -53,7 +55,6 @@ public class BCLBiomeBuilder {
     private static final SurfaceRules.ConditionSource SURFACE_NOISE = SurfaceRules.noiseCondition(Noises.SOUL_SAND_LAYER,
                                                                                                   -0.012);
 
-    private final List<TagKey<Biome>> structureTags = new ArrayList<>(8);
     private final List<Pair<GenerationStep.Carving, Holder<? extends ConfiguredWorldCarver<?>>>> carvers = new ArrayList<>(
             1);
     private BiomeGenerationSettings.Builder generationSettings;
@@ -62,6 +63,8 @@ public class BCLBiomeBuilder {
     private SurfaceRules.RuleSource surfaceRule;
     private Precipitation precipitation;
     private ResourceLocation biomeID;
+
+    private Set<TagKey<Biome>> tags = Sets.newHashSet();
 
     private final List<Climate.ParameterPoint> parameters = Lists.newArrayList();
 
@@ -88,7 +91,6 @@ public class BCLBiomeBuilder {
         INSTANCE.generationSettings = null;
         INSTANCE.effectsBuilder = null;
         INSTANCE.spawnSettings = null;
-        INSTANCE.structureTags.clear();
         INSTANCE.temperature = 1.0F;
         INSTANCE.fogDensity = 1.0F;
         INSTANCE.edgeSize = 0;
@@ -99,6 +101,7 @@ public class BCLBiomeBuilder {
         INSTANCE.edge = null;
         INSTANCE.carvers.clear();
         INSTANCE.parameters.clear();
+        INSTANCE.tags.clear();
         return INSTANCE;
     }
 
@@ -590,7 +593,7 @@ public class BCLBiomeBuilder {
      * @return same {@link BCLBiomeBuilder} instance.
      */
     public BCLBiomeBuilder structure(TagKey<Biome> structureTag) {
-        structureTags.add(structureTag);
+        tags.add(structureTag);
         return this;
     }
 
@@ -667,6 +670,13 @@ public class BCLBiomeBuilder {
      */
     public BCLBiomeBuilder surface(SurfaceRules.RuleSource newSurfaceRule) {
         this.surfaceRule = newSurfaceRule;
+        return this;
+    }
+
+    public BCLBiomeBuilder tag(TagKey<Biome>... tag) {
+        for (TagKey<Biome> t : tag) {
+            tags.add(t);
+        }
         return this;
     }
 
@@ -755,7 +765,7 @@ public class BCLBiomeBuilder {
 
         final Biome biome = builder.build();
         final T res = biomeConstructor.apply(biomeID, biome, settings);
-        res.attachStructures(structureTags);
+        res.addBiomeTags(tags);
         res.setSurface(surfaceRule);
         res.addClimateParameters(parameters);
 

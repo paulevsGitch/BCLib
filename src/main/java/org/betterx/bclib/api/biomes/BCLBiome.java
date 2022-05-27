@@ -27,7 +27,7 @@ import java.util.function.Consumer;
 import org.jetbrains.annotations.Nullable;
 
 public class BCLBiome extends BCLBiomeSettings {
-    private final Set<TagKey<Biome>> structureTags = Sets.newHashSet();
+    private final Set<TagKey<Biome>> biomeTags = Sets.newHashSet();
     private final WeightedList<BCLBiome> subbiomes = new WeightedList<>();
     private final Map<String, Object> customData = Maps.newHashMap();
     private final ResourceLocation biomeID;
@@ -200,7 +200,7 @@ public class BCLBiome extends BCLBiomeSettings {
      */
     void afterRegistration() {
         ResourceKey<Biome> key = BuiltinRegistries.BIOME.getResourceKey(getBiome()).orElseThrow();
-        this.structureTags.forEach(tagKey -> TagAPI.addBiomeTag(tagKey, biome));
+        this.biomeTags.forEach(tagKey -> TagAPI.addBiomeTag(tagKey, biome));
 
         if (this.surfaceInit != null) {
             surfaceInit.accept(key);
@@ -280,8 +280,8 @@ public class BCLBiome extends BCLBiomeSettings {
      * Adds structures to this biome. For internal use only.
      * Used inside {@link BCLBiomeBuilder}.
      */
-    void attachStructures(List<TagKey<Biome>> structures) {
-        structureTags.addAll(structures);
+    void addBiomeTags(Set<TagKey<Biome>> tags) {
+        biomeTags.addAll(tags);
     }
 
     /**

@@ -169,6 +169,7 @@ public class BiomeAPI {
      */
     public static void initRegistry(Registry<Biome> biomeRegistry) {
         if (biomeRegistry != BiomeAPI.biomeRegistry) {
+            System.out.println("Switching Registry to " + biomeRegistry);//17015, 19009, 19058, 19009
             BiomeAPI.biomeRegistry = biomeRegistry;
             CLIENT.clear();
         }
@@ -420,11 +421,20 @@ public class BiomeAPI {
      * @return biome {@link ResourceLocation}.
      */
     public static ResourceLocation getBiomeID(Biome biome) {
-        ResourceLocation id = BuiltinRegistries.BIOME.getKey(biome);
-        if (id == null && biomeRegistry != null) {
+        ResourceLocation id = null;
+        if (biomeRegistry != null) {
             id = biomeRegistry.getKey(biome);
         }
-        return id == null ? EMPTY_BIOME.getID() : id;
+        if (id == null) {
+            id = BuiltinRegistries.BIOME.getKey(biome);
+        }
+
+        if (id == null) {
+            BCLib.LOGGER.error("Unable to get ID for " + biome + ". Falling back to empty Biome...");
+            id = EMPTY_BIOME.getID();
+        }
+
+        return id;
     }
 
     /**
