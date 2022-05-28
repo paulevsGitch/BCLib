@@ -4,11 +4,13 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
+import net.minecraft.world.level.levelgen.RandomState;
 import net.minecraft.world.level.levelgen.WorldGenSettings;
 import net.minecraft.world.level.levelgen.structure.StructureSet;
 import net.minecraft.world.level.levelgen.synth.NormalNoise;
@@ -115,5 +117,15 @@ public class BCLChunkGenerator extends NoiseBasedChunkGenerator {
     @Override
     public String toString() {
         return "BCLib - Chunk Generator (" + Integer.toHexString(hashCode()) + ")";
+    }
+
+    public static RandomState createRandomState(ServerLevel level, ChunkGenerator generator) {
+        if (generator instanceof NoiseBasedChunkGenerator noiseBasedChunkGenerator) {
+            return RandomState.create(noiseBasedChunkGenerator.generatorSettings().value(),
+                    level.registryAccess().registryOrThrow(Registry.NOISE_REGISTRY),
+                    level.getSeed());
+        } else {
+            return RandomState.create(level.registryAccess(), NoiseGeneratorSettings.OVERWORLD, level.getSeed());
+        }
     }
 }

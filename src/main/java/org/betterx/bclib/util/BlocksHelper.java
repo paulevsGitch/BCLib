@@ -17,7 +17,9 @@ import net.minecraft.world.level.block.state.properties.Property;
 import com.google.common.collect.Maps;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
+import java.util.function.Predicate;
 
 public class BlocksHelper {
     private static final Map<Block, Integer> COLOR_BY_BLOCK = Maps.newHashMap();
@@ -200,5 +202,17 @@ public class BlocksHelper {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    public static Optional<BlockPos> findSurface(LevelAccessor level,
+                                                 BlockPos startPos,
+                                                 int minY,
+                                                 Predicate<BlockState> surface) {
+        final MutableBlockPos POS = new MutableBlockPos(startPos.getX(), startPos.getY(), startPos.getZ());
+        for (int y = startPos.getY(); y >= minY; y--) {
+            POS.setY(y);
+            if (surface.test(level.getBlockState(POS))) return Optional.of(POS);
+        }
+        return Optional.empty();
     }
 }

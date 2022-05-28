@@ -37,6 +37,7 @@ public class HexBiomeMap implements BiomeMap {
         this.picker = picker;
         this.scale = HexBiomeChunk.scaleMap(size);
         Random random = new Random(seed);
+
         noises[0] = new OpenSimplexNoise(random.nextInt());
         noises[1] = new OpenSimplexNoise(random.nextInt());
         noiseIterations = (byte) Math.min(Math.ceil(Math.log(scale) / Math.log(2)), 5);

@@ -132,8 +132,24 @@ public class BCLFeatureBuilder<FC extends FeatureConfiguration, F extends Featur
         return modifier(InSquarePlacement.spread());
     }
 
+    public BCLFeatureBuilder distanceToTopAndBottom10() {
+        return modifier(PlacementUtils.RANGE_10_10);
+    }
+
+    public BCLFeatureBuilder distanceToTopAndBottom4() {
+        return modifier(PlacementUtils.RANGE_4_4);
+    }
+
     public BCLFeatureBuilder heightmap() {
         return modifier(PlacementUtils.HEIGHTMAP);
+    }
+
+    public BCLFeatureBuilder heightmapTopSolid() {
+        return modifier(PlacementUtils.HEIGHTMAP_TOP_SOLID);
+    }
+
+    public BCLFeatureBuilder heightmapWorldSurface() {
+        return modifier(PlacementUtils.HEIGHTMAP_WORLD_SURFACE);
     }
 
     /**
@@ -142,7 +158,7 @@ public class BCLFeatureBuilder<FC extends FeatureConfiguration, F extends Featur
      * @param configuration any {@link FeatureConfiguration} for provided {@link Feature}.
      * @return created {@link BCLFeature} instance.
      */
-    public BCLFeature build(FC configuration) {
+    public BCLFeature buildAndRegister(FC configuration) {
         PlacementModifier[] modifiers = modifications.toArray(new PlacementModifier[modifications.size()]);
         return new BCLFeature(featureID, feature, decoration, configuration, modifiers);
     }
@@ -153,7 +169,17 @@ public class BCLFeatureBuilder<FC extends FeatureConfiguration, F extends Featur
      *
      * @return created {@link BCLFeature} instance.
      */
+    public BCLFeature buildAndRegister() {
+        return buildAndRegister((FC) FeatureConfiguration.NONE);
+    }
+
+    @Deprecated(forRemoval = true)
+    public BCLFeature build(FC configuration) {
+        return buildAndRegister(configuration);
+    }
+
+    @Deprecated(forRemoval = true)
     public BCLFeature build() {
-        return build((FC) FeatureConfiguration.NONE);
+        return buildAndRegister();
     }
 }

@@ -40,7 +40,12 @@ public class BCLCommonFeatures {
                                                    int density,
                                                    boolean allHeight) {
         if (allHeight) {
-            return BCLFeatureBuilder.start(id, feature).countLayers(density).squarePlacement().onlyInBiome().build();
+            return BCLFeatureBuilder
+                    .start(id, feature)
+                    .countLayers(density)
+                    .squarePlacement()
+                    .onlyInBiome()
+                    .buildAndRegister();
         } else {
             return BCLFeatureBuilder
                     .start(id, feature)
@@ -48,7 +53,7 @@ public class BCLCommonFeatures {
                     .squarePlacement()
                     .heightmap()
                     .onlyInBiome()
-                    .build();
+                    .buildAndRegister();
         }
     }
 
@@ -63,7 +68,7 @@ public class BCLCommonFeatures {
     public static BCLFeature makeChunkFeature(ResourceLocation id,
                                               Decoration decoration,
                                               Feature<NoneFeatureConfiguration> feature) {
-        return BCLFeatureBuilder.start(id, feature).decoration(decoration).count(1).onlyInBiome().build();
+        return BCLFeatureBuilder.start(id, feature).decoration(decoration).count(1).onlyInBiome().buildAndRegister();
     }
 
     /**
@@ -84,7 +89,7 @@ public class BCLCommonFeatures {
                                 .oncePerChunks(chance)
                                 .squarePlacement()
                                 .onlyInBiome()
-                                .build();
+                                .buildAndRegister();
     }
 
     /**
@@ -105,7 +110,7 @@ public class BCLCommonFeatures {
                                 .count(count)
                                 .squarePlacement()
                                 .onlyInBiome()
-                                .build();
+                                .buildAndRegister();
     }
 
     /**
@@ -140,7 +145,7 @@ public class BCLCommonFeatures {
 
         builder.modifier(placement).squarePlacement().onlyInBiome();
 
-        return builder.build(new OreConfiguration(
+        return builder.buildAndRegister(new OreConfiguration(
                 new BlockMatchTest(hostBlock),
                 blockOre.defaultBlockState(),
                 veinSize,

@@ -8,7 +8,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonReader;
-import org.apache.logging.log4j.LogManager;
 import org.betterx.bclib.BCLib;
 
 import java.io.IOException;
@@ -48,7 +47,6 @@ public class ModUtil {
         if (mods != null) return mods;
 
         mods = new HashMap<>();
-        org.apache.logging.log4j.Logger logger = LogManager.getFormatterLogger("BCLib|ModLoader");
         PathUtil.fileWalker(PathUtil.MOD_FOLDER.toFile(), false, (ModUtil::accept));
 
         return mods;
