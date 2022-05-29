@@ -1,5 +1,6 @@
 package org.betterx.bclib.api.tag;
 
+import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
 
@@ -26,4 +27,16 @@ public class CommonBlockTags {
     public static final TagKey<Block> MINABLE_WITH_HAMMER = TagAPI.makeCommonBlockTag("mineable/hammer");
 
     public static final TagKey<Block> IS_OBSIDIAN = TagAPI.makeCommonBlockTag("is_obsidian");
+    public static final TagKey<Block> STALAGMITE_REPLACEABLE = TagAPI.makeCommonBlockTag("stalagmite_replaceable_blocks");
+
+    static {
+        TagAPI.BLOCKS.addOtherTags(STALAGMITE_REPLACEABLE,
+                BlockTags.DRIPSTONE_REPLACEABLE,
+                BlockTags.BASE_STONE_NETHER,
+                BlockTags.BASE_STONE_OVERWORLD,
+                NETHER_STONES,
+                SOUL_GROUND,
+                NETHER_MYCELIUM,
+                END_STONES);
+    }
 }

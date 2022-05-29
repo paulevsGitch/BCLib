@@ -29,8 +29,8 @@ public class TagAPI {
     public static TagType.RegistryBacked<Block> BLOCKS = registerType(Registry.BLOCK);
     public static TagType.RegistryBacked<Item> ITEMS = registerType(Registry.ITEM);
     public static TagType.Simple<Biome> BIOMES = registerType(Registry.BIOME_REGISTRY,
-                                                              "tags/worldgen/biome",
-                                                              b -> BiomeAPI.getBiomeID(b));
+            "tags/worldgen/biome",
+            b -> BiomeAPI.getBiomeID(b));
 
     public static <T> TagType.RegistryBacked<T> registerType(DefaultedRegistry<T> registry) {
         TagType<T> type = new TagType.RegistryBacked<>(registry);
@@ -45,9 +45,9 @@ public class TagAPI {
                                                      String directory,
                                                      Function<T, ResourceLocation> locationProvider) {
         return (TagType.Simple<T>) TYPES.computeIfAbsent(directory,
-                                                         (dir) -> new TagType.Simple<>(registry,
-                                                                                       dir,
-                                                                                       locationProvider));
+                (dir) -> new TagType.Simple<>(registry,
+                        dir,
+                        locationProvider));
     }
 
     public static <T> TagType.UnTyped<T> registerType(ResourceKey<? extends Registry<T>> registry, String directory) {
@@ -240,19 +240,6 @@ public class TagAPI {
         if (type != null) {
             type.apply(tagsMap);
         }
-
-//		final BiConsumer<ResourceLocation, Set<ResourceLocation>> consumer;
-//		consumer = (id, ids) -> apply(tagsMap.computeIfAbsent(id, key -> Tag.Builder.tag()), ids);
-//
-//		if ("tags/blocks".equals(directory)) {
-//			TAGS_BLOCK.forEach(consumer);
-//		}
-//		else if ("tags/items".equals(directory)) {
-//			TAGS_ITEM.forEach(consumer);
-//		}
-//		else if ("tags/worldgen/biome".equals(directory)) {
-//			TAGS_BIOME.forEach(consumer);
-//		}
         return tagsMap;
     }
 

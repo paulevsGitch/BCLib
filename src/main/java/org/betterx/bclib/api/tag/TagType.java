@@ -39,7 +39,7 @@ public class TagType<T> {
                         }
                         return null;
                     }
-                 );
+            );
             this.registry = registry;
         }
 
@@ -144,6 +144,33 @@ public class TagType<T> {
     public void addUntyped(ResourceLocation element, TagKey<T>... tagIDs) {
         for (TagKey<T> tagID : tagIDs) {
             addUntyped(tagID, element);
+        }
+    }
+
+    public void addOtherTags(TagKey<T> tagID, TagKey<T>... tags) {
+        if (isFrozen) BCLib.LOGGER.warning("Adding Tag " + tagID + " after the API was frozen.");
+        Set<ResourceLocation> set = getSetForTag(tagID);
+        for (TagKey<T> tag : tags) {
+            ResourceLocation id = tag.location();
+            if (id != null) {
+                set.add(id);
+            }
+        }
+    }
+
+    /**
+     * Adds one Tag to multiple Elements.
+     *
+     * @param tagID     {@link TagKey< Biome >} tag ID.
+     * @param locations array of Elements to add into tag.
+     */
+    protected void addUnchecked(TagKey<T> tagID, ResourceLocation... locations) {
+        if (isFrozen) BCLib.LOGGER.warning("Adding Tag " + tagID + " after the API was frozen.");
+        Set<ResourceLocation> set = getSetForTag(tagID);
+        for (ResourceLocation id : locations) {
+            if (id != null) {
+                set.add(id);
+            }
         }
     }
 
