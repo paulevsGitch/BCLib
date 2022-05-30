@@ -2,6 +2,7 @@ package org.betterx.bclib.api.tag;
 
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Blocks;
 
 public class CommonItemTags {
     public final static TagKey<Item> HAMMERS = TagAPI.makeCommonItemTag("hammers");
@@ -16,4 +17,8 @@ public class CommonItemTags {
     public static final TagKey<Item> WOODEN_BARREL = TagAPI.makeCommonItemTag("wooden_barrels");
     public static final TagKey<Item> WOODEN_CHEST = TagAPI.makeCommonItemTag("wooden_chests");
     public static final TagKey<Item> WORKBENCHES = TagAPI.makeCommonItemTag("workbench");
+
+    static {
+        TagAPI.ITEMS.add(SOUL_GROUND, Blocks.SOUL_SAND.asItem(), Blocks.SOUL_SOIL.asItem());
+    }
 }

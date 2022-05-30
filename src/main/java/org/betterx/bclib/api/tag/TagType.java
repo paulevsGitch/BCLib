@@ -89,7 +89,7 @@ public class TagType<T> {
     }
 
     public final String directory;
-    private final Map<ResourceLocation, Set<ResourceLocation>> tags = Maps.newConcurrentMap();
+    private final Map<ResourceLocation, Set<TagEntry>> tags = Maps.newConcurrentMap();
     public final ResourceKey<? extends Registry<T>> registryKey;
     private final Function<T, ResourceLocation> locationProvider;
 
@@ -101,11 +101,11 @@ public class TagType<T> {
         this.locationProvider = locationProvider;
     }
 
-    public Set<ResourceLocation> getSetForTag(ResourceLocation tagID) {
+    public Set<TagEntry> getSetForTag(ResourceLocation tagID) {
         return tags.computeIfAbsent(tagID, k -> Sets.newHashSet());
     }
 
-    public Set<ResourceLocation> getSetForTag(TagKey<T> tag) {
+    public Set<TagEntry> getSetForTag(TagKey<T> tag) {
         return getSetForTag(tag.location());
     }
 
@@ -133,10 +133,10 @@ public class TagType<T> {
 
     public void addUntyped(TagKey<T> tagID, ResourceLocation... elements) {
         if (isFrozen) BCLib.LOGGER.warning("Adding Tag " + tagID + " after the API was frozen.");
-        Set<ResourceLocation> set = getSetForTag(tagID);
+        Set<TagEntry> set = getSetForTag(tagID);
         for (ResourceLocation id : elements) {
             if (id != null) {
-                set.add(id);
+                set.add(TagEntry.element(id));
             }
         }
     }
@@ -149,27 +149,11 @@ public class TagType<T> {
 
     public void addOtherTags(TagKey<T> tagID, TagKey<T>... tags) {
         if (isFrozen) BCLib.LOGGER.warning("Adding Tag " + tagID + " after the API was frozen.");
-        Set<ResourceLocation> set = getSetForTag(tagID);
+        Set<TagEntry> set = getSetForTag(tagID);
         for (TagKey<T> tag : tags) {
             ResourceLocation id = tag.location();
             if (id != null) {
-                set.add(id);
-            }
-        }
-    }
-
-    /**
-     * Adds one Tag to multiple Elements.
-     *
-     * @param tagID     {@link TagKey< Biome >} tag ID.
-     * @param locations array of Elements to add into tag.
-     */
-    protected void addUnchecked(TagKey<T> tagID, ResourceLocation... locations) {
-        if (isFrozen) BCLib.LOGGER.warning("Adding Tag " + tagID + " after the API was frozen.");
-        Set<ResourceLocation> set = getSetForTag(tagID);
-        for (ResourceLocation id : locations) {
-            if (id != null) {
-                set.add(id);
+                set.add(TagEntry.tag(id));
             }
         }
     }
@@ -182,11 +166,11 @@ public class TagType<T> {
      */
     protected void add(TagKey<T> tagID, T... elements) {
         if (isFrozen) BCLib.LOGGER.warning("Adding Tag " + tagID + " after the API was frozen.");
-        Set<ResourceLocation> set = getSetForTag(tagID);
+        Set<TagEntry> set = getSetForTag(tagID);
         for (T element : elements) {
             ResourceLocation id = locationProvider.apply(element);
             if (id != null) {
-                set.add(id);
+                set.add(TagEntry.element(id));
             }
         }
     }
@@ -200,11 +184,11 @@ public class TagType<T> {
     @Deprecated(forRemoval = true)
     protected void add(ResourceLocation tagID, T... elements) {
         if (isFrozen) BCLib.LOGGER.warning("Adding Tag " + tagID + " after the API was frozen.");
-        Set<ResourceLocation> set = getSetForTag(tagID);
+        Set<TagEntry> set = getSetForTag(tagID);
         for (T element : elements) {
             ResourceLocation id = locationProvider.apply(element);
             if (id != null) {
-                set.add(id);
+                set.add(TagEntry.element(id));
             }
         }
     }
@@ -216,20 +200,20 @@ public class TagType<T> {
         }
     }
 
-    public void forEach(BiConsumer<ResourceLocation, Set<ResourceLocation>> consumer) {
+    public void forEach(BiConsumer<ResourceLocation, Set<TagEntry>> consumer) {
         tags.forEach(consumer);
     }
 
     public void apply(Map<ResourceLocation, List<TagLoader.EntryWithSource>> tagsMap) {
-        if (Registry.BIOME_REGISTRY.equals(registryKey)) BiomeAPI._runTagAdders();
+        if (Registry.BIOME_REGISTRY.equals(registryKey)) BiomeAPI._runBiomeTagAdders();
 
         //this.isFrozen = true;
         this.forEach((id, ids) -> apply(tagsMap.computeIfAbsent(id, key -> Lists.newArrayList()), ids));
     }
 
     private static List<TagLoader.EntryWithSource> apply(List<TagLoader.EntryWithSource> builder,
-                                                         Set<ResourceLocation> ids) {
-        ids.forEach(value -> builder.add(new TagLoader.EntryWithSource(TagEntry.element(value), BCLib.MOD_ID)));
+                                                         Set<TagEntry> ids) {
+        ids.forEach(value -> builder.add(new TagLoader.EntryWithSource(value, BCLib.MOD_ID)));
         return builder;
     }
 }
