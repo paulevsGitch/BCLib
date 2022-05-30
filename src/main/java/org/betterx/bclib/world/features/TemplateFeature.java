@@ -40,6 +40,6 @@ public class TemplateFeature<FC extends TemplateFeatureConfig> extends Feature<F
 
     @Override
     public boolean place(FeaturePlaceContext<FC> ctx) {
-        return ctx.config().structure.generate(ctx.level(), ctx.origin(), ctx.random());
+        return ctx.config().structure.generateInRandomOrientation(ctx.level(), ctx.origin(), ctx.random());
     }
 }

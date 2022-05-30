@@ -16,10 +16,12 @@ import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 
+import com.google.common.collect.Maps;
 import org.betterx.bclib.BCLib;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Map;
 
 public class StructureNBT {
     public final ResourceLocation location;
@@ -27,7 +29,7 @@ public class StructureNBT {
     protected Mirror mirror = Mirror.NONE;
     protected Rotation rotation = Rotation.NONE;
 
-    public StructureNBT(ResourceLocation location) {
+    protected StructureNBT(ResourceLocation location) {
         this.location = location;
         this.structure = readStructureFromJar(location);
     }
@@ -35,6 +37,12 @@ public class StructureNBT {
     protected StructureNBT(ResourceLocation location, StructureTemplate structure) {
         this.location = location;
         this.structure = structure;
+    }
+
+    private static final Map<ResourceLocation, StructureNBT> STRUCTURE_CACHE = Maps.newHashMap();
+
+    public static StructureNBT create(ResourceLocation location) {
+        return STRUCTURE_CACHE.computeIfAbsent(location, r -> new StructureNBT(r));
     }
 
     public StructureNBT setRotation(Rotation rotation) {
@@ -81,7 +89,13 @@ public class StructureNBT {
         return true;
     }
 
+    private static final Map<ResourceLocation, StructureTemplate> READER_CACHE = Maps.newHashMap();
+
     private static StructureTemplate readStructureFromJar(ResourceLocation resource) {
+        return READER_CACHE.computeIfAbsent(resource, r -> _readStructureFromJar(r));
+    }
+
+    private static StructureTemplate _readStructureFromJar(ResourceLocation resource) {
         String ns = resource.getNamespace();
         String nm = resource.getPath();
 

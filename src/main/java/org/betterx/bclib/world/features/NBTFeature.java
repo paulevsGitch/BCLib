@@ -29,6 +29,7 @@ import org.betterx.bclib.world.processors.DestructionStructureProcessor;
 import java.io.IOException;
 import java.io.InputStream;
 
+//TODO: 1.19 Check if we can merge this with the new TemplateFeature!
 public abstract class NBTFeature extends DefaultFeature {
     private final BlockState defaultBlock;
 
@@ -107,7 +108,7 @@ public abstract class NBTFeature extends DefaultFeature {
                 mirror,
                 rotation,
                 BlockPos.ZERO
-                                                     );
+        );
         center = center.offset(0, getYOffset(structure, world, center, random) + 0.5, 0);
 
         BoundingBox bounds = makeBox(center);

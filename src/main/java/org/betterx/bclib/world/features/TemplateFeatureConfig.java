@@ -31,6 +31,6 @@ public class TemplateFeatureConfig implements FeatureConfiguration {
     public final StructureWorldNBT structure;
 
     public TemplateFeatureConfig(ResourceLocation location, int offsetY, StructurePlacementType type) {
-        structure = new StructureWorldNBT(location, offsetY, type);
+        structure = StructureWorldNBT.create(location, offsetY, type);
     }
 }
