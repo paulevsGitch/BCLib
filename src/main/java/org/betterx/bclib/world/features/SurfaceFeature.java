@@ -32,14 +32,14 @@ public abstract class SurfaceFeature<T extends FeatureConfiguration> extends Fea
 
     @Override
     public boolean place(FeaturePlaceContext<T> ctx) {
-        Optional<BlockPos> pos = BlocksHelper.findSurface(ctx.level(),
+        Optional<BlockPos> pos = BlocksHelper.findSurfaceBelow(ctx.level(),
                 ctx.origin(),
                 minHeight(ctx),
                 this::isValidSurface);
         if (pos.isPresent()) {
             int y2 = ctx.level().getHeight(Heightmap.Types.WORLD_SURFACE_WG, ctx.origin().getX(), ctx.origin().getZ());
             int y3 = ctx.level().getHeight(Heightmap.Types.WORLD_SURFACE, ctx.origin().getX(), ctx.origin().getZ());
-            System.out.println("Surfaces:" + pos.get().getY() + ", " + y2 + ", " + y3);
+            System.out.println("Surfaces:" + pos.get().getY() + ", " + y2 + ", " + y3 + ", " + ctx.origin().getY());
 
             generate(pos.get(), ctx);
             return true;

@@ -15,6 +15,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.BiomeGenerationSettings;
 import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.biome.MobSpawnSettings.SpawnerData;
@@ -38,6 +39,7 @@ import com.google.common.base.Suppliers;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.betterx.bclib.BCLib;
 import org.betterx.bclib.api.tag.CommonBiomeTags;
@@ -129,11 +131,11 @@ public class BiomeAPI {
 
     public static final BCLBiome THE_END = registerEndLandBiome(getFromRegistry(Biomes.THE_END));
     public static final BCLBiome END_MIDLANDS = registerSubBiome(THE_END,
-                                                                 getFromRegistry(Biomes.END_MIDLANDS).value(),
-                                                                 0.5F);
+            getFromRegistry(Biomes.END_MIDLANDS).value(),
+            0.5F);
     public static final BCLBiome END_HIGHLANDS = registerSubBiome(THE_END,
-                                                                  getFromRegistry(Biomes.END_HIGHLANDS).value(),
-                                                                  0.5F);
+            getFromRegistry(Biomes.END_HIGHLANDS).value(),
+            0.5F);
 
     public static final BCLBiome END_BARRENS = registerEndVoidBiome(getFromRegistry(new ResourceLocation("end_barrens")));
     public static final BCLBiome SMALL_END_ISLANDS = registerEndVoidBiome(getFromRegistry(new ResourceLocation(
@@ -216,15 +218,15 @@ public class BiomeAPI {
 
     public static BCLBiome registerSubBiome(BCLBiome parent, BCLBiome subBiome) {
         return registerSubBiome(parent,
-                                subBiome,
-                                BiomeType.BIOME_TYPE_MAP.getOrDefault(parent.getID(), BiomeType.NONE));
+                subBiome,
+                BiomeType.BIOME_TYPE_MAP.getOrDefault(parent.getID(), BiomeType.NONE));
     }
 
     public static BCLBiome registerSubBiome(BCLBiome parent, Biome subBiome, float genChance) {
         return registerSubBiome(parent,
-                                subBiome,
-                                genChance,
-                                BiomeType.BIOME_TYPE_MAP.getOrDefault(parent.getID(), BiomeType.NONE));
+                subBiome,
+                genChance,
+                BiomeType.BIOME_TYPE_MAP.getOrDefault(parent.getID(), BiomeType.NONE));
     }
 
     public static BCLBiome registerSubBiome(BCLBiome parent, BCLBiome subBiome, BiomeType dim) {
@@ -312,7 +314,7 @@ public class BiomeAPI {
      */
     public static BCLBiome registerEndLandBiome(Holder<Biome> biome, float genChance) {
         BCLBiome bclBiome = new BCLBiome(biome.value(),
-                                         VanillaBiomeSettings.createVanilla().setGenChance(genChance).build());
+                VanillaBiomeSettings.createVanilla().setGenChance(genChance).build());
 
         registerBiome(bclBiome, BiomeType.OTHER_END_LAND);
         return bclBiome;
@@ -360,7 +362,7 @@ public class BiomeAPI {
      */
     public static BCLBiome registerEndVoidBiome(Holder<Biome> biome, float genChance) {
         BCLBiome bclBiome = new BCLBiome(biome.value(),
-                                         VanillaBiomeSettings.createVanilla().setGenChance(genChance).build());
+                VanillaBiomeSettings.createVanilla().setGenChance(genChance).build());
 
         registerBiome(bclBiome, BiomeType.END_VOID);
         return bclBiome;
@@ -601,7 +603,7 @@ public class BiomeAPI {
     public static void registerBiomeModification(ResourceKey<LevelStem> dimensionID,
                                                  BiConsumer<ResourceLocation, Holder<Biome>> modification) {
         List<BiConsumer<ResourceLocation, Holder<Biome>>> modifications = MODIFICATIONS.computeIfAbsent(dimensionID,
-                                                                                                        k -> Lists.newArrayList());
+                k -> Lists.newArrayList());
         modifications.add(modification);
     }
 
@@ -635,7 +637,7 @@ public class BiomeAPI {
     /**
      * For internal use only
      */
-    public static void _runTagAdders() {
+    public static void _runBiomeTagAdders() {
         for (var mod : TAG_ADDERS.entrySet()) {
             Stream<ResourceLocation> s = null;
             if (mod.getKey() == Level.NETHER) s = BiomeType.BIOME_TYPE_MAP.entrySet()
@@ -667,7 +669,7 @@ public class BiomeAPI {
     public static void onFinishingBiomeTags(ResourceKey dimensionID,
                                             BiConsumer<ResourceLocation, Holder<Biome>> modification) {
         List<BiConsumer<ResourceLocation, Holder<Biome>>> modifications = TAG_ADDERS.computeIfAbsent(dimensionID,
-                                                                                                     k -> Lists.newArrayList());
+                k -> Lists.newArrayList());
         modifications.add(modification);
     }
 
@@ -718,9 +720,9 @@ public class BiomeAPI {
         }
 
         List<BiConsumer<ResourceLocation, Holder<Biome>>> modifications = MODIFICATIONS.get(level
-                                                                                                    .dimensionTypeRegistration()
-                                                                                                    .unwrapKey()
-                                                                                                    .orElseThrow());
+                .dimensionTypeRegistration()
+                .unwrapKey()
+                .orElseThrow());
         for (Holder<Biome> biomeHolder : biomes) {
             if (biomeHolder.isBound()) {
                 applyModificationsAndUpdateFeatures(modifications, biomeHolder);
@@ -773,16 +775,16 @@ public class BiomeAPI {
      * @param biome The {@link Biome} to sort the features for
      */
     public static void sortBiomeFeatures(Holder<Biome> biome) {
-//        BiomeGenerationSettings settings = biome.value().getGenerationSettings();
-//        BiomeGenerationSettingsAccessor accessor = (BiomeGenerationSettingsAccessor) settings;
-//        List<HolderSet<PlacedFeature>> featureList = CollectionsUtil.getMutable(accessor.bclib_getFeatures());
-//        final int size = featureList.size();
-//        for (int i = 0; i < size; i++) {
-//            List<Holder<PlacedFeature>> features = getFeaturesListCopy(featureList, i);
-//            sortFeatures(features);
-//            featureList.set(i, HolderSet.direct(features));
-//        }
-//        accessor.bclib_setFeatures(featureList);
+        BiomeGenerationSettings settings = biome.value().getGenerationSettings();
+        BiomeGenerationSettingsAccessor accessor = (BiomeGenerationSettingsAccessor) settings;
+        List<HolderSet<PlacedFeature>> featureList = CollectionsUtil.getMutable(accessor.bclib_getFeatures());
+        final int size = featureList.size();
+        for (int i = 0; i < size; i++) {
+            List<Holder<PlacedFeature>> features = getFeaturesListCopy(featureList, i);
+            sortFeatures(features);
+            featureList.set(i, HolderSet.direct(features));
+        }
+        accessor.bclib_setFeatures(featureList);
     }
 
     /**
@@ -930,25 +932,25 @@ public class BiomeAPI {
     }
 
     private static void sortFeatures(List<Holder<PlacedFeature>> features) {
-//        initFeatureOrder();
-//
-//        Set<Holder<PlacedFeature>> featuresWithoutDuplicates = Sets.newHashSet();
-//        features.forEach(holder -> featuresWithoutDuplicates.add(holder));
-//
-//        if (featuresWithoutDuplicates.size() != features.size()) {
-//            features.clear();
-//            featuresWithoutDuplicates.forEach(feature -> features.add(feature));
-//        }
-//
-//        features.forEach(feature -> {
-//            FEATURE_ORDER.computeIfAbsent(feature, f -> FEATURE_ORDER_ID.getAndIncrement());
-//        });
-//
-//        features.sort((f1, f2) -> {
-//            int v1 = FEATURE_ORDER.getOrDefault(f1, 70000);
-//            int v2 = FEATURE_ORDER.getOrDefault(f2, 70000);
-//            return Integer.compare(v1, v2);
-//        });
+        initFeatureOrder();
+
+        Set<Holder<PlacedFeature>> featuresWithoutDuplicates = Sets.newHashSet();
+        features.forEach(holder -> featuresWithoutDuplicates.add(holder));
+
+        if (featuresWithoutDuplicates.size() != features.size()) {
+            features.clear();
+            featuresWithoutDuplicates.forEach(feature -> features.add(feature));
+        }
+
+        features.forEach(feature -> {
+            FEATURE_ORDER.computeIfAbsent(feature, f -> FEATURE_ORDER_ID.getAndIncrement());
+        });
+
+        features.sort((f1, f2) -> {
+            int v1 = FEATURE_ORDER.getOrDefault(f1, 70000);
+            int v2 = FEATURE_ORDER.getOrDefault(f2, 70000);
+            return Integer.compare(v1, v2);
+        });
     }
 
 

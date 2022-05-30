@@ -59,7 +59,8 @@ public class BCLStructure<S extends Structure> {
         return structure(tagKey, Map.of(), decoration, terrainAdjustment);
     }
 
-    private static <S extends Structure> StructureType<S> registerStructureType(ResourceLocation id, Codec<S> codec) {
+    private static <S extends Structure> StructureType<S> registerStructureType(ResourceLocation id,
+                                                                                Codec<S> codec) {
         return Registry.register(Registry.STRUCTURE_TYPES, id, () -> codec);
     }
 
@@ -93,9 +94,9 @@ public class BCLStructure<S extends Structure> {
         //
 
         this.spreadConfig = new RandomSpreadStructurePlacement(spacing,
-                                                               separation,
-                                                               RandomSpreadType.LINEAR,
-                                                               RANDOM.nextInt(8192));
+                separation,
+                RandomSpreadType.LINEAR,
+                RANDOM.nextInt(8192));
         this.structureKey = ResourceKey.create(Registry.STRUCTURE_REGISTRY, id);
         this.structureSetKey = ResourceKey.create(Registry.STRUCTURE_SET_REGISTRY, id);
         this.structureType = registerStructureType(id, STRUCTURE_CODEC);
@@ -136,8 +137,8 @@ public class BCLStructure<S extends Structure> {
                                 QuartPos.fromBlock(blockPos.getY()),
                                 QuartPos.fromBlock(blockPos.getZ()),
                                 context.randomState().sampler()
-                                      )
-                                        );
+                        )
+        );
     }
 
     public Holder<Structure> getStructure() {

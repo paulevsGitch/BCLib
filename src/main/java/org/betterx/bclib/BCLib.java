@@ -49,12 +49,13 @@ public class BCLib implements ModInitializer {
         AnvilRecipe.register();
 
         DataExchangeAPI.registerDescriptors(List.of(
-                HelloClient.DESCRIPTOR,
-                HelloServer.DESCRIPTOR,
-                RequestFiles.DESCRIPTOR,
-                SendFiles.DESCRIPTOR,
-                Chunker.DESCRIPTOR
-                                                   ));
+                        HelloClient.DESCRIPTOR,
+                        HelloServer.DESCRIPTOR,
+                        RequestFiles.DESCRIPTOR,
+                        SendFiles.DESCRIPTOR,
+                        Chunker.DESCRIPTOR
+                )
+        );
 
         BCLibPatch.register();
         Configs.save();

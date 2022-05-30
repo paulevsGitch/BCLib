@@ -55,18 +55,20 @@ public class BCLFeature {
         Holder<ConfiguredFeature<?, ?>> configuredFeature;
         if (!BuiltinRegistries.CONFIGURED_FEATURE.containsKey(id)) {
             configuredFeature = (Holder<ConfiguredFeature<?, ?>>) (Object) FeatureUtils.register(id.toString(),
-                                                                                                 feature,
-                                                                                                 configuration);
+                    feature,
+                    configuration);
         } else {
-            configuredFeature = BuiltinRegistries.CONFIGURED_FEATURE.getHolder(ResourceKey.create(BuiltinRegistries.CONFIGURED_FEATURE.key(),
-                                                                                                  id)).orElseThrow();
+            configuredFeature = BuiltinRegistries.CONFIGURED_FEATURE
+                    .getHolder(ResourceKey.create(BuiltinRegistries.CONFIGURED_FEATURE.key(),
+                            id))
+                    .orElseThrow();
         }
 
         if (!BuiltinRegistries.PLACED_FEATURE.containsKey(id)) {
             return PlacementUtils.register(id.toString(), configuredFeature, modifiers);
         } else {
             return BuiltinRegistries.PLACED_FEATURE.getHolder(ResourceKey.create(BuiltinRegistries.PLACED_FEATURE.key(),
-                                                                                 id)).orElseThrow();
+                    id)).orElseThrow();
         }
     }
 
@@ -77,6 +79,10 @@ public class BCLFeature {
                 .filter(entry -> entry.getValue() == obj)
                 .findAny();
         return optional.isPresent();
+    }
+
+    public static <C extends FeatureConfiguration, F extends Feature<C>> F register(String string, F feature) {
+        return Registry.register(Registry.FEATURE, string, feature);
     }
 
     /**

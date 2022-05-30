@@ -13,6 +13,7 @@ import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraft.world.level.material.LavaFluid;
 
 import com.google.common.collect.Maps;
 
@@ -204,15 +205,47 @@ public class BlocksHelper {
         }
     }
 
-    public static Optional<BlockPos> findSurface(LevelAccessor level,
-                                                 BlockPos startPos,
-                                                 int minY,
-                                                 Predicate<BlockState> surface) {
+    public static Optional<BlockPos> findSurfaceBelow(LevelAccessor level,
+                                                      BlockPos startPos,
+                                                      int minY,
+                                                      Predicate<BlockState> surface) {
         final MutableBlockPos POS = new MutableBlockPos(startPos.getX(), startPos.getY(), startPos.getZ());
         for (int y = startPos.getY(); y >= minY; y--) {
             POS.setY(y);
             if (surface.test(level.getBlockState(POS))) return Optional.of(POS);
         }
         return Optional.empty();
+    }
+
+    public static boolean findSurface(LevelAccessor level,
+                                      MutableBlockPos startPos,
+                                      Direction dir,
+                                      int length,
+                                      Predicate<BlockState> surface) {
+        for (int len = 0; len < length; len++) {
+            if (surface.test(level.getBlockState(startPos))) return true;
+            startPos.move(dir, 1);
+        }
+        return false;
+    }
+
+    public static boolean isFreeSpace(LevelAccessor level,
+                                      BlockPos startPos,
+                                      Direction dir,
+                                      int length,
+                                      Predicate<BlockState> freeSurface) {
+        MutableBlockPos POS = startPos.mutable();
+        for (int len = 1; len < length; len++) {
+            POS.move(dir, 1);
+            if (!freeSurface.test(level.getBlockState(POS))) {
+                return false;
+            }
+
+        }
+        return true;
+    }
+
+    public static boolean isLava(BlockState state) {
+        return state.getFluidState().getType() instanceof LavaFluid;
     }
 }
