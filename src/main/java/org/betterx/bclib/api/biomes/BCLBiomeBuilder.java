@@ -29,6 +29,7 @@ import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import org.betterx.bclib.api.structures.BCLStructure;
 import org.betterx.bclib.api.surface.SurfaceRuleBuilder;
 import org.betterx.bclib.entity.BCLEntityWrapper;
 import org.betterx.bclib.mixin.common.BiomeGenerationSettingsAccessor;
@@ -37,7 +38,6 @@ import org.betterx.bclib.util.ColorUtil;
 import org.betterx.bclib.util.Pair;
 import org.betterx.bclib.util.TriFunction;
 import org.betterx.bclib.world.features.BCLFeature;
-import org.betterx.bclib.world.structures.BCLStructure;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,7 +53,7 @@ public class BCLBiomeBuilder {
 
     private static final BCLBiomeBuilder INSTANCE = new BCLBiomeBuilder();
     private static final SurfaceRules.ConditionSource SURFACE_NOISE = SurfaceRules.noiseCondition(Noises.SOUL_SAND_LAYER,
-                                                                                                  -0.012);
+            -0.012);
 
     private final List<Pair<GenerationStep.Carving, Holder<? extends ConfiguredWorldCarver<?>>>> carvers = new ArrayList<>(
             1);
@@ -157,7 +157,7 @@ public class BCLBiomeBuilder {
                                                  int minGroupCount,
                                                  int maxGroupCount) {
         getSpawns().addSpawn(entityType.getCategory(),
-                             new SpawnerData(entityType, weight, minGroupCount, maxGroupCount));
+                new SpawnerData(entityType, weight, minGroupCount, maxGroupCount));
         return this;
     }
 
@@ -619,8 +619,8 @@ public class BCLBiomeBuilder {
         var oKey = carver.unwrapKey();
         if (oKey.isPresent()) {
             BiomeModifications.addCarver(ctx -> ctx.getBiomeKey().location().equals(immutableID),
-                                         step,
-                                         (ResourceKey<ConfiguredWorldCarver<?>>) oKey.get());
+                    step,
+                    (ResourceKey<ConfiguredWorldCarver<?>>) oKey.get());
         }
         //carvers.add(new Pair<>(step, carver));
         return this;
@@ -656,10 +656,10 @@ public class BCLBiomeBuilder {
      */
     public BCLBiomeBuilder surface(Block surfaceBlock, Block subterrainBlock, int depth) {
         return surface(SurfaceRuleBuilder
-                               .start()
-                               .surface(surfaceBlock.defaultBlockState())
-                               .subsurface(subterrainBlock.defaultBlockState(), depth)
-                               .build());
+                .start()
+                .surface(surfaceBlock.defaultBlockState())
+                .subsurface(subterrainBlock.defaultBlockState(), depth)
+                .build());
     }
 
     /**

@@ -17,6 +17,7 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemp
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import org.betterx.bclib.api.structures.BCLStructure;
 
 import java.util.List;
 import java.util.Optional;
@@ -122,7 +123,7 @@ public abstract class TemplateStructure extends Structure {
             if (isCorrectBase.test(state, before)) break;
         }
         if (y >= maxHeight || y < seaLevel) return Optional.empty();
-
+        if (!BCLStructure.isValidBiome(ctx, y)) return Optional.empty();
 
         BlockPos halfSize = new BlockPos(structureTemplate.getSize().getX() / 2,
                 0,
