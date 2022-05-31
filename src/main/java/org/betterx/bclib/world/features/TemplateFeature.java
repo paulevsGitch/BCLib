@@ -12,24 +12,28 @@ import net.minecraft.world.level.levelgen.placement.EnvironmentScanPlacement;
 
 import com.mojang.serialization.Codec;
 import org.betterx.bclib.api.features.BCLFeatureBuilder;
+import org.betterx.bclib.world.structures.StructureNBT;
 
 public class TemplateFeature<FC extends TemplateFeatureConfig> extends Feature<FC> {
     public static final Feature<TemplateFeatureConfig> INSTANCE = BCLFeature.register("template",
-            new TemplateFeature(TemplateFeatureConfig.CODEC));
+                                                                                      new TemplateFeature(
+                                                                                              TemplateFeatureConfig.CODEC));
 
     public static <T extends TemplateFeatureConfig> BCLFeature createAndRegister(TemplateFeatureConfig configuration,
                                                                                  int onveEveryChunk) {
         return BCLFeatureBuilder
                 .start(new ResourceLocation(configuration.structure.location.getNamespace(),
-                        "feature_" + configuration.structure.location.getPath()), INSTANCE)
+                                            "feature_" + configuration.structure.location.getPath()), INSTANCE)
                 .decoration(GenerationStep.Decoration.SURFACE_STRUCTURES)
                 .oncePerChunks(onveEveryChunk)
                 .squarePlacement()
                 .distanceToTopAndBottom10()
                 .modifier(EnvironmentScanPlacement.scanningFor(Direction.DOWN,
-                        BlockPredicate.solid(),
-                        BlockPredicate.matchesBlocks(Blocks.AIR, Blocks.WATER, Blocks.LAVA),
-                        12))
+                                                               BlockPredicate.solid(),
+                                                               BlockPredicate.matchesBlocks(Blocks.AIR,
+                                                                                            Blocks.WATER,
+                                                                                            Blocks.LAVA),
+                                                               12))
                 .modifier(BiomeFilter.biome())
                 .buildAndRegister(configuration);
     }
@@ -40,6 +44,10 @@ public class TemplateFeature<FC extends TemplateFeatureConfig> extends Feature<F
 
     @Override
     public boolean place(FeaturePlaceContext<FC> ctx) {
-        return ctx.config().structure.generateInRandomOrientation(ctx.level(), ctx.origin(), ctx.random());
+        return ctx.config().structure.generateIfPlaceable(ctx.level(),
+                                                          ctx.origin(),
+                                                          StructureNBT.getRandomRotation(ctx.random()),
+                                                          StructureNBT.getRandomMirror(ctx.random())
+                                                         );
     }
 }

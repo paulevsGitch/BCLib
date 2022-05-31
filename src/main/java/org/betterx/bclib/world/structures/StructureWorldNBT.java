@@ -3,10 +3,10 @@ package org.betterx.bclib.world.structures;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.BlockPos.MutableBlockPos;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 
@@ -33,27 +33,29 @@ public class StructureWorldNBT extends StructureNBT {
     }
 
 
-    public boolean generateInRandomOrientation(ServerLevelAccessor level, BlockPos pos, RandomSource random) {
-        randomRM(random);
-        return generate(level, pos);
-    }
-
-    public boolean generate(ServerLevelAccessor level, BlockPos pos) {
-        if (canGenerate(level, pos)) {
-            return generateCentered(level, pos.above(offsetY));
+    public boolean generateIfPlaceable(ServerLevelAccessor level,
+                                       BlockPos pos,
+                                       Rotation r,
+                                       Mirror m) {
+        if (canGenerate(level, pos, r)) {
+            return generate(level, pos, r, m);
         }
         return false;
     }
 
-    protected boolean canGenerate(LevelAccessor level, BlockPos pos) {
+    public boolean generate(ServerLevelAccessor level, BlockPos pos, Rotation r, Mirror m) {
+        return generateCentered(level, pos.above(offsetY), r, m);
+    }
+
+    protected boolean canGenerate(LevelAccessor level, BlockPos pos, Rotation rotation) {
         if (type == StructurePlacementType.FLOOR)
-            return canGenerateFloor(level, pos);
+            return canGenerateFloor(level, pos, rotation);
         else if (type == StructurePlacementType.LAVA)
-            return canGenerateLava(level, pos);
+            return canGenerateLava(level, pos, rotation);
         else if (type == StructurePlacementType.UNDER)
-            return canGenerateUnder(level, pos);
+            return canGenerateUnder(level, pos, rotation);
         else if (type == StructurePlacementType.CEIL)
-            return canGenerateCeil(level, pos);
+            return canGenerateCeil(level, pos, rotation);
         else
             return false;
     }
@@ -67,46 +69,35 @@ public class StructureWorldNBT extends StructureNBT {
         return false;
     }
 
-    protected boolean canGenerateFloor(LevelAccessor world, BlockPos pos) {
+    protected boolean canGenerateFloor(LevelAccessor world, BlockPos pos, Rotation rotation) {
         if (containsBedrock(world, pos)) return false;
 
-        return getAirFraction(world, pos) > 0.6 && getAirFractionFoundation(world, pos) < 0.5;
+        return getAirFraction(world, pos, rotation) > 0.6 && getAirFractionFoundation(world, pos, rotation) < 0.5;
     }
 
-    protected boolean canGenerateLava(LevelAccessor world, BlockPos pos) {
+    protected boolean canGenerateLava(LevelAccessor world, BlockPos pos, Rotation rotation) {
         if (containsBedrock(world, pos)) return false;
 
-        return getLavaFractionFoundation(world, pos) > 0.9 && getAirFraction(world, pos) > 0.9;
+        return getLavaFractionFoundation(world, pos, rotation) > 0.9 && getAirFraction(world, pos, rotation) > 0.9;
     }
 
-    protected boolean canGenerateUnder(LevelAccessor world, BlockPos pos) {
+    protected boolean canGenerateUnder(LevelAccessor world, BlockPos pos, Rotation rotation) {
         if (containsBedrock(world, pos)) return false;
 
-        return getAirFraction(world, pos) < 0.2;
+        return getAirFraction(world, pos, rotation) < 0.2;
     }
 
-    protected boolean canGenerateCeil(LevelAccessor world, BlockPos pos) {
+    protected boolean canGenerateCeil(LevelAccessor world, BlockPos pos, Rotation rotation) {
         if (containsBedrock(world, pos)) return false;
 
-        return getAirFractionBottom(world, pos) > 0.8 && getAirFraction(world, pos) < 0.6;
+        return getAirFractionBottom(world, pos, rotation) > 0.8 && getAirFraction(world, pos, rotation) < 0.6;
     }
 
     public BoundingBox boundingBox(Rotation r, BlockPos p) {
-        MutableBlockPos size = new MutableBlockPos().set(new BlockPos(structure.getSize()).rotate(rotation));
-        size.setX(Math.abs(size.getX()) >> 1);
-        size.setY(Math.abs(size.getY()) >> 1);
-        size.setZ(Math.abs(size.getZ()) >> 1);
-        return new BoundingBox(
-                p.getX() - size.getX(),
-                p.getY() - size.getY(),
-                p.getZ() - size.getZ(),
-                p.getX() + size.getX(),
-                p.getY() + size.getY(),
-                p.getZ() + size.getZ()
-        );
+        return getBoundingBox(p, r, Mirror.NONE);
     }
 
-    protected float getAirFraction(LevelAccessor world, BlockPos pos) {
+    protected float getAirFraction(LevelAccessor world, BlockPos pos, Rotation rotation) {
         final MutableBlockPos POS = new MutableBlockPos();
         int airCount = 0;
 
@@ -134,7 +125,7 @@ public class StructureWorldNBT extends StructureNBT {
         return (float) airCount / count;
     }
 
-    private float getLavaFractionFoundation(LevelAccessor world, BlockPos pos) {
+    private float getLavaFractionFoundation(LevelAccessor world, BlockPos pos, Rotation rotation) {
         final MutableBlockPos POS = new MutableBlockPos();
         int lavaCount = 0;
 
@@ -161,7 +152,7 @@ public class StructureWorldNBT extends StructureNBT {
         return (float) lavaCount / count;
     }
 
-    private float getAirFractionFoundation(LevelAccessor world, BlockPos pos) {
+    private float getAirFractionFoundation(LevelAccessor world, BlockPos pos, Rotation rotation) {
         final MutableBlockPos POS = new MutableBlockPos();
         int airCount = 0;
 
@@ -189,7 +180,7 @@ public class StructureWorldNBT extends StructureNBT {
         return (float) airCount / count;
     }
 
-    private float getAirFractionBottom(LevelAccessor world, BlockPos pos) {
+    private float getAirFractionBottom(LevelAccessor world, BlockPos pos, Rotation rotation) {
         final MutableBlockPos POS = new MutableBlockPos();
         int airCount = 0;
 
