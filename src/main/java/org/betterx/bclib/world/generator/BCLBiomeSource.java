@@ -9,6 +9,7 @@ import net.minecraft.world.level.biome.BiomeSource;
 import com.google.common.collect.Sets;
 import org.betterx.bclib.api.biomes.BiomeAPI;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -25,6 +26,11 @@ public abstract class BCLBiomeSource extends BiomeSource {
     public final int biomeSourceVersion;
 
     private static List<Holder<Biome>> preInit(Registry<Biome> biomeRegistry, List<Holder<Biome>> biomes) {
+        biomes = biomes.stream().sorted(Comparator.comparing(holder -> holder.unwrapKey()
+                                                                             .get()
+                                                                             .location()
+                                                                             .toString()))
+                       .toList();
         biomes.forEach(biome -> BiomeAPI.sortBiomeFeatures(biome));
         return biomes;
     }
@@ -88,6 +94,7 @@ public abstract class BCLBiomeSource extends BiomeSource {
                                                    BCLibNetherBiomeSource.ValidBiomePredicate test) {
         return biomeRegistry.stream()
                             .filter(biome -> biomeRegistry.getResourceKey(biome).isPresent())
+
                             .map(biome -> biomeRegistry.getOrCreateHolderOrThrow(biomeRegistry.getResourceKey(biome)
                                                                                               .get()))
                             .filter(biome -> {
@@ -97,6 +104,7 @@ public abstract class BCLBiomeSource extends BiomeSource {
                                 if (include.contains(strLocation)) return true;
 
                                 return test.isValid(biome, location);
-                            }).toList();
+                            })
+                            .toList();
     }
 }
