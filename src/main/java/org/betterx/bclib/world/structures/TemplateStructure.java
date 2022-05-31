@@ -21,21 +21,23 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
+import java.util.function.BiPredicate;
 
 public abstract class TemplateStructure extends Structure {
     protected final List<Config> configs;
 
-    public static <T extends TemplateStructure> Codec<T> simpleCodec(BiFunction instancer) {
+    public static <T extends TemplateStructure> Codec<T> simpleTemplateCodec(BiFunction<StructureSettings, List<Config>, T> instancer) {
         return RecordCodecBuilder.create((instance) -> instance
-                                                 .group(
-                                                         Structure.settingsCodec(instance),
-                                                         ExtraCodecs.nonEmptyList(Config.CODEC.listOf())
-                                                                    .fieldOf("configs")
-                                                                    .forGetter((T ruinedPortalStructure) -> ruinedPortalStructure.configs)
-                                                       )
-                                                 .apply(instance, instancer)
-                                        );
+                .group(
+                        Structure.settingsCodec(instance),
+                        ExtraCodecs.nonEmptyList(Config.CODEC.listOf())
+                                   .fieldOf("configs")
+                                   .forGetter((T ruinedPortalStructure) -> ruinedPortalStructure.configs)
+                )
+                .apply(instance, instancer)
+        );
     }
+
 
     protected TemplateStructure(StructureSettings structureSettings,
                                 ResourceLocation location,
@@ -68,54 +70,84 @@ public abstract class TemplateStructure extends Structure {
         return null;
     }
 
+    protected boolean isLavaPlaceable(BlockState state, BlockState before) {
+        return state.is(Blocks.AIR) && before.is(Blocks.LAVA);
+    }
+
+    protected boolean isFloorPlaceable(BlockState state, BlockState before) {
+        return state.is(Blocks.AIR) && before.getMaterial().isSolid();
+    }
+
     @Override
     public Optional<GenerationStub> findGenerationPoint(GenerationContext ctx) {
+
         WorldGenerationContext worldGenerationContext = new WorldGenerationContext(ctx.chunkGenerator(),
-                                                                                   ctx.heightAccessor());
+                ctx.heightAccessor());
         final Config config = randomConfig(ctx.random());
         if (config == null) return Optional.empty();
-
         ChunkPos chunkPos = ctx.chunkPos();
         final int x = chunkPos.getMiddleBlockX();
         final int z = chunkPos.getMiddleBlockZ();
         NoiseColumn column = ctx.chunkGenerator().getBaseColumn(x, z, ctx.heightAccessor(), ctx.randomState());
-        final int seaLevel = ctx.chunkGenerator().getSeaLevel();
         StructureTemplate structureTemplate = ctx.structureTemplateManager().getOrCreate(config.location);
-        final int maxHeight = worldGenerationContext.getGenDepth() - 4 - (structureTemplate.getSize(Rotation.NONE)
-                                                                                           .getY() + config.offsetY);
-        int y = seaLevel;
-        BlockState state = column.getBlock(y - 1);
 
-        for (; y < maxHeight; y++) {
-            BlockState below = state;
-            state = column.getBlock(y);
-            if (state.is(Blocks.AIR) && below.is(Blocks.LAVA)) break;
+
+        BiPredicate<BlockState, BlockState> isCorrectBase;
+        int searchStep;
+        if (config.type == StructurePlacementType.LAVA) {
+            isCorrectBase = this::isLavaPlaceable;
+            searchStep = 1;
+        } else if (config.type == StructurePlacementType.CEIL) {
+            isCorrectBase = this::isFloorPlaceable;
+            searchStep = -1;
+        } else {
+            isCorrectBase = this::isFloorPlaceable;
+            searchStep = 1;
         }
-        if (y >= maxHeight) return Optional.empty();
+
+
+        final int seaLevel =
+                ctx.chunkGenerator().getSeaLevel()
+                        + (searchStep > 0 ? 0 : (structureTemplate.getSize(Rotation.NONE).getY() + config.offsetY));
+        final int maxHeight =
+                worldGenerationContext.getGenDepth()
+                        - 4
+                        - (searchStep > 0 ? (structureTemplate.getSize(Rotation.NONE).getY() + config.offsetY) : 0);
+        int y = searchStep > 0 ? seaLevel : maxHeight - 1;
+        BlockState state = column.getBlock(y - searchStep);
+
+        for (; y < maxHeight && y >= seaLevel; y += searchStep) {
+            BlockState before = state;
+            state = column.getBlock(y);
+            if (isCorrectBase.test(state, before)) break;
+        }
+        if (y >= maxHeight || y < seaLevel) return Optional.empty();
 
 
         BlockPos halfSize = new BlockPos(structureTemplate.getSize().getX() / 2,
-                                         0,
-                                         structureTemplate.getSize().getZ() / 2);
+                0,
+                structureTemplate.getSize().getZ() / 2);
         Rotation rotation = StructureNBT.getRandomRotation(ctx.random());
         Mirror mirror = StructureNBT.getRandomMirror(ctx.random());
-        BlockPos centerPos = new BlockPos(x, y, z);
+        BlockPos centerPos = new BlockPos(x,
+                y - (searchStep == 1 ? 0 : (structureTemplate.getSize(Rotation.NONE).getY())),
+                z);
         BoundingBox boundingBox = structureTemplate.getBoundingBox(centerPos, rotation, halfSize, mirror);
 
 
         // if (!structure.canGenerate(ctx.chunkGenerator()., centerPos))
         return Optional.of(new GenerationStub(centerPos,
-                                              structurePiecesBuilder ->
-                                                      structurePiecesBuilder.addPiece(
-                                                              new TemplatePiece(ctx.structureTemplateManager(),
-                                                                                config.location,
-                                                                                centerPos.offset(
-                                                                                        0,
-                                                                                        config.offsetY,
-                                                                                        0),
-                                                                                rotation,
-                                                                                mirror,
-                                                                                halfSize))
+                structurePiecesBuilder ->
+                        structurePiecesBuilder.addPiece(
+                                new TemplatePiece(ctx.structureTemplateManager(),
+                                        config.location,
+                                        centerPos.offset(
+                                                0,
+                                                config.offsetY,
+                                                0),
+                                        rotation,
+                                        mirror,
+                                        halfSize))
         ));
 
     }
@@ -123,28 +155,28 @@ public abstract class TemplateStructure extends Structure {
     public record Config(ResourceLocation location, int offsetY, StructurePlacementType type, float chance) {
         public static final Codec<Config> CODEC =
                 RecordCodecBuilder.create((instance) ->
-                                                  instance.group(
-                                                                  ResourceLocation.CODEC
-                                                                          .fieldOf("location")
-                                                                          .forGetter((cfg) -> cfg.location),
+                        instance.group(
+                                        ResourceLocation.CODEC
+                                                .fieldOf("location")
+                                                .forGetter((cfg) -> cfg.location),
 
-                                                                  Codec
-                                                                          .INT
-                                                                          .fieldOf("offset_y")
-                                                                          .orElse(0)
-                                                                          .forGetter((cfg) -> cfg.offsetY),
+                                        Codec
+                                                .INT
+                                                .fieldOf("offset_y")
+                                                .orElse(0)
+                                                .forGetter((cfg) -> cfg.offsetY),
 
-                                                                  StructurePlacementType.CODEC
-                                                                          .fieldOf("placement")
-                                                                          .orElse(StructurePlacementType.FLOOR)
-                                                                          .forGetter((cfg) -> cfg.type),
-                                                                  Codec
-                                                                          .FLOAT
-                                                                          .fieldOf("chance")
-                                                                          .orElse(1.0f)
-                                                                          .forGetter((cfg) -> cfg.chance)
-                                                                )
-                                                          .apply(instance, Config::new)
-                                         );
+                                        StructurePlacementType.CODEC
+                                                .fieldOf("placement")
+                                                .orElse(StructurePlacementType.FLOOR)
+                                                .forGetter((cfg) -> cfg.type),
+                                        Codec
+                                                .FLOAT
+                                                .fieldOf("chance")
+                                                .orElse(1.0f)
+                                                .forGetter((cfg) -> cfg.chance)
+                                )
+                                .apply(instance, Config::new)
+                );
     }
 }

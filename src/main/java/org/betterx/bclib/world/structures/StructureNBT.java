@@ -39,7 +39,7 @@ public class StructureNBT {
     }
 
     public static Rotation getRandomRotation(RandomSource random) {
-        return Rotation.getRandom(random) == Rotation.NONE ? Rotation.CLOCKWISE_90 : Rotation.COUNTERCLOCKWISE_90;
+        return Rotation.getRandom(random);
     }
 
     public static Mirror getRandomMirror(RandomSource random) {
@@ -73,7 +73,7 @@ public class StructureNBT {
                 data,
                 world.getRandom(),
                 Block.UPDATE_CLIENTS
-                              );
+        );
         return true;
     }
 

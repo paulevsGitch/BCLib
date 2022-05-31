@@ -65,6 +65,10 @@ public class TagAPI {
         return BIOMES.makeTag(new ResourceLocation(modID, name));
     }
 
+    public static TagKey<Biome> makeStructureTag(String modID, String name) {
+        return TagAPI.makeBiomeTag(modID, "has_structure/" + name);
+    }
+
 
     /**
      * Get or create {@link Block} {@link TagKey} with mod namespace.

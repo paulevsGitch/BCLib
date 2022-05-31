@@ -78,10 +78,28 @@ public class BCLStructure<S extends Structure> {
                         int spacing,
                         int separation,
                         boolean adaptNoise) {
+        this(id,
+                structureBuilder,
+                step,
+                spacing,
+                separation,
+                adaptNoise,
+                Structure.simpleCodec(structureBuilder),
+                null);
+    }
+
+    public BCLStructure(ResourceLocation id,
+                        Function<Structure.StructureSettings, S> structureBuilder,
+                        GenerationStep.Decoration step,
+                        int spacing,
+                        int separation,
+                        boolean adaptNoise,
+                        Codec<S> codec,
+                        TagKey<Biome> biomeTag) {
         this.id = id;
         this.featureStep = step;
 
-        this.STRUCTURE_CODEC = Structure.simpleCodec(structureBuilder);
+        this.STRUCTURE_CODEC = codec;
         //parts from vanilla for Structure generation
         //public static final ResourceKey<ConfiguredStructure<?, ?>> JUNGLE_TEMPLE =
         //     BuiltinStructures.createKey("jungle_pyramid");
@@ -101,7 +119,9 @@ public class BCLStructure<S extends Structure> {
         this.structureSetKey = ResourceKey.create(Registry.STRUCTURE_SET_REGISTRY, id);
         this.structureType = registerStructureType(id, STRUCTURE_CODEC);
 
-        this.biomeTag = TagAPI.makeBiomeTag(id.getNamespace(), "has_structure/" + id.getPath());
+        this.biomeTag = biomeTag == null
+                ? TagAPI.makeStructureTag(id.getNamespace(), id.getPath())
+                : biomeTag;
         this.baseStructure = structureBuilder.apply(structure(biomeTag, featureStep, TerrainAdjustment.NONE));
         this.structure = StructuresAccessor.callRegister(structureKey, this.baseStructure);
         StructureSets.register(structureSetKey, this.structure, spreadConfig);
