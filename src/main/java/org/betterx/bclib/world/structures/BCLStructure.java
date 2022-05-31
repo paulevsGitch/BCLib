@@ -122,7 +122,7 @@ public class BCLStructure<S extends Structure> {
         this.biomeTag = biomeTag == null
                 ? TagAPI.makeStructureTag(id.getNamespace(), id.getPath())
                 : biomeTag;
-        this.baseStructure = structureBuilder.apply(structure(biomeTag, featureStep, TerrainAdjustment.NONE));
+        this.baseStructure = structureBuilder.apply(structure(this.biomeTag, featureStep, TerrainAdjustment.NONE));
         this.structure = StructuresAccessor.callRegister(structureKey, this.baseStructure);
         StructureSets.register(structureSetKey, this.structure, spreadConfig);
     }

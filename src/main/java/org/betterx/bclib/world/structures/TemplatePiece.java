@@ -51,10 +51,6 @@ public class TemplatePiece extends TemplateStructurePiece {
                 resourceLocation.toString(),
                 makeSettings(rotation, mirror, halfSize),
                 shiftPos(rotation, mirror, halfSize, centerPos));
-        System.out.println("Piece: " + resourceLocation);
-        System.out.println("    - " + centerPos);
-        System.out.println("    - " + boundingBox);
-        System.out.println("    - " + templatePosition);
     }
 
     public TemplatePiece(StructureTemplateManager structureTemplateManager, CompoundTag compoundTag) {
