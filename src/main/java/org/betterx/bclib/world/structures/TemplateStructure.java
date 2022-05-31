@@ -55,7 +55,6 @@ public abstract class TemplateStructure extends Structure {
     }
 
     protected Config randomConfig(RandomSource random) {
-        Config config = null;
         if (this.configs.size() > 1) {
             final float chanceSum = configs.parallelStream().map(c -> c.chance()).reduce(0.0f, (p, c) -> p + c);
             float rnd = random.nextFloat() * chanceSum;

@@ -3,6 +3,7 @@ package org.betterx.bclib.world.structures;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.BlockPos.MutableBlockPos;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.Blocks;
@@ -11,27 +12,74 @@ import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 
 import com.google.common.collect.Maps;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import org.betterx.bclib.util.BlocksHelper;
 
 import java.util.Map;
 
 public class StructureWorldNBT extends StructureNBT {
+    public static final Codec<StructureWorldNBT> CODEC =
+            RecordCodecBuilder.create((instance) ->
+                    instance.group(
+                                    ResourceLocation.CODEC
+                                            .fieldOf("location")
+                                            .forGetter((cfg) -> cfg.location),
+
+                                    Codec
+                                            .INT
+                                            .fieldOf("offset_y")
+                                            .orElse(0)
+                                            .forGetter((cfg) -> cfg.offsetY),
+
+                                    StructurePlacementType.CODEC
+                                            .fieldOf("placement")
+                                            .orElse(StructurePlacementType.FLOOR)
+                                            .forGetter((cfg) -> cfg.type),
+                                    Codec
+                                            .FLOAT
+                                            .fieldOf("chance")
+                                            .orElse(1.0f)
+                                            .forGetter((cfg) -> cfg.chance)
+                            )
+                            .apply(instance, StructureWorldNBT::new)
+            );
+
     public final StructurePlacementType type;
     public final int offsetY;
+    public final float chance;
 
-    protected StructureWorldNBT(ResourceLocation location, int offsetY, StructurePlacementType type) {
+    protected StructureWorldNBT(ResourceLocation location, int offsetY, StructurePlacementType type, float chance) {
         super(location);
         this.offsetY = offsetY;
         this.type = type;
+        this.chance = chance;
     }
 
     private static final Map<String, StructureWorldNBT> READER_CACHE = Maps.newHashMap();
 
     public static StructureWorldNBT create(ResourceLocation location, int offsetY, StructurePlacementType type) {
-        String key = location.toString() + "::" + offsetY + "::" + type.getSerializedName();
-        return READER_CACHE.computeIfAbsent(key, r -> new StructureWorldNBT(location, offsetY, type));
+        return create(location, offsetY, type, 1.0f);
     }
 
+    public static StructureWorldNBT create(ResourceLocation location,
+                                           int offsetY,
+                                           StructurePlacementType type,
+                                           float chance) {
+        String key = location.toString() + "::" + offsetY + "::" + type.getSerializedName();
+        return READER_CACHE.computeIfAbsent(key, r -> new StructureWorldNBT(location, offsetY, type, chance));
+    }
+
+    public boolean generateIfPlaceable(ServerLevelAccessor level,
+                                       BlockPos pos,
+                                       RandomSource random
+    ) {
+        return generateIfPlaceable(level,
+                pos,
+                StructureNBT.getRandomRotation(random),
+                StructureNBT.getRandomMirror(random)
+        );
+    }
 
     public boolean generateIfPlaceable(ServerLevelAccessor level,
                                        BlockPos pos,
