@@ -21,13 +21,14 @@ public class TemplateFeature<FC extends TemplateFeatureConfig> extends Feature<F
             new TemplateFeature(
                     TemplateFeatureConfig.CODEC));
 
-    public static <T extends TemplateFeatureConfig> BCLFeature createAndRegister(ResourceLocation location,
-                                                                                 TemplateFeatureConfig configuration,
-                                                                                 int onveEveryChunk) {
+    public static <T extends TemplateFeatureConfig> BCLFeature createAndRegisterRare(ResourceLocation location,
+                                                                                     TemplateFeatureConfig configuration,
+                                                                                     int onceEveryChunk) {
+
+
         return BCLFeatureBuilder
                 .start(location, INSTANCE)
                 .decoration(GenerationStep.Decoration.SURFACE_STRUCTURES)
-                .oncePerChunks(onveEveryChunk)
                 .squarePlacement()
                 .distanceToTopAndBottom10()
                 .modifier(EnvironmentScanPlacement.scanningFor(Direction.DOWN,
@@ -37,6 +38,22 @@ public class TemplateFeature<FC extends TemplateFeatureConfig> extends Feature<F
                                 Blocks.LAVA),
                         12))
                 .modifier(BiomeFilter.biome())
+                .oncePerChunks(onceEveryChunk)
+                .buildAndRegister(configuration);
+    }
+
+    public static <T extends TemplateFeatureConfig> BCLFeature createAndRegister(ResourceLocation location,
+                                                                                 TemplateFeatureConfig configuration,
+                                                                                 int count) {
+
+
+        return BCLFeatureBuilder
+                .start(location, INSTANCE)
+                .decoration(GenerationStep.Decoration.SURFACE_STRUCTURES)
+                .count(count)
+                .squarePlacement()
+                .distanceToTopAndBottom10()
+                .onlyInBiome()
                 .buildAndRegister(configuration);
     }
 

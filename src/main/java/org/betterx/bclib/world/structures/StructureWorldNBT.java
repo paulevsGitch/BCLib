@@ -104,6 +104,8 @@ public class StructureWorldNBT extends StructureNBT {
             return canGenerateUnder(level, pos, rotation);
         else if (type == StructurePlacementType.CEIL)
             return canGenerateCeil(level, pos, rotation);
+        else if (type == StructurePlacementType.FLOOR_FREE_ABOVE)
+            return canGenerateFloorFreeAbove(level, pos, rotation);
         else
             return false;
     }
@@ -115,6 +117,14 @@ public class StructureWorldNBT extends StructureNBT {
             }
         }
         return false;
+    }
+
+    protected boolean canGenerateFloorFreeAbove(LevelAccessor world, BlockPos pos, Rotation rotation) {
+        if (containsBedrock(world, pos)) return false;
+
+        return getAirFractionFoundation(world, pos, rotation) < 0.5
+                && world.getBlockState(pos.above(2)).is(Blocks.AIR)
+                && world.getBlockState(pos.above(4)).is(Blocks.AIR);
     }
 
     protected boolean canGenerateFloor(LevelAccessor world, BlockPos pos, Rotation rotation) {
