@@ -12,8 +12,6 @@ import net.minecraft.world.level.levelgen.placement.PlacementModifierType;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.stream.Stream;
 
 public class Extend extends PlacementModifier {
@@ -42,12 +40,13 @@ public class Extend extends PlacementModifier {
     public Stream<BlockPos> getPositions(PlacementContext placementContext,
                                          RandomSource random,
                                          BlockPos blockPos) {
+        var builder = Stream.<BlockPos>builder();
         final int count = length.sample(random);
-        List<BlockPos> pos = new ArrayList<>(count);
-        for (int y = 0; y < count; y++) {
-            pos.add(blockPos.relative(direction, y + 1));
+        builder.add(blockPos);
+        for (int y = 1; y < count + 1; y++) {
+            builder.add(blockPos.relative(direction, y));
         }
-        return pos.stream();
+        return builder.build();
     }
 
     @Override

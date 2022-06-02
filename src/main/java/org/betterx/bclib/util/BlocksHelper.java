@@ -229,13 +229,39 @@ public class BlocksHelper {
         return false;
     }
 
+    public static boolean findSurroundingSurface(LevelAccessor level,
+                                                 MutableBlockPos startPos,
+                                                 Direction dir,
+                                                 int length,
+                                                 Predicate<BlockState> surface) {
+        for (int len = 0; len < length; len++) {
+            if (surface.test(level.getBlockState(startPos))) {
+                if (len == 0) { //we started inside of the surface
+                    for (int lenUp = 0; lenUp < length; lenUp++) {
+                        startPos.move(dir, -1);
+                        if (!surface.test(level.getBlockState(startPos))) {
+                            startPos.move(dir, 1);
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+                return true;
+            }
+
+            startPos.move(dir, 1);
+        }
+        return false;
+    }
+
+
     public static boolean isFreeSpace(LevelAccessor level,
                                       BlockPos startPos,
                                       Direction dir,
                                       int length,
                                       Predicate<BlockState> freeSurface) {
         MutableBlockPos POS = startPos.mutable();
-        for (int len = 1; len < length; len++) {
+        for (int len = 0; len < length; len++) {
             POS.move(dir, 1);
             if (!freeSurface.test(level.getBlockState(POS))) {
                 return false;

@@ -1,18 +1,22 @@
 package org.betterx.bclib.world.features.placement;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.levelgen.placement.PlacementContext;
 import net.minecraft.world.level.levelgen.placement.PlacementModifier;
 import net.minecraft.world.level.levelgen.placement.PlacementModifierType;
 
+import com.google.common.collect.Maps;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
+import java.util.Map;
 import java.util.stream.Stream;
 
 public class Offset extends PlacementModifier {
+    private static Map<Direction, Offset> DIRECTIONS = Maps.newHashMap();
     public static final Codec<Offset> CODEC = RecordCodecBuilder.create((instance) -> instance
             .group(
                     Vec3i.CODEC
@@ -27,6 +31,10 @@ public class Offset extends PlacementModifier {
         this.offset = offset;
     }
 
+    public static Offset inDirection(Direction dir) {
+        return DIRECTIONS.get(dir);
+    }
+
     @Override
     public Stream<BlockPos> getPositions(PlacementContext placementContext,
                                          RandomSource randomSource,
@@ -37,5 +45,10 @@ public class Offset extends PlacementModifier {
     @Override
     public PlacementModifierType<?> type() {
         return PlacementModifiers.OFFSET;
+    }
+
+    static {
+        for (Direction d : Direction.values())
+            DIRECTIONS.put(d, new Offset(d.getNormal()));
     }
 }

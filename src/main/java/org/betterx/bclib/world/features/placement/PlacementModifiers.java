@@ -29,6 +29,10 @@ public class PlacementModifiers {
             "is_basin",
             IsBasin.CODEC);
 
+    public static final PlacementModifierType<Is> IS = register(
+            "is",
+            Is.CODEC);
+
     public static final PlacementModifierType<Offset> OFFSET = register(
             "offset",
             Offset.CODEC);
@@ -36,6 +40,10 @@ public class PlacementModifiers {
     public static final PlacementModifierType<Extend> EXTEND = register(
             "extend",
             Extend.CODEC);
+
+    public static final PlacementModifierType<OnEveryLayer> ON_EVERY_LAYER = register(
+            "on_every_layer",
+            OnEveryLayer.CODEC);
 
 
     private static <P extends PlacementModifier> PlacementModifierType<P> register(String path, Codec<P> codec) {

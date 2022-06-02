@@ -1,19 +1,20 @@
 package org.betterx.bclib.api.features;
 
 import net.minecraft.core.Direction;
+import net.minecraft.core.Vec3i;
 import net.minecraft.data.worldgen.placement.PlacementUtils;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.valueproviders.IntProvider;
 import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.level.levelgen.GenerationStep.Decoration;
+import net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
 import net.minecraft.world.level.levelgen.placement.*;
 import net.minecraft.world.level.material.Material;
 
 import org.betterx.bclib.world.features.BCLFeature;
-import org.betterx.bclib.world.features.placement.FindSolidInDirection;
-import org.betterx.bclib.world.features.placement.IsEmptyAboveSampledFilter;
-import org.betterx.bclib.world.features.placement.MinEmptyFilter;
+import org.betterx.bclib.world.features.placement.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -137,6 +138,14 @@ public class BCLFeatureBuilder<FC extends FeatureConfiguration, F extends Featur
         return modifier(InSquarePlacement.spread());
     }
 
+    public BCLFeatureBuilder stencil() {
+        return modifier(Stencil.all());
+    }
+
+    public BCLFeatureBuilder stencilOneIn4() {
+        return modifier(Stencil.oneIn4());
+    }
+
     /**
      * Select random height that is 10 above min Build height and 10 below max generation height
      *
@@ -177,8 +186,36 @@ public class BCLFeatureBuilder<FC extends FeatureConfiguration, F extends Featur
         return modifier(IsEmptyAboveSampledFilter.emptyAbove4());
     }
 
+    public BCLFeatureBuilder isEmptyAbove() {
+        return modifier(IsEmptyAboveSampledFilter.emptyAbove());
+    }
+
     public BCLFeatureBuilder isEmptyAbove(int d1, int d2) {
         return modifier(new IsEmptyAboveSampledFilter(d1, d2));
+    }
+
+    public BCLFeatureBuilder onEveryLayer() {
+        return modifier(OnEveryLayer.simple());
+    }
+
+    public BCLFeatureBuilder spreadHorizontal(IntProvider p) {
+        return modifier(RandomOffsetPlacement.horizontal(p));
+    }
+
+    public BCLFeatureBuilder spreadVertical(IntProvider p) {
+        return modifier(RandomOffsetPlacement.horizontal(p));
+    }
+
+    public BCLFeatureBuilder spread(IntProvider horizontal, IntProvider vertical) {
+        return modifier(RandomOffsetPlacement.of(horizontal, vertical));
+    }
+
+    public BCLFeatureBuilder offset(Direction dir) {
+        return modifier(Offset.inDirection(dir));
+    }
+
+    public BCLFeatureBuilder offset(Vec3i dir) {
+        return modifier(new Offset(dir));
     }
 
     /**
@@ -190,6 +227,22 @@ public class BCLFeatureBuilder<FC extends FeatureConfiguration, F extends Featur
      */
     public BCLFeatureBuilder findSolidFloor(int distance) {
         return modifier(FindSolidInDirection.down(distance));
+    }
+
+    public BCLFeatureBuilder noiseBasedCount(float noiseLevel, int belowNoiseCount, int aboveNoiseCount) {
+        return modifier(NoiseThresholdCountPlacement.of(noiseLevel, belowNoiseCount, aboveNoiseCount));
+    }
+
+    public BCLFeatureBuilder extendDown(int min, int max) {
+        return modifier(new Extend(Direction.DOWN, UniformInt.of(min, max)));
+    }
+
+    public BCLFeatureBuilder inBasinOf(BlockPredicate... predicates) {
+        return modifier(new IsBasin(BlockPredicate.anyOf(predicates)));
+    }
+
+    public BCLFeatureBuilder is(BlockPredicate... predicates) {
+        return modifier(new Is(BlockPredicate.anyOf(predicates)));
     }
 
     public BCLFeatureBuilder findSolidCeil(int distance) {

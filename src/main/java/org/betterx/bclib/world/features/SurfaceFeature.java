@@ -2,7 +2,6 @@ package org.betterx.bclib.world.features;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
@@ -37,14 +36,6 @@ public abstract class SurfaceFeature<T extends FeatureConfiguration> extends Fea
                 minHeight(ctx),
                 this::isValidSurface);
         if (pos.isPresent()) {
-            int y2 = ctx.level().getHeight(Heightmap.Types.WORLD_SURFACE_WG, ctx.origin().getX(), ctx.origin().getZ());
-            int y3 = ctx.level().getHeight(Heightmap.Types.WORLD_SURFACE, ctx.origin().getX(), ctx.origin().getZ());
-            int y4 = ctx.level().getHeight(Heightmap.Types.OCEAN_FLOOR, ctx.origin().getX(), ctx.origin().getZ());
-            int y5 = ctx.level().getHeight(Heightmap.Types.OCEAN_FLOOR_WG, ctx.origin().getX(), ctx.origin().getZ());
-            System.out.println("Surfaces:" + pos
-                    .get()
-                    .getY() + ", " + y2 + ", " + y3 + ", " + y4 + ", " + y5 + ", " + ctx.origin().getY());
-
             generate(pos.get(), ctx);
             return true;
         }

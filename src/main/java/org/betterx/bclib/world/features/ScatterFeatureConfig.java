@@ -1,11 +1,14 @@
 package org.betterx.bclib.world.features;
 
 import net.minecraft.util.RandomSource;
+import net.minecraft.util.valueproviders.ConstantInt;
+import net.minecraft.util.valueproviders.IntProvider;
+import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
 
-import com.mojang.datafixers.util.Function14;
+import com.mojang.datafixers.util.Function15;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import org.betterx.bclib.BCLib;
@@ -14,7 +17,7 @@ import org.betterx.bclib.api.tag.CommonBlockTags;
 import java.util.Optional;
 
 public abstract class ScatterFeatureConfig implements FeatureConfiguration {
-    public interface Instancer<T extends ScatterFeatureConfig> extends Function14<BlockState, BlockState, BlockState, Optional<BlockState>, Float, Float, Float, Float, Integer, Integer, Float, Float, Float, Boolean, T> {
+    public interface Instancer<T extends ScatterFeatureConfig> extends Function15<BlockState, BlockState, BlockState, Optional<BlockState>, Float, Float, Float, Float, Integer, Integer, Float, Float, Float, Boolean, IntProvider, T> {
     }
 
     public final BlockState clusterBlock;
@@ -31,6 +34,8 @@ public abstract class ScatterFeatureConfig implements FeatureConfiguration {
     public final float sizeVariation;
     public final float floorChance;
 
+    public final IntProvider spreadCount;
+
     public final boolean growWhileFree;
 
     public ScatterFeatureConfig(BlockState clusterBlock,
@@ -46,7 +51,8 @@ public abstract class ScatterFeatureConfig implements FeatureConfiguration {
                                 float maxSpread,
                                 float sizeVariation,
                                 float floorChance,
-                                boolean growWhileFree) {
+                                boolean growWhileFree,
+                                IntProvider spreadCount) {
         this.clusterBlock = clusterBlock;
         this.tipBlock = tipBlock == null ? clusterBlock : tipBlock;
         this.bottomBlock = bottomBlock == null ? clusterBlock : bottomBlock;
@@ -61,6 +67,7 @@ public abstract class ScatterFeatureConfig implements FeatureConfiguration {
         this.sizeVariation = sizeVariation;
         this.floorChance = floorChance;
         this.growWhileFree = growWhileFree;
+        this.spreadCount = spreadCount;
     }
 
 
@@ -137,7 +144,11 @@ public abstract class ScatterFeatureConfig implements FeatureConfiguration {
                                 .BOOL
                                 .fieldOf("grow_while_empty")
                                 .orElse(false)
-                                .forGetter((T cfg) -> cfg.growWhileFree)
+                                .forGetter((T cfg) -> cfg.growWhileFree),
+                        IntProvider.codec(0, 64)
+                                   .fieldOf("length")
+                                   .orElse(UniformInt.of(0, 3))
+                                   .forGetter(cfg -> cfg.spreadCount)
                 )
                 .apply(instance, instancer)
         );
@@ -158,6 +169,7 @@ public abstract class ScatterFeatureConfig implements FeatureConfiguration {
         private float sizeVariation = 0;
         private float floorChance = 0.5f;
         private boolean growWhileFree = false;
+        public IntProvider spreadCount = ConstantInt.of(0);
         private final Instancer<T> instancer;
 
         public Builder(Instancer<T> instancer) {
@@ -251,6 +263,11 @@ public abstract class ScatterFeatureConfig implements FeatureConfiguration {
         }
 
         public Builder<T> spread(float maxSpread, float sizeVariation) {
+            return spread(maxSpread, sizeVariation, ConstantInt.of((int) Math.min(16, 4 * maxSpread * maxSpread)));
+        }
+
+        public Builder<T> spread(float maxSpread, float sizeVariation, IntProvider spreadCount) {
+            this.spreadCount = spreadCount; //
             this.maxSpread = maxSpread;
             this.sizeVariation = sizeVariation;
             return this;
@@ -286,7 +303,8 @@ public abstract class ScatterFeatureConfig implements FeatureConfiguration {
                     this.maxSpread,
                     this.sizeVariation,
                     this.floorChance,
-                    this.growWhileFree
+                    this.growWhileFree,
+                    this.spreadCount
             );
         }
     }
@@ -307,7 +325,8 @@ public abstract class ScatterFeatureConfig implements FeatureConfiguration {
                        float maxSpread,
                        float sizeVariation,
                        float floorChance,
-                       boolean growWhileFree) {
+                       boolean growWhileFree,
+                       IntProvider spreadCount) {
             super(clusterBlock,
                     tipBlock,
                     bottomBlock,
@@ -321,8 +340,10 @@ public abstract class ScatterFeatureConfig implements FeatureConfiguration {
                     maxSpread,
                     sizeVariation,
                     floorChance,
-                    growWhileFree);
+                    growWhileFree,
+                    spreadCount);
         }
+
 
         public static Builder<OnSolid> startOnSolid() {
             return Builder.start(OnSolid::new);

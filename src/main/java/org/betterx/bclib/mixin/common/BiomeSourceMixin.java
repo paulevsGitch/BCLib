@@ -28,11 +28,11 @@ public abstract class BiomeSourceMixin implements BiomeSourceAccessor {
 
     @Inject(method = "<init>(Ljava/util/List;)V", at = @At("TAIL"))
     public void bcl_init(List list, CallbackInfo ci) {
-        System.out.println("new BiomeSource (" + Integer.toHexString(hashCode()) + ", biomes=" + possibleBiomes().size() + ")");
-        if (possibleBiomes().size() == 27) {
-            System.out.println("Nether????");
-        } else if (possibleBiomes().size() == 2) {
-            System.out.println("Datapack Nether???");
-        }
+//        System.out.println("new BiomeSource (" + Integer.toHexString(hashCode()) + ", biomes=" + possibleBiomes().size() + ")");
+//        if (possibleBiomes().size() == 27) {
+//            System.out.println("Nether????");
+//        } else if (possibleBiomes().size() == 2) {
+//            System.out.println("Datapack Nether???");
+//        }
     }
 }

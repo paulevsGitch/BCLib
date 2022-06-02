@@ -20,23 +20,29 @@ public class Stencil extends PlacementModifier {
     private static final Boolean[] BN_STENCIL;
     private final List<Boolean> stencil;
     private static final Stencil DEFAULT;
+    private static final Stencil DEFAULT4;
+    private final int selectOneIn;
 
     private static List<Boolean> convert(Boolean[] s) {
         return Arrays.stream(s).toList();
     }
 
-    public Stencil(Boolean[] stencil) {
-        this(convert(stencil));
+    public Stencil(Boolean[] stencil, int selectOneIn) {
+        this(convert(stencil), selectOneIn);
     }
 
-    public Stencil(List<Boolean> stencil) {
+    public Stencil(List<Boolean> stencil, int selectOneIn) {
         this.stencil = stencil;
+        this.selectOneIn = selectOneIn;
     }
 
-    public static Stencil basic() {
+    public static Stencil all() {
         return DEFAULT;
     }
 
+    public static Stencil oneIn4() {
+        return DEFAULT4;
+    }
 
     @Override
     public Stream<BlockPos> getPositions(PlacementContext placementContext,
@@ -319,13 +325,18 @@ public class Stencil extends PlacementModifier {
                 false
         };
 
-        DEFAULT = new Stencil(BN_STENCIL);
+        DEFAULT = new Stencil(BN_STENCIL, 1);
+        DEFAULT4 = new Stencil(BN_STENCIL, 4);
         CODEC = RecordCodecBuilder.create((instance) -> instance
                 .group(
                         ExtraCodecs.nonEmptyList(Codec.BOOL.listOf())
                                    .fieldOf("structures")
                                    .orElse(convert(BN_STENCIL))
-                                   .forGetter((Stencil a) -> a.stencil)
+                                   .forGetter((Stencil a) -> a.stencil),
+                        Codec.INT
+                                .fieldOf("one_in")
+                                .orElse(1)
+                                .forGetter((Stencil a) -> a.selectOneIn)
                 )
                 .apply(instance, Stencil::new)
         );

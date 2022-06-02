@@ -16,8 +16,8 @@ import java.util.stream.Stream;
 
 public class FindSolidInDirection extends PlacementModifier {
 
-    protected static final FindSolidInDirection DOWN = new FindSolidInDirection(Direction.DOWN, 12);
-    protected static final FindSolidInDirection UP = new FindSolidInDirection(Direction.UP, 12);
+    protected static final FindSolidInDirection DOWN = new FindSolidInDirection(Direction.DOWN, 6);
+    protected static final FindSolidInDirection UP = new FindSolidInDirection(Direction.UP, 6);
     public static final Codec<FindSolidInDirection> CODEC = RecordCodecBuilder.create((instance) -> instance
             .group(
                     Direction.CODEC.fieldOf("dir").orElse(Direction.DOWN).forGetter((p) -> p.direction),
@@ -54,7 +54,7 @@ public class FindSolidInDirection extends PlacementModifier {
                                          RandomSource randomSource,
                                          BlockPos blockPos) {
         BlockPos.MutableBlockPos POS = blockPos.mutable();
-        if (BlocksHelper.findSurface(placementContext.getLevel(),
+        if (BlocksHelper.findSurroundingSurface(placementContext.getLevel(),
                 POS,
                 direction,
                 maxSearchDistance,

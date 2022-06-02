@@ -110,13 +110,13 @@ public class ScatterFeature<FC extends ScatterFeatureConfig>
 
 
             final double distNormalizer = (config.maxSpread * Math.sqrt(2));
-            final int tryCount = (int) Math.min(16, 4 * config.maxSpread * config.maxSpread);
+            final int tryCount = config.spreadCount.sample(random);
             for (int i = 0; i < tryCount; i++) {
                 int x = origin.getX() + (int) (random.nextGaussian() * config.maxSpread);
                 int z = origin.getZ() + (int) (random.nextGaussian() * config.maxSpread);
                 POS.set(x, origin.getY(), z);
 
-                if (BlocksHelper.findSurface(level, POS, surfaceDirection, 4, config::isValidBase)) {
+                if (BlocksHelper.findSurroundingSurface(level, POS, surfaceDirection, 4, config::isValidBase)) {
                     int myHeight;
                     if (config.growWhileFree) {
                         myHeight = BlocksHelper.blockCount(level,

@@ -15,6 +15,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
  */
 public class IsEmptyAboveSampledFilter extends PlacementFilter {
     private static final IsEmptyAboveSampledFilter DEFAULT = new IsEmptyAboveSampledFilter(4, 2);
+    private static final IsEmptyAboveSampledFilter DEFAULT1 = new IsEmptyAboveSampledFilter(1, 1);
     public static final Codec<IsEmptyAboveSampledFilter> CODEC = RecordCodecBuilder.create((instance) -> instance
             .group(
                     Codec.intRange(1, 32).fieldOf("d1").orElse(2).forGetter((p) -> p.distance1),
@@ -24,6 +25,10 @@ public class IsEmptyAboveSampledFilter extends PlacementFilter {
 
     public static PlacementFilter emptyAbove4() {
         return DEFAULT;
+    }
+
+    public static PlacementFilter emptyAbove() {
+        return DEFAULT1;
     }
 
     public IsEmptyAboveSampledFilter(int d1, int d2) {
@@ -38,7 +43,8 @@ public class IsEmptyAboveSampledFilter extends PlacementFilter {
     @Override
     protected boolean shouldPlace(PlacementContext ctx, RandomSource random, BlockPos pos) {
         WorldGenLevel level = ctx.getLevel();
-        if (level.isEmptyBlock(pos.above(distance1)) && level.isEmptyBlock(pos.above(distance2))) {
+        if (level.isEmptyBlock(pos.above(distance1))
+                && (distance1 == distance2 || level.isEmptyBlock(pos.above(distance2)))) {
             return true;
         }
         return false;
