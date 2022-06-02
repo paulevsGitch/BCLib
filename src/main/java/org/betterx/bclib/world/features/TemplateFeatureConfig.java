@@ -16,7 +16,7 @@ public class TemplateFeatureConfig implements FeatureConfiguration {
             .group(
                     ExtraCodecs.nonEmptyList(StructureWorldNBT.CODEC.listOf())
                                .fieldOf("structures")
-                               .forGetter((TemplateFeatureConfig ruinedPortalStructure) -> ruinedPortalStructure.structures)
+                               .forGetter((TemplateFeatureConfig cfg) -> cfg.structures)
             )
             .apply(instance, TemplateFeatureConfig::new)
     );

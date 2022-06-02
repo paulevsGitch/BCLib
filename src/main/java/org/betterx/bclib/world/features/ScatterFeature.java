@@ -105,32 +105,44 @@ public class ScatterFeature<FC extends ScatterFeatureConfig>
         if (config.isValidBase(level.getBlockState(basePos))) {
             final Direction surfaceDirection = direction.getOpposite();
             BlockPos.MutableBlockPos POS = new BlockPos.MutableBlockPos();
+            basePos = basePos.relative(direction, 1);
             buildPillarWithBase(level, origin, basePos, direction, centerHeight, config, random);
 
 
             final double distNormalizer = (config.maxSpread * Math.sqrt(2));
-
-            for (int i = 0; i < 16; i++) {
+            final int tryCount = (int) Math.min(16, 4 * config.maxSpread * config.maxSpread);
+            for (int i = 0; i < tryCount; i++) {
                 int x = origin.getX() + (int) (random.nextGaussian() * config.maxSpread);
                 int z = origin.getZ() + (int) (random.nextGaussian() * config.maxSpread);
                 POS.set(x, origin.getY(), z);
 
                 if (BlocksHelper.findSurface(level, POS, surfaceDirection, 4, config::isValidBase)) {
+                    int myHeight;
+                    if (config.growWhileFree) {
+                        myHeight = BlocksHelper.blockCount(level,
+                                POS,
+                                direction,
+                                config.maxHeight,
+                                state -> state.getMaterial().isReplaceable());
+                    } else {
+                        myHeight = centerHeight;
+                    }
+
                     POS.move(direction, 1);
                     int dx = x - POS.getX();
                     int dz = z - POS.getZ();
                     float sizeFactor = (1 - (float) (Math.sqrt(dx * dx + dz * dz) / distNormalizer));
                     sizeFactor = (1 - (random.nextFloat() * config.sizeVariation)) * sizeFactor;
-                    final int height = (int) Math.max(
+                    myHeight = (int) Math.min(Math.max(
                             config.minHeight,
-                            config.minHeight + sizeFactor * (centerHeight - config.minHeight)
-                    );
+                            config.minHeight + sizeFactor * (myHeight - config.minHeight)
+                    ), config.maxHeight);
 
                     buildPillarWithBase(level,
                             POS,
                             POS.relative(direction.getOpposite()),
                             direction,
-                            height,
+                            myHeight,
                             config,
                             random);
                 }
@@ -147,7 +159,7 @@ public class ScatterFeature<FC extends ScatterFeatureConfig>
                                      RandomSource random) {
         if (BlocksHelper.isFreeSpace(level, origin, direction, height, (state) -> state.is(Blocks.AIR))) {
             createPatchOfBaseBlocks(level, random, basePos, config);
-            buildPillar(level, origin, direction, height, config);
+            buildPillar(level, origin, direction, height, config, random);
         }
     }
 
@@ -155,18 +167,32 @@ public class ScatterFeature<FC extends ScatterFeatureConfig>
                              BlockPos origin,
                              Direction direction,
                              int height,
-                             ScatterFeatureConfig config) {
+                             ScatterFeatureConfig config,
+                             RandomSource random) {
 
         final BlockPos.MutableBlockPos POS = origin.mutable();
         buildBaseToTipColumn(height, (blockState) -> {
             BlocksHelper.setWithoutUpdate(level, POS, blockState);
             POS.move(direction);
-        }, config);
+        }, config, random);
     }
 
-    protected void buildBaseToTipColumn(int totalHeight, Consumer<BlockState> consumer, ScatterFeatureConfig config) {
-        for (int size = totalHeight; size >= 0; size--) {
-            consumer.accept(config.createBlock(size));
+    protected void buildBaseToTipColumn(int totalHeight,
+                                        Consumer<BlockState> consumer,
+                                        ScatterFeatureConfig config,
+                                        RandomSource random) {
+        for (int size = 0; size < totalHeight; size++) {
+            consumer.accept(config.createBlock(size, totalHeight - 1, random));
+//            Block s = config.createBlock(size, totalHeight - 1, random).getBlock();
+//            if (size == 0) s = Blocks.YELLOW_CONCRETE;
+//            else if (size == 1) s = Blocks.LIME_CONCRETE;
+//            else if (size == 2) s = Blocks.CYAN_CONCRETE;
+//            else if (size == 3) s = Blocks.LIGHT_BLUE_CONCRETE;
+//            else if (size == 4) s = Blocks.BLUE_CONCRETE;
+//            else if (size == 5) s = Blocks.PURPLE_CONCRETE;
+//            else if (size == 6) s = Blocks.MAGENTA_CONCRETE;
+//            else s = Blocks.GRAY_CONCRETE;
+//            consumer.accept(s.defaultBlockState());
         }
     }
 
@@ -217,7 +243,7 @@ public class ScatterFeature<FC extends ScatterFeatureConfig>
                                             BlockPos blockPos,
                                             BlockState baseState) {
         BlockState blockState = levelAccessor.getBlockState(blockPos);
-        if (blockState.is(CommonBlockTags.STALAGMITE_BASE)) {
+        if (blockState.is(CommonBlockTags.TERRAIN)) {
             levelAccessor.setBlock(blockPos, baseState, 2);
         }
     }

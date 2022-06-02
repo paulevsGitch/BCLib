@@ -5,14 +5,15 @@ import net.minecraft.data.worldgen.placement.PlacementUtils;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.level.levelgen.GenerationStep.Decoration;
-import net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
 import net.minecraft.world.level.levelgen.placement.*;
 import net.minecraft.world.level.material.Material;
 
 import org.betterx.bclib.world.features.BCLFeature;
+import org.betterx.bclib.world.features.placement.FindSolidInDirection;
 import org.betterx.bclib.world.features.placement.IsEmptyAboveSampledFilter;
+import org.betterx.bclib.world.features.placement.MinEmptyFilter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -188,14 +189,26 @@ public class BCLFeatureBuilder<FC extends FeatureConfiguration, F extends Featur
      * @see #findSolidSurface(Direction, int) for Details
      */
     public BCLFeatureBuilder findSolidFloor(int distance) {
-        return findSolidSurface(Direction.DOWN, distance);
+        return modifier(FindSolidInDirection.down(distance));
+    }
+
+    public BCLFeatureBuilder findSolidCeil(int distance) {
+        return modifier(FindSolidInDirection.up(distance));
+    }
+
+    public BCLFeatureBuilder hasMinimumDownwardSpace() {
+        return modifier(MinEmptyFilter.down());
+    }
+
+    public BCLFeatureBuilder hasMinimumUpwardSpace() {
+        return modifier(MinEmptyFilter.up());
     }
 
 
     /**
      * Cast a ray with max {@code distance} length to find the next solid Block. The ray will travel through replaceable
-     * Blocks (see {@link Material#isReplaceable()}) and will be accepted if it hits a solid one
-     * (see {@link Material#isSolid()} ()})
+     * Blocks (see {@link Material#isReplaceable()}) and will be accepted if it hits a block with the
+     * {@link org.betterx.bclib.api.tag.CommonBlockTags#TERRAIN}-tag
      *
      * @param dir      The direction the ray is cast
      * @param distance The maximum search Distance
@@ -203,10 +216,7 @@ public class BCLFeatureBuilder<FC extends FeatureConfiguration, F extends Featur
      * @see #findSolidSurface(Direction, int) for Details
      */
     public BCLFeatureBuilder findSolidSurface(Direction dir, int distance) {
-        return modifier(EnvironmentScanPlacement.scanningFor(dir,
-                BlockPredicate.solid(),
-                BlockPredicate.replaceable(),
-                distance));
+        return modifier(new FindSolidInDirection(dir, distance));
     }
 
     public BCLFeatureBuilder heightmap() {

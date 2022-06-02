@@ -1,17 +1,25 @@
 package org.betterx.bclib.world.features;
 
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
 
-import com.mojang.datafixers.util.Function11;
+import com.mojang.datafixers.util.Function14;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import org.betterx.bclib.BCLib;
+import org.betterx.bclib.api.tag.CommonBlockTags;
 
 import java.util.Optional;
 
 public abstract class ScatterFeatureConfig implements FeatureConfiguration {
+    public interface Instancer<T extends ScatterFeatureConfig> extends Function14<BlockState, BlockState, BlockState, Optional<BlockState>, Float, Float, Float, Float, Integer, Integer, Float, Float, Float, Boolean, T> {
+    }
+
     public final BlockState clusterBlock;
+    public final BlockState tipBlock;
+    public final BlockState bottomBlock;
     public final Optional<BlockState> baseState;
     public final float baseReplaceChance;
     public final float chanceOfDirectionalSpread;
@@ -23,7 +31,11 @@ public abstract class ScatterFeatureConfig implements FeatureConfiguration {
     public final float sizeVariation;
     public final float floorChance;
 
+    public final boolean growWhileFree;
+
     public ScatterFeatureConfig(BlockState clusterBlock,
+                                BlockState tipBlock,
+                                BlockState bottomBlock,
                                 Optional<BlockState> baseState,
                                 float baseReplaceChance,
                                 float chanceOfDirectionalSpread,
@@ -33,8 +45,11 @@ public abstract class ScatterFeatureConfig implements FeatureConfiguration {
                                 int maxHeight,
                                 float maxSpread,
                                 float sizeVariation,
-                                float floorChance) {
+                                float floorChance,
+                                boolean growWhileFree) {
         this.clusterBlock = clusterBlock;
+        this.tipBlock = tipBlock == null ? clusterBlock : tipBlock;
+        this.bottomBlock = bottomBlock == null ? clusterBlock : bottomBlock;
         this.baseState = baseState;
         this.baseReplaceChance = baseReplaceChance;
         this.chanceOfDirectionalSpread = chanceOfDirectionalSpread;
@@ -45,6 +60,7 @@ public abstract class ScatterFeatureConfig implements FeatureConfiguration {
         this.maxSpread = maxSpread;
         this.sizeVariation = sizeVariation;
         this.floorChance = floorChance;
+        this.growWhileFree = growWhileFree;
     }
 
 
@@ -54,13 +70,21 @@ public abstract class ScatterFeatureConfig implements FeatureConfiguration {
 
     public abstract boolean isValidBase(BlockState state);
 
-    public abstract BlockState createBlock(int height);
+    public abstract BlockState createBlock(int height, int maxHeight, RandomSource random);
 
-    public static <T extends ScatterFeatureConfig> Codec<T> buildCodec(Function11<BlockState, Optional<BlockState>, Float, Float, Float, Float, Integer, Integer, Float, Float, Float, T> instancer) {
+    public static <T extends ScatterFeatureConfig> Codec<T> buildCodec(Instancer<T> instancer) {
         return RecordCodecBuilder.create((instance) -> instance
                 .group(BlockState.CODEC
                                 .fieldOf("cluster_block")
                                 .forGetter((T cfg) -> cfg.clusterBlock),
+                        BlockState.CODEC
+                                .fieldOf("tip_block")
+                                .orElse(null)
+                                .forGetter((T cfg) -> cfg.tipBlock),
+                        BlockState.CODEC
+                                .fieldOf("bottom_block")
+                                .orElse(null)
+                                .forGetter((T cfg) -> cfg.bottomBlock),
                         BlockState.CODEC
                                 .optionalFieldOf("base_state")
                                 .forGetter((T cfg) -> cfg.baseState),
@@ -108,10 +132,215 @@ public abstract class ScatterFeatureConfig implements FeatureConfiguration {
                                 .floatRange(0, 1)
                                 .fieldOf("floor_chance")
                                 .orElse(0.5f)
-                                .forGetter((T cfg) -> cfg.floorChance)
+                                .forGetter((T cfg) -> cfg.floorChance),
+                        Codec
+                                .BOOL
+                                .fieldOf("grow_while_empty")
+                                .orElse(false)
+                                .forGetter((T cfg) -> cfg.growWhileFree)
                 )
                 .apply(instance, instancer)
         );
+    }
+
+    public static class Builder<T extends ScatterFeatureConfig> {
+        private BlockState clusterBlock;
+        private BlockState tipBlock;
+        private BlockState bottomBlock;
+        private Optional<BlockState> baseState = Optional.empty();
+        private float baseReplaceChance = 0;
+        private float chanceOfDirectionalSpread = 0;
+        private float chanceOfSpreadRadius2 = 0;
+        private float chanceOfSpreadRadius3 = 0;
+        private int minHeight = 2;
+        private int maxHeight = 12;
+        private float maxSpread = 0;
+        private float sizeVariation = 0;
+        private float floorChance = 0.5f;
+        private boolean growWhileFree = false;
+        private final Instancer<T> instancer;
+
+        public Builder(Instancer<T> instancer) {
+            this.instancer = instancer;
+        }
+
+        public static <T extends ScatterFeatureConfig> Builder<T> start(Instancer<T> instancer) {
+            return new Builder<>(instancer);
+        }
+
+        public Builder<T> block(Block b) {
+            return block(b.defaultBlockState());
+        }
+
+        public Builder<T> singleBlock(Block b) {
+            return block(b.defaultBlockState()).heightRange(1, 1).spread(0, 0);
+        }
+
+        public Builder<T> block(BlockState s) {
+            this.clusterBlock = s;
+            if (tipBlock == null) tipBlock = s;
+            if (bottomBlock == null) bottomBlock = s;
+            return this;
+        }
+
+        public Builder<T> tipBlock(BlockState s) {
+            tipBlock = s;
+            return this;
+        }
+
+        public Builder<T> bottomBlock(BlockState s) {
+            bottomBlock = s;
+            return this;
+        }
+
+        public Builder<T> heightRange(int min, int max) {
+            minHeight = min;
+            maxHeight = max;
+            return this;
+        }
+
+        public Builder<T> growWhileFree() {
+            growWhileFree = true;
+            return this;
+        }
+
+        public Builder<T> minHeight(int h) {
+            minHeight = h;
+            return this;
+        }
+
+        public Builder<T> maxHeight(int h) {
+            maxHeight = h;
+            return this;
+        }
+
+        public Builder<T> generateBaseBlock(BlockState baseState) {
+            return generateBaseBlock(baseState, 1, 0, 0, 0);
+        }
+
+        public Builder<T> generateBaseBlock(BlockState baseState, float baseReplaceChance) {
+            return generateBaseBlock(baseState, baseReplaceChance, 0, 0, 0);
+        }
+
+
+        public Builder<T> generateBaseBlock(BlockState baseState,
+                                            float chanceOfDirectionalSpread,
+                                            float chanceOfSpreadRadius2,
+                                            float chanceOfSpreadRadius3) {
+            return generateBaseBlock(baseState,
+                    1,
+                    chanceOfDirectionalSpread,
+                    chanceOfSpreadRadius2,
+                    chanceOfSpreadRadius3);
+        }
+
+        public Builder<T> generateBaseBlock(BlockState baseState,
+                                            float baseReplaceChance,
+                                            float chanceOfDirectionalSpread,
+                                            float chanceOfSpreadRadius2,
+                                            float chanceOfSpreadRadius3) {
+            if (this.baseState.isPresent() && this.baseReplaceChance == 0) {
+                BCLib.LOGGER.error("Base generation was already selected.");
+            }
+            this.baseState = Optional.of(baseState);
+            this.baseReplaceChance = baseReplaceChance;
+            this.chanceOfDirectionalSpread = chanceOfDirectionalSpread;
+            this.chanceOfSpreadRadius2 = chanceOfSpreadRadius2;
+            this.chanceOfSpreadRadius3 = chanceOfSpreadRadius3;
+            return this;
+        }
+
+        public Builder<T> spread(float maxSpread, float sizeVariation) {
+            this.maxSpread = maxSpread;
+            this.sizeVariation = sizeVariation;
+            return this;
+        }
+
+        public Builder<T> floorChance(float chance) {
+            this.floorChance = chance;
+            return this;
+        }
+
+        public Builder<T> onFloor() {
+            this.floorChance = 1;
+            return this;
+        }
+
+        public Builder<T> onCeil() {
+            this.floorChance = 0;
+            return this;
+        }
+
+        public T build() {
+            return instancer.apply(
+                    this.clusterBlock,
+                    this.tipBlock,
+                    this.bottomBlock,
+                    this.baseState,
+                    this.baseReplaceChance,
+                    this.chanceOfDirectionalSpread,
+                    this.chanceOfSpreadRadius2,
+                    this.chanceOfSpreadRadius3,
+                    this.minHeight,
+                    this.maxHeight,
+                    this.maxSpread,
+                    this.sizeVariation,
+                    this.floorChance,
+                    this.growWhileFree
+            );
+        }
+    }
+
+    public static class OnSolid extends ScatterFeatureConfig {
+        public static final Codec<OnSolid> CODEC = buildCodec(OnSolid::new);
+
+        public OnSolid(BlockState clusterBlock,
+                       BlockState tipBlock,
+                       BlockState bottomBlock,
+                       Optional<BlockState> baseState,
+                       float baseReplaceChance,
+                       float chanceOfDirectionalSpread,
+                       float chanceOfSpreadRadius2,
+                       float chanceOfSpreadRadius3,
+                       int minHeight,
+                       int maxHeight,
+                       float maxSpread,
+                       float sizeVariation,
+                       float floorChance,
+                       boolean growWhileFree) {
+            super(clusterBlock,
+                    tipBlock,
+                    bottomBlock,
+                    baseState,
+                    baseReplaceChance,
+                    chanceOfDirectionalSpread,
+                    chanceOfSpreadRadius2,
+                    chanceOfSpreadRadius3,
+                    minHeight,
+                    maxHeight,
+                    maxSpread,
+                    sizeVariation,
+                    floorChance,
+                    growWhileFree);
+        }
+
+        public static Builder<OnSolid> startOnSolid() {
+            return Builder.start(OnSolid::new);
+        }
+
+
+        @Override
+        public boolean isValidBase(BlockState state) {
+            return state.is(CommonBlockTags.TERRAIN);
+        }
+
+        @Override
+        public BlockState createBlock(int height, int maxHeight, RandomSource random) {
+            if (height == 0) return this.bottomBlock;
+            return height == maxHeight
+                    ? this.tipBlock
+                    : this.clusterBlock;
+        }
     }
 
 }

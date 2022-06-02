@@ -17,6 +17,26 @@ public class PlacementModifiers {
             "min_empty_filter",
             MinEmptyFilter.CODEC);
 
+    public static final PlacementModifierType<FindSolidInDirection> SOLID_IN_DIR = register(
+            "solid_in_dir",
+            FindSolidInDirection.CODEC);
+
+    public static final PlacementModifierType<Stencil> STENCIL = register(
+            "stencil",
+            Stencil.CODEC);
+
+    public static final PlacementModifierType<IsBasin> IS_BASIN = register(
+            "is_basin",
+            IsBasin.CODEC);
+
+    public static final PlacementModifierType<Offset> OFFSET = register(
+            "offset",
+            Offset.CODEC);
+
+    public static final PlacementModifierType<Extend> EXTEND = register(
+            "extend",
+            Extend.CODEC);
+
 
     private static <P extends PlacementModifier> PlacementModifierType<P> register(String path, Codec<P> codec) {
         return register(BCLib.makeID(path), codec);

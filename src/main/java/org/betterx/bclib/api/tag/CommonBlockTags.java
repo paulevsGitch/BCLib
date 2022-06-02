@@ -29,7 +29,7 @@ public class CommonBlockTags {
     public static final TagKey<Block> MINABLE_WITH_HAMMER = TagAPI.makeCommonBlockTag("mineable/hammer");
 
     public static final TagKey<Block> IS_OBSIDIAN = TagAPI.makeCommonBlockTag("is_obsidian");
-    public static final TagKey<Block> STALAGMITE_BASE = TagAPI.makeCommonBlockTag("stalagmite_base_blocks");
+    public static final TagKey<Block> TERRAIN = TagAPI.makeCommonBlockTag("terrain");
 
     static {
         TagAPI.BLOCKS.add(END_STONES, Blocks.END_STONE);
@@ -47,8 +47,7 @@ public class CommonBlockTags {
 
         TagAPI.BLOCKS.add(IS_OBSIDIAN, Blocks.OBSIDIAN, Blocks.CRYING_OBSIDIAN);
 
-        TagAPI.BLOCKS.add(STALAGMITE_BASE, Blocks.DIAMOND_BLOCK);
-        TagAPI.BLOCKS.addOtherTags(STALAGMITE_BASE,
+        TagAPI.BLOCKS.addOtherTags(TERRAIN,
                 BlockTags.DRIPSTONE_REPLACEABLE,
                 BlockTags.BASE_STONE_OVERWORLD,
                 NETHER_STONES,
