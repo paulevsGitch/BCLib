@@ -1,4 +1,4 @@
-package org.betterx.bclib.world.features;
+package org.betterx.bclib.api.features.config;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.ExtraCodecs;

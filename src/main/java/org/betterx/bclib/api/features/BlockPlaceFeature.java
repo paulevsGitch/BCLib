@@ -1,10 +1,11 @@
-package org.betterx.bclib.world.features;
+package org.betterx.bclib.api.features;
 
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
 
 import com.mojang.serialization.Codec;
+import org.betterx.bclib.api.features.config.BlockPlaceFeatureConfig;
 import org.betterx.bclib.util.BlocksHelper;
 
 import java.util.Optional;

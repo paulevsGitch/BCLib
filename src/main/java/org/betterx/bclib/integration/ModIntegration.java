@@ -18,8 +18,8 @@ import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.fabricmc.loader.api.FabricLoader;
 
 import org.betterx.bclib.BCLib;
+import org.betterx.bclib.api.features.BCLFeature;
 import org.betterx.bclib.api.tag.TagAPI;
-import org.betterx.bclib.world.features.BCLFeature;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;

@@ -42,6 +42,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.betterx.bclib.BCLib;
+import org.betterx.bclib.api.features.BCLFeature;
 import org.betterx.bclib.api.tag.CommonBiomeTags;
 import org.betterx.bclib.api.tag.TagAPI;
 import org.betterx.bclib.interfaces.BiomeSourceAccessor;
@@ -51,7 +52,6 @@ import org.betterx.bclib.interfaces.SurfaceRuleProvider;
 import org.betterx.bclib.mixin.common.BiomeGenerationSettingsAccessor;
 import org.betterx.bclib.mixin.common.MobSpawnSettingsAccessor;
 import org.betterx.bclib.util.CollectionsUtil;
-import org.betterx.bclib.world.features.BCLFeature;
 
 import java.util.List;
 import java.util.Map;

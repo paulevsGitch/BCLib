@@ -1,4 +1,4 @@
-package org.betterx.bclib.world.features.placement;
+package org.betterx.bclib.api.features.placement;
 
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;

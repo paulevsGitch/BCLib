@@ -1,4 +1,4 @@
-package org.betterx.bclib.world.features;
+package org.betterx.bclib.api.features;
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
@@ -15,6 +15,8 @@ import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraft.world.level.levelgen.placement.PlacementModifier;
 
 import org.betterx.bclib.BCLib;
+import org.betterx.bclib.api.features.config.BlockPlaceFeatureConfig;
+import org.betterx.bclib.api.features.config.ScatterFeatureConfig;
 
 import java.util.Map.Entry;
 import java.util.Optional;

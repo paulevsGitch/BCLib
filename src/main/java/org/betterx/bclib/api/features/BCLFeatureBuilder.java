@@ -13,8 +13,7 @@ import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfigur
 import net.minecraft.world.level.levelgen.placement.*;
 import net.minecraft.world.level.material.Material;
 
-import org.betterx.bclib.world.features.BCLFeature;
-import org.betterx.bclib.world.features.placement.*;
+import org.betterx.bclib.api.features.placement.*;
 
 import java.util.ArrayList;
 import java.util.List;

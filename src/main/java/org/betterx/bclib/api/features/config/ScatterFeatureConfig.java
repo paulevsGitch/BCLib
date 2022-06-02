@@ -1,4 +1,4 @@
-package org.betterx.bclib.world.features;
+package org.betterx.bclib.api.features.config;
 
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.valueproviders.ConstantInt;

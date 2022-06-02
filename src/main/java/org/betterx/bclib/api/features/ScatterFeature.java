@@ -1,4 +1,4 @@
-package org.betterx.bclib.world.features;
+package org.betterx.bclib.api.features;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -22,7 +22,7 @@ import net.minecraft.world.level.levelgen.feature.configurations.SimpleRandomFea
 import net.minecraft.world.level.levelgen.placement.*;
 
 import com.mojang.serialization.Codec;
-import org.betterx.bclib.api.features.BCLFeatureBuilder;
+import org.betterx.bclib.api.features.config.ScatterFeatureConfig;
 import org.betterx.bclib.api.tag.CommonBlockTags;
 import org.betterx.bclib.util.BlocksHelper;
 

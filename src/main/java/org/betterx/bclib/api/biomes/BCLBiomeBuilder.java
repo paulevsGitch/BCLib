@@ -29,6 +29,7 @@ import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import org.betterx.bclib.api.features.BCLFeature;
 import org.betterx.bclib.api.structures.BCLStructure;
 import org.betterx.bclib.api.surface.SurfaceRuleBuilder;
 import org.betterx.bclib.entity.BCLEntityWrapper;
@@ -37,7 +38,6 @@ import org.betterx.bclib.util.CollectionsUtil;
 import org.betterx.bclib.util.ColorUtil;
 import org.betterx.bclib.util.Pair;
 import org.betterx.bclib.util.TriFunction;
-import org.betterx.bclib.world.features.BCLFeature;
 
 import java.util.ArrayList;
 import java.util.List;
