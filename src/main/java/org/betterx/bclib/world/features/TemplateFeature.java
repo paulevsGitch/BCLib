@@ -1,15 +1,10 @@
 package org.betterx.bclib.world.features;
 
-import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.GenerationStep;
-import net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
-import net.minecraft.world.level.levelgen.placement.BiomeFilter;
-import net.minecraft.world.level.levelgen.placement.EnvironmentScanPlacement;
 
 import com.mojang.serialization.Codec;
 import org.betterx.bclib.api.features.BCLFeatureBuilder;
@@ -29,30 +24,28 @@ public class TemplateFeature<FC extends TemplateFeatureConfig> extends Feature<F
         return BCLFeatureBuilder
                 .start(location, INSTANCE)
                 .decoration(GenerationStep.Decoration.SURFACE_STRUCTURES)
-                .squarePlacement()
-                .distanceToTopAndBottom10()
-                .modifier(EnvironmentScanPlacement.scanningFor(Direction.DOWN,
-                        BlockPredicate.solid(),
-                        BlockPredicate.matchesBlocks(Blocks.AIR,
-                                Blocks.WATER,
-                                Blocks.LAVA),
-                        12))
-                .modifier(BiomeFilter.biome())
-                .oncePerChunks(onceEveryChunk)
+                .oncePerChunks(onceEveryChunk) //discard neighboring chunks
+                .count(16) //try 16 placements in chunk
+                .squarePlacement() //randomize x/z in chunk
+                .randomHeight10FromFloorCeil() //randomize height 10 above and 10 below max vertical
+                .findSolidFloor(12) //cast downward ray to find solid surface
+                .isEmptyAbove4() //make sure we have 4 free blocks above
+                .onlyInBiome() //ensure that we still are in the correct biome
+
                 .buildAndRegister(configuration);
     }
 
     public static <T extends TemplateFeatureConfig> BCLFeature createAndRegister(ResourceLocation location,
                                                                                  TemplateFeatureConfig configuration,
                                                                                  int count) {
-
-
         return BCLFeatureBuilder
                 .start(location, INSTANCE)
                 .decoration(GenerationStep.Decoration.SURFACE_STRUCTURES)
                 .count(count)
                 .squarePlacement()
-                .distanceToTopAndBottom10()
+                .randomHeight10FromFloorCeil()
+                .findSolidFloor(12) //cast downward ray to find solid surface
+                .isEmptyAbove4()
                 .onlyInBiome()
                 .buildAndRegister(configuration);
     }

@@ -104,8 +104,6 @@ public class StructureWorldNBT extends StructureNBT {
             return canGenerateUnder(level, pos, rotation);
         else if (type == StructurePlacementType.CEIL)
             return canGenerateCeil(level, pos, rotation);
-        else if (type == StructurePlacementType.FLOOR_FREE_ABOVE)
-            return canGenerateFloorFreeAbove(level, pos, rotation);
         else
             return false;
     }

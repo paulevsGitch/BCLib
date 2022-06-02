@@ -5,7 +5,7 @@ import net.minecraft.util.StringRepresentable;
 import com.mojang.serialization.Codec;
 
 public enum StructurePlacementType implements StringRepresentable {
-    FLOOR, WALL, CEIL, LAVA, UNDER, FLOOR_FREE_ABOVE;
+    FLOOR, WALL, CEIL, LAVA, UNDER;
 
     public static final Codec<StructurePlacementType> CODEC = StringRepresentable.fromEnum(StructurePlacementType::values);
 

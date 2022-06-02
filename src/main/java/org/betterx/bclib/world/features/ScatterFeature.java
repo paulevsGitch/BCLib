@@ -2,6 +2,7 @@ package org.betterx.bclib.world.features;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
 import net.minecraft.data.worldgen.placement.PlacementUtils;
 import net.minecraft.resources.ResourceLocation;
@@ -25,6 +26,8 @@ import org.betterx.bclib.api.features.BCLFeatureBuilder;
 import org.betterx.bclib.api.tag.CommonBlockTags;
 import org.betterx.bclib.util.BlocksHelper;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -35,28 +38,32 @@ public class ScatterFeature<FC extends ScatterFeatureConfig>
                                                                                 int minPerChunk,
                                                                                 int maxPerChunk,
                                                                                 T cfg,
-                                                                                Feature<T> inlineFeatures) {
-        SimpleRandomFeatureConfiguration configuration = new SimpleRandomFeatureConfiguration(HolderSet.direct(
-                PlacementUtils.inlinePlaced(inlineFeatures,
-                        cfg,
-                        EnvironmentScanPlacement.scanningFor(Direction.DOWN,
-                                BlockPredicate.solid(),
-                                BlockPredicate.ONLY_IN_AIR_PREDICATE,
-                                12),
-                        RandomOffsetPlacement.vertical(ConstantInt.of(1))),
-                PlacementUtils.inlinePlaced(inlineFeatures,
-                        cfg,
-                        EnvironmentScanPlacement.scanningFor(Direction.UP,
-                                BlockPredicate.solid(),
-                                BlockPredicate.ONLY_IN_AIR_PREDICATE,
-                                12),
-                        RandomOffsetPlacement.vertical(ConstantInt.of(-1)))));
+                                                                                Feature<T> inlineFeature) {
+        List<Holder<PlacedFeature>> set = new ArrayList<>(2);
+        if (cfg.floorChance > 0) set.add(PlacementUtils.inlinePlaced(inlineFeature,
+                cfg,
+                EnvironmentScanPlacement.scanningFor(Direction.DOWN,
+                        BlockPredicate.solid(),
+                        BlockPredicate.ONLY_IN_AIR_PREDICATE,
+                        12),
+                RandomOffsetPlacement.vertical(ConstantInt.of(1))));
+
+        if (cfg.floorChance < 1) {
+            set.add(PlacementUtils.inlinePlaced(inlineFeature,
+                    cfg,
+                    EnvironmentScanPlacement.scanningFor(Direction.UP,
+                            BlockPredicate.solid(),
+                            BlockPredicate.ONLY_IN_AIR_PREDICATE,
+                            12),
+                    RandomOffsetPlacement.vertical(ConstantInt.of(-1))));
+        }
+        SimpleRandomFeatureConfiguration configuration = new SimpleRandomFeatureConfiguration(HolderSet.direct(set));
 
         return BCLFeatureBuilder.start(location, SIMPLE_RANDOM_SELECTOR)
                                 .decoration(GenerationStep.Decoration.VEGETAL_DECORATION)
                                 .modifier(CountPlacement.of(UniformInt.of(minPerChunk, maxPerChunk)))
                                 .modifier(InSquarePlacement.spread())
-                                .distanceToTopAndBottom4()
+                                .randomHeight4FromFloorCeil()
                                 .modifier(CountPlacement.of(UniformInt.of(2, 5)))
                                 .modifier(RandomOffsetPlacement.of(
                                         ClampedNormalInt.of(0.0f, 2.0f, -6, 6),

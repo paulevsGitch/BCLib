@@ -245,6 +245,22 @@ public class BlocksHelper {
         return true;
     }
 
+    public static int blockCount(LevelAccessor level,
+                                 BlockPos startPos,
+                                 Direction dir,
+                                 int length,
+                                 Predicate<BlockState> freeSurface) {
+        MutableBlockPos POS = startPos.mutable();
+        for (int len = 1; len < length; len++) {
+            POS.move(dir, 1);
+            if (!freeSurface.test(level.getBlockState(POS))) {
+                return len - 1;
+            }
+
+        }
+        return length;
+    }
+
     public static boolean isLava(BlockState state) {
         return state.getFluidState().getType() instanceof LavaFluid;
     }

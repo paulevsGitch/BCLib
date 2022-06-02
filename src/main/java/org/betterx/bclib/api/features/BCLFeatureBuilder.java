@@ -1,14 +1,18 @@
 package org.betterx.bclib.api.features;
 
+import net.minecraft.core.Direction;
 import net.minecraft.data.worldgen.placement.PlacementUtils;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.level.levelgen.GenerationStep.Decoration;
+import net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
 import net.minecraft.world.level.levelgen.placement.*;
+import net.minecraft.world.level.material.Material;
 
 import org.betterx.bclib.world.features.BCLFeature;
+import org.betterx.bclib.world.features.placement.IsEmptyAboveSampledFilter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -132,12 +136,77 @@ public class BCLFeatureBuilder<FC extends FeatureConfiguration, F extends Featur
         return modifier(InSquarePlacement.spread());
     }
 
-    public BCLFeatureBuilder distanceToTopAndBottom10() {
+    /**
+     * Select random height that is 10 above min Build height and 10 below max generation height
+     *
+     * @return The instance it was called on
+     */
+    public BCLFeatureBuilder randomHeight10FromFloorCeil() {
         return modifier(PlacementUtils.RANGE_10_10);
     }
 
-    public BCLFeatureBuilder distanceToTopAndBottom4() {
+    /**
+     * Select random height that is 4 above min Build height and 10 below max generation height
+     *
+     * @return The instance it was called on
+     */
+    public BCLFeatureBuilder randomHeight4FromFloorCeil() {
         return modifier(PlacementUtils.RANGE_4_4);
+    }
+
+    /**
+     * Select random height that is 8 above min Build height and 10 below max generation height
+     *
+     * @return The instance it was called on
+     */
+    public BCLFeatureBuilder randomHeight8FromFloorCeil() {
+        return modifier(PlacementUtils.RANGE_8_8);
+    }
+
+    /**
+     * Select random height that is above min Build height and 10 below max generation height
+     *
+     * @return The instance it was called on
+     */
+    public BCLFeatureBuilder randomHeight() {
+        return modifier(PlacementUtils.FULL_RANGE);
+    }
+
+    public BCLFeatureBuilder isEmptyAbove4() {
+        return modifier(IsEmptyAboveSampledFilter.emptyAbove4());
+    }
+
+    public BCLFeatureBuilder isEmptyAbove(int d1, int d2) {
+        return modifier(new IsEmptyAboveSampledFilter(d1, d2));
+    }
+
+    /**
+     * Cast a downward ray with max {@code distance} length to find the next solid Block.
+     *
+     * @param distance The maximum search Distance
+     * @return The instance it was called on
+     * @see #findSolidSurface(Direction, int) for Details
+     */
+    public BCLFeatureBuilder findSolidFloor(int distance) {
+        return findSolidSurface(Direction.DOWN, distance);
+    }
+
+
+    /**
+     * Cast a ray with max {@code distance} length to find the next solid Block. The ray will travel through replaceable
+     * Blocks (see {@link Material#isReplaceable()}) and will be accepted if it hits a solid one
+     * (see {@link Material#isSolid()} ()})
+     *
+     * @param dir      The direction the ray is cast
+     * @param distance The maximum search Distance
+     * @return The instance it was called on
+     * @see #findSolidSurface(Direction, int) for Details
+     */
+    public BCLFeatureBuilder findSolidSurface(Direction dir, int distance) {
+        return modifier(EnvironmentScanPlacement.scanningFor(dir,
+                BlockPredicate.solid(),
+                BlockPredicate.replaceable(),
+                distance));
     }
 
     public BCLFeatureBuilder heightmap() {

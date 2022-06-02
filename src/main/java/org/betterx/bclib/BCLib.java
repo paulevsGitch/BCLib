@@ -22,6 +22,7 @@ import org.betterx.bclib.recipes.CraftingRecipes;
 import org.betterx.bclib.registry.BaseBlockEntities;
 import org.betterx.bclib.registry.BaseRegistry;
 import org.betterx.bclib.util.Logger;
+import org.betterx.bclib.world.features.placement.PlacementModifiers;
 import org.betterx.bclib.world.generator.BCLibEndBiomeSource;
 import org.betterx.bclib.world.generator.BCLibNetherBiomeSource;
 import org.betterx.bclib.world.generator.GeneratorOptions;
@@ -50,16 +51,17 @@ public class BCLib implements ModInitializer {
         AnvilRecipe.register();
 
         DataExchangeAPI.registerDescriptors(List.of(
-                                                    HelloClient.DESCRIPTOR,
-                                                    HelloServer.DESCRIPTOR,
-                                                    RequestFiles.DESCRIPTOR,
-                                                    SendFiles.DESCRIPTOR,
-                                                    Chunker.DESCRIPTOR
-                                                   )
-                                           );
+                        HelloClient.DESCRIPTOR,
+                        HelloServer.DESCRIPTOR,
+                        RequestFiles.DESCRIPTOR,
+                        SendFiles.DESCRIPTOR,
+                        Chunker.DESCRIPTOR
+                )
+        );
 
         BCLibPatch.register();
         TemplatePiece.ensureStaticInitialization();
+        PlacementModifiers.ensureStaticInitialization();
         Configs.save();
         if (isDevEnvironment()) {
             Biome.BiomeBuilder builder = new Biome.BiomeBuilder()
