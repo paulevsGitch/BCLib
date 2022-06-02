@@ -91,6 +91,10 @@ public class BCLFeatureBuilder<FC extends FeatureConfiguration, F extends Featur
         return modifier(CountPlacement.of(UniformInt.of(0, count)));
     }
 
+    public BCLFeatureBuilder countRange(int min, int max) {
+        return modifier(CountPlacement.of(UniformInt.of(min, max)));
+    }
+
     /**
      * Generate feature in certain iterations (per chunk).
      * Feature will be generated on all layers (example - Nether plants).

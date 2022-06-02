@@ -14,10 +14,20 @@ import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfigur
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraft.world.level.levelgen.placement.PlacementModifier;
 
+import org.betterx.bclib.BCLib;
+
 import java.util.Map.Entry;
 import java.util.Optional;
 
 public class BCLFeature {
+    public static final Feature<ScatterFeatureConfig.OnSolid> SCATTER_ON_SOLID = register(
+            BCLib.makeID("scatter_on_solid"),
+            new ScatterFeature<>(ScatterFeatureConfig.OnSolid.CODEC)
+    );
+    public static final Feature<BlockPlaceFeatureConfig> PLACE_BLOCK = register(
+            BCLib.makeID("place_block"),
+            new BlockPlaceFeature<>(BlockPlaceFeatureConfig.CODEC)
+    );
     private final Holder<PlacedFeature> placedFeature;
     private final Decoration featureStep;
     private final Feature<?> feature;
@@ -81,7 +91,8 @@ public class BCLFeature {
         return optional.isPresent();
     }
 
-    public static <C extends FeatureConfiguration, F extends Feature<C>> F register(String string, F feature) {
+    public static <C extends FeatureConfiguration, F extends Feature<C>> F register(ResourceLocation string,
+                                                                                    F feature) {
         return Registry.register(Registry.FEATURE, string, feature);
     }
 

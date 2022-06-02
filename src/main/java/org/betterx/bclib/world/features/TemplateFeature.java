@@ -7,12 +7,13 @@ import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
 
 import com.mojang.serialization.Codec;
+import org.betterx.bclib.BCLib;
 import org.betterx.bclib.api.features.BCLFeatureBuilder;
 import org.betterx.bclib.world.structures.StructureNBT;
 import org.betterx.bclib.world.structures.StructureWorldNBT;
 
 public class TemplateFeature<FC extends TemplateFeatureConfig> extends Feature<FC> {
-    public static final Feature<TemplateFeatureConfig> INSTANCE = BCLFeature.register("template",
+    public static final Feature<TemplateFeatureConfig> INSTANCE = BCLFeature.register(BCLib.makeID("template"),
             new TemplateFeature(
                     TemplateFeatureConfig.CODEC));
 
