@@ -15,7 +15,6 @@ import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraft.world.level.levelgen.placement.PlacementModifier;
 
 import org.betterx.bclib.BCLib;
-import org.betterx.bclib.api.features.config.BlockPlaceFeatureConfig;
 import org.betterx.bclib.api.features.config.ScatterFeatureConfig;
 
 import java.util.Map.Entry;
@@ -25,11 +24,7 @@ public class BCLFeature {
     public static final Feature<ScatterFeatureConfig.OnSolid> SCATTER_ON_SOLID = register(
             BCLib.makeID("scatter_on_solid"),
             new ScatterFeature<>(ScatterFeatureConfig.OnSolid.CODEC)
-    );
-    public static final Feature<BlockPlaceFeatureConfig> PLACE_BLOCK = register(
-            BCLib.makeID("place_block"),
-            new BlockPlaceFeature<>(BlockPlaceFeatureConfig.CODEC)
-    );
+                                                                                         );
     private final Holder<PlacedFeature> placedFeature;
     private final Decoration featureStep;
     private final Feature<?> feature;
@@ -67,12 +62,12 @@ public class BCLFeature {
         Holder<ConfiguredFeature<?, ?>> configuredFeature;
         if (!BuiltinRegistries.CONFIGURED_FEATURE.containsKey(id)) {
             configuredFeature = (Holder<ConfiguredFeature<?, ?>>) (Object) FeatureUtils.register(id.toString(),
-                    feature,
-                    configuration);
+                                                                                                 feature,
+                                                                                                 configuration);
         } else {
             configuredFeature = BuiltinRegistries.CONFIGURED_FEATURE
                     .getHolder(ResourceKey.create(BuiltinRegistries.CONFIGURED_FEATURE.key(),
-                            id))
+                                                  id))
                     .orElseThrow();
         }
 
@@ -80,7 +75,7 @@ public class BCLFeature {
             return PlacementUtils.register(id.toString(), configuredFeature, modifiers);
         } else {
             return BuiltinRegistries.PLACED_FEATURE.getHolder(ResourceKey.create(BuiltinRegistries.PLACED_FEATURE.key(),
-                    id)).orElseThrow();
+                                                                                 id)).orElseThrow();
         }
     }
 

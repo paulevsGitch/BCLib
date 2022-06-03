@@ -221,6 +221,31 @@ public class BlocksHelper {
         return false;
     }
 
+    public static boolean findOnSurroundingSurface(LevelAccessor level,
+                                                   MutableBlockPos startPos,
+                                                   Direction dir,
+                                                   int length,
+                                                   Predicate<BlockState> surface) {
+        for (int len = 0; len < length; len++) {
+            if (surface.test(level.getBlockState(startPos))) {
+                if (len == 0) { //we started inside of the surface
+                    for (int lenUp = 0; lenUp < length; lenUp++) {
+                        startPos.move(dir, -1);
+                        if (!surface.test(level.getBlockState(startPos))) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+                startPos.move(dir, -1);
+                return true;
+            }
+
+            startPos.move(dir, 1);
+        }
+        return false;
+    }
+
     public static boolean findSurroundingSurface(LevelAccessor level,
                                                  MutableBlockPos startPos,
                                                  Direction dir,

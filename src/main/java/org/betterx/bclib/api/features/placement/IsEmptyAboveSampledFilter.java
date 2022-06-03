@@ -16,19 +16,40 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 public class IsEmptyAboveSampledFilter extends PlacementFilter {
     private static final IsEmptyAboveSampledFilter DEFAULT = new IsEmptyAboveSampledFilter(4, 2);
     private static final IsEmptyAboveSampledFilter DEFAULT1 = new IsEmptyAboveSampledFilter(1, 1);
+    private static final IsEmptyAboveSampledFilter DEFAULT2 = new IsEmptyAboveSampledFilter(1, 2);
+
+    private static final IsEmptyAboveSampledFilter BELOW_DEFAULT = new IsEmptyAboveSampledFilter(-4, -2);
+    private static final IsEmptyAboveSampledFilter BELOW_DEFAULT1 = new IsEmptyAboveSampledFilter(-1, -1);
+    private static final IsEmptyAboveSampledFilter BELOW_DEFAULT2 = new IsEmptyAboveSampledFilter(-1, -2);
     public static final Codec<IsEmptyAboveSampledFilter> CODEC = RecordCodecBuilder.create((instance) -> instance
             .group(
-                    Codec.intRange(1, 32).fieldOf("d1").orElse(2).forGetter((p) -> p.distance1),
-                    Codec.intRange(1, 32).fieldOf("d2").orElse(4).forGetter((p) -> p.distance1)
-            )
+                    Codec.intRange(-32, 32).fieldOf("d1").orElse(4).forGetter((p) -> p.distance1),
+                    Codec.intRange(-32, 32).fieldOf("d2").orElse(2).forGetter((p) -> p.distance1)
+                  )
             .apply(instance, IsEmptyAboveSampledFilter::new));
 
     public static PlacementFilter emptyAbove4() {
         return DEFAULT;
     }
 
+    public static PlacementFilter emptyAbove2() {
+        return DEFAULT2;
+    }
+
     public static PlacementFilter emptyAbove() {
         return DEFAULT1;
+    }
+
+    public static PlacementFilter emptyBelow4() {
+        return BELOW_DEFAULT;
+    }
+
+    public static PlacementFilter emptyBelow2() {
+        return BELOW_DEFAULT2;
+    }
+
+    public static PlacementFilter emptyBelow() {
+        return BELOW_DEFAULT1;
     }
 
     public IsEmptyAboveSampledFilter(int d1, int d2) {
