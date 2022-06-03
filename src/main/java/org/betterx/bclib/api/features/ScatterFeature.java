@@ -23,7 +23,6 @@ import net.minecraft.world.level.levelgen.placement.*;
 
 import com.mojang.serialization.Codec;
 import org.betterx.bclib.api.features.config.ScatterFeatureConfig;
-import org.betterx.bclib.api.tag.CommonBlockTags;
 import org.betterx.bclib.util.BlocksHelper;
 
 import java.util.ArrayList;
@@ -243,7 +242,7 @@ public class ScatterFeature<FC extends ScatterFeatureConfig>
                                             BlockPos blockPos,
                                             BlockState baseState) {
         BlockState blockState = levelAccessor.getBlockState(blockPos);
-        if (blockState.is(CommonBlockTags.TERRAIN)) {
+        if (BlocksHelper.isTerrain(blockState)) {
             levelAccessor.setBlock(blockPos, baseState, 2);
         }
     }

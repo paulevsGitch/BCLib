@@ -10,6 +10,7 @@ import net.minecraft.world.level.levelgen.placement.PlacementModifier;
 import net.minecraft.world.level.levelgen.placement.PlacementModifierType;
 
 import com.mojang.serialization.Codec;
+import org.betterx.bclib.util.BlocksHelper;
 
 import java.util.stream.Stream;
 
@@ -60,15 +61,11 @@ public class OnEveryLayer
         for (int y = startY; y >= ctx.getMinBuildHeight() + 1; --y) {
             mPos.setY(y - 1);
             BlockState belowState = ctx.getBlockState(mPos);
-            if (!OnEveryLayer.isEmpty(belowState) && OnEveryLayer.isEmpty(nowState) && !belowState.is(Blocks.BEDROCK)) {
+            if (BlocksHelper.isTerrain(belowState) && BlocksHelper.isFreeOrFluid(nowState) && !belowState.is(Blocks.BEDROCK)) {
                 return mPos.getY() + 1;
             }
             nowState = belowState;
         }
         return Integer.MAX_VALUE;
-    }
-
-    private static boolean isEmpty(BlockState blockState) {
-        return blockState.isAir() || blockState.is(Blocks.WATER) || blockState.is(Blocks.LAVA);
     }
 }

@@ -12,7 +12,7 @@ import com.mojang.datafixers.util.Function15;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import org.betterx.bclib.BCLib;
-import org.betterx.bclib.api.tag.CommonBlockTags;
+import org.betterx.bclib.util.BlocksHelper;
 
 import java.util.Optional;
 
@@ -352,7 +352,7 @@ public abstract class ScatterFeatureConfig implements FeatureConfiguration {
 
         @Override
         public boolean isValidBase(BlockState state) {
-            return state.is(CommonBlockTags.TERRAIN);
+            return BlocksHelper.isTerrain(state);
         }
 
         @Override

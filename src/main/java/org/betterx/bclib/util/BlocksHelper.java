@@ -16,6 +16,7 @@ import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.material.LavaFluid;
 
 import com.google.common.collect.Maps;
+import org.betterx.bclib.api.tag.CommonBlockTags;
 
 import java.util.Map;
 import java.util.Optional;
@@ -169,15 +170,6 @@ public class BlocksHelper {
         return DIRECTIONS[random.nextInt(6)];
     }
 
-    /**
-     * Check if block is {@link Fluid} or not.
-     *
-     * @param state - {@link BlockState} to check.
-     * @return {@code true} if block is fluid and {@code false} if not.
-     */
-    public static boolean isFluid(BlockState state) {
-        return !state.getFluidState().isEmpty();
-    }
 
     /**
      * Check if block is "invulnerable" like Bedrock.
@@ -239,7 +231,7 @@ public class BlocksHelper {
                 if (len == 0) { //we started inside of the surface
                     for (int lenUp = 0; lenUp < length; lenUp++) {
                         startPos.move(dir, -1);
-                        if (!surface.test(level.getBlockState(startPos))) {
+                        if (BlocksHelper.isFree(level.getBlockState(startPos))) {
                             startPos.move(dir, 1);
                             return true;
                         }
@@ -289,5 +281,36 @@ public class BlocksHelper {
 
     public static boolean isLava(BlockState state) {
         return state.getFluidState().getType() instanceof LavaFluid;
+    }
+
+    /**
+     * Check if block is {@link Fluid} or not.
+     *
+     * @param state - {@link BlockState} to check.
+     * @return {@code true} if block is fluid and {@code false} if not.
+     */
+    @Deprecated(forRemoval = true)
+    public static boolean isFluidOld(BlockState state) {
+        return !state.getFluidState().isEmpty();
+    }
+
+    public static boolean isFluid(BlockState state) {
+        return state.getMaterial().isLiquid();
+    }
+
+    public static boolean isFree(BlockState state) {
+        return state.isAir();
+    }
+
+    public static boolean isFreeOrFluid(BlockState state) {
+        return state.isAir() || isFluid(state);
+    }
+
+    public static boolean isTerrain(BlockState state) {
+        return state.is(CommonBlockTags.TERRAIN);
+    }
+
+    public static boolean isTerrainOrFluid(BlockState state) {
+        return state.is(CommonBlockTags.TERRAIN) || isFluid(state);
     }
 }
