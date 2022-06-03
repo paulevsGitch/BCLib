@@ -41,21 +41,21 @@ public class ScatterFeature<FC extends ScatterFeatureConfig>
                                                                                 Feature<T> inlineFeature) {
         List<Holder<PlacedFeature>> set = new ArrayList<>(2);
         if (cfg.floorChance > 0) set.add(PlacementUtils.inlinePlaced(inlineFeature,
-                cfg,
-                EnvironmentScanPlacement.scanningFor(Direction.DOWN,
-                        BlockPredicate.solid(),
-                        BlockPredicate.ONLY_IN_AIR_PREDICATE,
-                        12),
-                RandomOffsetPlacement.vertical(ConstantInt.of(1))));
+                                                                     cfg,
+                                                                     EnvironmentScanPlacement.scanningFor(Direction.DOWN,
+                                                                                                          BlockPredicate.solid(),
+                                                                                                          BlockPredicate.ONLY_IN_AIR_PREDICATE,
+                                                                                                          12),
+                                                                     RandomOffsetPlacement.vertical(ConstantInt.of(1))));
 
         if (cfg.floorChance < 1) {
             set.add(PlacementUtils.inlinePlaced(inlineFeature,
-                    cfg,
-                    EnvironmentScanPlacement.scanningFor(Direction.UP,
-                            BlockPredicate.solid(),
-                            BlockPredicate.ONLY_IN_AIR_PREDICATE,
-                            12),
-                    RandomOffsetPlacement.vertical(ConstantInt.of(-1))));
+                                                cfg,
+                                                EnvironmentScanPlacement.scanningFor(Direction.UP,
+                                                                                     BlockPredicate.solid(),
+                                                                                     BlockPredicate.ONLY_IN_AIR_PREDICATE,
+                                                                                     12),
+                                                RandomOffsetPlacement.vertical(ConstantInt.of(-1))));
         }
         SimpleRandomFeatureConfiguration configuration = new SimpleRandomFeatureConfiguration(HolderSet.direct(set));
 
@@ -87,7 +87,8 @@ public class ScatterFeature<FC extends ScatterFeatureConfig>
         if (direction.isEmpty()) {
             return false;
         }
-        BlockPos basePos = origin.relative(direction.get().getOpposite());
+        BlockPos basePos = origin.relative(direction.get(), -1);
+
 
         int i = (int) (random.nextFloat() * (1 + config.maxHeight - config.minHeight) + config.minHeight);
         growCenterPillar(level, origin, basePos, direction.get(), i, config, random);
@@ -105,10 +106,8 @@ public class ScatterFeature<FC extends ScatterFeatureConfig>
         if (config.isValidBase(level.getBlockState(basePos))) {
             final Direction surfaceDirection = direction.getOpposite();
             BlockPos.MutableBlockPos POS = new BlockPos.MutableBlockPos();
-            basePos = basePos.relative(direction, 1);
             buildPillarWithBase(level, origin, basePos, direction, centerHeight, config, random);
-
-
+            
             final double distNormalizer = (config.maxSpread * Math.sqrt(2));
             final int tryCount = config.spreadCount.sample(random);
             for (int i = 0; i < tryCount; i++) {
@@ -120,10 +119,10 @@ public class ScatterFeature<FC extends ScatterFeatureConfig>
                     int myHeight;
                     if (config.growWhileFree) {
                         myHeight = BlocksHelper.blockCount(level,
-                                POS,
-                                direction,
-                                config.maxHeight,
-                                state -> state.getMaterial().isReplaceable());
+                                                           POS,
+                                                           direction,
+                                                           config.maxHeight,
+                                                           state -> state.getMaterial().isReplaceable());
                     } else {
                         myHeight = centerHeight;
                     }
@@ -136,15 +135,15 @@ public class ScatterFeature<FC extends ScatterFeatureConfig>
                     myHeight = (int) Math.min(Math.max(
                             config.minHeight,
                             config.minHeight + sizeFactor * (myHeight - config.minHeight)
-                    ), config.maxHeight);
+                                                      ), config.maxHeight);
 
                     buildPillarWithBase(level,
-                            POS,
-                            POS.relative(direction.getOpposite()),
-                            direction,
-                            myHeight,
-                            config,
-                            random);
+                                        POS,
+                                        POS.relative(direction.getOpposite()),
+                                        direction,
+                                        myHeight,
+                                        config,
+                                        random);
                 }
             }
         }
