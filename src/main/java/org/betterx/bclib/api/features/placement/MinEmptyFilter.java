@@ -53,7 +53,7 @@ public class MinEmptyFilter extends PlacementFilter {
                 pos.relative(direction),
                 direction,
                 distance - 1,
-                state -> state.getMaterial().isReplaceable()
+                BlocksHelper::isFree
         );
     }
 

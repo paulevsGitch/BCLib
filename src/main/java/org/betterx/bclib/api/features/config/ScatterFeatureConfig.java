@@ -81,81 +81,81 @@ public abstract class ScatterFeatureConfig implements FeatureConfiguration {
 
     public static <T extends ScatterFeatureConfig> Codec<T> buildCodec(Instancer<T> instancer) {
         return RecordCodecBuilder.create((instance) -> instance
-                                                 .group(BlockState.CODEC
-                                                                .fieldOf("cluster_block")
-                                                                .forGetter((T cfg) -> cfg.clusterBlock),
-                                                        BlockState.CODEC
-                                                                .optionalFieldOf("tip_block")
-                                                                .orElse(Optional.empty())
-                                                                .forGetter((T cfg) -> cfg.tipBlock == cfg.clusterBlock
-                                                                        ? Optional.empty()
-                                                                        : Optional.of(cfg.tipBlock)),
-                                                        BlockState.CODEC
-                                                                .optionalFieldOf("bottom_block")
-                                                                .orElse(Optional.empty())
-                                                                .forGetter((T cfg) -> cfg.bottomBlock == cfg.clusterBlock
-                                                                        ? Optional.empty()
-                                                                        : Optional.of(cfg.bottomBlock)),
-                                                        BlockState.CODEC
-                                                                .optionalFieldOf("base_state")
-                                                                .forGetter((T cfg) -> cfg.baseState),
-                                                        Codec
-                                                                .floatRange(0.0F, 1.0F)
-                                                                .fieldOf("baseReplaceChance")
-                                                                .orElse(1.0F)
-                                                                .forGetter((T cfg) -> cfg.baseReplaceChance),
-                                                        Codec
-                                                                .floatRange(0.0F, 1.0F)
-                                                                .fieldOf("chance_of_directional_spread")
-                                                                .orElse(0.7F)
-                                                                .forGetter((T cfg) -> cfg.chanceOfDirectionalSpread),
-                                                        Codec
-                                                                .floatRange(0.0F, 1.0F)
-                                                                .fieldOf("chance_of_spread_radius2")
-                                                                .orElse(0.5F)
-                                                                .forGetter((T cfg) -> cfg.chanceOfSpreadRadius2),
-                                                        Codec
-                                                                .floatRange(0.0F, 1.0F)
-                                                                .fieldOf("chance_of_spread_radius3")
-                                                                .orElse(0.5F)
-                                                                .forGetter((T cfg) -> cfg.chanceOfSpreadRadius3),
-                                                        Codec
-                                                                .intRange(1, 20)
-                                                                .fieldOf("min_height")
-                                                                .orElse(2)
-                                                                .forGetter((T cfg) -> cfg.minHeight),
-                                                        Codec
-                                                                .intRange(1, 20)
-                                                                .fieldOf("max_height")
-                                                                .orElse(7)
-                                                                .forGetter((T cfg) -> cfg.maxHeight),
-                                                        Codec
-                                                                .floatRange(0, 10)
-                                                                .fieldOf("max_spread")
-                                                                .orElse(2f)
-                                                                .forGetter((T cfg) -> cfg.maxSpread),
-                                                        Codec
-                                                                .floatRange(0, 1)
-                                                                .fieldOf("size_variation")
-                                                                .orElse(0.7f)
-                                                                .forGetter((T cfg) -> cfg.sizeVariation),
-                                                        Codec
-                                                                .floatRange(0, 1)
-                                                                .fieldOf("floor_chance")
-                                                                .orElse(0.5f)
-                                                                .forGetter((T cfg) -> cfg.floorChance),
-                                                        Codec
-                                                                .BOOL
-                                                                .fieldOf("grow_while_empty")
-                                                                .orElse(false)
-                                                                .forGetter((T cfg) -> cfg.growWhileFree),
-                                                        IntProvider.codec(0, 64)
-                                                                   .fieldOf("length")
-                                                                   .orElse(UniformInt.of(0, 3))
-                                                                   .forGetter(cfg -> cfg.spreadCount)
-                                                       )
-                                                 .apply(instance, instancer)
-                                        );
+                .group(BlockState.CODEC
+                                .fieldOf("cluster_block")
+                                .forGetter((T cfg) -> cfg.clusterBlock),
+                        BlockState.CODEC
+                                .optionalFieldOf("tip_block")
+                                .orElse(Optional.empty())
+                                .forGetter((T cfg) -> cfg.tipBlock == cfg.clusterBlock
+                                        ? Optional.empty()
+                                        : Optional.of(cfg.tipBlock)),
+                        BlockState.CODEC
+                                .optionalFieldOf("bottom_block")
+                                .orElse(Optional.empty())
+                                .forGetter((T cfg) -> cfg.bottomBlock == cfg.clusterBlock
+                                        ? Optional.empty()
+                                        : Optional.of(cfg.bottomBlock)),
+                        BlockState.CODEC
+                                .optionalFieldOf("base_state")
+                                .forGetter((T cfg) -> cfg.baseState),
+                        Codec
+                                .floatRange(0.0F, 1.0F)
+                                .fieldOf("baseReplaceChance")
+                                .orElse(1.0F)
+                                .forGetter((T cfg) -> cfg.baseReplaceChance),
+                        Codec
+                                .floatRange(0.0F, 1.0F)
+                                .fieldOf("chance_of_directional_spread")
+                                .orElse(0.7F)
+                                .forGetter((T cfg) -> cfg.chanceOfDirectionalSpread),
+                        Codec
+                                .floatRange(0.0F, 1.0F)
+                                .fieldOf("chance_of_spread_radius2")
+                                .orElse(0.5F)
+                                .forGetter((T cfg) -> cfg.chanceOfSpreadRadius2),
+                        Codec
+                                .floatRange(0.0F, 1.0F)
+                                .fieldOf("chance_of_spread_radius3")
+                                .orElse(0.5F)
+                                .forGetter((T cfg) -> cfg.chanceOfSpreadRadius3),
+                        Codec
+                                .intRange(1, 20)
+                                .fieldOf("min_height")
+                                .orElse(2)
+                                .forGetter((T cfg) -> cfg.minHeight),
+                        Codec
+                                .intRange(1, 20)
+                                .fieldOf("max_height")
+                                .orElse(7)
+                                .forGetter((T cfg) -> cfg.maxHeight),
+                        Codec
+                                .floatRange(0, 10)
+                                .fieldOf("max_spread")
+                                .orElse(2f)
+                                .forGetter((T cfg) -> cfg.maxSpread),
+                        Codec
+                                .floatRange(0, 1)
+                                .fieldOf("size_variation")
+                                .orElse(0.7f)
+                                .forGetter((T cfg) -> cfg.sizeVariation),
+                        Codec
+                                .floatRange(0, 1)
+                                .fieldOf("floor_chance")
+                                .orElse(0.5f)
+                                .forGetter((T cfg) -> cfg.floorChance),
+                        Codec
+                                .BOOL
+                                .fieldOf("grow_while_empty")
+                                .orElse(false)
+                                .forGetter((T cfg) -> cfg.growWhileFree),
+                        IntProvider.codec(0, 64)
+                                   .fieldOf("length")
+                                   .orElse(UniformInt.of(0, 3))
+                                   .forGetter(cfg -> cfg.spreadCount)
+                )
+                .apply(instance, instancer)
+        );
     }
 
     public static class Builder<T extends ScatterFeatureConfig> {
@@ -244,10 +244,10 @@ public abstract class ScatterFeatureConfig implements FeatureConfiguration {
                                             float chanceOfSpreadRadius2,
                                             float chanceOfSpreadRadius3) {
             return generateBaseBlock(baseState,
-                                     1,
-                                     chanceOfDirectionalSpread,
-                                     chanceOfSpreadRadius2,
-                                     chanceOfSpreadRadius3);
+                    1,
+                    chanceOfDirectionalSpread,
+                    chanceOfSpreadRadius2,
+                    chanceOfSpreadRadius3);
         }
 
         public Builder<T> generateBaseBlock(BlockState baseState,
@@ -309,7 +309,7 @@ public abstract class ScatterFeatureConfig implements FeatureConfiguration {
                     this.floorChance,
                     this.growWhileFree,
                     this.spreadCount
-                                  );
+            );
         }
     }
 
@@ -332,20 +332,20 @@ public abstract class ScatterFeatureConfig implements FeatureConfiguration {
                        boolean growWhileFree,
                        IntProvider spreadCount) {
             super(clusterBlock,
-                  tipBlock,
-                  bottomBlock,
-                  baseState,
-                  baseReplaceChance,
-                  chanceOfDirectionalSpread,
-                  chanceOfSpreadRadius2,
-                  chanceOfSpreadRadius3,
-                  minHeight,
-                  maxHeight,
-                  maxSpread,
-                  sizeVariation,
-                  floorChance,
-                  growWhileFree,
-                  spreadCount);
+                    tipBlock,
+                    bottomBlock,
+                    baseState,
+                    baseReplaceChance,
+                    chanceOfDirectionalSpread,
+                    chanceOfSpreadRadius2,
+                    chanceOfSpreadRadius3,
+                    minHeight,
+                    maxHeight,
+                    maxSpread,
+                    sizeVariation,
+                    floorChance,
+                    growWhileFree,
+                    spreadCount);
         }
 
 

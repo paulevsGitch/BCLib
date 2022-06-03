@@ -260,6 +260,10 @@ public class BCLFeatureBuilder<FC extends FeatureConfiguration, F extends Featur
         return modifier(new IsBasin(BlockPredicate.anyOf(predicates)));
     }
 
+    public BCLFeatureBuilder inOpenBasinOf(BlockPredicate... predicates) {
+        return modifier(IsBasin.openTop(BlockPredicate.anyOf(predicates)));
+    }
+
     public BCLFeatureBuilder is(BlockPredicate... predicates) {
         return modifier(new Is(BlockPredicate.anyOf(predicates)));
     }

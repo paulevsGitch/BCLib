@@ -12,7 +12,6 @@ import net.minecraft.util.valueproviders.ConstantInt;
 import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.WorldGenLevel;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate;
@@ -23,6 +22,7 @@ import net.minecraft.world.level.levelgen.placement.*;
 
 import com.mojang.serialization.Codec;
 import org.betterx.bclib.api.features.config.ScatterFeatureConfig;
+import org.betterx.bclib.api.tag.CommonBlockTags;
 import org.betterx.bclib.util.BlocksHelper;
 
 import java.util.ArrayList;
@@ -40,21 +40,21 @@ public class ScatterFeature<FC extends ScatterFeatureConfig>
                                                                                 Feature<T> inlineFeature) {
         List<Holder<PlacedFeature>> set = new ArrayList<>(2);
         if (cfg.floorChance > 0) set.add(PlacementUtils.inlinePlaced(inlineFeature,
-                                                                     cfg,
-                                                                     EnvironmentScanPlacement.scanningFor(Direction.DOWN,
-                                                                                                          BlockPredicate.solid(),
-                                                                                                          BlockPredicate.ONLY_IN_AIR_PREDICATE,
-                                                                                                          12),
-                                                                     RandomOffsetPlacement.vertical(ConstantInt.of(1))));
+                cfg,
+                EnvironmentScanPlacement.scanningFor(Direction.DOWN,
+                        BlockPredicate.matchesTag(CommonBlockTags.TERRAIN),
+                        BlockPredicate.ONLY_IN_AIR_PREDICATE,
+                        12),
+                RandomOffsetPlacement.vertical(ConstantInt.of(1))));
 
         if (cfg.floorChance < 1) {
             set.add(PlacementUtils.inlinePlaced(inlineFeature,
-                                                cfg,
-                                                EnvironmentScanPlacement.scanningFor(Direction.UP,
-                                                                                     BlockPredicate.solid(),
-                                                                                     BlockPredicate.ONLY_IN_AIR_PREDICATE,
-                                                                                     12),
-                                                RandomOffsetPlacement.vertical(ConstantInt.of(-1))));
+                    cfg,
+                    EnvironmentScanPlacement.scanningFor(Direction.UP,
+                            BlockPredicate.matchesTag(CommonBlockTags.TERRAIN),
+                            BlockPredicate.ONLY_IN_AIR_PREDICATE,
+                            12),
+                    RandomOffsetPlacement.vertical(ConstantInt.of(-1))));
         }
         SimpleRandomFeatureConfiguration configuration = new SimpleRandomFeatureConfiguration(HolderSet.direct(set));
 
@@ -112,21 +112,21 @@ public class ScatterFeature<FC extends ScatterFeatureConfig>
             for (int i = 0; i < tryCount; i++) {
                 int x = origin.getX() + (int) (random.nextGaussian() * config.maxSpread);
                 int z = origin.getZ() + (int) (random.nextGaussian() * config.maxSpread);
-                POS.set(x, origin.getY(), z);
+                POS.set(x, basePos.getY(), z);
 
                 if (BlocksHelper.findSurroundingSurface(level, POS, surfaceDirection, 4, config::isValidBase)) {
                     int myHeight;
                     if (config.growWhileFree) {
                         myHeight = BlocksHelper.blockCount(level,
-                                                           POS,
-                                                           direction,
-                                                           config.maxHeight,
-                                                           state -> state.getMaterial().isReplaceable());
+                                POS,
+                                direction,
+                                config.maxHeight,
+                                BlocksHelper::isFree
+                        );
                     } else {
                         myHeight = centerHeight;
                     }
 
-                    POS.move(direction, 1);
                     int dx = x - POS.getX();
                     int dz = z - POS.getZ();
                     float sizeFactor = (1 - (float) (Math.sqrt(dx * dx + dz * dz) / distNormalizer));
@@ -134,15 +134,19 @@ public class ScatterFeature<FC extends ScatterFeatureConfig>
                     myHeight = (int) Math.min(Math.max(
                             config.minHeight,
                             config.minHeight + sizeFactor * (myHeight - config.minHeight)
-                                                      ), config.maxHeight);
+                    ), config.maxHeight);
 
+                    BlockState baseState = level.getBlockState(POS.relative(direction.getOpposite()));
+                    if (!config.isValidBase(baseState)) {
+                        System.out.println("Starting from " + baseState + " at " + POS.relative(direction.getOpposite()));
+                    }
                     buildPillarWithBase(level,
-                                        POS,
-                                        POS.relative(direction.getOpposite()),
-                                        direction,
-                                        myHeight,
-                                        config,
-                                        random);
+                            POS,
+                            POS.relative(direction.getOpposite()),
+                            direction,
+                            myHeight,
+                            config,
+                            random);
                 }
             }
         }
@@ -155,7 +159,7 @@ public class ScatterFeature<FC extends ScatterFeatureConfig>
                                      int height,
                                      ScatterFeatureConfig config,
                                      RandomSource random) {
-        if (BlocksHelper.isFreeSpace(level, origin, direction, height, (state) -> state.is(Blocks.AIR))) {
+        if (BlocksHelper.isFreeSpace(level, origin, direction, height, BlocksHelper::isFree)) {
             createPatchOfBaseBlocks(level, random, basePos, config);
             buildPillar(level, origin, direction, height, config, random);
         }
@@ -170,6 +174,10 @@ public class ScatterFeature<FC extends ScatterFeatureConfig>
 
         final BlockPos.MutableBlockPos POS = origin.mutable();
         buildBaseToTipColumn(height, (blockState) -> {
+            BlockState previous = level.getBlockState(POS);
+            if (!BlocksHelper.isFree(previous)) {
+                System.out.println("Replaced " + previous + " with " + blockState + " at " + POS);
+            }
             BlocksHelper.setWithoutUpdate(level, POS, blockState);
             POS.move(direction);
         }, config, random);
@@ -181,16 +189,6 @@ public class ScatterFeature<FC extends ScatterFeatureConfig>
                                         RandomSource random) {
         for (int size = 0; size < totalHeight; size++) {
             consumer.accept(config.createBlock(size, totalHeight - 1, random));
-//            Block s = config.createBlock(size, totalHeight - 1, random).getBlock();
-//            if (size == 0) s = Blocks.YELLOW_CONCRETE;
-//            else if (size == 1) s = Blocks.LIME_CONCRETE;
-//            else if (size == 2) s = Blocks.CYAN_CONCRETE;
-//            else if (size == 3) s = Blocks.LIGHT_BLUE_CONCRETE;
-//            else if (size == 4) s = Blocks.BLUE_CONCRETE;
-//            else if (size == 5) s = Blocks.PURPLE_CONCRETE;
-//            else if (size == 6) s = Blocks.MAGENTA_CONCRETE;
-//            else s = Blocks.GRAY_CONCRETE;
-//            consumer.accept(s.defaultBlockState());
         }
     }
 

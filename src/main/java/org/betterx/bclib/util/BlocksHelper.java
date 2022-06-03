@@ -251,21 +251,28 @@ public class BlocksHelper {
                                                  Direction dir,
                                                  int length,
                                                  Predicate<BlockState> surface) {
+        BlockState beforeState = null;
+        BlockState nowState;
         for (int len = 0; len < length; len++) {
-            if (surface.test(level.getBlockState(startPos))) {
+            nowState = level.getBlockState(startPos);
+            if (surface.test(nowState)) {
                 if (len == 0) { //we started inside of the surface
+                    beforeState = nowState;
                     for (int lenUp = 0; lenUp < length; lenUp++) {
                         startPos.move(dir, -1);
-                        if (BlocksHelper.isFree(level.getBlockState(startPos))) {
-                            startPos.move(dir, 1);
-                            return true;
+                        nowState = level.getBlockState(startPos);
+                        if (BlocksHelper.isFree(nowState)) {
+                            return surface.test(beforeState);
                         }
+                        beforeState = nowState;
                     }
                     return false;
+                } else {
+                    startPos.move(dir, -1);
+                    return BlocksHelper.isFree(beforeState);
                 }
-                return true;
             }
-
+            beforeState = nowState;
             startPos.move(dir, 1);
         }
         return false;
@@ -279,11 +286,10 @@ public class BlocksHelper {
                                       Predicate<BlockState> freeSurface) {
         MutableBlockPos POS = startPos.mutable();
         for (int len = 0; len < length; len++) {
-            POS.move(dir, 1);
             if (!freeSurface.test(level.getBlockState(POS))) {
                 return false;
             }
-
+            POS.move(dir, 1);
         }
         return true;
     }
@@ -294,12 +300,11 @@ public class BlocksHelper {
                                  int length,
                                  Predicate<BlockState> freeSurface) {
         MutableBlockPos POS = startPos.mutable();
-        for (int len = 1; len < length; len++) {
-            POS.move(dir, 1);
+        for (int len = 0; len < length; len++) {
             if (!freeSurface.test(level.getBlockState(POS))) {
-                return len - 1;
+                return len;
             }
-
+            POS.move(dir, 1);
         }
         return length;
     }
