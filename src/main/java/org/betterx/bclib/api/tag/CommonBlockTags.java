@@ -46,8 +46,15 @@ public class CommonBlockTags {
         TagAPI.BLOCKS.add(SOUL_GROUND, Blocks.SOUL_SAND, Blocks.SOUL_SOIL);
 
         TagAPI.BLOCKS.add(IS_OBSIDIAN, Blocks.OBSIDIAN, Blocks.CRYING_OBSIDIAN);
-        TagAPI.BLOCKS.add(TERRAIN, Blocks.MAGMA_BLOCK);
-        
+        TagAPI.BLOCKS.add(TERRAIN,
+                Blocks.MAGMA_BLOCK,
+                Blocks.GRAVEL,
+                Blocks.SAND,
+                Blocks.RED_SAND,
+                Blocks.GLOWSTONE,
+                Blocks.BONE_BLOCK
+        );
+
         TagAPI.BLOCKS.addOtherTags(TERRAIN,
                 BlockTags.DRIPSTONE_REPLACEABLE,
                 BlockTags.BASE_STONE_OVERWORLD,

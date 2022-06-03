@@ -356,7 +356,8 @@ public abstract class ScatterFeatureConfig implements FeatureConfiguration {
 
         @Override
         public boolean isValidBase(BlockState state) {
-            return BlocksHelper.isTerrain(state);
+            return BlocksHelper.isTerrain(state)
+                    || baseState.map(s -> state.is(s.getBlock())).orElse(false);
         }
 
         @Override
