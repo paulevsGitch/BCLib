@@ -189,8 +189,24 @@ public class BCLFeatureBuilder<FC extends FeatureConfiguration, F extends Featur
         return modifier(IsEmptyAboveSampledFilter.emptyAbove4());
     }
 
+    public BCLFeatureBuilder isEmptyAbove2() {
+        return modifier(IsEmptyAboveSampledFilter.emptyAbove2());
+    }
+
     public BCLFeatureBuilder isEmptyAbove() {
         return modifier(IsEmptyAboveSampledFilter.emptyAbove());
+    }
+
+    public BCLFeatureBuilder isEmptyBelow4() {
+        return modifier(IsEmptyAboveSampledFilter.emptyBelow4());
+    }
+
+    public BCLFeatureBuilder isEmptyBelow2() {
+        return modifier(IsEmptyAboveSampledFilter.emptyBelow2());
+    }
+
+    public BCLFeatureBuilder isEmptyBelow() {
+        return modifier(IsEmptyAboveSampledFilter.emptyBelow());
     }
 
     public BCLFeatureBuilder isEmptyAbove(int d1, int d2) {

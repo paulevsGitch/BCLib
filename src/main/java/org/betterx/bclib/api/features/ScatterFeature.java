@@ -68,7 +68,7 @@ public class ScatterFeature<FC extends ScatterFeatureConfig>
                                 .modifier(RandomOffsetPlacement.of(
                                         ClampedNormalInt.of(0.0f, 2.0f, -6, 6),
                                         ClampedNormalInt.of(0.0f, 0.6f, -2, 2)))
-                                .modifier(BiomeFilter.biome())
+                                .onlyInBiome()
                                 .buildAndRegister(configuration);
     }
 
@@ -107,7 +107,7 @@ public class ScatterFeature<FC extends ScatterFeatureConfig>
             final Direction surfaceDirection = direction.getOpposite();
             BlockPos.MutableBlockPos POS = new BlockPos.MutableBlockPos();
             buildPillarWithBase(level, origin, basePos, direction, centerHeight, config, random);
-            
+
             final double distNormalizer = (config.maxSpread * Math.sqrt(2));
             final int tryCount = config.spreadCount.sample(random);
             for (int i = 0; i < tryCount; i++) {
