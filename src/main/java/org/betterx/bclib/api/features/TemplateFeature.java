@@ -7,15 +7,11 @@ import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
 
 import com.mojang.serialization.Codec;
-import org.betterx.bclib.BCLib;
 import org.betterx.bclib.api.features.config.TemplateFeatureConfig;
 import org.betterx.bclib.world.structures.StructureNBT;
 import org.betterx.bclib.world.structures.StructureWorldNBT;
 
 public class TemplateFeature<FC extends TemplateFeatureConfig> extends Feature<FC> {
-    public static final Feature<TemplateFeatureConfig> INSTANCE = BCLFeature.register(BCLib.makeID("template"),
-            new TemplateFeature(
-                    TemplateFeatureConfig.CODEC));
 
     public static <T extends TemplateFeatureConfig> BCLFeature createAndRegisterRare(ResourceLocation location,
                                                                                      TemplateFeatureConfig configuration,
@@ -23,9 +19,9 @@ public class TemplateFeature<FC extends TemplateFeatureConfig> extends Feature<F
 
 
         return BCLFeatureBuilder
-                .start(location, INSTANCE)
+                .start(location, BCLFeature.TEMPLATE)
                 .decoration(GenerationStep.Decoration.SURFACE_STRUCTURES)
-                .oncePerChunks(onceEveryChunk) //discard neighboring chunks
+                .onceEvery(onceEveryChunk) //discard neighboring chunks
                 .count(16) //try 16 placements in chunk
                 .squarePlacement() //randomize x/z in chunk
                 .randomHeight10FromFloorCeil() //randomize height 10 above and 10 below max vertical
@@ -40,7 +36,7 @@ public class TemplateFeature<FC extends TemplateFeatureConfig> extends Feature<F
                                                                                  TemplateFeatureConfig configuration,
                                                                                  int count) {
         return BCLFeatureBuilder
-                .start(location, INSTANCE)
+                .start(location, BCLFeature.TEMPLATE)
                 .decoration(GenerationStep.Decoration.SURFACE_STRUCTURES)
                 .count(count)
                 .squarePlacement()

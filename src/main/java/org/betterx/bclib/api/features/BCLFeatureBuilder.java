@@ -119,13 +119,13 @@ public class BCLFeatureBuilder<FC extends FeatureConfiguration, F extends Featur
     }
 
     /**
-     * Will place feature once in certain amount of chunks (in average).
+     * Will place feature once every n-th attempts (in average).
      *
-     * @param chunks amount of chunks.
+     * @param n amount of attempts.
      * @return same {@link BCLFeatureBuilder} instance.
      */
-    public BCLFeatureBuilder oncePerChunks(int chunks) {
-        return modifier(RarityFilter.onAverageOnceEvery(chunks));
+    public BCLFeatureBuilder onceEvery(int n) {
+        return modifier(RarityFilter.onAverageOnceEvery(n));
     }
 
     /**

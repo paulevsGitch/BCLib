@@ -84,7 +84,7 @@ public class BCLCommonFeatures {
                                                 int chance) {
         return BCLFeatureBuilder.start(id, feature)
                                 .decoration(decoration)
-                                .oncePerChunks(chance)
+                                .onceEvery(chance)
                                 .squarePlacement()
                                 .onlyInBiome()
                                 .buildAndRegister();
@@ -136,7 +136,7 @@ public class BCLCommonFeatures {
         BCLFeatureBuilder builder = BCLFeatureBuilder.start(id, Feature.ORE).decoration(Decoration.UNDERGROUND_ORES);
 
         if (rare) {
-            builder.oncePerChunks(veins);
+            builder.onceEvery(veins);
         } else {
             builder.count(veins);
         }

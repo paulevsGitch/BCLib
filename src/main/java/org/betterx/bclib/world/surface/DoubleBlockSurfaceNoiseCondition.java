@@ -5,6 +5,7 @@ import net.minecraft.util.KeyDispatchDataCodec;
 import net.minecraft.world.level.levelgen.SurfaceRules;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import org.betterx.bclib.BCLib;
 import org.betterx.bclib.api.surface.rules.SurfaceNoiseCondition;
 import org.betterx.bclib.mixin.common.SurfaceRulesContextAccessor;
@@ -14,8 +15,14 @@ import org.betterx.bclib.util.MHelper;
 public class DoubleBlockSurfaceNoiseCondition extends SurfaceNoiseCondition {
     public static final DoubleBlockSurfaceNoiseCondition CONDITION = new DoubleBlockSurfaceNoiseCondition(0);
     private static final OpenSimplexNoise NOISE = new OpenSimplexNoise(4141);
-    public static final KeyDispatchDataCodec<DoubleBlockSurfaceNoiseCondition> CODEC = KeyDispatchDataCodec.of(Codec.DOUBLE.fieldOf(
-            "threshold").xmap(DoubleBlockSurfaceNoiseCondition::new, obj -> obj.threshold).codec());
+    public static final Codec<DoubleBlockSurfaceNoiseCondition> CODEC = RecordCodecBuilder.create(instance -> instance
+            .group(
+                    Codec.DOUBLE.fieldOf("threshold").orElse(0.0).forGetter(o -> o.threshold)
+            )
+            .apply(instance, DoubleBlockSurfaceNoiseCondition::new));
+
+    public static final KeyDispatchDataCodec<DoubleBlockSurfaceNoiseCondition> KEY_CODEC = KeyDispatchDataCodec.of(
+            CODEC);
     private final double threshold;
 
     public DoubleBlockSurfaceNoiseCondition(double threshold) {
@@ -24,7 +31,7 @@ public class DoubleBlockSurfaceNoiseCondition extends SurfaceNoiseCondition {
 
     @Override
     public KeyDispatchDataCodec<? extends SurfaceRules.ConditionSource> codec() {
-        return CODEC;
+        return KEY_CODEC;
     }
 
     private static int lastX = Integer.MIN_VALUE;
@@ -47,7 +54,7 @@ public class DoubleBlockSurfaceNoiseCondition extends SurfaceNoiseCondition {
 
     static {
         Registry.register(Registry.CONDITION,
-                          BCLib.makeID("doubleblock_surface"),
-                          DoubleBlockSurfaceNoiseCondition.CODEC.codec());
+                BCLib.makeID("doubleblock_surface"),
+                DoubleBlockSurfaceNoiseCondition.CODEC);
     }
 }

@@ -10,7 +10,6 @@ import net.minecraft.world.level.levelgen.placement.PlacementModifierType;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import org.betterx.bclib.api.tag.CommonBlockTags;
 import org.betterx.bclib.util.BlocksHelper;
 
 import java.util.List;
@@ -26,7 +25,7 @@ public class FindSolidInDirection extends PlacementModifier {
                                                              .forGetter(a -> a.direction),
                                                   Codec.intRange(1, 32).fieldOf("dist").orElse(12).forGetter((p) -> p.maxSearchDistance))
                                           .apply(instance,
-                                                 FindSolidInDirection::new));
+                                                  FindSolidInDirection::new));
     protected static final FindSolidInDirection DOWN = new FindSolidInDirection(Direction.DOWN, 6);
     protected static final FindSolidInDirection UP = new FindSolidInDirection(Direction.UP, 6);
     private final List<Direction> direction;
@@ -70,11 +69,12 @@ public class FindSolidInDirection extends PlacementModifier {
         BlockPos.MutableBlockPos POS = blockPos.mutable();
         Direction d = randomDirection(randomSource);
         if (BlocksHelper.findOnSurroundingSurface(placementContext.getLevel(),
-                                                  POS,
-                                                  d,
-                                                  maxSearchDistance,
-                                                  state -> state.is(CommonBlockTags.TERRAIN)))
+                POS,
+                d,
+                maxSearchDistance,
+                BlocksHelper::isTerrain)) {
             return Stream.of(POS);
+        }
 
         return Stream.of();
     }

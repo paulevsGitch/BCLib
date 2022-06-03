@@ -161,7 +161,9 @@ public class ScatterFeature<FC extends ScatterFeatureConfig>
                                      RandomSource random) {
         if (BlocksHelper.isFreeSpace(level, origin, direction, height, BlocksHelper::isFree)) {
             createPatchOfBaseBlocks(level, random, basePos, config);
-            buildPillar(level, origin, direction, height, config, random);
+            if (config.bottomBlock.canSurvive(level, origin)) {
+                buildPillar(level, origin, direction, height, config, random);
+            }
         }
     }
 

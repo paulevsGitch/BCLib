@@ -11,11 +11,13 @@ import net.minecraft.world.level.levelgen.GenerationStep.Decoration;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
+import net.minecraft.world.level.levelgen.feature.configurations.RandomFeatureConfiguration;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraft.world.level.levelgen.placement.PlacementModifier;
 
 import org.betterx.bclib.BCLib;
 import org.betterx.bclib.api.features.config.ScatterFeatureConfig;
+import org.betterx.bclib.api.features.config.TemplateFeatureConfig;
 
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -23,8 +25,14 @@ import java.util.Optional;
 public class BCLFeature {
     public static final Feature<ScatterFeatureConfig.OnSolid> SCATTER_ON_SOLID = register(
             BCLib.makeID("scatter_on_solid"),
-            new ScatterFeature<>(ScatterFeatureConfig.OnSolid.CODEC)
-                                                                                         );
+            new ScatterFeature<>(ScatterFeatureConfig.OnSolid.CODEC));
+
+    public static final Feature<RandomFeatureConfiguration> RANDOM_SELECT = register(
+            BCLib.makeID("random_select"),
+            new WeightedRandomSelectorFeature());
+    public static final Feature<TemplateFeatureConfig> TEMPLATE = register(BCLib.makeID("template"),
+            new TemplateFeature(
+                    TemplateFeatureConfig.CODEC));
     private final Holder<PlacedFeature> placedFeature;
     private final Decoration featureStep;
     private final Feature<?> feature;
@@ -62,12 +70,12 @@ public class BCLFeature {
         Holder<ConfiguredFeature<?, ?>> configuredFeature;
         if (!BuiltinRegistries.CONFIGURED_FEATURE.containsKey(id)) {
             configuredFeature = (Holder<ConfiguredFeature<?, ?>>) (Object) FeatureUtils.register(id.toString(),
-                                                                                                 feature,
-                                                                                                 configuration);
+                    feature,
+                    configuration);
         } else {
             configuredFeature = BuiltinRegistries.CONFIGURED_FEATURE
                     .getHolder(ResourceKey.create(BuiltinRegistries.CONFIGURED_FEATURE.key(),
-                                                  id))
+                            id))
                     .orElseThrow();
         }
 
@@ -75,7 +83,7 @@ public class BCLFeature {
             return PlacementUtils.register(id.toString(), configuredFeature, modifiers);
         } else {
             return BuiltinRegistries.PLACED_FEATURE.getHolder(ResourceKey.create(BuiltinRegistries.PLACED_FEATURE.key(),
-                                                                                 id)).orElseThrow();
+                    id)).orElseThrow();
         }
     }
 
