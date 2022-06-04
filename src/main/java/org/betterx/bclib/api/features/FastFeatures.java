@@ -26,7 +26,8 @@ public class FastFeatures {
                                      boolean onFloor,
                                      boolean sparse,
                                      ScatterFeatureConfig.Builder builder,
-                                     Feature scatterFeature) {
+                                     Feature scatterFeature
+    ) {
         BCLFeatureBuilder fBuilder = BCLFeatureBuilder.start(location, scatterFeature);
         if (onFloor) {
             fBuilder.findSolidFloor(3).isEmptyAbove2();
@@ -59,6 +60,30 @@ public class FastFeatures {
     }
 
     public static BCLFeature
+    simple(ResourceLocation location,
+           int searchDist,
+           boolean rare,
+           Feature<NoneFeatureConfiguration> feature) {
+        return simple(location, searchDist, rare, feature, NoneFeatureConfiguration.NONE);
+    }
+
+    public static <FC extends FeatureConfiguration> BCLFeature
+    simple(ResourceLocation location,
+           int searchDist,
+           boolean rare,
+           Feature<FC> feature,
+           FC config) {
+        BCLFeatureBuilder builder = BCLFeatureBuilder
+                .start(location, feature)
+                .findSolidFloor(Math.min(12, searchDist))
+                .is(BlockPredicate.ONLY_IN_AIR_PREDICATE);
+        if (rare) {
+            builder.onceEvery(4);
+        }
+        return builder.buildAndRegister(config);
+    }
+
+    public static BCLFeature
     patch(ResourceLocation location, Feature<NoneFeatureConfiguration> feature) {
         return patch(location, 96, 7, 3, feature, FeatureConfiguration.NONE);
     }
@@ -80,11 +105,7 @@ public class FastFeatures {
           Feature<FC> feature,
           FC config) {
         ResourceLocation patchLocation = new ResourceLocation(location.getNamespace(), location.getPath() + "_patch");
-        final BCLFeature SINGLE = BCLFeatureBuilder
-                .start(location, feature)
-                .findSolidFloor(Math.min(12, ySpread))
-                .is(BlockPredicate.ONLY_IN_AIR_PREDICATE)
-                .buildAndRegister(config);
+        final BCLFeature SINGLE = simple(location, ySpread, false, feature, config);
 
         return BCLFeatureBuilder
                 .start(patchLocation, Feature.RANDOM_PATCH)
