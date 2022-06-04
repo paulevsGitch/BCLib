@@ -27,7 +27,7 @@ public class BCLFeature {
             BCLib.makeID("scatter_on_solid"),
             new ScatterFeature<>(ScatterFeatureConfig.OnSolid.CODEC));
 
-    public static final Feature<RandomFeatureConfiguration> RANDOM_SELECT = register(
+    public static final Feature<RandomFeatureConfiguration> RANDOM_SELECTOR = register(
             BCLib.makeID("random_select"),
             new WeightedRandomSelectorFeature());
     public static final Feature<TemplateFeatureConfig> TEMPLATE = register(BCLib.makeID("template"),

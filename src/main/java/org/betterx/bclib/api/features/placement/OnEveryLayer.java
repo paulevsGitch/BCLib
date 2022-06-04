@@ -10,22 +10,38 @@ import net.minecraft.world.level.levelgen.placement.PlacementModifier;
 import net.minecraft.world.level.levelgen.placement.PlacementModifierType;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import org.betterx.bclib.util.BlocksHelper;
 
+import java.util.Optional;
 import java.util.stream.Stream;
 
 public class OnEveryLayer
         extends PlacementModifier {
-    private static OnEveryLayer INSTANCE = new OnEveryLayer();
-    public static final Codec<OnEveryLayer> CODEC = Codec.unit(() -> INSTANCE);
+    private static OnEveryLayer INSTANCE = new OnEveryLayer(Optional.empty(), Optional.empty());
+    private static OnEveryLayer INSTANCE_MIN_4 = new OnEveryLayer(Optional.of(4), Optional.empty());
+    public static final Codec<OnEveryLayer> CODEC = RecordCodecBuilder.create(instance -> instance
+            .group(
+                    Codec.INT.optionalFieldOf("min").forGetter(o -> o.minHeight),
+                    Codec.INT.optionalFieldOf("max").forGetter(o -> o.maxHeight)
+            ).apply(instance, OnEveryLayer::new));
 
 
-    private OnEveryLayer() {
+    private final Optional<Integer> minHeight;
+    private final Optional<Integer> maxHeight;
 
+    private OnEveryLayer(Optional<Integer> minHeight, Optional<Integer> maxHeight) {
+        this.minHeight = minHeight;
+
+        this.maxHeight = maxHeight;
     }
 
     public static OnEveryLayer simple() {
         return INSTANCE;
+    }
+
+    public static OnEveryLayer min4() {
+        return INSTANCE_MIN_4;
     }
 
     @Override
@@ -37,10 +53,14 @@ public class OnEveryLayer
 
         final int z = pos.getZ();
         final int x = pos.getX();
-        int y = ctx.getHeight(Heightmap.Types.MOTION_BLOCKING, x, z);
+        final int levelHeight = ctx.getHeight(Heightmap.Types.MOTION_BLOCKING, x, z);
+        final int minLevelHeight = ctx.getMinBuildHeight();
+        int y = maxHeight.map(h -> Math.min(levelHeight, h)).orElse(levelHeight);
+        final int minHeight = this.minHeight.map(h -> Math.max(minLevelHeight, h)).orElse(minLevelHeight);
+
         int layerY;
         do {
-            layerY = OnEveryLayer.findOnGroundYPosition(ctx, x, y, z);
+            layerY = OnEveryLayer.findOnGroundYPosition(ctx, x, y, z, minHeight);
             if (layerY != Integer.MAX_VALUE) {
                 builder.add(new BlockPos(x, layerY, z));
                 y = layerY - 1;
@@ -55,10 +75,10 @@ public class OnEveryLayer
         return PlacementModifiers.ON_EVERY_LAYER;
     }
 
-    private static int findOnGroundYPosition(PlacementContext ctx, int x, int startY, int z) {
+    private static int findOnGroundYPosition(PlacementContext ctx, int x, int startY, int z, int minHeight) {
         BlockPos.MutableBlockPos mPos = new BlockPos.MutableBlockPos(x, startY, z);
         BlockState nowState = ctx.getBlockState(mPos);
-        for (int y = startY; y >= ctx.getMinBuildHeight() + 1; --y) {
+        for (int y = startY; y >= minHeight + 1; --y) {
             mPos.setY(y - 1);
             BlockState belowState = ctx.getBlockState(mPos);
             if (BlocksHelper.isTerrain(belowState) && BlocksHelper.isFreeOrFluid(nowState) && !belowState.is(Blocks.BEDROCK)) {

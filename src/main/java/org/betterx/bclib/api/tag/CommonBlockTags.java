@@ -58,6 +58,7 @@ public class CommonBlockTags {
         TagAPI.BLOCKS.addOtherTags(TERRAIN,
                 BlockTags.DRIPSTONE_REPLACEABLE,
                 BlockTags.BASE_STONE_OVERWORLD,
+                BlockTags.NYLIUM,
                 NETHER_STONES,
                 NETHER_ORES,
                 SOUL_GROUND,

@@ -26,14 +26,13 @@ public class WeightedRandomSelectorFeature extends Feature<RandomFeatureConfigur
         if (!cfg.features.isEmpty()) {
             final float totalWeight = cfg.features.stream().map(w -> w.chance).reduce(0.0f, (p, c) -> p + c);
             float bar = random.nextFloat() * totalWeight;
-            
+
             for (WeightedPlacedFeature f : cfg.features) {
                 selected = f.feature.value();
                 bar -= f.chance;
                 if (bar < 0) break;
             }
         }
-
         return selected.place(level, generator, random, pos);
     }
 }
