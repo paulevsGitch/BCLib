@@ -17,15 +17,17 @@ import org.betterx.bclib.api.features.placement.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class BCLFeatureBuilder<FC extends FeatureConfiguration, F extends Feature<FC>> {
-    private static final BCLFeatureBuilder INSTANCE = new BCLFeatureBuilder();
-    private final List<PlacementModifier> modifications = new ArrayList<>(16);
+    private final List<PlacementModifier> modifications = new ArrayList<>(5);
     private ResourceLocation featureID;
-    private Decoration decoration;
-    private F feature;
+    private Decoration decoration = Decoration.VEGETAL_DECORATION;
+    private final F feature;
 
-    private BCLFeatureBuilder() {
+    private BCLFeatureBuilder(ResourceLocation featureID, F feature) {
+        this.featureID = featureID;
+        this.feature = feature;
     }
 
     /**
@@ -36,11 +38,7 @@ public class BCLFeatureBuilder<FC extends FeatureConfiguration, F extends Featur
      * @return {@link BCLFeatureBuilder} instance.
      */
     public static BCLFeatureBuilder start(ResourceLocation featureID, Feature<?> feature) {
-        INSTANCE.decoration = Decoration.VEGETAL_DECORATION;
-        INSTANCE.modifications.clear();
-        INSTANCE.featureID = featureID;
-        INSTANCE.feature = feature;
-        return INSTANCE;
+        return new BCLFeatureBuilder(featureID, feature);
     }
 
     /**
@@ -265,7 +263,11 @@ public class BCLFeatureBuilder<FC extends FeatureConfiguration, F extends Featur
     }
 
     public BCLFeatureBuilder is(BlockPredicate... predicates) {
-        return modifier(new Is(BlockPredicate.anyOf(predicates)));
+        return modifier(new Is(BlockPredicate.anyOf(predicates), Optional.empty()));
+    }
+
+    public BCLFeatureBuilder isAbove(BlockPredicate... predicates) {
+        return modifier(new Is(BlockPredicate.anyOf(predicates), Optional.of(Direction.DOWN.getNormal())));
     }
 
     public BCLFeatureBuilder findSolidCeil(int distance) {
