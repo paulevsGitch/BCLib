@@ -297,8 +297,8 @@ public class BCLFeatureBuilder<FC extends FeatureConfiguration, F extends Featur
         return modifier(new FindSolidInDirection(dir, distance));
     }
 
-    public BCLFeatureBuilder findSolidSurface(List<Direction> dir, int distance) {
-        return modifier(new FindSolidInDirection(dir, distance));
+    public BCLFeatureBuilder findSolidSurface(List<Direction> dir, int distance, boolean randomSelect) {
+        return modifier(new FindSolidInDirection(dir, distance, randomSelect));
     }
 
     public BCLFeatureBuilder heightmap() {

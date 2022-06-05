@@ -10,8 +10,9 @@ import net.minecraft.world.level.levelgen.placement.CaveSurface;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.betterx.bclib.api.biomes.BiomeAPI;
+import org.betterx.bclib.api.surface.rules.Conditions;
+import org.betterx.bclib.api.surface.rules.DoubleBlockSurfaceNoiseCondition;
 import org.betterx.bclib.api.surface.rules.NoiseCondition;
-import org.betterx.bclib.world.surface.DoubleBlockSurfaceNoiseCondition;
 
 import java.util.Collections;
 import java.util.List;
@@ -96,7 +97,7 @@ public class SurfaceRuleBuilder {
      */
     public SurfaceRuleBuilder filler(BlockState state) {
         entryInstance = getFromCache("fill_" + state.toString(),
-                                     () -> new SurfaceRuleEntry(10, SurfaceRules.state(state)));
+                () -> new SurfaceRuleEntry(10, SurfaceRules.state(state)));
         rules.add(entryInstance);
         return this;
     }
@@ -127,14 +128,14 @@ public class SurfaceRuleBuilder {
     public SurfaceRuleBuilder belowFloor(BlockState state, int height, NoiseCondition noise) {
         entryInstance = getFromCache("below_floor_" + height + "_" + state.toString() + "_" + noise.getClass()
                                                                                                    .getSimpleName(),
-                                     () -> {
-                                         RuleSource rule = SurfaceRules.state(state);
-                                         rule = SurfaceRules.ifTrue(SurfaceRules.stoneDepthCheck(height,
-                                                                                                 false,
-                                                                                                 CaveSurface.FLOOR),
-                                                                    SurfaceRules.ifTrue(noise, rule));
-                                         return new SurfaceRuleEntry(3, rule);
-                                     });
+                () -> {
+                    RuleSource rule = SurfaceRules.state(state);
+                    rule = SurfaceRules.ifTrue(SurfaceRules.stoneDepthCheck(height,
+                                    false,
+                                    CaveSurface.FLOOR),
+                            SurfaceRules.ifTrue(noise, rule));
+                    return new SurfaceRuleEntry(3, rule);
+                });
         rules.add(entryInstance);
         return this;
     }
@@ -237,7 +238,7 @@ public class SurfaceRuleBuilder {
      * @return same {@link SurfaceRuleBuilder} instance.
      */
     public SurfaceRuleBuilder chancedFloor(BlockState surfaceBlockA, BlockState surfaceBlockB) {
-        return chancedFloor(surfaceBlockA, surfaceBlockB, DoubleBlockSurfaceNoiseCondition.CONDITION);
+        return chancedFloor(surfaceBlockA, surfaceBlockB, Conditions.DOUBLE_BLOCK_SURFACE_NOISE);
     }
 
     /**
@@ -251,18 +252,37 @@ public class SurfaceRuleBuilder {
     public SurfaceRuleBuilder chancedFloor(BlockState surfaceBlockA, BlockState surfaceBlockB, NoiseCondition noise) {
         entryInstance = getFromCache("chancedFloor_" + surfaceBlockA + "_" + surfaceBlockB + "_" + noise.getClass()
                                                                                                         .getSimpleName(),
-                                     () -> {
-                                         RuleSource rule =
-                                                 SurfaceRules.ifTrue(SurfaceRules.ON_FLOOR,
-                                                                     SurfaceRules.sequence(
-                                                                             SurfaceRules.ifTrue(noise,
-                                                                                                 SurfaceRules.state(
-                                                                                                         surfaceBlockA)),
-                                                                             SurfaceRules.state(surfaceBlockB)
-                                                                                          )
-                                                                    );
-                                         return new SurfaceRuleEntry(4, rule);
-                                     });
+                () -> {
+                    RuleSource rule =
+                            SurfaceRules.ifTrue(SurfaceRules.ON_FLOOR,
+                                    SurfaceRules.sequence(
+                                            SurfaceRules.ifTrue(noise,
+                                                    SurfaceRules.state(
+                                                            surfaceBlockA)),
+                                            SurfaceRules.state(surfaceBlockB)
+                                    )
+                            );
+                    return new SurfaceRuleEntry(4, rule);
+                });
+        rules.add(entryInstance);
+        return this;
+    }
+
+    public SurfaceRuleBuilder chancedFloor(BlockState surfaceBlockA, RuleSource surfaceBlockB, NoiseCondition noise) {
+        entryInstance = getFromCache("chancedFloor_" + surfaceBlockA + "_" + surfaceBlockB + "_" + noise.getClass()
+                                                                                                        .getSimpleName(),
+                () -> {
+                    RuleSource rule =
+                            SurfaceRules.ifTrue(SurfaceRules.ON_FLOOR,
+                                    SurfaceRules.sequence(
+                                            SurfaceRules.ifTrue(noise,
+                                                    SurfaceRules.state(
+                                                            surfaceBlockA)),
+                                            surfaceBlockB
+                                    )
+                            );
+                    return new SurfaceRuleEntry(4, rule);
+                });
         rules.add(entryInstance);
         return this;
     }

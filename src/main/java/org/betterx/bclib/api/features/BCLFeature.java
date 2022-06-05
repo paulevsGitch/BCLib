@@ -16,6 +16,7 @@ import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraft.world.level.levelgen.placement.PlacementModifier;
 
 import org.betterx.bclib.BCLib;
+import org.betterx.bclib.api.features.config.PlaceFacingBlockConfig;
 import org.betterx.bclib.api.features.config.ScatterFeatureConfig;
 import org.betterx.bclib.api.features.config.TemplateFeatureConfig;
 
@@ -23,6 +24,9 @@ import java.util.Map.Entry;
 import java.util.Optional;
 
 public class BCLFeature {
+    public static final Feature<PlaceFacingBlockConfig> PLACE_BLOCK = register(
+            BCLib.makeID("place_block"),
+            new PlaceBlockFeature<>(PlaceFacingBlockConfig.CODEC));
     public static final Feature<ScatterFeatureConfig.OnSolid> SCATTER_ON_SOLID = register(
             BCLib.makeID("scatter_on_solid"),
             new ScatterFeature<>(ScatterFeatureConfig.OnSolid.CODEC));

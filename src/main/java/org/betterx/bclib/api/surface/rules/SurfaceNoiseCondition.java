@@ -28,4 +28,6 @@ public abstract class SurfaceNoiseCondition implements NoiseCondition {
     }
 
     public abstract boolean test(SurfaceRulesContextAccessor context);
+
+
 }

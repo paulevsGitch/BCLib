@@ -3,6 +3,7 @@ package org.betterx.bclib.api.tag;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 
 
 public class NamedBlockTags {
@@ -36,4 +37,8 @@ public class NamedBlockTags {
     public static final TagKey<Block> SOUL_SPEED_BLOCKS = BlockTags.SOUL_SPEED_BLOCKS;
     public static final TagKey<Block> BEACON_BASE_BLOCKS = BlockTags.BEACON_BASE_BLOCKS;
     public static final TagKey<Block> STONE_BRICKS = BlockTags.STONE_BRICKS;
+
+    static {
+        TagAPI.BLOCKS.add(BlockTags.NETHER_CARVER_REPLACEABLES, Blocks.RED_SAND, Blocks.MAGMA_BLOCK);
+    }
 }

@@ -1,7 +1,10 @@
 package org.betterx.bclib.api.features;
 
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
@@ -9,7 +12,9 @@ import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConf
 import net.minecraft.world.level.levelgen.feature.configurations.RandomPatchConfiguration;
 import net.minecraft.world.level.levelgen.feature.configurations.SimpleBlockConfiguration;
 import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider;
+import net.minecraft.world.level.levelgen.feature.stateproviders.RandomizedIntStateProvider;
 
+import org.betterx.bclib.api.features.config.PlaceFacingBlockConfig;
 import org.betterx.bclib.api.features.config.ScatterFeatureConfig;
 
 public class FastFeatures {
@@ -59,12 +64,55 @@ public class FastFeatures {
                 new SimpleBlockConfiguration(BlockStateProvider.simple(block)));
     }
 
+    public static BCLFeature patchWitRandomInt(ResourceLocation location, Block block, IntegerProperty prop) {
+        return patchWitRandomInt(location, block, prop, 96, 7, 3);
+    }
+
+    public static BCLFeature
+    patchWitRandomInt(ResourceLocation location,
+                      Block block,
+                      IntegerProperty prop,
+                      int attempts,
+                      int xzSpread,
+                      int ySpread) {
+        return patch(location,
+                attempts,
+                xzSpread,
+                ySpread,
+                simple(location, ySpread, false, block.defaultBlockState(), prop));
+    }
+
     public static BCLFeature
     simple(ResourceLocation location,
            int searchDist,
            boolean rare,
            Feature<NoneFeatureConfiguration> feature) {
         return simple(location, searchDist, rare, feature, NoneFeatureConfiguration.NONE);
+    }
+
+    public static BCLFeature
+    simple(ResourceLocation location,
+           int searchDist,
+           boolean rare,
+           BlockState baseState,
+           IntegerProperty property) {
+        int min = Integer.MAX_VALUE;
+        int max = Integer.MIN_VALUE;
+
+        for (Integer i : property.getPossibleValues()) {
+            if (i < min) min = i;
+            if (i > max) max = i;
+        }
+
+        return simple(location,
+                searchDist,
+                rare,
+                Feature.SIMPLE_BLOCK,
+                new SimpleBlockConfiguration(new RandomizedIntStateProvider(
+                        BlockStateProvider.simple(baseState),
+                        property,
+                        UniformInt.of(min, max)
+                )));
     }
 
     public static <FC extends FeatureConfiguration> BCLFeature
@@ -104,11 +152,33 @@ public class FastFeatures {
           int ySpread,
           Feature<FC> feature,
           FC config) {
-        ResourceLocation patchLocation = new ResourceLocation(location.getNamespace(), location.getPath() + "_patch");
         final BCLFeature SINGLE = simple(location, ySpread, false, feature, config);
+        return patch(location, attempts, xzSpread, ySpread, SINGLE);
+    }
+
+    public static BCLFeature
+    wallPatch(ResourceLocation location,
+              Block block,
+              int attempts,
+              int xzSpread,
+              int ySpread) {
+        final BCLFeature SINGLE = simple(location, ySpread, false, BCLFeature.PLACE_BLOCK,
+                new PlaceFacingBlockConfig(block, PlaceFacingBlockConfig.HORIZONTAL));
+        return patch(location, attempts, xzSpread, ySpread, SINGLE);
+    }
+
+    public static BCLFeature
+    patch(ResourceLocation location,
+          int attempts,
+          int xzSpread,
+          int ySpread,
+          BCLFeature single) {
+        ResourceLocation patchLocation = new ResourceLocation(location.getNamespace(), location.getPath() + "_patch");
 
         return BCLFeatureBuilder
                 .start(patchLocation, Feature.RANDOM_PATCH)
-                .buildAndRegister(new RandomPatchConfiguration(attempts, xzSpread, ySpread, SINGLE.getPlacedFeature()));
+                .buildAndRegister(new RandomPatchConfiguration(attempts, xzSpread, ySpread, single.getPlacedFeature()));
     }
+
+
 }

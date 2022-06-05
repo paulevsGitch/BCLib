@@ -15,6 +15,7 @@ import org.betterx.bclib.api.WorldDataAPI;
 import org.betterx.bclib.api.dataexchange.DataExchangeAPI;
 import org.betterx.bclib.api.dataexchange.handler.autosync.*;
 import org.betterx.bclib.api.features.placement.PlacementModifiers;
+import org.betterx.bclib.api.surface.rules.Conditions;
 import org.betterx.bclib.api.tag.TagAPI;
 import org.betterx.bclib.config.Configs;
 import org.betterx.bclib.presets.worldgen.BCLWorldPresets;
@@ -49,6 +50,7 @@ public class BCLib implements ModInitializer {
         DataExchangeAPI.registerMod(MOD_ID);
         BCLWorldPresets.registerPresets();
         AnvilRecipe.register();
+        Conditions.registerAll();
 
         DataExchangeAPI.registerDescriptors(List.of(
                         HelloClient.DESCRIPTOR,
