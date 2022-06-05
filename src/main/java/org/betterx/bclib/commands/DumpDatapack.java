@@ -34,15 +34,14 @@ import java.nio.file.Files;
 
 public class DumpDatapack {
     static int dumpDatapack(CommandContext<CommandSourceStack> ctx) {
-        dumpDatapack();
+        dumpDatapack(ctx.getSource().getLevel().registryAccess());
         return Command.SINGLE_SUCCESS;
     }
 
-    public static void dumpDatapack() {
-        final RegistryAccess registryAccess = RegistryAccess.builtinCopy();
+    public static void dumpDatapack(RegistryAccess registryAccess) {
         final RegistryOps<JsonElement> registryOps = RegistryOps.create(JsonOps.INSTANCE, registryAccess);
         GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder = gsonBuilder.setPrettyPrinting();   //Sets pretty formatting
+        gsonBuilder = gsonBuilder.setPrettyPrinting();
         Gson gson = gsonBuilder.create();
         registryAccess.registries().forEach(r -> dumpDatapack(r, registryOps, gson));
     }
