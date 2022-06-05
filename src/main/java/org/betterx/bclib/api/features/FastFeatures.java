@@ -91,6 +91,19 @@ public class FastFeatures {
     }
 
     public static BCLFeature
+    single(ResourceLocation location, Block block) {
+        return single(location, BlockStateProvider.simple(block));
+
+    }
+
+    public static BCLFeature
+    single(ResourceLocation location, BlockStateProvider provider) {
+        return BCLFeatureBuilder
+                .start(location, provider)
+                .buildAndRegister();
+    }
+
+    public static BCLFeature
     simple(ResourceLocation location,
            int searchDist,
            boolean rare,

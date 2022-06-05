@@ -6,10 +6,15 @@ import net.minecraft.data.worldgen.placement.PlacementUtils;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.valueproviders.IntProvider;
 import net.minecraft.util.valueproviders.UniformInt;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.GenerationStep.Decoration;
 import net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate;
 import net.minecraft.world.level.levelgen.feature.Feature;
+import net.minecraft.world.level.levelgen.feature.SimpleBlockFeature;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
+import net.minecraft.world.level.levelgen.feature.configurations.SimpleBlockConfiguration;
+import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider;
 import net.minecraft.world.level.levelgen.placement.*;
 import net.minecraft.world.level.material.Material;
 
@@ -24,6 +29,7 @@ public class BCLFeatureBuilder<FC extends FeatureConfiguration, F extends Featur
     private ResourceLocation featureID;
     private Decoration decoration = Decoration.VEGETAL_DECORATION;
     private final F feature;
+    private BlockStateProvider provider;
 
     private BCLFeatureBuilder(ResourceLocation featureID, F feature) {
         this.featureID = featureID;
@@ -39,6 +45,26 @@ public class BCLFeatureBuilder<FC extends FeatureConfiguration, F extends Featur
      */
     public static BCLFeatureBuilder start(ResourceLocation featureID, Feature<?> feature) {
         return new BCLFeatureBuilder(featureID, feature);
+    }
+
+    public static BCLFeatureBuilder<SimpleBlockConfiguration, SimpleBlockFeature> start(ResourceLocation featureID,
+                                                                                        Block block) {
+        return start(featureID, BlockStateProvider.simple(block));
+    }
+
+    public static BCLFeatureBuilder<SimpleBlockConfiguration, SimpleBlockFeature> start(ResourceLocation featureID,
+                                                                                        BlockState state) {
+        return start(featureID, BlockStateProvider.simple(state));
+    }
+
+    public static BCLFeatureBuilder<SimpleBlockConfiguration, SimpleBlockFeature> start(ResourceLocation featureID,
+                                                                                        BlockStateProvider provider) {
+        BCLFeatureBuilder<SimpleBlockConfiguration, SimpleBlockFeature> builder = new BCLFeatureBuilder(
+                featureID,
+                Feature.SIMPLE_BLOCK
+        );
+        builder.provider = provider;
+        return builder;
     }
 
     /**
@@ -141,6 +167,10 @@ public class BCLFeatureBuilder<FC extends FeatureConfiguration, F extends Featur
 
     public BCLFeatureBuilder stencil() {
         return modifier(Stencil.all());
+    }
+
+    public BCLFeatureBuilder all() {
+        return modifier(All.simple());
     }
 
     public BCLFeatureBuilder stencilOneIn4() {
@@ -331,6 +361,8 @@ public class BCLFeatureBuilder<FC extends FeatureConfiguration, F extends Featur
      * @return created {@link BCLFeature} instance.
      */
     public BCLFeature buildAndRegister() {
+        if (this.feature == Feature.SIMPLE_BLOCK && provider != null)
+            return buildAndRegister((FC) new SimpleBlockConfiguration(provider));
         return buildAndRegister((FC) FeatureConfiguration.NONE);
     }
 

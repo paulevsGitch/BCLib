@@ -11,14 +11,13 @@ import net.minecraft.world.level.levelgen.GenerationStep.Decoration;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
+import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
 import net.minecraft.world.level.levelgen.feature.configurations.RandomFeatureConfiguration;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraft.world.level.levelgen.placement.PlacementModifier;
 
 import org.betterx.bclib.BCLib;
-import org.betterx.bclib.api.features.config.PlaceFacingBlockConfig;
-import org.betterx.bclib.api.features.config.ScatterFeatureConfig;
-import org.betterx.bclib.api.features.config.TemplateFeatureConfig;
+import org.betterx.bclib.api.features.config.*;
 
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -37,6 +36,16 @@ public class BCLFeature {
     public static final Feature<TemplateFeatureConfig> TEMPLATE = register(BCLib.makeID("template"),
             new TemplateFeature(
                     TemplateFeatureConfig.CODEC));
+
+    public static final Feature<NoneFeatureConfiguration> MARK_POSTPROCESSING = register(BCLib.makeID(
+                    "mark_postprocessing"),
+            new MarkPostProcessingFeature());
+
+    public static final Feature<SequenceFeatureConfig> SEQUENCE = register(BCLib.makeID("sequence"),
+            new SequenceFeature());
+
+    public static final Feature<ConditionFeatureConfig> CONDITION = register(BCLib.makeID("condition"),
+            new ConditionFeature());
     private final Holder<PlacedFeature> placedFeature;
     private final Decoration featureStep;
     private final Feature<?> feature;

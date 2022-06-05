@@ -25,6 +25,10 @@ public class PlacementModifiers {
             "stencil",
             Stencil.CODEC);
 
+    public static final PlacementModifierType<All> ALL = register(
+            "all",
+            All.CODEC);
+
     public static final PlacementModifierType<IsBasin> IS_BASIN = register(
             "is_basin",
             IsBasin.CODEC);

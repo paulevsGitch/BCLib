@@ -8,22 +8,22 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
+import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider;
+import net.minecraft.world.level.levelgen.feature.stateproviders.WeightedStateProvider;
 
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import java.util.List;
-import java.util.Optional;
 
 public abstract class PlaceBlockFeatureConfig implements FeatureConfiguration {
 
-    protected static <T extends PlaceBlockFeatureConfig> RecordCodecBuilder<T, SimpleWeightedRandomList<BlockState>> blockStateCodec() {
-        return SimpleWeightedRandomList
-                .wrappedCodec(BlockState.CODEC)
+    protected static <T extends PlaceBlockFeatureConfig> RecordCodecBuilder<T, BlockStateProvider> blockStateCodec() {
+        return BlockStateProvider.CODEC
                 .fieldOf("entries")
-                .forGetter((T o) -> o.weightedList);
+                .forGetter((T o) -> o.stateProvider);
     }
 
-    protected final SimpleWeightedRandomList<BlockState> weightedList;
+    protected final BlockStateProvider stateProvider;
 
 
     protected static SimpleWeightedRandomList<BlockState> buildWeightedList(List<BlockState> states) {
@@ -44,7 +44,7 @@ public abstract class PlaceBlockFeatureConfig implements FeatureConfiguration {
     }
 
     public PlaceBlockFeatureConfig(BlockState state) {
-        this(buildWeightedList(state));
+        this(BlockStateProvider.simple(state));
     }
 
 
@@ -53,19 +53,20 @@ public abstract class PlaceBlockFeatureConfig implements FeatureConfiguration {
     }
 
     public PlaceBlockFeatureConfig(SimpleWeightedRandomList<BlockState> blocks) {
-        this.weightedList = blocks;
+        this.stateProvider = new WeightedStateProvider(blocks);
     }
 
-    public Optional<BlockState> getRandomBlock(RandomSource random) {
-        return this.weightedList.getRandomValue(random);
+    public PlaceBlockFeatureConfig(BlockStateProvider blocks) {
+        this.stateProvider = blocks;
+    }
+
+    public BlockState getRandomBlock(RandomSource random, BlockPos pos) {
+        return this.stateProvider.getState(random, pos);
     }
 
     public boolean place(FeaturePlaceContext<? extends PlaceBlockFeatureConfig> ctx) {
-        Optional<BlockState> state = getRandomBlock(ctx.random());
-        if (state.isPresent()) {
-            return placeBlock(ctx, ctx.level(), ctx.origin(), state.get());
-        }
-        return false;
+        BlockState state = getRandomBlock(ctx.random(), ctx.origin());
+        return placeBlock(ctx, ctx.level(), ctx.origin(), state);
     }
 
 

@@ -38,7 +38,7 @@ public class IsBasin extends PlacementFilter {
         this.topPredicate = topPredicate;
     }
 
-    public static IsBasin simple(BlockPredicate predicate) {
+    public static PlacementFilter simple(BlockPredicate predicate) {
         return new IsBasin(predicate);
     }
 

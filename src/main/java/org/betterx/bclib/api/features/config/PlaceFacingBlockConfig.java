@@ -9,6 +9,8 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
+import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider;
+import net.minecraft.world.level.levelgen.feature.stateproviders.WeightedStateProvider;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -45,7 +47,7 @@ public class PlaceFacingBlockConfig extends PlaceBlockFeatureConfig {
     }
 
     public PlaceFacingBlockConfig(BlockState state, List<Direction> dir) {
-        this(buildWeightedList(state), dir);
+        this(BlockStateProvider.simple(state), dir);
     }
 
     public PlaceFacingBlockConfig(List<BlockState> states, List<Direction> dir) {
@@ -53,6 +55,10 @@ public class PlaceFacingBlockConfig extends PlaceBlockFeatureConfig {
     }
 
     public PlaceFacingBlockConfig(SimpleWeightedRandomList<BlockState> blocks, List<Direction> dir) {
+        this(new WeightedStateProvider(blocks), dir);
+    }
+
+    public PlaceFacingBlockConfig(BlockStateProvider blocks, List<Direction> dir) {
         super(blocks);
         directions = dir;
     }
