@@ -18,6 +18,7 @@ public class CommonBlockTags {
     public static final TagKey<Block> NETHER_PORTAL_FRAME = TagAPI.makeCommonBlockTag("nether_pframe");
     public static final TagKey<Block> NETHER_STONES = TagAPI.makeCommonBlockTag("nether_stones");
     public static final TagKey<Block> NETHER_ORES = TagAPI.makeCommonBlockTag("nether_ores");
+    public static final TagKey<Block> END_ORES = TagAPI.makeCommonBlockTag("end_ores");
     public static final TagKey<Block> SAPLINGS = TagAPI.makeCommonBlockTag("saplings");
     public static final TagKey<Block> SOUL_GROUND = TagAPI.makeCommonBlockTag("soul_ground");
     public static final TagKey<Block> WOODEN_BARREL = TagAPI.makeCommonBlockTag("wooden_barrels");
