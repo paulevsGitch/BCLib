@@ -1,5 +1,6 @@
 package org.betterx.bclib.api.features.config;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.valueproviders.ConstantInt;
 import net.minecraft.util.valueproviders.IntProvider;
@@ -7,6 +8,7 @@ import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
+import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider;
 
 import com.mojang.datafixers.util.Function15;
 import com.mojang.serialization.Codec;
@@ -17,12 +19,12 @@ import org.betterx.bclib.util.BlocksHelper;
 import java.util.Optional;
 
 public abstract class ScatterFeatureConfig implements FeatureConfiguration {
-    public interface Instancer<T extends ScatterFeatureConfig> extends Function15<BlockState, Optional<BlockState>, Optional<BlockState>, Optional<BlockState>, Float, Float, Float, Float, Integer, Integer, Float, Float, Float, Boolean, IntProvider, T> {
+    public interface Instancer<T extends ScatterFeatureConfig> extends Function15<BlockStateProvider, Optional<BlockStateProvider>, Optional<BlockStateProvider>, Optional<BlockState>, Float, Float, Float, Float, Integer, Integer, Float, Float, Float, Boolean, IntProvider, T> {
     }
 
-    public final BlockState clusterBlock;
-    public final BlockState tipBlock;
-    public final BlockState bottomBlock;
+    public final BlockStateProvider clusterBlock;
+    public final BlockStateProvider tipBlock;
+    public final BlockStateProvider bottomBlock;
     public final Optional<BlockState> baseState;
     public final float baseReplaceChance;
     public final float chanceOfDirectionalSpread;
@@ -38,9 +40,9 @@ public abstract class ScatterFeatureConfig implements FeatureConfiguration {
 
     public final boolean growWhileFree;
 
-    public ScatterFeatureConfig(BlockState clusterBlock,
-                                Optional<BlockState> tipBlock,
-                                Optional<BlockState> bottomBlock,
+    public ScatterFeatureConfig(BlockStateProvider clusterBlock,
+                                Optional<BlockStateProvider> tipBlock,
+                                Optional<BlockStateProvider> bottomBlock,
                                 Optional<BlockState> baseState,
                                 float baseReplaceChance,
                                 float chanceOfDirectionalSpread,
@@ -77,20 +79,20 @@ public abstract class ScatterFeatureConfig implements FeatureConfiguration {
 
     public abstract boolean isValidBase(BlockState state);
 
-    public abstract BlockState createBlock(int height, int maxHeight, RandomSource random);
+    public abstract BlockState createBlock(int height, int maxHeight, RandomSource random, BlockPos pos);
 
     public static <T extends ScatterFeatureConfig> Codec<T> buildCodec(Instancer<T> instancer) {
         return RecordCodecBuilder.create((instance) -> instance
-                .group(BlockState.CODEC
+                .group(BlockStateProvider.CODEC
                                 .fieldOf("cluster_block")
                                 .forGetter((T cfg) -> cfg.clusterBlock),
-                        BlockState.CODEC
+                        BlockStateProvider.CODEC
                                 .optionalFieldOf("tip_block")
                                 .orElse(Optional.empty())
                                 .forGetter((T cfg) -> cfg.tipBlock == cfg.clusterBlock
                                         ? Optional.empty()
                                         : Optional.of(cfg.tipBlock)),
-                        BlockState.CODEC
+                        BlockStateProvider.CODEC
                                 .optionalFieldOf("bottom_block")
                                 .orElse(Optional.empty())
                                 .forGetter((T cfg) -> cfg.bottomBlock == cfg.clusterBlock
@@ -159,9 +161,9 @@ public abstract class ScatterFeatureConfig implements FeatureConfiguration {
     }
 
     public static class Builder<T extends ScatterFeatureConfig> {
-        private BlockState clusterBlock;
-        private BlockState tipBlock;
-        private BlockState bottomBlock;
+        private BlockStateProvider clusterBlock;
+        private BlockStateProvider tipBlock;
+        private BlockStateProvider bottomBlock;
         private Optional<BlockState> baseState = Optional.empty();
         private float baseReplaceChance = 0;
         private float chanceOfDirectionalSpread = 0;
@@ -193,18 +195,35 @@ public abstract class ScatterFeatureConfig implements FeatureConfiguration {
         }
 
         public Builder<T> block(BlockState s) {
+            this.clusterBlock = BlockStateProvider.simple(s);
+            if (tipBlock == null) tipBlock = BlockStateProvider.simple(s);
+            if (bottomBlock == null) bottomBlock = BlockStateProvider.simple(s);
+            return this;
+        }
+
+        public Builder<T> tipBlock(BlockState s) {
+            tipBlock = BlockStateProvider.simple(s);
+            return this;
+        }
+
+        public Builder<T> bottomBlock(BlockState s) {
+            bottomBlock = BlockStateProvider.simple(s);
+            return this;
+        }
+
+        public Builder<T> block(BlockStateProvider s) {
             this.clusterBlock = s;
             if (tipBlock == null) tipBlock = s;
             if (bottomBlock == null) bottomBlock = s;
             return this;
         }
 
-        public Builder<T> tipBlock(BlockState s) {
+        public Builder<T> tipBlock(BlockStateProvider s) {
             tipBlock = s;
             return this;
         }
 
-        public Builder<T> bottomBlock(BlockState s) {
+        public Builder<T> bottomBlock(BlockStateProvider s) {
             bottomBlock = s;
             return this;
         }
@@ -316,9 +335,9 @@ public abstract class ScatterFeatureConfig implements FeatureConfiguration {
     public static class OnSolid extends ScatterFeatureConfig {
         public static final Codec<OnSolid> CODEC = buildCodec(OnSolid::new);
 
-        public OnSolid(BlockState clusterBlock,
-                       Optional<BlockState> tipBlock,
-                       Optional<BlockState> bottomBlock,
+        public OnSolid(BlockStateProvider clusterBlock,
+                       Optional<BlockStateProvider> tipBlock,
+                       Optional<BlockStateProvider> bottomBlock,
                        Optional<BlockState> baseState,
                        float baseReplaceChance,
                        float chanceOfDirectionalSpread,
@@ -361,11 +380,11 @@ public abstract class ScatterFeatureConfig implements FeatureConfiguration {
         }
 
         @Override
-        public BlockState createBlock(int height, int maxHeight, RandomSource random) {
-            if (height == 0) return this.bottomBlock;
+        public BlockState createBlock(int height, int maxHeight, RandomSource random, BlockPos pos) {
+            if (height == 0) return this.bottomBlock.getState(random, pos);
             return height == maxHeight
-                    ? this.tipBlock
-                    : this.clusterBlock;
+                    ? this.tipBlock.getState(random, pos)
+                    : this.clusterBlock.getState(random, pos);
         }
     }
 

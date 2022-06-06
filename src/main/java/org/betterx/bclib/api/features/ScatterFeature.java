@@ -28,7 +28,6 @@ import org.betterx.bclib.util.BlocksHelper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Consumer;
 
 public class ScatterFeature<FC extends ScatterFeatureConfig>
         extends Feature<FC> {
@@ -161,7 +160,8 @@ public class ScatterFeature<FC extends ScatterFeatureConfig>
                                      RandomSource random) {
         if (BlocksHelper.isFreeSpace(level, origin, direction, height, BlocksHelper::isFree)) {
             createPatchOfBaseBlocks(level, random, basePos, config);
-            if (config.bottomBlock.canSurvive(level, origin)) {
+            BlockState bottom = config.bottomBlock.getState(random, origin);
+            if (bottom.canSurvive(level, origin)) {
                 buildPillar(level, origin, direction, height, config, random);
             }
         }
@@ -175,22 +175,14 @@ public class ScatterFeature<FC extends ScatterFeatureConfig>
                              RandomSource random) {
 
         final BlockPos.MutableBlockPos POS = origin.mutable();
-        buildBaseToTipColumn(height, (blockState) -> {
+        for (int size = 0; size < height; size++) {
             BlockState previous = level.getBlockState(POS);
+            BlockState state = config.createBlock(size, height - 1, random, POS);
             if (!BlocksHelper.isFree(previous)) {
-                System.out.println("Replaced " + previous + " with " + blockState + " at " + POS);
+                System.out.println("Replaced " + previous + " with " + state + " at " + POS);
             }
-            BlocksHelper.setWithoutUpdate(level, POS, blockState);
+            BlocksHelper.setWithoutUpdate(level, POS, state);
             POS.move(direction);
-        }, config, random);
-    }
-
-    protected void buildBaseToTipColumn(int totalHeight,
-                                        Consumer<BlockState> consumer,
-                                        ScatterFeatureConfig config,
-                                        RandomSource random) {
-        for (int size = 0; size < totalHeight; size++) {
-            consumer.accept(config.createBlock(size, totalHeight - 1, random));
         }
     }
 
