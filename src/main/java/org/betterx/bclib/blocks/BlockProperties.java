@@ -1,6 +1,7 @@
 package org.betterx.bclib.blocks;
 
 import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
@@ -22,7 +23,7 @@ public class BlockProperties {
     public static final IntegerProperty FULLNESS = IntegerProperty.create("fullness", 0, 3);
     public static final IntegerProperty COLOR = IntegerProperty.create("color", 0, 7);
     public static final IntegerProperty SIZE = IntegerProperty.create("size", 0, 7);
-    public static final IntegerProperty AGE = IntegerProperty.create("age", 0, 3);
+    public static final IntegerProperty AGE = BlockStateProperties.AGE_3;
 
     public enum TripleShape implements StringRepresentable {
         TOP("top", 0), MIDDLE("middle", 1), BOTTOM("bottom", 2);

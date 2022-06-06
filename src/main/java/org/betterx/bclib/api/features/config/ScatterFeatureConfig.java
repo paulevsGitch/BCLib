@@ -14,6 +14,7 @@ import com.mojang.datafixers.util.Function15;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import org.betterx.bclib.BCLib;
+import org.betterx.bclib.blocks.BlockProperties;
 import org.betterx.bclib.util.BlocksHelper;
 
 import java.util.Optional;
@@ -122,17 +123,17 @@ public abstract class ScatterFeatureConfig implements FeatureConfiguration {
                                 .orElse(0.5F)
                                 .forGetter((T cfg) -> cfg.chanceOfSpreadRadius3),
                         Codec
-                                .intRange(1, 20)
+                                .intRange(1, 64)
                                 .fieldOf("min_height")
                                 .orElse(2)
                                 .forGetter((T cfg) -> cfg.minHeight),
                         Codec
-                                .intRange(1, 20)
+                                .intRange(1, 64)
                                 .fieldOf("max_height")
                                 .orElse(7)
                                 .forGetter((T cfg) -> cfg.maxHeight),
                         Codec
-                                .floatRange(0, 10)
+                                .floatRange(0, 16)
                                 .fieldOf("max_spread")
                                 .orElse(2f)
                                 .forGetter((T cfg) -> cfg.maxSpread),
@@ -208,6 +209,17 @@ public abstract class ScatterFeatureConfig implements FeatureConfiguration {
 
         public Builder<T> bottomBlock(BlockState s) {
             bottomBlock = BlockStateProvider.simple(s);
+            return this;
+        }
+
+        public Builder<T> tripleShape(Block s) {
+            return tripleShape(s.defaultBlockState());
+        }
+
+        public Builder<T> tripleShape(BlockState s) {
+            block(s.setValue(BlockProperties.TRIPLE_SHAPE, BlockProperties.TripleShape.MIDDLE));
+            tipBlock(s.setValue(BlockProperties.TRIPLE_SHAPE, BlockProperties.TripleShape.TOP));
+            bottomBlock(s.setValue(BlockProperties.TRIPLE_SHAPE, BlockProperties.TripleShape.BOTTOM));
             return this;
         }
 
