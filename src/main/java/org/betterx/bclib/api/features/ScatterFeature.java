@@ -114,17 +114,7 @@ public class ScatterFeature<FC extends ScatterFeatureConfig>
                 POS.set(x, basePos.getY(), z);
 
                 if (BlocksHelper.findSurroundingSurface(level, POS, surfaceDirection, 4, config::isValidBase)) {
-                    int myHeight;
-                    if (config.growWhileFree) {
-                        myHeight = BlocksHelper.blockCount(level,
-                                POS,
-                                direction,
-                                config.maxHeight,
-                                BlocksHelper::isFree
-                        );
-                    } else {
-                        myHeight = centerHeight;
-                    }
+                    int myHeight = freeHeight(level, direction, centerHeight, config, POS);
 
                     int dx = x - POS.getX();
                     int dz = z - POS.getZ();
@@ -149,6 +139,25 @@ public class ScatterFeature<FC extends ScatterFeatureConfig>
                 }
             }
         }
+    }
+
+    private int freeHeight(LevelAccessor level,
+                           Direction direction,
+                           int centerHeight,
+                           ScatterFeatureConfig config,
+                           BlockPos.MutableBlockPos POS) {
+        int myHeight;
+        if (config.growWhileFree) {
+            myHeight = BlocksHelper.blockCount(level,
+                    POS,
+                    direction,
+                    config.maxHeight,
+                    BlocksHelper::isFree
+            );
+        } else {
+            myHeight = centerHeight;
+        }
+        return myHeight;
     }
 
     private void buildPillarWithBase(LevelAccessor level,

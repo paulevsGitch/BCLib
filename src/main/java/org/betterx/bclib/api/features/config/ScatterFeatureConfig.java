@@ -191,7 +191,7 @@ public abstract class ScatterFeatureConfig implements FeatureConfiguration {
         }
 
         public Builder<T> singleBlock(Block b) {
-            return block(b.defaultBlockState()).heightRange(1, 1).spread(0, 0);
+            return block(b.defaultBlockState()).heightRange(1, 1).spread(0, 0, ConstantInt.of(0));
         }
 
         public Builder<T> block(BlockState s) {
