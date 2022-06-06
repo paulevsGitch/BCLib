@@ -23,7 +23,7 @@ public class SequenceFeatureConfig implements FeatureConfiguration {
 
     private final List<Holder<PlacedFeature>> features;
 
-    public static SequenceFeatureConfig create(List<BCLFeature> features) {
+    public static SequenceFeatureConfig create(List<BCLFeature<?, ?>> features) {
         return new SequenceFeatureConfig(features.stream().map(f -> f.getPlacedFeature()).toList());
     }
 

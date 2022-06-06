@@ -69,7 +69,11 @@ public abstract class ModIntegration {
         Feature<?> feature = Registry.FEATURE.get(id);
         Holder<PlacedFeature> featurePlaced = BuiltinRegistries.PLACED_FEATURE.getHolder(getFeatureKey(placedFeatureID))
                                                                               .orElse(null);
-        return new BCLFeature(id, feature, featureStep, featurePlaced);
+        return new BCLFeature(id,
+                feature,
+                featureStep,
+                featurePlaced.value().getFeatures().map(f -> f.config()).findFirst().orElse(null),
+                featurePlaced);
     }
 
     public BCLFeature getFeature(String name, GenerationStep.Decoration featureStep) {

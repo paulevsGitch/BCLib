@@ -65,6 +65,7 @@ public class CommonBlockTags {
                 NETHER_ORES,
                 SOUL_GROUND,
                 NETHER_MYCELIUM,
+                MYCELIUM,
                 END_STONES);
 
         TagAPI.BLOCKS.add(MYCELIUM, Blocks.MYCELIUM);

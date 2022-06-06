@@ -22,7 +22,7 @@ import org.betterx.bclib.api.features.config.*;
 import java.util.Map.Entry;
 import java.util.Optional;
 
-public class BCLFeature {
+public class BCLFeature<F extends Feature<FC>, FC extends FeatureConfiguration> {
     public static final Feature<PlaceFacingBlockConfig> PLACE_BLOCK = register(
             BCLib.makeID("place_block"),
             new PlaceBlockFeature<>(PlaceFacingBlockConfig.CODEC));
@@ -48,24 +48,27 @@ public class BCLFeature {
             new ConditionFeature());
     private final Holder<PlacedFeature> placedFeature;
     private final Decoration featureStep;
-    private final Feature<?> feature;
+    private final F feature;
+    private final FC configuration;
 
 
-    public <FC extends FeatureConfiguration, F extends Feature<FC>> BCLFeature(ResourceLocation id,
-                                                                               F feature,
-                                                                               Decoration featureStep,
-                                                                               FC configuration,
-                                                                               PlacementModifier[] modifiers) {
-        this(id, feature, featureStep, buildPlacedFeature(id, feature, configuration, modifiers));
+    public BCLFeature(ResourceLocation id,
+                      F feature,
+                      Decoration featureStep,
+                      FC configuration,
+                      PlacementModifier[] modifiers) {
+        this(id, feature, featureStep, configuration, buildPlacedFeature(id, feature, configuration, modifiers));
     }
 
     public BCLFeature(ResourceLocation id,
-                      Feature<?> feature,
+                      F feature,
                       Decoration featureStep,
+                      FC configuration,
                       Holder<PlacedFeature> placedFeature) {
         this.placedFeature = placedFeature;
         this.featureStep = featureStep;
         this.feature = feature;
+        this.configuration = configuration;
 
         if (!BuiltinRegistries.PLACED_FEATURE.containsKey(id)) {
             Registry.register(BuiltinRegistries.PLACED_FEATURE, id, placedFeature.value());
@@ -119,7 +122,7 @@ public class BCLFeature {
      *
      * @return {@link Feature}.
      */
-    public Feature<?> getFeature() {
+    public F getFeature() {
         return feature;
     }
 
@@ -139,5 +142,9 @@ public class BCLFeature {
      */
     public Decoration getDecoration() {
         return featureStep;
+    }
+
+    public FC getConfiguration() {
+        return configuration;
     }
 }

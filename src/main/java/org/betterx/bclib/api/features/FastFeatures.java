@@ -64,6 +64,16 @@ public class FastFeatures {
                 new SimpleBlockConfiguration(BlockStateProvider.simple(block)));
     }
 
+    public static BCLFeature
+    patch(ResourceLocation location, BlockStateProvider provider, int attempts, int xzSpread, int ySpread) {
+        return patch(location,
+                attempts,
+                xzSpread,
+                ySpread,
+                Feature.SIMPLE_BLOCK,
+                new SimpleBlockConfiguration(provider));
+    }
+
     public static BCLFeature patchWitRandomInt(ResourceLocation location, Block block, IntegerProperty prop) {
         return patchWitRandomInt(location, block, prop, 96, 7, 3);
     }
