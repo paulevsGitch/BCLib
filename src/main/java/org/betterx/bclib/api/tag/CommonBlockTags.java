@@ -14,6 +14,7 @@ public class CommonBlockTags {
     public static final TagKey<Block> IMMOBILE = TagAPI.makeCommonBlockTag("immobile");
     public static final TagKey<Block> LEAVES = TagAPI.makeCommonBlockTag("leaves");
     public static final TagKey<Block> NETHERRACK = TagAPI.makeCommonBlockTag("netherrack");
+    public static final TagKey<Block> MYCELIUM = TagAPI.makeCommonBlockTag("mycelium");
     public static final TagKey<Block> NETHER_MYCELIUM = TagAPI.makeCommonBlockTag("nether_mycelium");
     public static final TagKey<Block> NETHER_PORTAL_FRAME = TagAPI.makeCommonBlockTag("nether_pframe");
     public static final TagKey<Block> NETHER_STONES = TagAPI.makeCommonBlockTag("nether_stones");
@@ -65,5 +66,8 @@ public class CommonBlockTags {
                 SOUL_GROUND,
                 NETHER_MYCELIUM,
                 END_STONES);
+
+        TagAPI.BLOCKS.add(MYCELIUM, Blocks.MYCELIUM);
+        TagAPI.BLOCKS.addOtherTags(MYCELIUM, NETHER_MYCELIUM);
     }
 }

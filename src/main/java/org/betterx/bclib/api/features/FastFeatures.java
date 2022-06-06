@@ -104,6 +104,13 @@ public class FastFeatures {
     }
 
     public static BCLFeature
+    simple(ResourceLocation location, Feature<NoneFeatureConfiguration> feature) {
+        return BCLFeatureBuilder
+                .start(location, feature)
+                .buildAndRegister();
+    }
+
+    public static BCLFeature
     simple(ResourceLocation location,
            int searchDist,
            boolean rare,
@@ -192,6 +199,4 @@ public class FastFeatures {
                 .start(patchLocation, Feature.RANDOM_PATCH)
                 .buildAndRegister(new RandomPatchConfiguration(attempts, xzSpread, ySpread, single.getPlacedFeature()));
     }
-
-
 }
