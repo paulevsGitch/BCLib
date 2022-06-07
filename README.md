@@ -1,6 +1,6 @@
-[![](https://jitpack.io/v/paulevsGitch/BCLib.svg)](https://jitpack.io/#paulevsGitch/BCLib)
+[![](https://jitpack.io/v/quiqueck/BCLib.svg)](https://jitpack.io/#quiqueck/BCLib)
 # BCLib
-BCLib is a library mod for BetterX team mods, developed for Fabric, MC 1.18
+BCLib is a library mod for BetterX team mods, developed for Fabric, MC 1.19
 
 ## Features:
 ### Rendering
