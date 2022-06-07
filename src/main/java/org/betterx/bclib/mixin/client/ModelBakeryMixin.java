@@ -7,7 +7,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.profiling.ProfilerFiller;
 
-import org.betterx.bclib.api.ModIntegrationAPI;
+import org.betterx.bclib.api.v2.ModIntegrationAPI;
 import org.betterx.bclib.client.models.CustomModelBakery;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;

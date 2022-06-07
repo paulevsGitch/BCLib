@@ -2,7 +2,7 @@ package org.betterx.bclib.integration.modmenu;
 
 import com.terraformersmc.modmenu.api.ConfigScreenFactory;
 import com.terraformersmc.modmenu.api.ModMenuApi;
-import org.betterx.bclib.gui.modmenu.MainScreen;
+import org.betterx.bclib.client.gui.modmenu.MainScreen;
 
 import java.util.HashMap;
 import java.util.Map;

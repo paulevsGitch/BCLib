@@ -7,7 +7,7 @@ import net.minecraft.world.level.block.Block;
 
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 
-import org.betterx.bclib.api.tag.TagAPI;
+import org.betterx.bclib.api.v2.tag.TagAPI;
 import org.betterx.bclib.complexmaterials.ComplexMaterial;
 import org.betterx.bclib.registry.BlockRegistry;
 

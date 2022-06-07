@@ -6,8 +6,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.FlatLevelGeneratorPresetTags;
 import net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorPreset;
 
-import org.betterx.bclib.api.tag.TagAPI;
-import org.betterx.bclib.api.tag.TagType;
+import org.betterx.bclib.api.v2.tag.TagAPI;
+import org.betterx.bclib.api.v2.tag.TagType;
 
 public class FlatLevelPresets {
     public static TagType.Simple<FlatLevelGeneratorPreset> FLAT_LEVEL_PRESETS =

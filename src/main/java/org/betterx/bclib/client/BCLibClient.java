@@ -7,9 +7,9 @@ import net.minecraft.resources.ResourceLocation;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.model.*;
 
-import org.betterx.bclib.api.ModIntegrationAPI;
-import org.betterx.bclib.api.PostInitAPI;
-import org.betterx.bclib.api.dataexchange.DataExchangeAPI;
+import org.betterx.bclib.api.v2.ModIntegrationAPI;
+import org.betterx.bclib.api.v2.PostInitAPI;
+import org.betterx.bclib.api.v2.dataexchange.DataExchangeAPI;
 import org.betterx.bclib.client.models.CustomModelBakery;
 import org.betterx.bclib.client.presets.WorldPresetsUI;
 import org.betterx.bclib.registry.BaseBlockEntityRenders;

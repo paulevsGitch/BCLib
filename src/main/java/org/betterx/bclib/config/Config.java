@@ -1,10 +1,10 @@
 package org.betterx.bclib.config;
 
 import org.betterx.bclib.BCLib;
-import org.betterx.bclib.api.dataexchange.DataExchangeAPI;
-import org.betterx.bclib.api.dataexchange.SyncFileHash;
-import org.betterx.bclib.api.dataexchange.handler.autosync.AutoSyncID;
-import org.betterx.bclib.api.dataexchange.handler.autosync.FileContentWrapper;
+import org.betterx.bclib.api.v2.dataexchange.DataExchangeAPI;
+import org.betterx.bclib.api.v2.dataexchange.SyncFileHash;
+import org.betterx.bclib.api.v2.dataexchange.handler.autosync.AutoSyncID;
+import org.betterx.bclib.api.v2.dataexchange.handler.autosync.FileContentWrapper;
 
 import java.io.File;
 import java.util.ArrayList;

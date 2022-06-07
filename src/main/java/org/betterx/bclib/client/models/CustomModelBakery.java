@@ -16,7 +16,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.mojang.datafixers.util.Pair;
-import org.betterx.bclib.api.ModIntegrationAPI;
+import org.betterx.bclib.api.v2.ModIntegrationAPI;
 import org.betterx.bclib.client.render.EmissiveTextureInfo;
 import org.betterx.bclib.interfaces.BlockModelProvider;
 import org.betterx.bclib.interfaces.ItemModelProvider;

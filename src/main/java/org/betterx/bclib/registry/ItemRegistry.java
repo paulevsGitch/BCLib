@@ -15,9 +15,9 @@ import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.block.DispenserBlock;
 
-import org.betterx.bclib.api.tag.CommonItemTags;
-import org.betterx.bclib.api.tag.NamedToolTags;
-import org.betterx.bclib.api.tag.TagAPI;
+import org.betterx.bclib.api.v2.tag.CommonItemTags;
+import org.betterx.bclib.api.v2.tag.NamedToolTags;
+import org.betterx.bclib.api.v2.tag.TagAPI;
 import org.betterx.bclib.config.PathConfig;
 import org.betterx.bclib.items.BaseDiscItem;
 import org.betterx.bclib.items.BaseDrinkItem;

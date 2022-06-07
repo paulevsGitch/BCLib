@@ -16,8 +16,8 @@ import net.minecraft.world.phys.BlockHitResult;
 
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 
-import org.betterx.bclib.api.tag.NamedMineableTags;
-import org.betterx.bclib.api.tag.TagAPI;
+import org.betterx.bclib.api.v2.tag.NamedMineableTags;
+import org.betterx.bclib.api.v2.tag.TagAPI;
 
 public class BaseStripableLogBlock extends BaseRotatedPillarBlock {
     private final Block striped;

@@ -13,10 +13,10 @@ import net.minecraft.world.level.storage.LevelStorageSource.LevelStorageAccess;
 import net.minecraft.world.level.storage.ServerLevelData;
 import net.minecraft.world.level.storage.WritableLevelData;
 
-import org.betterx.bclib.api.LifeCycleAPI;
-import org.betterx.bclib.api.biomes.BiomeAPI;
-import org.betterx.bclib.world.generator.BCLBiomeSource;
-import org.betterx.bclib.world.generator.BCLibNetherBiomeSource;
+import org.betterx.bclib.api.v2.LifeCycleAPI;
+import org.betterx.bclib.api.v2.generator.BCLBiomeSource;
+import org.betterx.bclib.api.v2.generator.BCLibNetherBiomeSource;
+import org.betterx.bclib.api.v2.levelgen.biomes.InternalBiomeAPI;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -68,7 +68,7 @@ public abstract class ServerLevelMixin extends Level {
                 list,
                 bl2);
 
-        BiomeAPI.applyModificationsDeprecated(ServerLevel.class.cast(this));
+        InternalBiomeAPI.applyModificationsDeprecated(ServerLevel.class.cast(this));
 
         if (level.dimension() == Level.NETHER) {
             BCLibNetherBiomeSource.setWorldHeight(level.getChunkSource().getGenerator().getGenDepth());

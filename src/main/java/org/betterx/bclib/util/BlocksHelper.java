@@ -16,7 +16,7 @@ import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.material.LavaFluid;
 
 import com.google.common.collect.Maps;
-import org.betterx.bclib.api.tag.CommonBlockTags;
+import org.betterx.bclib.api.v2.tag.CommonBlockTags;
 
 import java.util.Map;
 import java.util.Optional;

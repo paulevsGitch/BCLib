@@ -12,13 +12,13 @@ import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.WorldGenSettings;
 
 import com.mojang.serialization.Dynamic;
-import org.betterx.bclib.api.datafixer.DataFixerAPI;
-import org.betterx.bclib.api.datafixer.ForcedLevelPatch;
-import org.betterx.bclib.api.datafixer.MigrationProfile;
+import org.betterx.bclib.api.v2.datafixer.DataFixerAPI;
+import org.betterx.bclib.api.v2.datafixer.ForcedLevelPatch;
+import org.betterx.bclib.api.v2.datafixer.MigrationProfile;
+import org.betterx.bclib.api.v2.generator.GeneratorOptions;
+import org.betterx.bclib.api.v2.levelgen.LevelGenUtil;
 import org.betterx.bclib.config.Configs;
-import org.betterx.bclib.api.worldgen.WorldGenUtil;
 import org.betterx.bclib.util.MHelper;
-import org.betterx.bclib.world.generator.GeneratorOptions;
 
 import java.util.Optional;
 
@@ -45,7 +45,7 @@ final class BiomeSourcePatch extends ForcedLevelPatch {
     @Override
     protected Boolean runLevelDatPatch(CompoundTag root, MigrationProfile profile) {
         //make sure we have a working generators file before attempting to patch
-        WorldGenUtil.migrateGeneratorSettings();
+        LevelGenUtil.migrateGeneratorSettings();
 
         final CompoundTag worldGenSettings = root.getCompound("Data").getCompound("WorldGenSettings");
         final CompoundTag dimensions = worldGenSettings.getCompound("dimensions");
@@ -115,10 +115,10 @@ final class BiomeSourcePatch extends ForcedLevelPatch {
                 .resultOrPartial(BCLib.LOGGER::error);
 
         Optional<ChunkGenerator> netherGenerator = oLevelStem.map(l -> l.generator());
-        int biomeSourceVersion = WorldGenUtil.getBiomeVersionForGenerator(netherGenerator.orElse(null));
-        int targetVersion = WorldGenUtil.getBiomeVersionForCurrentWorld(dimensionKey);
+        int biomeSourceVersion = LevelGenUtil.getBiomeVersionForGenerator(netherGenerator.orElse(null));
+        int targetVersion = LevelGenUtil.getBiomeVersionForCurrentWorld(dimensionKey);
         if (biomeSourceVersion != targetVersion) {
-            Optional<Holder<LevelStem>> refLevelStem = WorldGenUtil.referenceStemForVersion(
+            Optional<Holder<LevelStem>> refLevelStem = LevelGenUtil.referenceStemForVersion(
                     dimensionKey,
                     targetVersion,
                     registryAccess,

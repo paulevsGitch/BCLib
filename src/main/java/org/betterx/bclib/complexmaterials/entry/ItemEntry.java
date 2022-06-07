@@ -6,7 +6,7 @@ import net.minecraft.world.item.Item;
 
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 
-import org.betterx.bclib.api.tag.TagAPI;
+import org.betterx.bclib.api.v2.tag.TagAPI;
 import org.betterx.bclib.complexmaterials.ComplexMaterial;
 import org.betterx.bclib.registry.ItemRegistry;
 

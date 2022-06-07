@@ -1,6 +1,6 @@
 package org.betterx.bclib.interfaces;
 
-import org.betterx.bclib.world.generator.BiomePicker;
+import org.betterx.bclib.api.v2.generator.BiomePicker;
 
 public interface BiomeMap {
     void setChunkProcessor(TriConsumer<Integer, Integer, Integer> processor);

@@ -1,7 +1,7 @@
 package org.betterx.bclib.config;
 
 import org.betterx.bclib.BCLib;
-import org.betterx.bclib.api.dataexchange.handler.autosync.AutoSync;
+import org.betterx.bclib.api.v2.dataexchange.handler.autosync.AutoSync;
 
 import java.util.ArrayList;
 import java.util.List;

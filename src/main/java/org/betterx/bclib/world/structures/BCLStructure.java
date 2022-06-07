@@ -10,20 +10,21 @@ import net.minecraft.world.level.levelgen.structure.placement.RandomSpreadStruct
 import net.minecraft.world.level.levelgen.structure.placement.RandomSpreadType;
 
 import com.mojang.serialization.Codec;
+import org.betterx.bclib.api.v2.levelgen.structures.BCLStructureBuilder;
 import org.betterx.bclib.util.MHelper;
 
 import java.util.function.Function;
 
 @Deprecated(forRemoval = true)
 /**
- *  Please use the {@link org.betterx.bclib.api.structures.BCLStructure} and
- *  {@link org.betterx.bclib.api.structures.BCLStructureBuilder} instead.
+ *  Please use the {@link org.betterx.bclib.api.v2.levelgen.structures.BCLStructure} and
+ *  {@link BCLStructureBuilder} instead.
  */
-public class BCLStructure<S extends Structure> extends org.betterx.bclib.api.structures.BCLStructure<S> {
+public class BCLStructure<S extends Structure> extends org.betterx.bclib.api.v2.levelgen.structures.BCLStructure<S> {
 
     @Deprecated(forRemoval = true)
     /**
-     * Please use the {@link org.betterx.bclib.api.structures.BCLStructureBuilder} instead:
+     * Please use the {@link BCLStructureBuilder} instead:
      *
      * BCLStructureBuilder
      *             .start(id, structureBuilder)
@@ -41,7 +42,7 @@ public class BCLStructure<S extends Structure> extends org.betterx.bclib.api.str
 
     @Deprecated(forRemoval = true)
     /**
-     * Please use the {@link org.betterx.bclib.api.structures.BCLStructureBuilder} instead:
+     * Please use the {@link BCLStructureBuilder} instead:
      *
      * BCLStructureBuilder
      *             .start(id, structureBuilder)
@@ -68,7 +69,7 @@ public class BCLStructure<S extends Structure> extends org.betterx.bclib.api.str
     @Deprecated(forRemoval = true)
     /**
      *
-     * Please use the {@link org.betterx.bclib.api.structures.BCLStructureBuilder} instead:
+     * Please use the {@link BCLStructureBuilder} instead:
      *
      * BCLStructureBuilder
      *             .start(id, structureBuilder)

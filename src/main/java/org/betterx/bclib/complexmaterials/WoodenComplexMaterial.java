@@ -13,7 +13,7 @@ import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.registry.FlammableBlockRegistry;
 
 import org.betterx.bclib.BCLib;
-import org.betterx.bclib.api.tag.*;
+import org.betterx.bclib.api.v2.tag.*;
 import org.betterx.bclib.blocks.*;
 import org.betterx.bclib.complexmaterials.entry.BlockEntry;
 import org.betterx.bclib.complexmaterials.entry.RecipeEntry;

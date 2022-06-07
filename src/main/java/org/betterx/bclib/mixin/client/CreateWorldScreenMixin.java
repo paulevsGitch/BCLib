@@ -12,9 +12,9 @@ import net.minecraft.world.level.levelgen.presets.WorldPreset;
 import net.minecraft.world.level.storage.LevelStorageSource;
 
 import com.mojang.datafixers.util.Pair;
-import org.betterx.bclib.api.LifeCycleAPI;
-import org.betterx.bclib.api.biomes.BiomeAPI;
-import org.betterx.bclib.api.worldgen.WorldGenUtil;
+import org.betterx.bclib.api.v2.LifeCycleAPI;
+import org.betterx.bclib.api.v2.levelgen.LevelGenUtil;
+import org.betterx.bclib.api.v2.levelgen.biomes.InternalBiomeAPI;
 import org.betterx.bclib.presets.worldgen.BCLWorldPresets;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -38,7 +38,7 @@ public class CreateWorldScreenMixin {
                           DataPackConfig dataPackConfig,
                           WorldGenSettingsComponent worldGenSettingsComponent,
                           CallbackInfo ci) {
-        BiomeAPI.initRegistry(worldGenSettingsComponent.registryHolder());
+        InternalBiomeAPI.initRegistry(worldGenSettingsComponent.registryHolder());
     }
 
     //Change the WorldPreset that is selected by default on the Create World Screen
@@ -52,7 +52,7 @@ public class CreateWorldScreenMixin {
     private static WorldLoader.WorldDataSupplier<WorldGenSettings> bcl_NewDefaultSettings(WorldLoader.WorldDataSupplier<WorldGenSettings> worldDataSupplier) {
         return (resourceManager, dataPackConfig) -> {
             Pair<WorldGenSettings, RegistryAccess.Frozen> res = worldDataSupplier.get(resourceManager, dataPackConfig);
-            return WorldGenUtil.defaultWorldDataSupplier(res.getSecond());
+            return LevelGenUtil.defaultWorldDataSupplier(res.getSecond());
         };
     }
 

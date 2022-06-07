@@ -6,7 +6,7 @@ import net.minecraft.server.Main;
 import net.minecraft.world.level.storage.LevelStorageSource;
 
 import com.mojang.serialization.DynamicOps;
-import org.betterx.bclib.api.LifeCycleAPI;
+import org.betterx.bclib.api.v2.LifeCycleAPI;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;

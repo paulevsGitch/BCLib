@@ -9,10 +9,10 @@ import net.minecraft.world.level.levelgen.WorldGenSettings;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.WorldData;
 
-import org.betterx.bclib.api.LifeCycleAPI;
-import org.betterx.bclib.api.biomes.BiomeAPI;
-import org.betterx.bclib.api.dataexchange.DataExchangeAPI;
-import org.betterx.bclib.api.datafixer.DataFixerAPI;
+import org.betterx.bclib.api.v2.LifeCycleAPI;
+import org.betterx.bclib.api.v2.dataexchange.DataExchangeAPI;
+import org.betterx.bclib.api.v2.datafixer.DataFixerAPI;
+import org.betterx.bclib.api.v2.levelgen.biomes.InternalBiomeAPI;
 import org.betterx.bclib.config.Configs;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -34,7 +34,7 @@ public abstract class WorldOpenFlowsMixin {
     @Inject(method = "loadLevel", cancellable = true, at = @At("HEAD"))
     private void bcl_callFixerOnLoad(Screen screen, String levelID, CallbackInfo ci) {
         DataExchangeAPI.prepareServerside();
-        BiomeAPI.prepareNewLevel();
+        InternalBiomeAPI.prepareNewLevel();
 
         if (DataFixerAPI.fixData(this.levelSource, levelID, true, (appliedFixes) -> {
             LifeCycleAPI._runBeforeLevelLoad();

@@ -5,7 +5,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 
 import org.betterx.bclib.BCLib;
-import org.betterx.bclib.api.tag.CommonItemTags;
+import org.betterx.bclib.api.v2.tag.CommonItemTags;
 import org.betterx.bclib.config.Configs;
 
 public class CraftingRecipes {

@@ -7,7 +7,7 @@ import com.google.common.reflect.TypeToken;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import org.betterx.bclib.api.dataexchange.handler.autosync.FileContentWrapper;
+import org.betterx.bclib.api.v2.dataexchange.handler.autosync.FileContentWrapper;
 import org.betterx.bclib.util.JsonFactory;
 import org.betterx.bclib.util.Pair;
 

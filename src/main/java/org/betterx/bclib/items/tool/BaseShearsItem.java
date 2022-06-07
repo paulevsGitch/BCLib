@@ -8,8 +8,8 @@ import net.minecraft.world.item.ShearsItem;
 
 import net.fabricmc.fabric.api.mininglevel.v1.FabricMineableTags;
 
-import org.betterx.bclib.api.tag.CommonItemTags;
-import org.betterx.bclib.api.tag.TagAPI;
+import org.betterx.bclib.api.v2.tag.CommonItemTags;
+import org.betterx.bclib.api.v2.tag.TagAPI;
 
 public class BaseShearsItem extends ShearsItem {
     public BaseShearsItem(Properties properties) {

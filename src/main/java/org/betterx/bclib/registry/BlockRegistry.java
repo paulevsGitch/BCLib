@@ -10,7 +10,7 @@ import net.minecraft.world.level.block.Block;
 
 import net.fabricmc.fabric.api.registry.FlammableBlockRegistry;
 
-import org.betterx.bclib.api.tag.*;
+import org.betterx.bclib.api.v2.tag.*;
 import org.betterx.bclib.blocks.BaseLeavesBlock;
 import org.betterx.bclib.blocks.BaseOreBlock;
 import org.betterx.bclib.blocks.FeatureSaplingBlock;

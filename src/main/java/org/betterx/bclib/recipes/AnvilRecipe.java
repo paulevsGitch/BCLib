@@ -27,7 +27,7 @@ import net.fabricmc.api.Environment;
 import com.google.gson.JsonObject;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import org.betterx.bclib.BCLib;
-import org.betterx.bclib.api.tag.CommonItemTags;
+import org.betterx.bclib.api.v2.tag.CommonItemTags;
 import org.betterx.bclib.config.PathConfig;
 import org.betterx.bclib.interfaces.UnknownReceipBookCategory;
 import org.betterx.bclib.util.ItemUtil;

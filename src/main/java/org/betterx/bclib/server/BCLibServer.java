@@ -2,9 +2,9 @@ package org.betterx.bclib.server;
 
 import net.fabricmc.api.DedicatedServerModInitializer;
 
-import org.betterx.bclib.api.ModIntegrationAPI;
-import org.betterx.bclib.api.PostInitAPI;
-import org.betterx.bclib.api.dataexchange.DataExchangeAPI;
+import org.betterx.bclib.api.v2.ModIntegrationAPI;
+import org.betterx.bclib.api.v2.PostInitAPI;
+import org.betterx.bclib.api.v2.dataexchange.DataExchangeAPI;
 
 public class BCLibServer implements DedicatedServerModInitializer {
     @Override

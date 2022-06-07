@@ -7,7 +7,7 @@ import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 
 import org.betterx.bclib.BCLib;
-import org.betterx.bclib.api.ModIntegrationAPI;
+import org.betterx.bclib.api.v2.ModIntegrationAPI;
 import org.betterx.bclib.client.render.EmissiveTextureInfo;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
