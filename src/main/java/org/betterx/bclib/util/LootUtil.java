@@ -7,10 +7,17 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.BuiltInLootTables;
 import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
+import net.minecraft.world.level.storage.loot.entries.LootPoolEntryContainer;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 
+import org.betterx.bclib.BCLib;
+import org.betterx.bclib.interfaces.LootPoolAccessor;
+
+import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,5 +37,37 @@ public class LootUtil {
 
         if (table == LootTable.EMPTY) return Optional.empty();
         return Optional.of(table.getRandomItems(ctx));
+    }
+
+    public static boolean addToPool(LootTable.Builder table, int index, ArrayList<LootPoolEntryContainer> newEntries) {
+        List<LootPool> pools = new ArrayList<>(0);
+        try {
+            for (Field f : table.getClass()
+                                .getDeclaredFields()) {
+                if (List.class.isAssignableFrom(f.getType())) {
+                    f.setAccessible(true);
+                    List<?> list = (List<?>) f.get(table);
+                    if (list != null && list.size() > 0) {
+                        Object first = list.get(0);
+                        if (first != null && LootPool.class.isAssignableFrom(first.getClass())) {
+                            pools = (List<LootPool>) list;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (pools != null && pools.size() > index) {
+                LootPool pool = pools.get(index);
+                LootPoolAccessor acc = (LootPoolAccessor) pool;
+                pools.set(index, acc.bcl_mergeEntries(newEntries));
+
+                return true;
+            }
+        } catch (Throwable t) {
+            BCLib.LOGGER.error("ERROR building loot table: " + t.getMessage());
+        }
+
+        return false;
     }
 }

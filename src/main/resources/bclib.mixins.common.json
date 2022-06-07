@@ -20,6 +20,7 @@
     "EnchantingTableBlockMixin",
     "ItemStackMixin",
     "LayerLightSectionStorageMixin",
+    "LootPoolMixin",
     "MainMixin",
     "MinecraftServerMixin",
     "MobSpawnSettingsAccessor",
