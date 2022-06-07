@@ -17,6 +17,7 @@ import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
 import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
 import net.minecraft.world.level.levelgen.feature.configurations.RandomFeatureConfiguration;
+import net.minecraft.world.level.levelgen.feature.configurations.RandomPatchConfiguration;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraft.world.level.levelgen.placement.PlacementModifier;
 
@@ -62,6 +63,7 @@ public class BCLFeature<F extends Feature<FC>, FC extends FeatureConfiguration> 
     private final Decoration featureStep;
     private final F feature;
     private final FC configuration;
+    public final ResourceLocation id;
 
 
     public BCLFeature(ResourceLocation id,
@@ -81,6 +83,7 @@ public class BCLFeature<F extends Feature<FC>, FC extends FeatureConfiguration> 
         this.featureStep = featureStep;
         this.feature = feature;
         this.configuration = configuration;
+        this.id = id;
 
         if (!BuiltinRegistries.PLACED_FEATURE.containsKey(id)) {
             Registry.register(BuiltinRegistries.PLACED_FEATURE, id, placedFeature.value());
@@ -161,22 +164,47 @@ public class BCLFeature<F extends Feature<FC>, FC extends FeatureConfiguration> 
     }
 
     public boolean place(ServerLevel level, BlockPos pos, RandomSource random) {
-        return place(this.getFeature(), level, pos, random);
+        return place(this.getFeature(), this.getConfiguration(), level, pos, random);
     }
 
-    public static boolean place(Feature<?> feature, ServerLevel level, BlockPos pos, RandomSource random) {
-        if (feature instanceof UserGrowableFeature growable) {
-            return growable.grow(level, pos, random);
+    private static boolean placeUnbound(Feature<?> feature,
+                                        FeatureConfiguration config,
+                                        ServerLevel level,
+                                        BlockPos pos,
+                                        RandomSource random) {
+        if (config instanceof RandomPatchConfiguration rnd) {
+            var configured = rnd.feature().value().feature().value();
+            feature = configured.feature();
+            config = configured.config();
         }
-        
+
+        if (feature instanceof UserGrowableFeature growable) {
+            return growable.grow(level, pos, random, config);
+        }
+
         FeaturePlaceContext context = new FeaturePlaceContext(
                 Optional.empty(),
                 level,
                 level.getChunkSource().getGenerator(),
                 random,
                 pos,
-                null
+                config
         );
         return feature.place(context);
+    }
+
+    public static boolean place(Feature<NoneFeatureConfiguration> feature,
+                                ServerLevel level,
+                                BlockPos pos,
+                                RandomSource random) {
+        return placeUnbound(feature, FeatureConfiguration.NONE, level, pos, random);
+    }
+
+    public static <FC extends FeatureConfiguration> boolean place(Feature<FC> feature,
+                                                                  FC config,
+                                                                  ServerLevel level,
+                                                                  BlockPos pos,
+                                                                  RandomSource random) {
+        return placeUnbound(feature, config, level, pos, random);
     }
 }

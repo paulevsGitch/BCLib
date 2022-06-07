@@ -2,73 +2,22 @@ package org.betterx.bclib.api.v2.levelgen.features;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.Holder;
-import net.minecraft.core.HolderSet;
-import net.minecraft.data.worldgen.placement.PlacementUtils;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
-import net.minecraft.util.valueproviders.ClampedNormalInt;
-import net.minecraft.util.valueproviders.ConstantInt;
-import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.levelgen.GenerationStep;
-import net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
-import net.minecraft.world.level.levelgen.feature.configurations.SimpleRandomFeatureConfiguration;
-import net.minecraft.world.level.levelgen.placement.*;
 
 import com.mojang.serialization.Codec;
 import org.betterx.bclib.api.v2.levelgen.features.config.ScatterFeatureConfig;
-import org.betterx.bclib.api.v2.tag.CommonBlockTags;
 import org.betterx.bclib.util.BlocksHelper;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 public class ScatterFeature<FC extends ScatterFeatureConfig>
-        extends Feature<FC> {
-
-    public static <T extends ScatterFeatureConfig> BCLFeature createAndRegister(ResourceLocation location,
-                                                                                int minPerChunk,
-                                                                                int maxPerChunk,
-                                                                                T cfg,
-                                                                                Feature<T> inlineFeature) {
-        List<Holder<PlacedFeature>> set = new ArrayList<>(2);
-        if (cfg.floorChance > 0) set.add(PlacementUtils.inlinePlaced(inlineFeature,
-                cfg,
-                EnvironmentScanPlacement.scanningFor(Direction.DOWN,
-                        BlockPredicate.matchesTag(CommonBlockTags.TERRAIN),
-                        BlockPredicate.ONLY_IN_AIR_PREDICATE,
-                        12),
-                RandomOffsetPlacement.vertical(ConstantInt.of(1))));
-
-        if (cfg.floorChance < 1) {
-            set.add(PlacementUtils.inlinePlaced(inlineFeature,
-                    cfg,
-                    EnvironmentScanPlacement.scanningFor(Direction.UP,
-                            BlockPredicate.matchesTag(CommonBlockTags.TERRAIN),
-                            BlockPredicate.ONLY_IN_AIR_PREDICATE,
-                            12),
-                    RandomOffsetPlacement.vertical(ConstantInt.of(-1))));
-        }
-        SimpleRandomFeatureConfiguration configuration = new SimpleRandomFeatureConfiguration(HolderSet.direct(set));
-
-        return BCLFeatureBuilder.start(location, SIMPLE_RANDOM_SELECTOR)
-                                .decoration(GenerationStep.Decoration.VEGETAL_DECORATION)
-                                .modifier(CountPlacement.of(UniformInt.of(minPerChunk, maxPerChunk)))
-                                .modifier(InSquarePlacement.spread())
-                                .randomHeight4FromFloorCeil()
-                                .modifier(CountPlacement.of(UniformInt.of(2, 5)))
-                                .modifier(RandomOffsetPlacement.of(
-                                        ClampedNormalInt.of(0.0f, 2.0f, -6, 6),
-                                        ClampedNormalInt.of(0.0f, 0.6f, -2, 2)))
-                                .onlyInBiome()
-                                .buildAndRegister(configuration);
-    }
+        extends Feature<FC> implements UserGrowableFeature<FC> {
 
     public ScatterFeature(Codec<FC> configCodec) {
         super(configCodec);
@@ -104,7 +53,8 @@ public class ScatterFeature<FC extends ScatterFeatureConfig>
         if (config.isValidBase(level.getBlockState(basePos))) {
             final Direction surfaceDirection = direction.getOpposite();
             BlockPos.MutableBlockPos POS = new BlockPos.MutableBlockPos();
-            buildPillarWithBase(level, origin, basePos, direction, centerHeight, config, random);
+            int adaptedHeight = freeHeight(level, direction, centerHeight, config, origin);
+            buildPillarWithBase(level, origin, basePos, direction, adaptedHeight, config, random, false);
 
             final double distNormalizer = (config.maxSpread * Math.sqrt(2));
             final int tryCount = config.spreadCount.sample(random);
@@ -114,7 +64,11 @@ public class ScatterFeature<FC extends ScatterFeatureConfig>
                 POS.set(x, basePos.getY(), z);
 
                 if (BlocksHelper.findSurroundingSurface(level, POS, surfaceDirection, 4, config::isValidBase)) {
-                    int myHeight = freeHeight(level, direction, centerHeight, config, POS);
+                    int myHeight = freeHeight(level,
+                            direction,
+                            centerHeight,
+                            config,
+                            POS);
 
                     int dx = x - POS.getX();
                     int dz = z - POS.getZ();
@@ -135,7 +89,7 @@ public class ScatterFeature<FC extends ScatterFeatureConfig>
                             direction,
                             myHeight,
                             config,
-                            random);
+                            random, false);
                 }
             }
         }
@@ -143,9 +97,9 @@ public class ScatterFeature<FC extends ScatterFeatureConfig>
 
     private int freeHeight(LevelAccessor level,
                            Direction direction,
-                           int centerHeight,
+                           int defaultHeight,
                            ScatterFeatureConfig config,
-                           BlockPos.MutableBlockPos POS) {
+                           BlockPos POS) {
         int myHeight;
         if (config.growWhileFree) {
             myHeight = BlocksHelper.blockCount(level,
@@ -155,9 +109,9 @@ public class ScatterFeature<FC extends ScatterFeatureConfig>
                     BlocksHelper::isFree
             );
         } else {
-            myHeight = centerHeight;
+            myHeight = defaultHeight;
         }
-        return myHeight;
+        return Math.max(config.minHeight, myHeight);
     }
 
     private void buildPillarWithBase(LevelAccessor level,
@@ -166,8 +120,9 @@ public class ScatterFeature<FC extends ScatterFeatureConfig>
                                      Direction direction,
                                      int height,
                                      ScatterFeatureConfig config,
-                                     RandomSource random) {
-        if (BlocksHelper.isFreeSpace(level, origin, direction, height, BlocksHelper::isFree)) {
+                                     RandomSource random,
+                                     boolean force) {
+        if (force || BlocksHelper.isFreeSpace(level, origin, direction, height, BlocksHelper::isFree)) {
             createPatchOfBaseBlocks(level, random, basePos, config);
             BlockState bottom = config.bottomBlock.getState(random, origin);
             if (bottom.canSurvive(level, origin)) {
@@ -185,11 +140,7 @@ public class ScatterFeature<FC extends ScatterFeatureConfig>
 
         final BlockPos.MutableBlockPos POS = origin.mutable();
         for (int size = 0; size < height; size++) {
-            BlockState previous = level.getBlockState(POS);
             BlockState state = config.createBlock(size, height - 1, random, POS);
-            if (!BlocksHelper.isFree(previous)) {
-                System.out.println("Replaced " + previous + " with " + state + " at " + POS);
-            }
             BlocksHelper.setWithoutUpdate(level, POS, state);
             POS.move(direction);
         }
@@ -246,4 +197,29 @@ public class ScatterFeature<FC extends ScatterFeatureConfig>
             levelAccessor.setBlock(blockPos, baseState, 2);
         }
     }
+
+    @Override
+    public boolean grow(ServerLevelAccessor level,
+                        BlockPos origin,
+                        RandomSource random,
+                        FC config) {
+        Optional<Direction> oDirection = getTipDirection(level, origin, random, config);
+        if (oDirection.isEmpty()) {
+            return false;
+        }
+        Direction direction = oDirection.get();
+        BlockPos basePos = origin.relative(direction, -1);
+
+        if (config.isValidBase(level.getBlockState(basePos))) {
+            int centerHeight = (int) (random.nextFloat() * (1 + config.maxHeight - config.minHeight) + config.minHeight);
+            centerHeight = freeHeight(level,
+                    direction,
+                    centerHeight,
+                    config,
+                    origin.relative(direction, 1)) + 1;
+            buildPillarWithBase(level, origin, basePos, direction, centerHeight, config, random, true);
+        }
+        return false;
+    }
+
 }

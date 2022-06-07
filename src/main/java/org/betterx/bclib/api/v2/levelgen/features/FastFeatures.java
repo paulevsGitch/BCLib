@@ -20,10 +20,11 @@ import org.betterx.bclib.api.v2.levelgen.features.config.ScatterFeatureConfig;
 public class FastFeatures {
 
 
-    public static BCLFeature vine(ResourceLocation location,
-                                  boolean onFloor,
-                                  boolean sparse,
-                                  ScatterFeatureConfig.Builder builder) {
+    public static BCLFeature<ScatterFeature<ScatterFeatureConfig.OnSolid>, ScatterFeatureConfig.OnSolid> vine(
+            ResourceLocation location,
+            boolean onFloor,
+            boolean sparse,
+            ScatterFeatureConfig.Builder builder) {
         return scatter(location, onFloor, sparse, builder, BCLFeature.SCATTER_ON_SOLID);
     }
 
@@ -146,7 +147,7 @@ public class FastFeatures {
     }
 
 
-    public static <FC extends FeatureConfiguration> BCLFeature
+    public static <FC extends FeatureConfiguration> BCLFeature<Feature<FC>, FC>
     simple(ResourceLocation location,
            int searchDist,
            boolean rare,

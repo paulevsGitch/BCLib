@@ -16,7 +16,6 @@ import net.minecraft.world.level.block.SaplingBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.phys.shapes.CollisionContext;
@@ -42,9 +41,9 @@ import org.jetbrains.annotations.Nullable;
 
 public class FeatureSaplingBlock extends SaplingBlock implements RenderLayerProvider, BlockModelProvider {
     private static final VoxelShape SHAPE = Block.box(4, 0, 4, 12, 14, 12);
-    private final Function<BlockState, Feature<?>> feature;
+    private final Function<BlockState, BCLFeature> feature;
 
-    public FeatureSaplingBlock(Function<BlockState, Feature<?>> featureSupplier) {
+    public FeatureSaplingBlock(Function<BlockState, BCLFeature> featureSupplier) {
         this(FabricBlockSettings.of(Material.PLANT)
                                 .collidable(false)
                                 .instabreak()
@@ -54,7 +53,7 @@ public class FeatureSaplingBlock extends SaplingBlock implements RenderLayerProv
         );
     }
 
-    public FeatureSaplingBlock(int light, Function<BlockState, Feature<?>> featureSupplier) {
+    public FeatureSaplingBlock(int light, Function<BlockState, BCLFeature> featureSupplier) {
         this(FabricBlockSettings.of(Material.PLANT)
                                 .collidable(false)
                                 .luminance(light)
@@ -65,12 +64,13 @@ public class FeatureSaplingBlock extends SaplingBlock implements RenderLayerProv
         );
     }
 
-    public FeatureSaplingBlock(BlockBehaviour.Properties properties, Function<BlockState, Feature<?>> featureSupplier) {
+    public FeatureSaplingBlock(BlockBehaviour.Properties properties,
+                               Function<BlockState, BCLFeature> featureSupplier) {
         super(null, properties);
         this.feature = featureSupplier;
     }
 
-    protected Feature<?> getFeature(BlockState state) {
+    protected BCLFeature getFeature(BlockState state) {
         return feature.apply(state);
     }
 
@@ -97,7 +97,7 @@ public class FeatureSaplingBlock extends SaplingBlock implements RenderLayerProv
 
     @Override
     public void advanceTree(ServerLevel world, BlockPos pos, BlockState blockState, RandomSource random) {
-        BCLFeature.place(getFeature(blockState), world, pos, random);
+        getFeature(blockState).place(world, pos, random);
     }
 
     @Override

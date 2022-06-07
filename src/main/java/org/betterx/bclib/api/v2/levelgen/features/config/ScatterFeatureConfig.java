@@ -223,6 +223,17 @@ public abstract class ScatterFeatureConfig implements FeatureConfiguration {
             return this;
         }
 
+        public Builder<T> tripleShapeCeil(Block s) {
+            return tripleShapeCeil(s.defaultBlockState());
+        }
+
+        public Builder<T> tripleShapeCeil(BlockState s) {
+            block(s.setValue(BlockProperties.TRIPLE_SHAPE, BlockProperties.TripleShape.MIDDLE));
+            tipBlock(s.setValue(BlockProperties.TRIPLE_SHAPE, BlockProperties.TripleShape.BOTTOM));
+            bottomBlock(s.setValue(BlockProperties.TRIPLE_SHAPE, BlockProperties.TripleShape.TOP));
+            return this;
+        }
+
         public Builder<T> block(BlockStateProvider s) {
             this.clusterBlock = s;
             if (tipBlock == null) tipBlock = s;
@@ -296,6 +307,11 @@ public abstract class ScatterFeatureConfig implements FeatureConfiguration {
             this.chanceOfSpreadRadius3 = chanceOfSpreadRadius3;
             return this;
         }
+
+        public Builder<T> noSpread() {
+            return spread(0, 0, ConstantInt.of(0));
+        }
+
 
         public Builder<T> spread(float maxSpread, float sizeVariation) {
             return spread(maxSpread, sizeVariation, ConstantInt.of((int) Math.min(16, 4 * maxSpread * maxSpread)));

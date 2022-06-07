@@ -332,6 +332,10 @@ public class BlocksHelper {
         return state.isAir();
     }
 
+    public static boolean isFreeOrReplaceable(BlockState state) {
+        return state.isAir() || state.getMaterial().isReplaceable();
+    }
+
     public static boolean isFreeOrFluid(BlockState state) {
         return state.isAir() || isFluid(state);
     }
