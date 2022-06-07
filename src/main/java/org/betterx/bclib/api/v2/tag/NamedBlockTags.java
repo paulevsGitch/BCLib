@@ -39,7 +39,7 @@ public class NamedBlockTags {
     public static final TagKey<Block> STONE_BRICKS = BlockTags.STONE_BRICKS;
 
     static {
-        TagAPI.BLOCKS.add(BlockTags.NETHER_CARVER_REPLACEABLES, Blocks.RED_SAND, Blocks.MAGMA_BLOCK);
+        TagAPI.BLOCKS.add(BlockTags.NETHER_CARVER_REPLACEABLES, Blocks.RED_SAND, Blocks.MAGMA_BLOCK, Blocks.SCULK);
         TagAPI.BLOCKS.addOtherTags(BlockTags.NETHER_CARVER_REPLACEABLES,
                 CommonBlockTags.NETHER_STONES,
                 CommonBlockTags.NETHERRACK);

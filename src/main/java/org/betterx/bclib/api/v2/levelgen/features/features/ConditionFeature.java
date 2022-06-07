@@ -1,4 +1,4 @@
-package org.betterx.bclib.api.v2.levelgen.features;
+package org.betterx.bclib.api.v2.levelgen.features.features;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;

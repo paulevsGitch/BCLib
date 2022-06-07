@@ -1,4 +1,4 @@
-package org.betterx.bclib.api.v2.levelgen.features;
+package org.betterx.bclib.api.v2.levelgen.features.features;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.WorldGenLevel;
@@ -10,6 +10,7 @@ import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConf
 
 import org.betterx.bclib.util.BlocksHelper;
 
+@Deprecated(forRemoval = true)
 public abstract class DefaultFeature extends Feature<NoneFeatureConfiguration> {
     protected static final BlockState AIR = Blocks.AIR.defaultBlockState();
     protected static final BlockState WATER = Blocks.WATER.defaultBlockState();

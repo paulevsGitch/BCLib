@@ -39,7 +39,7 @@ public class BCLWorldPresets {
                             overworldStem,
                             netherContext,
                             endContext),
-            true);
+            false);
 
     /**
      * Registers a custom WorldPreset (with custom rules and behaviour)

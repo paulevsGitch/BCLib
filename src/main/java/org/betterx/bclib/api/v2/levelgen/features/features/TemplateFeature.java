@@ -1,4 +1,4 @@
-package org.betterx.bclib.api.v2.levelgen.features;
+package org.betterx.bclib.api.v2.levelgen.features.features;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
@@ -7,6 +7,8 @@ import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
 
 import com.mojang.serialization.Codec;
+import org.betterx.bclib.api.v2.levelgen.features.BCLFeature;
+import org.betterx.bclib.api.v2.levelgen.features.BCLFeatureBuilder;
 import org.betterx.bclib.api.v2.levelgen.features.config.TemplateFeatureConfig;
 import org.betterx.bclib.api.v2.levelgen.structures.StructureNBT;
 import org.betterx.bclib.api.v2.levelgen.structures.StructureWorldNBT;

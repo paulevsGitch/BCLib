@@ -1,14 +1,9 @@
 package org.betterx.bclib;
 
-import net.minecraft.core.Registry;
-import net.minecraft.data.BuiltinRegistries;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.biome.*;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.impl.biome.NetherBiomeData;
 import net.fabricmc.loader.api.FabricLoader;
 
 import org.betterx.bclib.api.v2.WorldDataAPI;
@@ -19,6 +14,7 @@ import org.betterx.bclib.api.v2.generator.BCLibNetherBiomeSource;
 import org.betterx.bclib.api.v2.generator.GeneratorOptions;
 import org.betterx.bclib.api.v2.levelgen.features.blockpredicates.Types;
 import org.betterx.bclib.api.v2.levelgen.features.placement.PlacementModifiers;
+import org.betterx.bclib.api.v2.levelgen.structures.TemplatePiece;
 import org.betterx.bclib.api.v2.levelgen.surface.rules.Conditions;
 import org.betterx.bclib.api.v2.tag.TagAPI;
 import org.betterx.bclib.commands.CommandRegistry;
@@ -29,7 +25,6 @@ import org.betterx.bclib.recipes.CraftingRecipes;
 import org.betterx.bclib.registry.BaseBlockEntities;
 import org.betterx.bclib.registry.BaseRegistry;
 import org.betterx.bclib.util.Logger;
-import org.betterx.bclib.api.v2.levelgen.structures.TemplatePiece;
 
 import java.util.List;
 
@@ -69,7 +64,7 @@ public class BCLib implements ModInitializer {
         TemplatePiece.ensureStaticInitialization();
         PlacementModifiers.ensureStaticInitialization();
         Configs.save();
-        if (isDevEnvironment()) {
+        /*if (isDevEnvironment()) {
             Biome.BiomeBuilder builder = new Biome.BiomeBuilder()
                     .precipitation(Biome.Precipitation.NONE)
                     .temperature(1.0f)
@@ -87,7 +82,7 @@ public class BCLib implements ModInitializer {
             biome = Registry.register(BuiltinRegistries.BIOME, loc, biome);
             ResourceKey<Biome> key = BuiltinRegistries.BIOME.getResourceKey(biome).orElseThrow();
             NetherBiomeData.addNetherBiome(key, Climate.parameters(-1, 1, 0, 0, 0, 0, 0));
-        }
+        }*/
     }
 
     public static boolean isDevEnvironment() {

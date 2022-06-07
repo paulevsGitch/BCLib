@@ -16,6 +16,7 @@ import net.minecraft.world.level.levelgen.feature.stateproviders.RandomizedIntSt
 
 import org.betterx.bclib.api.v2.levelgen.features.config.PlaceFacingBlockConfig;
 import org.betterx.bclib.api.v2.levelgen.features.config.ScatterFeatureConfig;
+import org.betterx.bclib.api.v2.levelgen.features.features.ScatterFeature;
 
 public class FastFeatures {
 

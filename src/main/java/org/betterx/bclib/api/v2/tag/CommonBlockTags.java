@@ -54,7 +54,8 @@ public class CommonBlockTags {
                 Blocks.SAND,
                 Blocks.RED_SAND,
                 Blocks.GLOWSTONE,
-                Blocks.BONE_BLOCK
+                Blocks.BONE_BLOCK,
+                Blocks.SCULK
         );
 
         TagAPI.BLOCKS.addOtherTags(TERRAIN,

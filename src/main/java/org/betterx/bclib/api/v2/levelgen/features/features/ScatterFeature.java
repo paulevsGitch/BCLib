@@ -1,4 +1,4 @@
-package org.betterx.bclib.api.v2.levelgen.features;
+package org.betterx.bclib.api.v2.levelgen.features.features;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -11,6 +11,7 @@ import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
 
 import com.mojang.serialization.Codec;
+import org.betterx.bclib.api.v2.levelgen.features.UserGrowableFeature;
 import org.betterx.bclib.api.v2.levelgen.features.config.ScatterFeatureConfig;
 import org.betterx.bclib.util.BlocksHelper;
 

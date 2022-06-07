@@ -23,6 +23,7 @@ import net.minecraft.world.level.levelgen.placement.PlacementModifier;
 
 import org.betterx.bclib.BCLib;
 import org.betterx.bclib.api.v2.levelgen.features.config.*;
+import org.betterx.bclib.api.v2.levelgen.features.features.*;
 
 import java.util.Map.Entry;
 import java.util.Optional;

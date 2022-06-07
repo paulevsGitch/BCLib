@@ -1,4 +1,4 @@
-package org.betterx.bclib.api.v2.levelgen.features;
+package org.betterx.bclib.api.v2.levelgen.features.features;
 
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
