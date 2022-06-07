@@ -145,6 +145,7 @@ public class FastFeatures {
                 )));
     }
 
+
     public static <FC extends FeatureConfiguration> BCLFeature
     simple(ResourceLocation location,
            int searchDist,
@@ -166,6 +167,7 @@ public class FastFeatures {
         return patch(location, 96, 7, 3, feature, FeatureConfiguration.NONE);
     }
 
+
     public static BCLFeature
     patch(ResourceLocation location,
           int attempts,
@@ -174,6 +176,7 @@ public class FastFeatures {
           Feature<NoneFeatureConfiguration> feature) {
         return patch(location, attempts, xzSpread, ySpread, feature, FeatureConfiguration.NONE);
     }
+
 
     public static <FC extends FeatureConfiguration> BCLFeature
     patch(ResourceLocation location,
@@ -209,4 +212,6 @@ public class FastFeatures {
                 .start(patchLocation, Feature.RANDOM_PATCH)
                 .buildAndRegister(new RandomPatchConfiguration(attempts, xzSpread, ySpread, single.getPlacedFeature()));
     }
+
+
 }

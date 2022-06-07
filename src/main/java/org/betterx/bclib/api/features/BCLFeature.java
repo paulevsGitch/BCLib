@@ -30,6 +30,14 @@ public class BCLFeature<F extends Feature<FC>, FC extends FeatureConfiguration> 
             BCLib.makeID("scatter_on_solid"),
             new ScatterFeature<>(ScatterFeatureConfig.OnSolid.CODEC));
 
+    public static final Feature<ScatterFeatureConfig.ExtendTop> SCATTER_EXTEND_TOP = register(
+            BCLib.makeID("scatter_extend_top"),
+            new ScatterFeature<>(ScatterFeatureConfig.ExtendTop.CODEC));
+
+    public static final Feature<ScatterFeatureConfig.ExtendBottom> SCATTER_EXTEND_BOTTOM = register(
+            BCLib.makeID("scatter_extend_bottom"),
+            new ScatterFeature<>(ScatterFeatureConfig.ExtendBottom.CODEC));
+
     public static final Feature<RandomFeatureConfiguration> RANDOM_SELECTOR = register(
             BCLib.makeID("random_select"),
             new WeightedRandomSelectorFeature());

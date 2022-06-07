@@ -245,6 +245,10 @@ public class BCLFeatureBuilder<FC extends FeatureConfiguration, F extends Featur
         return modifier(OnEveryLayer.simple());
     }
 
+    public BCLFeatureBuilder underEveryLayer() {
+        return modifier(UnderEveryLayer.simple());
+    }
+
     public BCLFeatureBuilder spreadHorizontal(IntProvider p) {
         return modifier(RandomOffsetPlacement.horizontal(p));
     }
@@ -298,6 +302,10 @@ public class BCLFeatureBuilder<FC extends FeatureConfiguration, F extends Featur
 
     public BCLFeatureBuilder isAbove(BlockPredicate... predicates) {
         return modifier(new Is(BlockPredicate.anyOf(predicates), Optional.of(Direction.DOWN.getNormal())));
+    }
+
+    public BCLFeatureBuilder isUnder(BlockPredicate... predicates) {
+        return modifier(new Is(BlockPredicate.anyOf(predicates), Optional.of(Direction.UP.getNormal())));
     }
 
     public BCLFeatureBuilder findSolidCeil(int distance) {

@@ -344,24 +344,28 @@ public abstract class ScatterFeatureConfig implements FeatureConfiguration {
         }
     }
 
+    public static Builder<OnSolid> startOnSolid() {
+        return Builder.start(OnSolid::new);
+    }
+
     public static class OnSolid extends ScatterFeatureConfig {
         public static final Codec<OnSolid> CODEC = buildCodec(OnSolid::new);
 
-        public OnSolid(BlockStateProvider clusterBlock,
-                       Optional<BlockStateProvider> tipBlock,
-                       Optional<BlockStateProvider> bottomBlock,
-                       Optional<BlockState> baseState,
-                       float baseReplaceChance,
-                       float chanceOfDirectionalSpread,
-                       float chanceOfSpreadRadius2,
-                       float chanceOfSpreadRadius3,
-                       int minHeight,
-                       int maxHeight,
-                       float maxSpread,
-                       float sizeVariation,
-                       float floorChance,
-                       boolean growWhileFree,
-                       IntProvider spreadCount) {
+        protected OnSolid(BlockStateProvider clusterBlock,
+                          Optional<BlockStateProvider> tipBlock,
+                          Optional<BlockStateProvider> bottomBlock,
+                          Optional<BlockState> baseState,
+                          float baseReplaceChance,
+                          float chanceOfDirectionalSpread,
+                          float chanceOfSpreadRadius2,
+                          float chanceOfSpreadRadius3,
+                          int minHeight,
+                          int maxHeight,
+                          float maxSpread,
+                          float sizeVariation,
+                          float floorChance,
+                          boolean growWhileFree,
+                          IntProvider spreadCount) {
             super(clusterBlock,
                     tipBlock,
                     bottomBlock,
@@ -380,11 +384,6 @@ public abstract class ScatterFeatureConfig implements FeatureConfiguration {
         }
 
 
-        public static Builder<OnSolid> startOnSolid() {
-            return Builder.start(OnSolid::new);
-        }
-
-
         @Override
         public boolean isValidBase(BlockState state) {
             return BlocksHelper.isTerrain(state)
@@ -397,6 +396,115 @@ public abstract class ScatterFeatureConfig implements FeatureConfiguration {
             return height == maxHeight
                     ? this.tipBlock.getState(random, pos)
                     : this.clusterBlock.getState(random, pos);
+        }
+    }
+
+
+    public static Builder<ExtendTop> startExtendTop() {
+        return Builder.start(ExtendTop::new);
+    }
+
+    public static class ExtendTop extends ScatterFeatureConfig {
+        public static final Codec<ExtendTop> CODEC = buildCodec(ExtendTop::new);
+
+        protected ExtendTop(BlockStateProvider clusterBlock,
+                            Optional<BlockStateProvider> tipBlock,
+                            Optional<BlockStateProvider> bottomBlock,
+                            Optional<BlockState> baseState,
+                            float baseReplaceChance,
+                            float chanceOfDirectionalSpread,
+                            float chanceOfSpreadRadius2,
+                            float chanceOfSpreadRadius3,
+                            int minHeight,
+                            int maxHeight,
+                            float maxSpread,
+                            float sizeVariation,
+                            float floorChance,
+                            boolean growWhileFree,
+                            IntProvider spreadCount) {
+            super(clusterBlock,
+                    tipBlock,
+                    bottomBlock,
+                    baseState,
+                    baseReplaceChance,
+                    chanceOfDirectionalSpread,
+                    chanceOfSpreadRadius2,
+                    chanceOfSpreadRadius3,
+                    minHeight,
+                    maxHeight,
+                    maxSpread,
+                    sizeVariation,
+                    floorChance,
+                    growWhileFree,
+                    spreadCount);
+        }
+
+
+        @Override
+        public boolean isValidBase(BlockState state) {
+            return BlocksHelper.isTerrain(state)
+                    || baseState.map(s -> state.is(s.getBlock())).orElse(false);
+        }
+
+        @Override
+        public BlockState createBlock(int height, int maxHeight, RandomSource random, BlockPos pos) {
+            if (height == 0) return this.bottomBlock.getState(random, pos);
+            if (height == 1) return this.clusterBlock.getState(random, pos);
+            return this.tipBlock.getState(random, pos);
+        }
+    }
+
+    public static Builder<ExtendBottom> startExtendBottom() {
+        return Builder.start(ExtendBottom::new);
+    }
+
+    public static class ExtendBottom extends ScatterFeatureConfig {
+        public static final Codec<ExtendBottom> CODEC = buildCodec(ExtendBottom::new);
+
+        protected ExtendBottom(BlockStateProvider clusterBlock,
+                               Optional<BlockStateProvider> tipBlock,
+                               Optional<BlockStateProvider> bottomBlock,
+                               Optional<BlockState> baseState,
+                               float baseReplaceChance,
+                               float chanceOfDirectionalSpread,
+                               float chanceOfSpreadRadius2,
+                               float chanceOfSpreadRadius3,
+                               int minHeight,
+                               int maxHeight,
+                               float maxSpread,
+                               float sizeVariation,
+                               float floorChance,
+                               boolean growWhileFree,
+                               IntProvider spreadCount) {
+            super(clusterBlock,
+                    tipBlock,
+                    bottomBlock,
+                    baseState,
+                    baseReplaceChance,
+                    chanceOfDirectionalSpread,
+                    chanceOfSpreadRadius2,
+                    chanceOfSpreadRadius3,
+                    minHeight,
+                    maxHeight,
+                    maxSpread,
+                    sizeVariation,
+                    floorChance,
+                    growWhileFree,
+                    spreadCount);
+        }
+
+
+        @Override
+        public boolean isValidBase(BlockState state) {
+            return BlocksHelper.isTerrain(state)
+                    || baseState.map(s -> state.is(s.getBlock())).orElse(false);
+        }
+
+        @Override
+        public BlockState createBlock(int height, int maxHeight, RandomSource random, BlockPos pos) {
+            if (height == maxHeight) return this.tipBlock.getState(random, pos);
+            if (height == maxHeight - 1) return this.clusterBlock.getState(random, pos);
+            return this.bottomBlock.getState(random, pos);
         }
     }
 

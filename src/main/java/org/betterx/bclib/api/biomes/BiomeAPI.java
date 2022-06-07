@@ -747,6 +747,11 @@ public class BiomeAPI {
 
     public static void applyModifications(BiomeSource source, ResourceKey<LevelStem> dimension) {
         BCLib.LOGGER.info("Apply Modifications for " + dimension.location() + " BiomeSource " + source);
+        /*if (dimension.location().equals(LevelStem.NETHER)){
+            if (source instanceof BCLBiomeSource s) {
+                NetherBiomes.useLegacyGeneration = s.biomeSourceVersion==BCLBiomeSource.BIOME_SOURCE_VERSION_SQUARE;
+            }
+        }*/
         final Set<Holder<Biome>> biomes = source.possibleBiomes();
         List<BiConsumer<ResourceLocation, Holder<Biome>>> modifications = MODIFICATIONS.get(dimension);
         for (Holder<Biome> biomeHolder : biomes) {
