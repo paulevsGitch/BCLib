@@ -2,7 +2,6 @@ package org.betterx.bclib.util;
 
 import net.fabricmc.loader.api.*;
 import net.fabricmc.loader.api.metadata.*;
-import net.fabricmc.loader.util.version.SemanticVersionImpl;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -59,8 +58,7 @@ public class ModUtil {
                                         .getAsJsonObject();
             Version ver;
             try {
-                ver = new SemanticVersionImpl(data.get("version")
-                                                  .getAsString(), false);
+                ver = SemanticVersion.parse(data.get("version").getAsString());
             } catch (VersionParsingException e) {
                 BCLib.LOGGER.error("Unable to parse Version in " + sourceFile);
                 return null;
