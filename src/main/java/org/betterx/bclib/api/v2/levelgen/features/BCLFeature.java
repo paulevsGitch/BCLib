@@ -1,5 +1,6 @@
 package org.betterx.bclib.api.v2.levelgen.features;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.data.BuiltinRegistries;
@@ -7,9 +8,12 @@ import net.minecraft.data.worldgen.features.FeatureUtils;
 import net.minecraft.data.worldgen.placement.PlacementUtils;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.levelgen.GenerationStep.Decoration;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.Feature;
+import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
 import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
 import net.minecraft.world.level.levelgen.feature.configurations.RandomFeatureConfiguration;
@@ -154,5 +158,25 @@ public class BCLFeature<F extends Feature<FC>, FC extends FeatureConfiguration> 
 
     public FC getConfiguration() {
         return configuration;
+    }
+
+    public boolean place(ServerLevel level, BlockPos pos, RandomSource random) {
+        return place(this.getFeature(), level, pos, random);
+    }
+
+    public static boolean place(Feature<?> feature, ServerLevel level, BlockPos pos, RandomSource random) {
+        if (feature instanceof UserGrowableFeature growable) {
+            return growable.grow(level, pos, random);
+        }
+        
+        FeaturePlaceContext context = new FeaturePlaceContext(
+                Optional.empty(),
+                level,
+                level.getChunkSource().getGenerator(),
+                random,
+                pos,
+                null
+        );
+        return feature.place(context);
     }
 }

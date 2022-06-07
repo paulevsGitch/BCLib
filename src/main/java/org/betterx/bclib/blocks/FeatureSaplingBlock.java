@@ -17,7 +17,6 @@ import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.feature.Feature;
-import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.phys.shapes.CollisionContext;
@@ -27,6 +26,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 
+import org.betterx.bclib.api.v2.levelgen.features.BCLFeature;
 import org.betterx.bclib.client.models.BasePatterns;
 import org.betterx.bclib.client.models.ModelsHelper;
 import org.betterx.bclib.client.models.PatternsHelper;
@@ -50,8 +50,8 @@ public class FeatureSaplingBlock extends SaplingBlock implements RenderLayerProv
                                 .instabreak()
                                 .sound(SoundType.GRASS)
                                 .randomTicks(),
-             featureSupplier
-            );
+                featureSupplier
+        );
     }
 
     public FeatureSaplingBlock(int light, Function<BlockState, Feature<?>> featureSupplier) {
@@ -61,8 +61,8 @@ public class FeatureSaplingBlock extends SaplingBlock implements RenderLayerProv
                                 .instabreak()
                                 .sound(SoundType.GRASS)
                                 .randomTicks(),
-             featureSupplier
-            );
+                featureSupplier
+        );
     }
 
     public FeatureSaplingBlock(BlockBehaviour.Properties properties, Function<BlockState, Feature<?>> featureSupplier) {
@@ -97,15 +97,7 @@ public class FeatureSaplingBlock extends SaplingBlock implements RenderLayerProv
 
     @Override
     public void advanceTree(ServerLevel world, BlockPos pos, BlockState blockState, RandomSource random) {
-        FeaturePlaceContext context = new FeaturePlaceContext(
-                Optional.empty(),
-                world,
-                world.getChunkSource().getGenerator(),
-                random,
-                pos,
-                null
-        );
-        getFeature(blockState).place(context);
+        BCLFeature.place(getFeature(blockState), world, pos, random);
     }
 
     @Override
