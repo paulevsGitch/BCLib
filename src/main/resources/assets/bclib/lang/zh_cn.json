@@ -51,5 +51,10 @@
 	"message.bclib.datafixer.progress": "将所有修复补丁应用于您的世界",
 	"title.bclib.datafixer.error": "修复世界时的错误",
 	"message.bclib.datafixer.error": "修复世界时出现了错误，请还原备份并修复以下错误，然后重试",
-	"title.bclib.datafixer.error.continue": "继续并标记为已修复"
+	"title.bclib.datafixer.error.continue": "继续并标记为已修复",
+	
+	"title.config.bclib.client.rendering.customFogRendering": "自定义雾渲染",
+	"title.config.bclib.client.rendering.netherThickFog": "下界浓雾",
+
+	"tooltip.bclib.place_on": "在 %s 上生长"
 }
